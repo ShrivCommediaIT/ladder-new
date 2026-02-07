@@ -1,0 +1,61 @@
+
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const LadderLinkPanel = ({ ladderId, ladderType }) => {
+  const [copied, setCopied] = useState(false);
+  const [loginUrl, setLoginUrl] = useState("");
+
+  useEffect(() => {
+    if (!ladderId || !ladderType) return;
+    if (typeof window === "undefined") return;
+
+    // ladder_id + ladder_type both query params
+    const url = `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`;
+
+    setLoginUrl(url);
+  }, [ladderId, ladderType]);
+
+  const handleCopy = () => {
+    if (!loginUrl) return;
+    navigator.clipboard.writeText(loginUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!loginUrl) return null;
+
+  return (
+    <div className="w-full backdrop-blur-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full text-white bg-gradient-to-r from-[#114153] to-blue-800">
+          <div className="flex flex-col sm:flex-row px-2 items-center rounded w-full py-3">
+            <span className="sm:text-sm text-center sm:text-left font-semibold px-2">
+              URL :
+            </span>
+
+            <input
+              type="text"
+              value={loginUrl}
+              readOnly
+              className="text-sm py-2 rounded-md flex-1 font-semibold outline-none"
+            />
+
+            <Button
+              onClick={handleCopy}
+              className="sm:ml-2 text-gray-200 px-4 py-2 border border-gray-100 shadow-md flex items-center gap-1 text-sm font-medium"
+            >
+              {copied ? "Copied!" : "Copy"}
+              <Copy size={14} />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LadderLinkPanel;

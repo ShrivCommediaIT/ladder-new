@@ -1,0 +1,499 @@
+
+
+  "use client";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { ArrowLeft, X, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import { movePlayer, movePlayerBestOf5 } from "@/redux/slices/playerMovingSlice";
+import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { useSearchParams } from "next/navigation";
+import { fetchUserActivity } from "@/redux/slices/activitySlice";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import PlayerBet from "./PlayerBet";
+
+const MoveNumberInput = ({
+  onClose = () => {},
+  currentId = null,
+  currentRank = null,
+  setLoading,
+  selectedPlayer = {},
+  userId: user_id
+}) => {
+  const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const ladder_id = searchParams.get("ladder_id");
+  
+  // States
+  const [selectedNumber, setSelectedNumber] = useState("");
+  const [localLoading, setLocalLoading] = useState(true);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [resultType, setResultType] = useState("");
+  const [score, setScore] = useState("");
+  const [betDescription, setBetDescription] = useState("");
+  const [showSectionAlert, setShowSectionAlert] = useState(false);
+  
+  const numberButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+  
+
+  const players = useSelector((state) => state.player?.players?.[ladder_id]?.data) || [];
+  const ladderDetails = useSelector((state) => state.player?.players?.[ladder_id]?.ladderDetails) || {};
+  const ladderType = ladderDetails?.type;
+ 
+  const challengedPlayer = players.find((p) => p.rank === Number(selectedNumber)) || null;
+
+  const preset = useSelector((state) => state.gradebar?.preset) || 6;
+
+
+  // Loading skeleton
+  useEffect(() => {
+    const timer = setTimeout(() => setLocalLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Event Handlers
+  const handleNumberClick = (num) => {
+    if (selectedNumber.length < 3) {
+      setSelectedNumber((prev) => prev + num);
+    }
+  };
+
+  const handleBackspace = () => setSelectedNumber((prev) => prev.slice(0, -1));
+  const handleCancel = () => onClose();
+
+  const resetForm = () => {
+    setSelectedNumber("");
+    setResultType("");
+    setScore("");
+    setBetDescription("");
+  };
+
+  // ✅ FIXED: Correct payload structure
+  const confirmMove = async () => {
+    console.log("🔥 Starting confirmMove...");
+    
+    if (!user_id || !ladder_id || !currentId) {
+      toast.error("Missing required information.");
+      setShowConfirm(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // ✅ PERFECT Payload for each API
+      let payload;
+      
+      if (ladderType === "best5") {
+        // Best of 5 API payload (NO move_from_user_id)
+        payload = {
+          ladder_id,
+          match_status: resultType,
+          user_id,
+          move_to_rank: Number(selectedNumber),
+          score,
+          move_from_rank: currentRank,
+          bet: betDescription || "",
+        };
+        
+        const result = await dispatch(movePlayerBestOf5(payload)).unwrap();
+        
+      } else {
+        // Normal API payload (WITH move_from_user_id)
+        payload = {
+          user_id,
+          ladder_id,
+          match_status: resultType,
+          move_from_user_id: currentId,
+          move_to_rank: Number(selectedNumber),
+          move_from_rank: currentRank,
+          score,
+        };
+        
+        
+        await dispatch(movePlayer(payload)).unwrap();
+      }
+
+      // Refresh data
+      await Promise.all([
+        dispatch(fetchLeaderboard({ ladder_id })),
+        dispatch(fetchUserActivity({ ladder_id })),
+      ]);
+
+      toast.success("Result posted successfully! ");
+      
+      setShowConfirm(false);
+      resetForm();
+      onClose();
+
+    } catch (err) {
+      console.error("Error Details:", err);
+      toast.error(err?.message || "Result Already Posted" );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+// ==================== new handle enter funtionality changes ==================
+
+const handleEnter = () => {
+  if (!user_id || !ladder_id || !currentId) {
+    toast.error("Missing required information.");
+    return;
+  }
+
+  if (!selectedNumber || isNaN(selectedNumber) || Number(selectedNumber) <= 0) {
+    toast.error("Please enter a valid rank number.");
+    return;
+  }
+
+  if (!resultType) {
+    toast.error("Please select 'Beat' or 'Lost'.");
+    return;
+  }
+
+  if ((ladderType === "best3" || ladderType === "best5") && !score) {
+    toast.error("Please select the match score.");
+    return;
+  }
+
+  if (!challengedPlayer) {
+    toast.error(`Player with rank ${selectedNumber} not found.`);
+    return;
+  }
+
+  const currentPlayer = players.find(
+    (p) => String(p.id) === String(currentId)
+  );
+
+  if (!currentPlayer) {
+    toast.error("Current player not found.");
+    return;
+  }
+
+  // ✅ ✅ REAL SECTION BY RANK (NOT BY FIELD)
+  const currentSectionIndex = Math.floor(
+    (Number(currentPlayer.rank) - 1) / Number(preset)
+  );
+
+  const targetSectionIndex = Math.floor(
+    (Number(challengedPlayer.rank) - 1) / Number(preset)
+  );
+
+  // ❌ BLOCK CROSS-SECTION
+  if (currentSectionIndex !== targetSectionIndex) {
+    setShowSectionAlert(true);
+    return;
+  }
+
+  // ✅ ALLOW SAME SECTION
+  setShowConfirm(true);
+};
+
+
+  // FIXED Score options
+  const scoreOptions = ladderType === "best3" 
+    ? ["2-0", "2-1"] 
+    : ladderType === "best5" 
+      ? ["3-0", "3-1", "3-2"] 
+      : [];
+
+  if (localLoading) {
+    return (
+      <div className="w-full max-w-lg mx-auto p-4 space-y-6">
+        <Skeleton className="h-6 w-3/4 bg-gray-700 rounded-lg" />
+        <Skeleton className="h-10 w-full bg-gray-700 rounded-lg" />
+        <div className="flex gap-4">
+          <Skeleton className="h-8 w-1/2 bg-gray-700 rounded-lg" />
+          <Skeleton className="h-8 w-1/2 bg-gray-700 rounded-lg" />
+        </div>
+        {(ladderType === "best3" || ladderType === "best5") && (
+          <Skeleton className="h-8 w-full bg-gray-700 rounded-lg" />
+        )}
+        <div className="grid grid-cols-3 gap-3">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <Skeleton key={i} className="h-14 w-full bg-gray-700 rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+  <motion.div
+    layout
+    className="
+      w-full
+      max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl
+      mx-auto
+      p-3 sm:p-5 md:p-6
+      text-gray-100
+      rounded-xl
+      max-h-[60vh]
+      overflow-y-auto
+      scrollbar-thin
+      scrollbar-thumb-gray-600
+      scrollbar-track-transparent
+      h-[30vh]
+    "
+  >
+    <h3 className="mb-4 text-xl sm:text-2xl font-bold text-violet-200 text-center">
+      Record Match Result
+    </h3>
+
+    {/* Result Selection */}
+    <div className="mb-4 p-4 bg-gray-900/70 rounded-xl border border-gray-700 shadow-md">
+      <p className="text-sm font-medium mb-4 text-gray-300 text-center">
+        Select the Match Outcome
+      </p>
+
+      <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-center gap-4">
+       
+       <div className="flex items-center justify-between mx-auto gap-8">
+         <div className="flex items-center gap-2">
+          <Checkbox
+            id="beat"
+            checked={resultType === "beat"}
+            onCheckedChange={(val) => setResultType(val ? "beat" : "")}
+            className="border-green-300 data-[state=checked]:bg-green-500"
+          />
+          <label htmlFor="beat" className="text-base font-medium cursor-pointer">
+            Beat
+          </label>
+        </div>
+
+           <div className="flex items-center gap-2">
+          <Checkbox
+            id="lost"
+            checked={resultType === "lost"}
+            onCheckedChange={(val) => setResultType(val ? "lost" : "")}
+            className="border-red-300 data-[state=checked]:bg-red-500"
+          />
+          <label htmlFor="lost" className="text-base font-medium cursor-pointer">
+            Lost
+          </label>
+        </div>
+       </div>
+
+        <PlayerBet betDescription={betDescription} setBetDescription={setBetDescription} />
+      </div>
+    </div>
+
+    {/* Score Selection */}
+    {(ladderType === "best3" || ladderType === "best5") && (
+      <div className="mb-4 p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-md">
+        <p className="text-sm font-medium mb-3 text-gray-300 text-center">
+          Select Final Score ({ladderType === "best3" ? "Best of 3" : "Best of 5"})
+        </p>
+
+        <div className="flex sm:flex justify-center gap-2">
+          {scoreOptions.map((s) => (
+            <div key={s} className="flex items-center gap-2">
+              <Checkbox
+                id={s}
+                checked={score === s}
+                onCheckedChange={(val) => setScore(val ? s : "")}
+                className="border-violet-500 data-[state=checked]:bg-violet-600"
+              />
+              <label htmlFor={s} className="text-base font-medium cursor-pointer">
+                {s}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Rank Input + Numpad */}
+    <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
+      {/* Input */}
+      <div className="w-full md:w-1/2 flex flex-col items-center md:items-start">
+        <p className="text-base font-medium mb-2 text-gray-300">
+          Enter Challenged Rank
+        </p>
+
+        <Input
+          value={selectedNumber}
+          readOnly
+          placeholder="---"
+          className="
+            mb-3
+            text-3xl sm:text-4xl
+            text-center
+            font-mono
+            w-full
+            max-w-[180px]
+            bg-gray-900
+            border-violet-500
+            text-violet-400
+            tracking-widest
+            rounded-xl
+          "
+        />
+
+        {challengedPlayer && (
+          <p className="text-base text-gray-100 mt-1">
+            Player: <span className="font-semibold">{challengedPlayer.name}</span>
+          </p>
+        )}
+      </div>
+
+      {/* Numpad */}
+      <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
+        {numberButtons.map((num) => (
+          <motion.button
+            key={num}
+            onClick={() => handleNumberClick(num)}
+            style={{ touchAction: "manipulation" }}
+            whileTap={{ scale: 0.95 }}
+            className="
+              h-12
+              w-full
+              bg-gray-700
+              text-gray-100
+              hover:bg-violet-600
+              transition-all
+              text-xl
+              font-bold
+              rounded-xl
+              shadow-lg
+              border
+              border-gray-600
+            "
+          >
+            {num}
+          </motion.button>
+        ))}
+      </div>
+    </div>
+
+    {/* Action Buttons */}
+    <div className="flex flex-col sm:flex-row gap-3 mt-6">
+      <Button
+        variant="outline"
+        onClick={handleBackspace}
+        className="w-full sm:w-auto bg-gray-700 text-gray-300"
+      >
+        <ArrowLeft className="w-4 h-4 mr-1" /> Backspace
+      </Button>
+
+      <Button
+        variant="destructive"
+        onClick={handleCancel}
+        className="w-full sm:w-auto"
+      >
+        <X className="w-4 h-4 mr-1" /> Cancel
+      </Button>
+
+      <Button
+        onClick={handleEnter}
+        disabled={
+          !selectedNumber ||
+          !resultType ||
+          ((ladderType === "best3" || ladderType === "best5") && !score)
+        }
+        className="w-full sm:w-auto bg-gradient-to-r from-violet-600 to-purple-600 text-white font-bold"
+      >
+        <CheckCircle className="w-4 h-4 mr-1" /> Post Result
+      </Button>
+    </div>
+
+
+    {/* Confirm Dialog */}
+    <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+      <AlertDialogContent className="bg-gray-900 border-violet-500 text-gray-100 w-[92vw] sm:max-w-md">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-xl font-bold text-violet-400 flex items-center gap-2">
+            <CheckCircle className="text-green-500 h-5 w-5" /> Confirm Result
+          </AlertDialogTitle>
+
+          <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
+            You are confirming the result for rank <b>#{selectedNumber}</b>.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter className="mt-5 flex flex-col sm:flex-row gap-3">
+          <AlertDialogCancel className="w-full text-gray-800 sm:w-auto">
+            Go Back
+          </AlertDialogCancel>
+
+          <AlertDialogAction
+            onClick={confirmMove}
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+          >
+            Confirm & Post
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+
+
+        {/* ❌ DIFFERENT SECTION ALERT */}
+<AlertDialog open={showSectionAlert} onOpenChange={setShowSectionAlert}>
+  <AlertDialogContent className="bg-gray-900 border-red-500 text-gray-100 w-[92vw] sm:max-w-md">
+    <AlertDialogHeader>
+      <AlertDialogTitle className="text-xl font-bold text-red-400">
+        Invalid Match!
+      </AlertDialogTitle>
+
+      <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
+        You can only play with players from the <b>same section</b>.
+        <br />
+        Cross-section matches are <b>not allowed</b>.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+
+    <AlertDialogFooter className="mt-5">
+      <AlertDialogAction
+        onClick={() => setShowSectionAlert(false)}
+        className="bg-red-600 hover:bg-red-700"
+      >
+        OK, Got It
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+  </motion.div>
+);
+
+};
+
+export default MoveNumberInput;
+
+
+
+
+
+
+
+// ============================ 03-12-2025 =======================
+
+
+
+
+
+
+
+
+
+
+
+
+
+

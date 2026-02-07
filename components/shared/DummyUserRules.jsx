@@ -1,0 +1,218 @@
+
+
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogFooter,
+} from "@/components/ui/alert-dialog";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+const APPKEY =
+  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
+const DummyUserRules = ({ ladderId }) => {
+  const [isEditingIndex, setIsEditingIndex] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [rules, setRules] = useState([]);
+  const [tempTitle, setTempTitle] = useState("");
+  const [tempContent, setTempContent] = useState("");
+  const [openRuleIds, setOpenRuleIds] = useState([]); // default: all closed
+
+  const userType = useSelector((state) => state.user?.user?.user_type);
+  const userEmail = useSelector((state) => state.user?.user?.user_id);
+
+  useEffect(() => {
+    const fetchRules = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(
+          `https://ne-games.com/leaderBoard/api/user/getRulesSuggestion?ladder_id=${ladderId}`,
+          { headers: { APPKEY } }
+        );
+        if (res.data.status === 200 && Array.isArray(res.data.data)) {
+          setRules(res.data.data);
+          setOpenRuleIds([]); // keep all rules closed by default
+        }
+      } catch (error) {
+        console.error("Error fetching rules:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (ladderId) fetchRules();
+  }, [ladderId]);
+
+  const handleEdit = (index) => {
+    setIsEditingIndex(index);
+    setTempTitle(rules[index].title || "");
+    setTempContent(rules[index].rules || "");
+  };
+
+  const handleSave = (index) => {
+    const updatedRules = [...rules];
+    updatedRules[index] = {
+      ...updatedRules[index],
+      title: tempTitle,
+      rules: tempContent,
+    };
+    setRules(updatedRules);
+    setIsEditingIndex(null);
+    setShowSuccessDialog(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditingIndex(null);
+  };
+
+  const toggleRule = (index) => {
+    setOpenRuleIds((prev) =>
+      prev.includes(index)
+        ? prev.filter((id) => id !== index)
+        : [...prev, index]
+    );
+  };
+
+  if (loading) return <p className="text-gray-300">Loading rules...</p>;
+
+  return (
+    <div className="space-y-6 w-full sm:px-4 md:px-0 max-w-md mt-4 sm:mt-0 md:mt-0 bg-gray-800 rounded-lg p-4 shadow-md">
+      {rules.map((rule, index) => {
+        const isOpen = openRuleIds.includes(index);
+
+        return (
+          <div key={index} className="space-y-2 w-full rounded">
+            {isEditingIndex === index && userType === "admin" ? (
+              <div className="space-y-3 w-full">
+                <Input
+                  className="text-lg sm:text-xl font-bold text-white bg-gray-700 border-none focus:ring-2 focus:ring-cyan-500 w-full"
+                  value={tempTitle}
+                  onChange={(e) => setTempTitle(e.target.value)}
+                />
+                <Textarea
+                  className="w-full bg-gray-700 text-white border-none focus:ring-2 focus:ring-cyan-500"
+                  rows={4}
+                  value={tempContent}
+                  onChange={(e) => setTempContent(e.target.value)}
+                />
+                <div className="flex flex-col sm:flex-row justify-end gap-2 w-full">
+                  <Button
+                    onClick={() => handleSave(index)}
+                    className="mt-2 sm:mt-0 bg-cyan-500 cursor-pointer px-6 sm:px-8 rounded font-semibold hover:bg-cyan-600 w-full sm:w-auto text-white"
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleCancel}
+                    className="mt-2 sm:mt-0 bg-gray-900 cursor-pointer px-6 sm:px-8 rounded font-semibold hover:bg-cyan-900 w-full sm:w-auto text-white"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full">
+                <div className="bg-gray-700 flex items-center justify-between gap-2 shadow p-4 text-white text-lg sm:text-xl font-bold rounded border border-cyan-600">
+                  <span className="break-words">{rule.title || "No Title"}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleRule(index)}
+                    className="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 focus:ring-2 focus:ring-cyan-600"
+                  >
+                    <span className="text-xs cursor-pointer">
+                      {isOpen ? "CLOSE" : "OPEN"}
+                    </span>
+                    {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </Button>
+                </div>
+
+                {isOpen && (
+                  <div>
+                    <p className="mt-2 bg-gray-900 p-4 font-semibold rounded shadow text-base sm:text-lg text-white whitespace-pre-line break-words max-h-[380px] overflow-y-auto border border-gray-700">
+                      {rule.rules || "No content available."}
+                    </p>
+                  </div>
+                )}
+
+                {(userType === "admin" || userEmail === "joebloggs@gmail.com") && (
+                  <div className="flex justify-end mt-3">
+                    {userEmail === "joebloggs@gmail.com" ? (
+                      <AlertDialog>
+                        <AlertDialogContent className="bg-gray-800 border-cyan-600">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-red-400">
+                              Only Admin can edit
+                            </AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <p className="text-gray-300">
+                            You do not have permission to edit the rules.
+                          </p>
+                          <AlertDialogFooter>
+                            <Button
+                              className="bg-cyan-600 text-white hover:bg-cyan-700"
+                            >
+                              OK
+                            </Button>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                        <Button
+                          size="sm"
+                          className="bg-red-700 hover:bg-red-800 py-3 px-4 cursor-pointer rounded text-white text-xs"
+                        >
+                          Admin <br /> can Edit info
+                        </Button>
+                      </AlertDialog>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={() => handleEdit(index)}
+                        className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                      >
+                        Admin can Edit info
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <AlertDialogContent className="bg-gray-800 border-cyan-600">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-green-400">
+              Content Changes Successful
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+          <p className="text-gray-300">
+            Your rule changes have been updated successfully!
+          </p>
+          <AlertDialogFooter>
+            <Button
+              onClick={() => setShowSuccessDialog(false)}
+              className="bg-cyan-600 text-white hover:bg-cyan-700"
+            >
+              OK
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default DummyUserRules;

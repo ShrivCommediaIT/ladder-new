@@ -1,0 +1,14 @@
+
+@keyframes slow-flash {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.slow-flash-animation {
+  animation: slow-flash 2s ease-in-out infinite;
+}
+
+.slow-flash-animation:hover {
+  animation-play-state: paused;
+}
