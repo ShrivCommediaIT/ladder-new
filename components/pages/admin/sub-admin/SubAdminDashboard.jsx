@@ -525,86 +525,80 @@ export default function SubAdminDashboard() {
   }, []);
 
   const checkCsvDuplicates = (file) => {
-  return new Promise((resolve, reject) => {
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      transformHeader: (h) => h.trim().toLowerCase(),
-      complete: (results) => {
-        const rows = results.data || [];
+    return new Promise((resolve, reject) => {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: (h) => h.trim().toLowerCase(),
+        complete: (results) => {
+          const rows = results.data || [];
 
-        if (!rows.length) {
-          resolve({ duplicateNames: [] });
-          return;
-        }
-
-        // 🔍 auto detect name column
-        const headers = Object.keys(rows[0]);
-
-        const nameKey =
-          headers.find((h) =>
-            h.includes("name")
-          ) || headers[0];
-
-
-        const seen = new Set();
-        const duplicates = [];
-
-        for (const row of rows) {
-          const raw = row[nameKey];
-
-          if (!raw) continue;
-
-          const normalized = raw
-            .toString()
-            .trim()
-            .replace(/\s+/g, " ")
-            .toLowerCase();
-
-          if (seen.has(normalized)) {
-            duplicates.push(raw);
-          } else {
-            seen.add(normalized);
+          if (!rows.length) {
+            resolve({ duplicateNames: [] });
+            return;
           }
-        }
 
-        console.log("Duplicate names →", duplicates);
+          // 🔍 auto detect name column
+          const headers = Object.keys(rows[0]);
 
-        resolve({ duplicateNames: duplicates });
-      },
-      error: reject,
+          const nameKey = headers.find((h) => h.includes("name")) || headers[0];
+
+          const seen = new Set();
+          const duplicates = [];
+
+          for (const row of rows) {
+            const raw = row[nameKey];
+
+            if (!raw) continue;
+
+            const normalized = raw
+              .toString()
+              .trim()
+              .replace(/\s+/g, " ")
+              .toLowerCase();
+
+            if (seen.has(normalized)) {
+              duplicates.push(raw);
+            } else {
+              seen.add(normalized);
+            }
+          }
+
+          console.log("Duplicate names →", duplicates);
+
+          resolve({ duplicateNames: duplicates });
+        },
+        error: reject,
+      });
     });
-  });
-};
+  };
 
   const subAdmin =
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("subAdmin") || "null")
       : null;
 
-const handleFileChange = async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  setDuplicateWarning(null);
+    setDuplicateWarning(null);
 
-  const result = await checkCsvDuplicates(file);
+    const result = await checkCsvDuplicates(file);
 
-  if (result.duplicateNames.length > 0) {
-    setDuplicateWarning(result);
-    setCsvFile(null);
+    if (result.duplicateNames.length > 0) {
+      setDuplicateWarning(result);
+      setCsvFile(null);
 
-    toast.error(
-      `Duplicate names found: ${[...new Set(result.duplicateNames)].join(", ")}`
-    );
+      toast.error(
+        `Duplicate names found: ${[...new Set(result.duplicateNames)].join(", ")}`,
+      );
 
-    return;
-  }
+      return;
+    }
 
-  setCsvFile(file);
-};
-
-
+    setCsvFile(file);
+  };
 
   const handleCreateLadder = async () => {
     if (duplicateWarning) {
@@ -752,24 +746,93 @@ const handleFileChange = async (e) => {
 
       {/* HEADER MOBILE */}
       <div className="sticky top-0 z-20 sm:hidden flex justify-between px-4 py-3 bg-black/70 backdrop-blur-xl border-b border-white/10">
-        <div>
-          <h1 className="text-lg font-bold text-cyan-300">
-            Sub-Admin Dashboard
-          </h1>
-          {/* <p className="text-xs text-white/50">Manage your ladders</p> */}
-        </div>
-        <div>
-          <SubAdminDetails />
+        <div className="mb-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            {/* LEFT CONTENT */}
+            <div className="min-w-0 flex-1">
+              {/* RIGHT PROFILE */}
+              <div className="flex justify-end items-center gap-4">
+                <div>
+                  <h1
+                    className="text-xl sm:text-2xl font-extrabold 
+                     bg-gradient-to-r from-cyan-300 to-fuchsia-300 
+                     text-transparent bg-clip-text"
+                  >
+                    Sub-admin Dashboard
+                  </h1>
+
+                  <div className="mt-2 flex flex-wrap items-center gap-2 text-sm sm:text-base">
+                    <span className="text-white/60">—</span>
+
+                    <span className="text-[#F0ACFF] font-medium">Section:</span>
+
+                    {/* <span className="font-semibold text-white/80 capitalize break-words">
+                      {subAdmin?.sport_name || "N/A"}
+                    </span> */}
+                    <p
+                      className="
+      relative overflow-hidden
+      text-sm sm:text-lg font-semibold text-white/90 capitalize
+      px-4 py-1 rounded-md 
+      bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
+      backdrop-blur-md
+
+      transition-all duration-700 ease-out
+      hover:scale-[1.04]
+      hover:shadow-[0_0_20px_rgba(240,172,255,0.25)]
+    "
+                    >
+                      {subAdmin?.sport_name || "N/A"}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <SubAdminDetails />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-5 pb-8 sm:pb-8">
         {/* DESKTOP HEADER */}
+
         <div className="hidden sm:flex justify-between items-center mb-6">
-          <h1 className="text-xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
-            Welcome to Sub-Admin Dashboard
-          </h1>
-          <SubAdminDetails />
+          <div className="flex gap-2 items-center">
+            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
+              Sub-admin Dashboard
+            </h1>
+
+            <div className="flex items-center gap-2 animate-fade-in">
+              <span className="text-white/50">—</span>
+
+              <p className="text-sm sm:text-lg text-[#F0ACFF] tracking-wide">
+                Section:
+              </p>
+
+              <p
+                className="
+      relative overflow-hidden
+      text-sm sm:text-lg font-semibold text-white/90 capitalize
+      px-4 py-1 rounded-md 
+      bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
+      backdrop-blur-md
+
+      transition-all duration-700 ease-out
+      hover:scale-[1.04]
+      hover:shadow-[0_0_20px_rgba(240,172,255,0.25)]
+    "
+              >
+                {subAdmin?.sport_name || "N/A"}
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <SubAdminDetails />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

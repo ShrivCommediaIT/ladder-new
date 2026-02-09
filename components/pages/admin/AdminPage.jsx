@@ -535,6 +535,14 @@ import { motion } from "framer-motion";
 
 import { importSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 
+import { Info, X } from "lucide-react"; // X icon for close button
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import AdminImportantInfo from "./info/AdminImportantInfo";
+
 export default function AdminPage() {
   const [ladderName, setLadderName] = useState("");
   const [csvFile, setCsvFile] = useState(null);
@@ -796,21 +804,75 @@ export default function AdminPage() {
 
       {/* HEADER MOBILE */}
       <div className="sticky top-0 z-20 sm:hidden flex justify-between px-4 py-3 bg-black/70 backdrop-blur-xl border-b border-white/10">
-        <div>
-          <h1 className="text-lg font-bold text-cyan-300">Admin Dashboard</h1>
-          {/* <p className="text-xs text-white/50">Manage your ladders</p> */}
-        </div>
-        <div>
-          <UserDetails />
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6 ">
+          {/* LEFT SIDE */}
+          <div className="flex flex-col gap-2">
+            <h1 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
+              Admin Dashboard
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-2 text-sm sm:text-lg text-white">
+              <p>Important Information</p>
+              <span>-</span>
+
+              {/* INFO POPOVER */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="underline text-cyan-300">
+                    Please Read
+                  </button>
+                </PopoverTrigger>
+
+                <PopoverContent
+                  side="top"
+                  align="center"
+                  className="w-[95vw] sm:w-xl max-h-[70vh] overflow-y-auto 
+                     bg-gray-300 border-slate-700 text-slate-900 
+                     px-3 py-4 rounded-lg shadow-2xl z-50"
+                >
+                  <AdminImportantInfo />
+                </PopoverContent>
+              </Popover>
+
+              {/* RIGHT SIDE — USER DETAILS */}
+              <div className="self-start sm:self-auto">
+                <UserDetails />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-5 pb-8 sm:pb-8">
         {/* DESKTOP HEADER */}
         <div className="hidden sm:flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
-            Admin Dashboard
-          </h1>
+          <div className="flex gap-2 items-center">
+            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
+              Admin Dashboard
+            </h1>
+
+            <div className="flex items-center gap-1">
+              <p className="text-lg text-white">Important Information</p> -
+              {/* --- INFO POPOVER START --- */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="grid place-items-center cursor-pointer underline text-cyan-300">
+                    {/* <Info className="w-4 h-4" /> */}
+                    Please Read
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  side="top"
+                  align="center"
+                  className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700 text-slate-900 px-2 py-4 rounded-lg shadow-2xl z-50 backdrop-blur-md"
+                >
+                  <AdminImportantInfo />
+                </PopoverContent>
+              </Popover>
+              {/* --- INFO POPOVER END --- */}
+            </div>
+          </div>
+
           <div>
             <UserDetails />
           </div>
@@ -1001,19 +1063,19 @@ export default function AdminPage() {
         </Card>
       </footer>
 
-          {duplicateWarning && (
-              <Alert className="mt-4 border-red-500/40 bg-red-500/10">
-                <AlertTitle>Duplicate Players Detected</AlertTitle>
-                <AlertDescription>
-                  {duplicateWarning.duplicateNames.length > 0 && (
-                    <div>
-                      Names:{" "}
-                      {[...new Set(duplicateWarning.duplicateNames)].join(", ")}
-                    </div>
-                  )}
-                </AlertDescription>
-              </Alert>
+      {duplicateWarning && (
+        <Alert className="mt-4 border-red-500/40 bg-red-500/10">
+          <AlertTitle>Duplicate Players Detected</AlertTitle>
+          <AlertDescription>
+            {duplicateWarning.duplicateNames.length > 0 && (
+              <div>
+                Names:{" "}
+                {[...new Set(duplicateWarning.duplicateNames)].join(", ")}
+              </div>
             )}
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 }

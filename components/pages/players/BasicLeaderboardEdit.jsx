@@ -1,15 +1,8 @@
-
-
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Select,
   SelectTrigger,
@@ -32,7 +25,7 @@ export const BasicLeaderboardEdit = ({
   currentId = null,
   ladderId: propLadderId,
   skillNumber,
-  skillActivityId
+  skillActivityId,
 }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -47,13 +40,9 @@ export const BasicLeaderboardEdit = ({
     Number(propLadderId) || Number(searchParams.get("ladder_id"));
 
   // Player data (skill leaderboard)
-  const players = useSelector(
-    (state) => state.skillLeaderboard?.data || []
-  );
+  const players = useSelector((state) => state.skillLeaderboard?.data || []);
 
-  const selectedPlayer = players.find(
-    (p) => Number(p.id) === Number(playerId)
-  );
+  const selectedPlayer = players.find((p) => Number(p.id) === Number(playerId));
 
   useEffect(() => {
     if (result?.success_message) {
@@ -87,12 +76,27 @@ export const BasicLeaderboardEdit = ({
         </DialogTitle>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="text-white">
+          <Tabs
+            value={selectedTab}
+            onValueChange={setSelectedTab}
+            className="text-white"
+          >
+       
             {/* DESKTOP TABS */}
             <div className="hidden sm:block">
-              <TabsList className="w-full bg-gray-800 text-white">
+              <TabsList className="w-full bg-gray-800 border border-gray-700">
                 {tabs.map((tab) => (
-                  <TabsTrigger key={tab.value} value={tab.value}>
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className="
+          text-gray-300
+          data-[state=active]:text-white
+          data-[state=active]:bg-gray-700
+          data-[state=active]:shadow-md
+          transition-all duration-200
+        "
+                  >
                     {tab.label}
                   </TabsTrigger>
                 ))}
@@ -126,7 +130,7 @@ export const BasicLeaderboardEdit = ({
                   skillNumber={skillNumber}
                   playerId={playerId}
                   skillActivityId={skillActivityId}
-                  onClose={handleChildClose}  // ✅ PASS HERE
+                  onClose={handleChildClose} // ✅ PASS HERE
                   initialActivity={skillNumber}
                 />
               </div>
@@ -137,7 +141,7 @@ export const BasicLeaderboardEdit = ({
               <PlayerImage
                 userId={playerId}
                 ladderId={ladder_id}
-                onClose={handleChildClose}  // ✅ PASS HERE TOO
+                onClose={handleChildClose} // ✅ PASS HERE TOO
               />
             </TabsContent>
           </Tabs>

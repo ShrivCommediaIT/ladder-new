@@ -144,21 +144,21 @@ export default function LoginUser({ ladderId, ladderType }) {
 
           {/* Username */}
           <div className="mb-6">
-            <Label className="text-teal-400 font-semibold text-lg mb-1 block">
+            <Label className="text-teal-400 text-md mb-1 block">
               Name
             </Label>
             <Input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="rounded-xl border-gray-600 bg-gray-800 text-gray-100"
-              placeholder="example@mail.com"
+              placeholder="Enter your name"
             />
           </div>
 
           {/* Password */}
           <div className="mb-8 relative">
-            <Label className="text-teal-400 font-semibold text-lg mb-1 block">
-              4 Digit Pin
+            <Label className="text-teal-400  text-md mb-1 block">
+              4 Digit Pin (numbers only available)
             </Label>
 
             <Input
@@ -184,7 +184,7 @@ export default function LoginUser({ ladderId, ladderType }) {
 
           {/* Button */}
           <Button
-            className="w-full border border-teal-700 bg-teal-800 hover:bg-teal-700 rounded-xl flex items-center justify-center gap-2"
+            className="w-full border border-teal-700 bg-teal-800 hover:bg-teal-700 rounded-xl flex items-center justify-center gap-2 cursor-pointer"
             onClick={handleLogin}
             disabled={loading}
           >
@@ -198,7 +198,7 @@ export default function LoginUser({ ladderId, ladderType }) {
               Don't have an account?{" "}
               <Link
                 href={`/register-user?ladder_id=${finalLadderId}&ladder_type=${finalLadderType}`}
-                className="text-blue-400 underline hover:text-purple-400"
+                className="text-teal-400 font-semibold hover:underline"
               >
                 Register here
               </Link>

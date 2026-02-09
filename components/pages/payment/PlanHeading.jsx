@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -31,8 +30,7 @@ export default function PlanHeading() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="absolute top-6 left-1/2 -translate-x-1/2 sm:left-10 sm:translate-x-0 z-10"
-      >
-      </motion.div>
+      ></motion.div>
 
       {/* MAIN CONTENT */}
       <motion.section
@@ -41,11 +39,16 @@ export default function PlanHeading() {
         transition={{ duration: 0.8 }}
         className="relative z-10 max-w-3xl w-full px-6 sm:px-10 py-10 mt-20 text-center bg-white/0 border border-white/80 rounded-2xl shadow-2xl"
       >
-        <h1 className="text-4xl sm:text-5xl font-extrabold uppercase tracking-wide mb-4 text-white drop-shadow-lg">
+        <h1 className="text-4xl sm:text-3xl font-extrabold uppercase tracking-wide mb-4 text-white drop-shadow-lg">
           Online Sports Solutions
         </h1>
 
-        <p className="text-2xl sm:text-3xl font-semibold mb-6 text-white">
+        <p className="text-sm sm:text-lg bg-[#2A4151] rounded-lg shadow py-4 font-semibold mb-2 text-white">
+          Automated Ladders, Minileagues, Leaderboards, Skills & Performance
+          Challenge Boards and so much more
+        </p>
+
+        <p className="text-xl sm:text-2xl font-semibold mb-2 text-white">
           Create and Test for Free Now!
         </p>
 
@@ -116,23 +119,7 @@ export default function PlanHeading() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.7 }}
         className="relative z-10 w-full mt-10 px-6 sm:px-12"
-      >
-       
-      </motion.section>
-
-     
+      ></motion.section>
     </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-

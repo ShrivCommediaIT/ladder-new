@@ -219,7 +219,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
                 className="cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30"
               >
                 <Shield className="mr-2 h-4 w-4 text-blue-600" />
-                Generate Club ID and Sub-admin Acess
+                Generate Club ID and Section Pins
               </DropdownMenuItem>
 
               <DropdownMenuItem

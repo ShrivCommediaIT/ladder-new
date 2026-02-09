@@ -134,10 +134,7 @@ const Best5Players = () => {
 
   const playerList = players?.[ladderId]?.data || [];
 
-  const isDescending = useSelector(
-  (state) => state.player.invertRanking
-);
-
+  const isDescending = useSelector((state) => state.player.invertRanking);
 
   useEffect(() => {
     if (user?.id) dispatch(fetchUserProfile(user.id));
@@ -153,61 +150,50 @@ const Best5Players = () => {
     dispatch(setSelectedPlayer(null));
   }, [ladderId, dispatch]);
 
+  const cleanedSearch = searchQuery.toLowerCase().replace(/\s+/g, "");
 
-  
-const cleanedSearch = searchQuery.toLowerCase().replace(/\s+/g, "");
+  // 🔍 filter
+  let filteredPlayers = playerList;
 
-// 🔍 filter
-let filteredPlayers = playerList;
+  if (cleanedSearch) {
+    filteredPlayers = playerList.filter((p) =>
+      p.name?.toLowerCase().replace(/\s+/g, "").includes(cleanedSearch),
+    );
+  }
 
-if (cleanedSearch) {
-  filteredPlayers = playerList.filter((p) =>
-    p.name
-      ?.toLowerCase()
-      .replace(/\s+/g, "")
-      .includes(cleanedSearch)
+  // 🧹 unique
+  const uniquePlayers = Array.from(
+    new Map(filteredPlayers.map((p) => [p.id, p])).values(),
   );
-}
 
-// 🧹 unique
-const uniquePlayers = Array.from(
-  new Map(filteredPlayers.map((p) => [p.id, p])).values()
-);
+  // 🎯 CONDITIONAL SORT
+  let sortedPlayers = [];
 
-// 🎯 CONDITIONAL SORT
-let sortedPlayers = [];
+  if (cleanedSearch) {
+    // ⭐ SEARCH MODE = startsWith first → then alphabetical
+    sortedPlayers = [...uniquePlayers].sort((a, b) => {
+      const aNameClean = (a.name || "").toLowerCase().replace(/\s+/g, "");
 
-if (cleanedSearch) {
-  // ⭐ SEARCH MODE = startsWith first → then alphabetical
-  sortedPlayers = [...uniquePlayers].sort((a, b) => {
-    const aNameClean = (a.name || "")
-      .toLowerCase()
-      .replace(/\s+/g, "");
+      const bNameClean = (b.name || "").toLowerCase().replace(/\s+/g, "");
 
-    const bNameClean = (b.name || "")
-      .toLowerCase()
-      .replace(/\s+/g, "");
+      const aStarts = aNameClean.startsWith(cleanedSearch);
+      const bStarts = bNameClean.startsWith(cleanedSearch);
 
-    const aStarts = aNameClean.startsWith(cleanedSearch);
-    const bStarts = bNameClean.startsWith(cleanedSearch);
+      // startsWith वालों को top pe lao
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
 
-    // startsWith वालों को top pe lao
-    if (aStarts && !bStarts) return -1;
-    if (!aStarts && bStarts) return 1;
-
-    // fir alphabetical
-    return aNameClean.localeCompare(bNameClean);
-  });
-} else {
-  // 🏆 NORMAL MODE = rank sort
-  sortedPlayers = [...uniquePlayers].sort((a, b) => {
-    const rA = Number(a.rank || 0);
-    const rB = Number(b.rank || 0);
-    return isDescending ? rB - rA : rA - rB;
-  });
-}
-
-
+      // fir alphabetical
+      return aNameClean.localeCompare(bNameClean);
+    });
+  } else {
+    // 🏆 NORMAL MODE = rank sort
+    sortedPlayers = [...uniquePlayers].sort((a, b) => {
+      const rA = Number(a.rank || 0);
+      const rB = Number(b.rank || 0);
+      return isDescending ? rB - rA : rA - rB;
+    });
+  }
 
   const generateGrades = (playersArr, gradebars = []) => {
     const size = Number(groupSize) || 6;
@@ -330,11 +316,36 @@ if (cleanedSearch) {
   };
 
   return (
-    <div id="print-section" className="space-y-6 relative" key={refreshKey}>
+    <div id="print-section" className="space-y-4 relative" key={refreshKey}>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
+      <div className="flex  gap-2 justify-between w-full">
+        <div className="w-full text-white md:w-full">
+          {playerList.length > 0 && (
+            <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+          )}
+        </div>
+        <div className="flex gap-3">
+          {/* <Button
+            onClick={() => setIsDescending((prev) => !prev)}
+            variant="secondary"
+            className="flex items-center gap-2 cursor-pointer text-white bg-teal-800 hover:bg-teal-900 "
+          >
+            <ArrowUpDown size={16} />
+            {isDescending ? "Ranking Descending" : "Ranking Ascending"}
+          </Button> */}
+        </div>
+      </div>
+
+      {/* Ladder link + search */}
+      <div className="flex flex-col gap-3 sm:flex-col md:items-center md:gap-2 md:justify-between">
+        <div className="w-full">
+          <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />
+        </div>
+      </div>
+
       {/* Edit Sections UI */}
-      <div className="mb-6 flex justify-between items-center sm:flex-row sm:items-center gap-3 bg-gradient-to-r from-gray-900 to-cyan-900 p-4 rounded-xl shadow-lg border border-teal-600">
+      <div className=" flex justify-between items-center sm:flex-row sm:items-center gap-3 bg-gradient-to-r from-gray-900 to-cyan-900 p-4 rounded-xl shadow-lg border border-teal-600">
         <label
           htmlFor="groupSize"
           className="text-white font-bold text-lg sm:text-xl"
@@ -353,33 +364,6 @@ if (cleanedSearch) {
             </option>
           ))}
         </select>
-      </div>
-
-      {/* Ladder link + search */}
-      <div className="flex flex-col mb-10 gap-3 sm:flex-col md:items-center md:gap-2 md:justify-between">
-        <div className="w-full">
-          <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />
-        </div>
-      </div>
-
-      <div className="flex  gap-2 justify-between w-full">
-        <div className="w-full text-white md:w-full">
-          {playerList.length > 0 && (
-            <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
-          )}
-        </div>
-        <div className="flex gap-3">
-          {/* <Button
-            onClick={() => setIsDescending((prev) => !prev)}
-            variant="secondary"
-            className="flex items-center gap-2 cursor-pointer text-white bg-teal-800 hover:bg-teal-900 "
-          >
-            <ArrowUpDown size={16} />
-            {isDescending ? "Ranking Descending" : "Ranking Ascending"}
-          </Button> */}
-
-       
-        </div>
       </div>
 
       {/* Loading */}

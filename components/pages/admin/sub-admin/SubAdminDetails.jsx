@@ -24,8 +24,8 @@
 //   const router = useRouter();
 //   const [user, setUser] = useState(null);
 //   const [uploading, setUploading] = useState(false);
+//   const [previewImage, setPreviewImage] = useState(null);
 
-//   // ✅ Get user from localStorage
 //   useEffect(() => {
 //     if (typeof window !== "undefined") {
 //       const storedUser = localStorage.getItem("subAdmin");
@@ -40,16 +40,23 @@
 //     }
 //   }, []);
 
+//   //  Helper function to validate image source
+//   const IMAGE_BASE = "https://ne-games.com/leaderBoard/uploads/";
+
+
+
 //   const handleImageChange = async (e) => {
 //     const file = e.target.files?.[0];
 //     if (!file) return;
+
+//     // 🔥 INSTANT PREVIEW
+//     const localPreview = URL.createObjectURL(file);
+//     setPreviewImage(localPreview);
 
 //     if (!user?.id) {
 //       alert("User id missing");
 //       return;
 //     }
-
-//     console.log("Uploading file:", file);
 
 //     const formData = new FormData();
 //     formData.append("id", String(user.id));
@@ -61,96 +68,101 @@
 //       const res = await axios.post(
 //         "https://ne-games.com/leaderBoard/api/app/user/updateSubadminimage",
 //         formData,
-//         {
-//           headers: {
-//             APPKEY: APPKEY,
-//           },
-//         },
+//         { headers: { APPKEY: APPKEY } },
 //       );
 
-//       console.log("UPLOAD RESPONSE:", res.data);
-
 //       if (res.data.status == 200 || res.data.status === "success") {
-//         // ⚠️ adjust based on actual response shape
-//         const imageUrl =
-//           res.data.image || res.data.data?.image || res.data.path;
+//         let imageName =
+//           res.data?.image || res.data?.data?.image || res.data?.path;
 
-//         if (imageUrl) {
-//           const updated = { ...user, image: imageUrl };
+//         if (imageName) {
+//           //  ensure full url stored
+//           if (!imageName.startsWith("http")) {
+//             imageName = IMAGE_BASE + imageName;
+//           }
+
+//           const updated = { ...user, image: imageName };
+
 //           localStorage.setItem("subAdmin", JSON.stringify(updated));
 //           setUser(updated);
+//           setPreviewImage(null);
 //         }
 
-//         alert("Profile image updated ✅");
+//         alert("Profile image updated successfully");
 //       } else {
 //         alert(res.data.message || "Upload failed");
+//         setPreviewImage(null); // rollback
 //       }
 //     } catch (err) {
-//       console.log("UPLOAD ERROR:", err.response || err);
 //       alert(err.response?.data?.message || "Upload error");
+//       setPreviewImage(null); // rollback
 //     } finally {
 //       setUploading(false);
 //     }
 //   };
 
-//   // Logout → always go to Club ID page
+//   const getImageSrc = () => {
+//   if (previewImage) return previewImage;
+//   if (user?.image) return user.image;
+//   return "/logo.jpg";
+// };
+
+
 //   const handleLogout = () => {
-//     // Clear storage
 //     localStorage.removeItem("admin");
 //     localStorage.removeItem("subAdmin");
 //     localStorage.removeItem("userData");
 //     localStorage.removeItem("persist:root");
 //     sessionStorage.clear();
-
-//     // Redirect to club id login page
 //     router.push(clubIdPage);
 //   };
 
 //   return (
-//     <div className="w-full">
+//     <div className="w-full flex justify-end items-center gap-3">
+//       {/* IMAGE UPLOAD — NOT DROPDOWN TRIGGER */}
+//       <label
+//         className="relative cursor-pointer group"
+//         onClick={(e) => e.stopPropagation()}
+//       >
+//         <div className="relative w-8 h-8 overflow-hidden rounded-full border bg-zinc-700">
+//           <img
+//             src={getImageSrc()}
+//             alt="User"
+//             className="w-full h-full object-cover"
+//           />
+
+//           <div
+//             className="absolute inset-0 bg-black/50 flex items-center justify-center 
+//                       opacity-0 group-hover:opacity-100 transition"
+//           >
+//             <Pencil className="w-3 h-3 text-white" />
+//           </div>
+//         </div>
+
+//         <input
+//           type="file"
+//           accept="image/*"
+//           className="hidden"
+//           disabled={uploading}
+//           onChange={handleImageChange}
+//         />
+//       </label>
+
+//       {/* DROPDOWN — SEPARATE */}
 //       <DropdownMenu>
 //         <DropdownMenuTrigger asChild>
-//           <div className="flex justify-end items-center space-x-3 cursor-pointer rounded-md px-3 py-2 transition hover:bg-zinc-800">
-//             {/* <Image
-//               src={Logo}
-//               alt="User"
-//               width={32}
-//               height={32}
-//               className="rounded-full border w-8 h-8 object-cover"
-//             /> */}
-//             <label className="relative cursor-pointer group">
-//               {/* profile image */}
-//               <div className="relative w-8 h-8 overflow-hidden rounded-full border transition-all duration-200 group-hover:scale-125">
-//                 <Image
-//                   src={user?.image || Logo}
-//                   alt="User"
-//                   fill
-//                   className="object-cover"
-//                 />
-
-//                 {/* overlay */}
-//                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-//                   <Pencil className="w-4 h-4 text-white" />
-//                 </div>
-//               </div>
-
-//               {/* hidden file input */}
-//               <input
-//                 type="file"
-//                 accept="image/*"
-//                 className="hidden"
-//                 disabled={uploading}
-//                 onChange={handleImageChange}
-//               />
-//             </label>
-
+//           <div
+//             className="flex items-center gap-2 cursor-pointer 
+//                       rounded-md px-2 py-1 hover:bg-zinc-800"
+//           >
 //             <div className="hidden sm:flex flex-col">
 //               <span className="text-sm font-semibold text-zinc-100 capitalize">
 //                 {user?.name || "Guest"}
 //               </span>
 //               <span className="text-xs text-zinc-300">Profile</span>
 //             </div>
-//             <IoIosArrowDown size={18} className="text-zinc-600" />
+
+//             <IoIosArrowDown size={18} className="text-zinc-500" />
 //           </div>
 //         </DropdownMenuTrigger>
 
@@ -186,18 +198,16 @@
 
 
 
-
-// =========================================================
+// =========================================
 
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { LogOut, UserCircle2, Pencil } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
-import Logo from "@/public/logo.jpg";
 import axios from "axios";
+// import Logo from "@/public/logo.jpg";
 
 import {
   DropdownMenu,
@@ -210,34 +220,30 @@ import {
 import { clubIdPage } from "@/helper/RouteName";
 
 const SubAdminDetails = () => {
-  const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+  const APPKEY =
+    "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
   const router = useRouter();
+
   const [user, setUser] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
 
+  // ✅ Load user from storage
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("subAdmin");
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser));
-        } catch (err) {
-          console.error("Invalid user in localStorage", err);
-          setUser(null);
-        }
+    const stored = localStorage.getItem("subAdmin");
+    if (stored) {
+      try {
+        setUser(JSON.parse(stored));
+      } catch {
+        setUser(null);
       }
     }
   }, []);
 
-  // ✅ Helper function to validate image source
-  const getImageSrc = () => {
-    if (user?.image && typeof user.image === "string" && user.image.trim() !== "") {
-      return user.image;
-    }
-    return Logo;
-  };
 
+
+  // ✅ Upload handler with instant preview + safe storage merge
   const handleImageChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -246,6 +252,10 @@ const SubAdminDetails = () => {
       alert("User id missing");
       return;
     }
+
+    // 🔥 instant preview
+    const localPreview = URL.createObjectURL(file);
+    setPreviewImage(localPreview);
 
     const formData = new FormData();
     formData.append("id", String(user.id));
@@ -258,28 +268,78 @@ const SubAdminDetails = () => {
         "https://ne-games.com/leaderBoard/api/app/user/updateSubadminimage",
         formData,
         {
-          headers: { APPKEY: APPKEY },
+          headers: {
+            APPKEY: APPKEY,
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
+      console.log("UPLOAD RESPONSE =", res.data);
+
       if (res.data.status == 200 || res.data.status === "success") {
-        const imageUrl = res.data.image || res.data.data?.image || res.data.path;
+        let imageUrl =
+          res.data?.image ||
+          res.data?.data?.image ||
+          res.data?.path;
+
         if (imageUrl) {
-          const updated = { ...user, image: imageUrl };
-          localStorage.setItem("subAdmin", JSON.stringify(updated));
-          setUser(updated);
+          // ensure full url
+          if (!imageUrl.startsWith("http")) {
+            imageUrl =
+              "https://ne-games.com/leaderBoard/uploads/" + imageUrl;
+          }
+
+          const existing = JSON.parse(
+            localStorage.getItem("subAdmin") || "{}"
+          );
+
+          const updatedUser = {
+            ...existing,
+            image: imageUrl,
+          };
+
+          localStorage.setItem(
+            "subAdmin",
+            JSON.stringify(updatedUser)
+          );
+
+          setUser(updatedUser);
         }
-        alert("Profile image updated ✅");
+
+        alert("Profile image updated ");
       } else {
         alert(res.data.message || "Upload failed");
       }
     } catch (err) {
+      console.error(err);
       alert(err.response?.data?.message || "Upload error");
     } finally {
       setUploading(false);
+      setPreviewImage(null);
     }
   };
 
+    //  Safe image resolver
+const IMAGE_BASE = "https://ne-games.com/leaderBoard/uploads/";
+
+const getImageSrc = () => {
+  if (previewImage) return previewImage;
+
+  const img = user?.image;
+  console.log("image : ", img)
+
+  if (!img) return "/logo.jpg";
+
+  // if already full URL
+  if (img.startsWith("http")) return img;
+
+  // if only filename came from API
+  return IMAGE_BASE + img;
+};
+
+
+  // ✅ Logout
   const handleLogout = () => {
     localStorage.removeItem("admin");
     localStorage.removeItem("subAdmin");
@@ -289,49 +349,68 @@ const SubAdminDetails = () => {
     router.push(clubIdPage);
   };
 
+  if (!user) return null;
+
   return (
-    <div className="w-full">
+    <div className="flex justify-end items-center gap-3">
+
+      {/* IMAGE UPLOAD */}
+      <label
+        className="relative cursor-pointer group"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative w-9 h-9 rounded-full overflow-hidden border bg-zinc-700">
+
+          <img
+            src={getImageSrc()}
+            alt="User"
+            className="w-full h-full object-cover"
+          />
+
+          {uploading && (
+            <div className="absolute inset-0 bg-black/60 grid place-items-center text-[10px] text-white">
+              Upload…
+            </div>
+          )}
+
+          <div className="absolute inset-0 bg-black/40 opacity-0 
+                          group-hover:opacity-100 transition 
+                          grid place-items-center">
+            <Pencil className="w-3 h-3 text-white" />
+          </div>
+        </div>
+
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          disabled={uploading}
+          onChange={handleImageChange}
+        />
+      </label>
+
+      {/*  DROPDOWN */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="flex justify-end items-center space-x-3 cursor-pointer rounded-md px-3 py-2 transition hover:bg-zinc-800">
-            <label className="relative cursor-pointer group">
-              <div className="relative w-8 h-8 overflow-hidden rounded-full border transition-all duration-200 group-hover:scale-125 bg-zinc-700">
-                <Image
-                  src={getImageSrc()}
-                  alt="User"
-                  fill
-                  unoptimized={true} // ✅ Prevents Next.js from failing on external/dynamic URLs
-                  className="object-cover"
-                />
+          <div className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-md hover:bg-zinc-800">
 
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                  <Pencil className="w-3 h-3 text-white" />
-                </div>
-              </div>
-
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={uploading}
-                onChange={handleImageChange}
-              />
-            </label>
-
-            <div className="hidden sm:flex flex-col">
+            <div className="hidden sm:flex flex-col leading-tight">
               <span className="text-sm font-semibold text-zinc-100 capitalize">
-                {user?.name || "Guest"}
+                {user.name}
               </span>
-              <span className="text-xs text-zinc-300">Profile</span>
+              <span className="text-xs text-zinc-400">
+                {user.sport_name}
+              </span>
             </div>
-            <IoIosArrowDown size={18} className="text-zinc-600" />
+
+            <IoIosArrowDown size={18} className="text-zinc-500" />
           </div>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="w-52 mt-2" align="end">
-          <DropdownMenuLabel className="flex items-center gap-2 text-zinc-700">
+        <DropdownMenuContent align="end" className="w-52 mt-2">
+          <DropdownMenuLabel className="flex items-center gap-2">
             <UserCircle2 className="w-4 h-4" />
-            {user?.name || "Guest"}
+            {user.name}
           </DropdownMenuLabel>
 
           <DropdownMenuItem
@@ -343,6 +422,7 @@ const SubAdminDetails = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
     </div>
   );
 };

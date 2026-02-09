@@ -469,7 +469,7 @@ import {
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import AddRemoveBox from "./AddRemoveBox"; // ✅ AddRemoveBox (handles add/remove/move logic)
+import AddRemoveBox from "./AddRemoveBox"; // AddRemoveBox (handles add/remove/move logic)
 import UploadPlayerLists from "../uploadCsv/UploadPlayerLists";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
@@ -491,7 +491,7 @@ import {
   CreditCard,
   Zap,
 } from "lucide-react"; // import lucide icons
-import InvertRankButton from "./InvertRankButton";
+// import InvertRankButton from "./InvertRankButton";
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
@@ -774,12 +774,12 @@ const AdminButton = () => {
           </>
         )}
 
-        <div className="">
+        {/* <div className="">
              <InvertRankButton
             isDescending={isDescending}
             onToggle={() => setIsDescending((prev) => !prev)}
           />
-        </div>
+        </div> */}
 
         {/* SINGLE DIALOG */}
         <Dialog
