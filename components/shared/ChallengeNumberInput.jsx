@@ -100,107 +100,6 @@ const Challenge = ({ userId }) => {
     );
   }
 
-  // return (
-  //   <>
-  //     <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-  //       <AlertDialogContent className="z-50 max-w-md bg-white shadow-lg">
-  //         <AlertDialogHeader>
-  //           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-  //           <AlertDialogDescription>
-  //             This action cannot be undone. This will send a challenge to rank{" "}
-  //             <span className="font-bold text-blue-600">
-  //               {challengeNumber}
-  //             </span>
-  //             .
-  //           </AlertDialogDescription>
-  //         </AlertDialogHeader>
-  //         <AlertDialogFooter>
-  //           <AlertDialogCancel className="bg-red-100 hover:bg-red-200">
-  //             Cancel
-  //           </AlertDialogCancel>
-  //           <AlertDialogAction
-  //             onClick={confirmChallenge}
-  //             className="bg-green-600 hover:bg-green-700"
-  //           >
-  //             Confirm
-  //           </AlertDialogAction>
-  //         </AlertDialogFooter>
-  //       </AlertDialogContent>
-  //     </AlertDialog>
-
-  //     <motion.div
-  //       layout
-  //       className="w-full max-w-md p-6 border rounded-xl bg-gray-800 dark:bg-gray-900 shadow-lg"
-  //     >
-  //       <form onSubmit={handleOpenConfirm} className="space-y-4">
-  //         <div>
-  //           <h3 className="text-lg text-center font-semibold mb-2">
-  //             I want to challenge number
-  //           </h3>
-  //           <div className="flex items-center gap-2">
-  //             <input
-  //               type="text"
-  //               value={challengeNumber}
-  //               placeholder="Enter Rank"
-  //               readOnly
-  //               className="w-full rounded-none text-center px-3 py-1 border text-lg"
-  //             />
-  //             <Button
-  //               className=" cursor-pointer"
-  //               type="button"
-  //               variant="destructive"
-  //               onClick={() => setChallengeNumber("")}
-  //             >
-  //               Cancel
-  //             </Button>
-  //           </div>
-  //           <p className="text-sm text-center text-gray-200 mt-4 flex flex-col gap-4 items-center justify-center">
-  //             Their number will appear for you to copy & paste into your chosen comms
-  //             <span className="relative font-semibold text-blue-600 border shadow-md px-8 py-1 w-48 text-center text-lg flex items-center justify-center gap-2">
-  //               {playerLoading
-  //                 ? "Loading..."
-  //                 : challengedPlayer?.phone ?? "N/A"}
-
-  //               {/* ✅ Copy icon with click handler */}
-  //               {!playerLoading && challengedPlayer?.phone && (
-  //                 <Copy
-  //                   className="w-5 h-5 text-gray-600 cursor-pointer hover:text-black"
-  //                   onClick={() => {
-  //                     navigator.clipboard
-  //                       .writeText(challengedPlayer.phone)
-  //                       .then(() => toast.success("Phone number copied!"))
-  //                       .catch(() => toast.error("Failed to copy!"));
-  //                   }}
-  //                 />
-  //               )}
-  //             </span>
-  //           </p>
-  //         </div>
-
-  //         <div className="grid grid-cols-5 gap-2 mt-4">
-  //           {["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].map((num) => (
-  //             <button
-  //               key={num}
-  //               type="button"
-  //               onClick={() => handleKeyClick(num)}
-  //               className="py-2 rounded-md border text-lg font-medium hover:bg-gray-500 dark:hover:bg-gray-800"
-  //             >
-  //               {num}
-  //             </button>
-  //           ))}
-  //           <button
-  //             type="button"
-  //             onClick={handleBackspace}
-  //             className="col-span-5 py-2 rounded-md border text-lg font-medium text-red-600 hover:bg-red-100 dark:hover:bg-red-900"
-  //           >
-  //             X backspace
-  //           </button>
-  //         </div>
-  //       </form>
-  //     </motion.div>
-  //   </>
-  // );
-
 return (
   <>
     <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
@@ -230,7 +129,7 @@ return (
       </AlertDialogContent>
     </AlertDialog>
 
-    {/* ✅ Scroll Wrapper */}
+    {/* Scroll Wrapper */}
     <div className="w-full flex justify-center px-2 sm:px-4 overflow-y-auto max-h-[90vh]">
       <motion.div
         layout
@@ -283,7 +182,7 @@ return (
             </p>
           </div>
 
-          {/* ✅ Responsive keypad */}
+          {/* Responsive keypad */}
           <div className="grid grid-cols-5 gap-2 mt-4">
             {["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].map((num) => (
               <button

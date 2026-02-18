@@ -189,19 +189,19 @@ const MoveNumberInput = ({
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-md mx-auto p-6 rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl border border-gray-700 text-white"
+      className="max-w-full mx-auto p-1 rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl border border-gray-700 text-white"
     >
-      <h2 className="text-2xl font-semibold text-center mb-5">
+      <h2 className="text-2xl font-semibold text-center mb-1">
         Match Result
       </h2>
 
       {/* Beat / Lost */}
-      <div className="flex justify-center gap-6 mb-4">
+      <div className="flex justify-center gap-6 mb-2">
         {["beat", "lost"].map((type) => (
           <div
             key={type}
             onClick={() => setResultType(type)}
-            className={`px-5 py-2 rounded-full cursor-pointer transition ${
+            className={`px-5 py-1 rounded-full cursor-pointer transition ${
               resultType === type
                 ? "bg-green-500 text-black font-semibold"
                 : "bg-gray-700 hover:bg-gray-600"
@@ -218,7 +218,7 @@ const MoveNumberInput = ({
       />
 
       {(ladderType === "best3" || ladderType === "best5") && (
-        <div className="flex justify-center gap-3 my-4 flex-wrap">
+        <div className="flex justify-center gap-3 my-2 flex-wrap">
           {scoreOptions.map((s) => (
             <div
               key={s}
@@ -238,20 +238,50 @@ const MoveNumberInput = ({
       <Input
         value={selectedNumber}
         readOnly
-        className="text-center text-3xl mb-4 bg-black text-green-400 border border-gray-700"
+        className="text-center text-3xl mb-2 bg-black text-green-400 border border-gray-700"
       />
 
-      <div className="grid grid-cols-3 gap-3 mb-4">
+      {/* <div className="grid grid-cols-3 gap-3 mb-2">
         {numberButtons.map((num) => (
           <Button
             key={num}
             onClick={() => handleNumberClick(num)}
-            className="py-6 text-lg bg-gray-800 hover:bg-gray-700"
+            className="py-2 text-lg bg-gray-800 hover:bg-gray-700"
           >
             {num}
           </Button>
         ))}
-      </div>
+      </div> */}
+
+      <div className="grid grid-cols-3 gap-3 mb-2">
+  {numberButtons.map((num) => {
+    if (num === 0) {
+      return (
+        <div key="zero-row" className="contents">
+          <div />
+          <Button
+            onClick={() => handleNumberClick(num)}
+            className="py-2 text-lg bg-gray-800 hover:bg-gray-700"
+          >
+            {num}
+          </Button>
+          <div />
+        </div>
+      );
+    }
+
+    return (
+      <Button
+        key={num}
+        onClick={() => handleNumberClick(num)}
+        className="py-2 text-lg bg-gray-800 hover:bg-gray-700"
+      >
+        {num}
+      </Button>
+    );
+  })}
+</div>
+
 
       <div className="flex gap-3">
         <Button onClick={handleBackspace} className="flex-1 bg-gray-700">

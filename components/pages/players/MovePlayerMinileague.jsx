@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, React, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -345,17 +345,17 @@ const MoveNumberMinileague = ({
         transition={{ duration: 0.2 }}
         className="
           w-full
-          max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl
+          max-w-[95vw] sm:max-w-xl md:max-w-4xl lg:max-w-4xl
           mx-auto
-          p-3 sm:p-5 md:p-6
+          p-3 sm:p-0 md:p-0
           text-gray-100
           rounded-xl
-          max-h-[60vh]
+          max-h-[80vh]
           overflow-y-auto
           scrollbar-thin
           scrollbar-thumb-gray-600
           scrollbar-track-transparent
-          h-[30vh]
+          h-[90vh]
         "
       >
         {/* Add debug info for troubleshooting */}
@@ -365,7 +365,7 @@ const MoveNumberMinileague = ({
           </div>
         )}
 
-        <h3 className="mb-4 text-xl sm:text-2xl font-bold text-violet-200 text-center">
+        <h3 className="text-sm sm:text-lg font-bold text-violet-200 text-center">
           Record Match Result 
           <span className="text-sm text-blue-400 block">
             {sectionName}
@@ -376,13 +376,13 @@ const MoveNumberMinileague = ({
         </h3>
 
         {/* Result Selection */}
-        <div className="mb-4 p-4 bg-gray-900/70 rounded-xl border border-gray-700 shadow-md">
-          <p className="text-sm font-medium mb-4 text-gray-300 text-center">
+        <div className="w-full mx-auto mb-2 bg-gray-900/70 rounded-xl border border-gray-700 shadow-md">
+          <p className="text-sm font-medium mt-2 text-gray-300 text-center">
             Select the Match Outcome
           </p>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-center gap-4">
-            <div className="flex items-center justify-between mx-auto gap-8">
+          <div className="flex flex-col items-center justify-center sm:flex-row sm:items-center sm:justify-center gap-4">
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="beat"
@@ -414,7 +414,7 @@ const MoveNumberMinileague = ({
 
         {/* Score Selection */}
         {(ladderType === "best3" || ladderType === "best5" || ladderType === "minileague") && (
-          <div className="mb-4 p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-md">
+          <div className="mb-2 p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-md">
             <p className="text-sm font-medium mb-3 text-gray-300 text-center">
               Select Final Score ({ladderType === "best3" ? "Best of 3" : "Best of 5 / Minileague"})
             </p>
@@ -433,7 +433,7 @@ const MoveNumberMinileague = ({
               ))}
             </div>
 
-            <div className="py-2 px-2 mt-2 rounded-md bg-yellow-200">
+            <div className="py-1 px-2 mt-1 rounded-md bg-yellow-200">
                 <p className="text-center text-black font-semibold">
                   Please make absolutely certain you enter the correct score.
                   <br />
@@ -444,7 +444,7 @@ const MoveNumberMinileague = ({
         )}
 
         {/* Rank Input + Numpad */}
-        <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
+        <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-2 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
           <div className="w-full md:w-1/2 flex flex-col items-center md:items-start">
             <p className="text-base font-medium mb-2 text-gray-300">
               Enter Challenged Rank 
@@ -493,7 +493,7 @@ const MoveNumberMinileague = ({
             )}
           </div>
 
-          <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
+          {/* <div className="w-full md:w-1/3 max-w-xs grid grid-cols-3 gap-2">
             {numberButtons.map((num) => (
               <motion.button
                 key={num}
@@ -501,7 +501,7 @@ const MoveNumberMinileague = ({
                 style={{ touchAction: "manipulation" }}
                 whileTap={{ scale: 0.95 }}
                 className="
-                  h-12
+                  h-8
                   w-full
                   bg-gray-700
                   text-gray-100
@@ -518,10 +518,50 @@ const MoveNumberMinileague = ({
                 {num}
               </motion.button>
             ))}
-          </div>
+          </div> */}
+
+
+
+          <div className="w-full md:w-1/4 max-w-xs grid grid-cols-3 gap-2">
+  {numberButtons.map((num) => {
+    if (num === 0) {
+  return (
+    <div key="zero-row" className="contents">
+      <div />
+      <motion.button
+        onClick={() => handleNumberClick(num)}
+        whileTap={{ scale: 0.95 }}
+        className="h-8 w-full bg-gray-700 text-center text-gray-100 hover:bg-violet-600 transition-all text-xl font-bold rounded-xl shadow-lg border border-gray-600"
+      >
+        {num}
+      </motion.button>
+      <div />
+    </div>
+  );
+}
+
+
+    return (
+      <motion.button
+        key={num}
+        onClick={() => handleNumberClick(num)}
+        style={{ touchAction: "manipulation" }}
+        whileTap={{ scale: 0.95 }}
+        className="h-8 w-full bg-gray-700 text-gray-100 hover:bg-violet-600 transition-all text-xl font-bold rounded-xl shadow-lg border border-gray-600"
+      >
+        {num}
+      </motion.button>
+    );
+  })}
+</div>
+
+
+
+
+
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 mt-6">
+        <div className="flex flex-col sm:flex-row gap-3 mt-2">
           <Button variant="outline" onClick={handleBackspace} className="w-full sm:w-auto bg-gray-700 text-gray-300">
             <ArrowLeft className="w-4 h-4 mr-1" /> Backspace
           </Button>

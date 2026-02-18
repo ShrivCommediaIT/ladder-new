@@ -139,7 +139,7 @@ export const EditPlayer = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh] p-0 overflow-hidden bg-gray-900 text-white rounded-2xl">
+      <DialogContent className="min-w-full md:min-w-[700px] lg:min-w-[900px] bg-gray-900 text-white">
         <DialogTitle>
           <VisuallyHidden>Edit Player</VisuallyHidden>
         </DialogTitle>

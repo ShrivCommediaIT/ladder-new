@@ -229,7 +229,7 @@ const SubAdminDetails = () => {
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
-  // ✅ Load user from storage
+  //  Load user from storage
   useEffect(() => {
     const stored = localStorage.getItem("subAdmin");
     if (stored) {
@@ -243,7 +243,7 @@ const SubAdminDetails = () => {
 
 
 
-  // ✅ Upload handler with instant preview + safe storage merge
+  // Upload handler with instant preview + safe storage merge
   const handleImageChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -253,7 +253,7 @@ const SubAdminDetails = () => {
       return;
     }
 
-    // 🔥 instant preview
+    //  instant preview
     const localPreview = URL.createObjectURL(file);
     setPreviewImage(localPreview);
 
@@ -274,8 +274,6 @@ const SubAdminDetails = () => {
           },
         }
       );
-
-      console.log("UPLOAD RESPONSE =", res.data);
 
       if (res.data.status == 200 || res.data.status === "success") {
         let imageUrl =
@@ -339,7 +337,7 @@ const getImageSrc = () => {
 };
 
 
-  // ✅ Logout
+  //  Logout
   const handleLogout = () => {
     localStorage.removeItem("admin");
     localStorage.removeItem("subAdmin");

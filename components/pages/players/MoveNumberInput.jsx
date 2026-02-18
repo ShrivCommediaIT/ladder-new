@@ -84,7 +84,7 @@ const MoveNumberInput = ({
 
   // ✅ FIXED: Correct payload structure
   const confirmMove = async () => {
-    console.log("🔥 Starting confirmMove...");
+    console.log("Starting confirmMove...");
     
     if (!user_id || !ladder_id || !currentId) {
       toast.error("Missing required information.");
@@ -186,7 +186,7 @@ const handleEnter = () => {
     return;
   }
 
-  // ✅ ✅ REAL SECTION BY RANK (NOT BY FIELD)
+  //  REAL SECTION BY RANK (NOT BY FIELD)
   const currentSectionIndex = Math.floor(
     (Number(currentPlayer.rank) - 1) / Number(preset)
   );
@@ -195,13 +195,13 @@ const handleEnter = () => {
     (Number(challengedPlayer.rank) - 1) / Number(preset)
   );
 
-  // ❌ BLOCK CROSS-SECTION
+  // BLOCK CROSS-SECTION
   if (currentSectionIndex !== targetSectionIndex) {
     setShowSectionAlert(true);
     return;
   }
 
-  // ✅ ALLOW SAME SECTION
+  // ALLOW SAME SECTION
   setShowConfirm(true);
 };
 
@@ -215,7 +215,7 @@ const handleEnter = () => {
 
   if (localLoading) {
     return (
-      <div className="w-full max-w-lg mx-auto p-4 space-y-6">
+      <div className="w-full max-w-lg mx-auto p-2 space-y-2">
         <Skeleton className="h-6 w-3/4 bg-gray-700 rounded-lg" />
         <Skeleton className="h-10 w-full bg-gray-700 rounded-lg" />
         <div className="flex gap-4">
@@ -237,34 +237,35 @@ const handleEnter = () => {
   return (
   <motion.div
     layout
-    className="
+        className="
       w-full
-      max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl
+      max-w-[95vw] overflow-auto sm:max-w-none md:max-w-none lg:max-w-none
       mx-auto
-      p-3 sm:p-5 md:p-6
+      p-3 sm:p-2 md:p-2
       text-gray-100
       rounded-xl
       max-h-[60vh]
-      overflow-y-auto
+      sm:max-h-[80vh]
+      md:max-h-[80vh]
+      lg:max-h-[80vh]
       scrollbar-thin
       scrollbar-thumb-gray-600
       scrollbar-track-transparent
-      h-[30vh]
     "
-  >
-    <h3 className="mb-4 text-xl sm:text-2xl font-bold text-violet-200 text-center">
+    >
+    <h3 className="mb-2 text-xl sm:text-2xl font-bold text-violet-200 text-center">
       Record Match Result
     </h3>
 
     {/* Result Selection */}
-    <div className="mb-4 p-4 bg-gray-900/70 rounded-xl border border-gray-700 shadow-md">
-      <p className="text-sm font-medium mb-4 text-gray-300 text-center">
+    <div className="mb-2 bg-gray-900/70 rounded-xl border border-gray-700 shadow-md">
+      <p className="text-sm font-medium mb-1 text-gray-300 text-center">
         Select the Match Outcome
       </p>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-center gap-4">
        
-       <div className="flex items-center justify-between mx-auto gap-8">
+       <div className="flex items-center justify-between mx-auto gap-3">
          <div className="flex items-center gap-2">
           <Checkbox
             id="beat"
@@ -296,8 +297,8 @@ const handleEnter = () => {
 
     {/* Score Selection */}
     {(ladderType === "best3" || ladderType === "best5") && (
-      <div className="mb-4 p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-md">
-        <p className="text-sm font-medium mb-3 text-gray-300 text-center">
+      <div className="mb-2 p-1 bg-gray-800 rounded-xl border border-gray-700 shadow-md">
+        <p className="text-sm font-medium mb-2 text-gray-300 text-center">
           Select Final Score ({ladderType === "best3" ? "Best of 3" : "Best of 5"})
         </p>
 
@@ -332,7 +333,7 @@ const handleEnter = () => {
           readOnly
           placeholder="---"
           className="
-            mb-3
+            mb-1
             text-3xl sm:text-4xl
             text-center
             font-mono
@@ -354,7 +355,7 @@ const handleEnter = () => {
       </div>
 
       {/* Numpad */}
-      <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
+      {/* <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
         {numberButtons.map((num) => (
           <motion.button
             key={num}
@@ -379,7 +380,68 @@ const handleEnter = () => {
             {num}
           </motion.button>
         ))}
-      </div>
+      </div> */}
+
+      <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
+  {numberButtons.map((num) => {
+    if (num === 0) {
+      return (
+        <div key="zero-row" className="contents">
+          <div />
+          <motion.button
+            onClick={() => handleNumberClick(num)}
+            style={{ touchAction: "manipulation" }}
+            whileTap={{ scale: 0.95 }}
+            className="
+              h-12
+              w-full
+              bg-gray-700
+              text-gray-100
+              hover:bg-violet-600
+              transition-all
+              text-xl
+              font-bold
+              rounded-xl
+              shadow-lg
+              border
+              border-gray-600
+            "
+          >
+            {num}
+          </motion.button>
+          <div />
+        </div>
+      );
+    }
+
+    return (
+      <motion.button
+        key={num}
+        onClick={() => handleNumberClick(num)}
+        style={{ touchAction: "manipulation" }}
+        whileTap={{ scale: 0.95 }}
+        className="
+          h-12
+          w-full
+          bg-gray-700
+          text-gray-100
+          hover:bg-violet-600
+          transition-all
+          text-xl
+          font-bold
+          rounded-xl
+          shadow-lg
+          border
+          border-gray-600
+        "
+      >
+        {num}
+      </motion.button>
+    );
+  })}
+</div>
+
+
     </div>
 
     {/* Action Buttons */}
@@ -475,15 +537,6 @@ const handleEnter = () => {
 };
 
 export default MoveNumberInput;
-
-
-
-
-
-
-
-// ============================ 03-12-2025 =======================
-
 
 
 

@@ -109,60 +109,13 @@ export default function BasicLeaderboardActivityEntryCard({
     if (/^\d*$/.test(val)) setValue(val || "0");
   };
 
-  /* ---------------- SAVE & AUTO CLOSE ⚡ ---------------- */
-  // const handleEnter = useCallback(async () => {
-  //   if (!skillActivityId || !playerId) return;
-
-  //   try {
-  //     setSaving(true);
-
-  //     // const payload = {
-  //     //   user_id: Number(playerId),
-  //     //   skill_activity_id: Number(skillActivityId),
-  //     //   score: Number(value), // negative numbers handled
-  //     // };
-
-  //     const num = Math.abs(Number(value) || 0);
-  //     const finalScore = skillSign === "-" ? -num : num;
-
-  //     const payload = {
-  //       user_id: Number(playerId),
-  //       skill_activity_id: Number(skillActivityId),
-  //       score: finalScore,
-  //     };
-
-  //     await axios.post(
-  //       "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
-  //       payload,
-  //       {
-  //         headers: {
-  //           APPKEY,
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     setOpenSuccess(true);
-
-  //     setTimeout(() => {
-  //       setOpenSuccess(false);
-  //       if (onClose) onClose();
-  //     }, 1500);
-  //   } catch (err) {
-  //     console.error("Failed to save score:", err);
-  //     alert("Failed to save score");
-  //   } finally {
-  //     setSaving(false);
-  //   }
-  // }, [skillActivityId, playerId, value, onClose]);
-
 
   const handleEnter = useCallback(async () => {
   if (!skillActivityId || !playerId) return;
 
   const num = Math.abs(Number(value) || 0);
 
-  // 🚫 ZERO BLOCK
+  // ZERO BLOCK
   if (num === 0) {
     setOpenZeroAlert(true);
     return;

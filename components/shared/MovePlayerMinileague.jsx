@@ -1,12 +1,18 @@
-
-
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { ArrowLeft, X, CheckCircle, XCircle, AlertCircle, Loader2, Upload } from "lucide-react";
+import {
+  ArrowLeft,
+  X,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Loader2,
+  Upload,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -60,92 +66,100 @@ const MovePlayerMinileague = ({
   // Redux selectors
   const rawMiniLeague = useSelector((state) => state.minileague?.data || []);
   const ladderDetails = useSelector(
-    (state) => state.player?.players?.[effectiveLadderId]?.ladderDetails || {}
+    (state) => state.player?.players?.[effectiveLadderId]?.ladderDetails || {},
   );
   const ladderType = ladderDetails?.type?.trim().toLowerCase() || "minileague";
 
-  // ✅ FIXED: Memoized players & sectionMap
+  // FIXED: Memoized players & sectionMap
   const { players, sectionMap } = useMemo(() => {
-    
     let players = [];
     let sectionMap = {};
 
     rawMiniLeague.forEach((sectionObj, sectionIndex) => {
-     
       const users = sectionObj?.users_record || sectionObj?.users || [];
       users.forEach((p) => {
         const playerId = Number(p.id);
-        players.push({ 
-          ...p, 
+        players.push({
+          ...p,
           id: playerId,
           rank: Number(p.rank || 0),
-          sectionIndex
+          sectionIndex,
         });
         sectionMap[playerId] = sectionIndex;
       });
     });
 
-
     return { players, sectionMap };
   }, [rawMiniLeague]);
 
-  // ✅ FIXED: Current player section
+  // FIXED: Current player section
   const getCurrentSection = useCallback(() => {
     const effectiveCurrentId = currentId || selectedPlayer?.id;
-    
+
     if (selectedPlayer?.sectionIndex !== undefined) {
       return selectedPlayer.sectionIndex;
     }
-    
+
     if (currentSectionIndex !== undefined) {
       return currentSectionIndex;
     }
-    
+
     const sectionFromMap = sectionMap[effectiveCurrentId];
     if (sectionFromMap !== undefined) {
       return sectionFromMap;
     }
-    
+
     return 0;
   }, [selectedPlayer, currentSectionIndex, currentId, sectionMap]);
 
   const currentSection = getCurrentSection();
   const sectionName =
-    rawMiniLeague[currentSection]?.section ||
-    `Section ${currentSection + 1}`;
+    rawMiniLeague[currentSection]?.section || `Section ${currentSection + 1}`;
   const effectiveCurrentId = currentId || selectedPlayer?.id || null;
 
   // ✅ FIXED: Memoized same section players & ranks
   const sameSectionPlayers = useMemo(() => {
-    const sectionPlayers = players.filter(p => p.sectionIndex === currentSection);
+    const sectionPlayers = players.filter(
+      (p) => p.sectionIndex === currentSection,
+    );
     return sectionPlayers;
   }, [players, currentSection]);
 
   const availableRanks = useMemo(() => {
-    const ranks = sameSectionPlayers.map(p => Number(p.rank)).sort((a, b) => a - b);
+    const ranks = sameSectionPlayers
+      .map((p) => Number(p.rank))
+      .sort((a, b) => a - b);
     return ranks;
   }, [sameSectionPlayers]);
 
-  const isValidRankForSection = useCallback((rank) => {
-    const valid = availableRanks.includes(Number(rank));
-    return valid;
-  }, [availableRanks]);
+  const isValidRankForSection = useCallback(
+    (rank) => {
+      const valid = availableRanks.includes(Number(rank));
+      return valid;
+    },
+    [availableRanks],
+  );
 
   // 🔥 FIXED: SIRF SAME SECTION se challengedPlayer find karo
   const challengedPlayer = useMemo(() => {
-    const player = sameSectionPlayers.find((p) => Number(p.rank) === Number(selectedNumber));
+    const player = sameSectionPlayers.find(
+      (p) => Number(p.rank) === Number(selectedNumber),
+    );
     return player;
   }, [sameSectionPlayers, selectedNumber, currentSection]);
 
   // ✅ targetSectionIndex direct calculate
-  const targetSectionIndex = challengedPlayer ? challengedPlayer.sectionIndex : null;
+  const targetSectionIndex = challengedPlayer
+    ? challengedPlayer.sectionIndex
+    : null;
 
   const numberButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-  const scoreOptions = ladderType === "best3" 
-    ? ["2-0", "2-1"] 
-    : (ladderType === "best5" || ladderType === "minileague") 
-    ? ["3-0", "3-1", "3-2"] 
-    : [];
+  const scoreOptions =
+    ladderType === "best3"
+      ? ["2-0", "2-1"]
+      : ladderType === "best5" || ladderType === "minileague"
+        ? ["3-0", "3-1", "3-2"]
+        : [];
 
   // NEW: Open confirm with win/loss detection
   const openConfirmDialog = useCallback(() => {
@@ -168,18 +182,21 @@ const MovePlayerMinileague = ({
 
   const handleNumberClick = (num) => {
     const newNumber = String(selectedNumber) + String(num);
-    
+
     if (newNumber.length <= 3) {
       if (newNumber.length < 3 || isValidRankForSection(newNumber)) {
         setSelectedNumber(newNumber);
       } else {
-        toast.error(`Rank ${newNumber} not available in Section ${sectionName}`);
+        toast.error(
+          `Rank ${newNumber} not available in Section ${sectionName}`,
+        );
       }
     }
   };
 
-  const handleBackspace = () => setSelectedNumber((prev) => String(prev).slice(0, -1));
-  
+  const handleBackspace = () =>
+    setSelectedNumber((prev) => String(prev).slice(0, -1));
+
   const handleCancel = () => {
     resetForm();
     onClose();
@@ -210,7 +227,7 @@ const MovePlayerMinileague = ({
       Number(currentRank) ||
       Number(selectedPlayer?.rank) ||
       Number(
-        players.find(p => Number(p.id) === Number(effectiveCurrentId))?.rank
+        players.find((p) => Number(p.id) === Number(effectiveCurrentId))?.rank,
       ) ||
       0;
 
@@ -218,7 +235,8 @@ const MovePlayerMinileague = ({
       setIsConfirming(true);
       setLoading?.(true);
 
-      const fromSectionName = rawMiniLeague[currentSection]?.section || "unknown";
+      const fromSectionName =
+        rawMiniLeague[currentSection]?.section || "unknown";
       const toSectionName = fromSectionName;
 
       const payload = {
@@ -260,13 +278,19 @@ const MovePlayerMinileague = ({
       return;
     }
 
-    if (!selectedNumber || isNaN(selectedNumber) || Number(selectedNumber) <= 0) {
+    if (
+      !selectedNumber ||
+      isNaN(selectedNumber) ||
+      Number(selectedNumber) <= 0
+    ) {
       toast.error("Please enter a valid rank number.");
       return;
     }
 
     if (!challengedPlayer) {
-      toast.error(`Player with rank ${selectedNumber} not found in Section ${currentSection + 1}`);
+      toast.error(
+        `Player with rank ${selectedNumber} not found in Section ${currentSection + 1}`,
+      );
       return;
     }
 
@@ -288,7 +312,7 @@ const MovePlayerMinileague = ({
 
     if (challengedPlayer.sectionIndex !== currentSection) {
       toast.error(
-        `Player in Section ${challengedPlayer.sectionIndex + 1}, not your Section ${currentSection + 1}`
+        `Player in Section ${challengedPlayer.sectionIndex + 1}, not your Section ${currentSection + 1}`,
       );
       return;
     }
@@ -323,24 +347,25 @@ const MovePlayerMinileague = ({
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.2 }}
         className="
-          w-full
-          max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl
-          mx-auto
-          p-3 sm:p-5 md:p-6
-          text-gray-100
-          rounded-xl
-          max-h-[60vh]
-          overflow-y-auto
-          scrollbar-thin
-          scrollbar-thumb-gray-600
-          scrollbar-track-transparent
-          h-[30vh]
+              w-full
+      max-w-[95vw] overflow-auto sm:max-w-none md:max-w-none lg:max-w-none
+      mx-auto
+      p-3 sm:p-2 md:p-2
+      text-gray-100
+      rounded-xl
+      max-h-[60vh]
+      sm:max-h-[80vh]
+      md:max-h-[80vh]
+      lg:max-h-[80vh]
+      scrollbar-thin
+      scrollbar-thumb-gray-600
+      scrollbar-track-transparent
         "
       >
-        <h3 className="mb-4 text-xl sm:text-2xl font-bold text-violet-200 text-center">
-          Record Match Result 
+        <h3 className="mb-2 text-xl sm:text-2xl font-bold text-violet-200 text-center">
+          Record Match Result
           <span className="text-sm text-blue-400 block">
-            {sectionName} 
+            {sectionName}
             <span className="text-green-400 ml-1">
               ({sameSectionPlayers.length} players)
             </span>
@@ -348,8 +373,8 @@ const MovePlayerMinileague = ({
         </h3>
 
         {/* Result Selection */}
-        <div className="mb-4 p-4 bg-gray-900/70 rounded-xl border border-gray-700 shadow-md">
-          <p className="text-sm font-medium mb-4 text-gray-300 text-center">
+        <div className="mb-2 p-2 bg-gray-900/70 rounded-xl border border-gray-700 shadow-md">
+          <p className="text-sm font-medium mb-2 text-gray-300 text-center">
             Select the Match Outcome
           </p>
 
@@ -362,7 +387,10 @@ const MovePlayerMinileague = ({
                   onCheckedChange={(val) => setResultType(val ? "beat" : "")}
                   className="border-green-300 data-[state=checked]:bg-green-500"
                 />
-                <label htmlFor="beat" className="text-base font-medium cursor-pointer">
+                <label
+                  htmlFor="beat"
+                  className="text-base font-medium cursor-pointer"
+                >
                   Beat
                 </label>
               </div>
@@ -374,21 +402,30 @@ const MovePlayerMinileague = ({
                   onCheckedChange={(val) => setResultType(val ? "lost" : "")}
                   className="border-red-300 data-[state=checked]:bg-red-500"
                 />
-                <label htmlFor="lost" className="text-base font-medium cursor-pointer">
+                <label
+                  htmlFor="lost"
+                  className="text-base font-medium cursor-pointer"
+                >
                   Lost to
                 </label>
               </div>
             </div>
 
-            <PlayerBet betDescription={betDescription} setBetDescription={setBetDescription} />
+            <PlayerBet
+              betDescription={betDescription}
+              setBetDescription={setBetDescription}
+            />
           </div>
         </div>
 
         {/* Score Selection */}
-        {(ladderType === "best3" || ladderType === "best5" || ladderType === "minileague") && (
-          <div className="mb-4 p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-md">
+        {(ladderType === "best3" ||
+          ladderType === "best5" ||
+          ladderType === "minileague") && (
+          <div className="mb-2 p-2 bg-gray-800 rounded-xl border border-gray-700 shadow-md">
             <p className="text-sm font-medium mb-3 text-gray-300 text-center">
-              Select Final Score ({ladderType === "best3" ? "Best of 3" : "Best of 5 / Minileague"})
+              Select Final Score (
+              {ladderType === "best3" ? "Best of 3" : "Best of 5 / Minileague"})
             </p>
 
             <div className="flex justify-center gap-2 flex-wrap">
@@ -400,12 +437,17 @@ const MovePlayerMinileague = ({
                     onCheckedChange={(val) => setScore(val ? s : "")}
                     className="border-violet-500 data-[state=checked]:bg-violet-600"
                   />
-                  <label htmlFor={s} className="text-base font-medium cursor-pointer">{s}</label>
+                  <label
+                    htmlFor={s}
+                    className="text-base font-medium cursor-pointer"
+                  >
+                    {s}
+                  </label>
                 </div>
               ))}
             </div>
 
-            <div className="py-2 px-2 mt-2 rounded-md bg-yellow-200">
+            <div className="py-1 px-2 mt-1 rounded-md bg-yellow-200">
               <p className="text-center text-black font-semibold">
                 Please make absolutely certain you enter the correct score.
                 <br />
@@ -416,10 +458,10 @@ const MovePlayerMinileague = ({
         )}
 
         {/* Rank Input + Numpad */}
-        <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
+        <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-2 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
           <div className="w-full md:w-1/2 flex flex-col items-center md:items-start">
             <p className="text-base font-medium mb-2 text-gray-300">
-              Enter Challenged Rank 
+              Enter Challenged Rank
               <span className="text-green-400 font-semibold ml-2">
                 ({sectionName})
               </span>
@@ -441,31 +483,42 @@ const MovePlayerMinileague = ({
                 text-violet-400
                 tracking-widest
                 rounded-xl
-                ${selectedNumber && isValidRankForSection(selectedNumber) 
-                  ? 'border-green-500 ring-2 ring-green-500/30' 
-                  : 'border-violet-500'
+                ${
+                  selectedNumber && isValidRankForSection(selectedNumber)
+                    ? "border-green-500 ring-2 ring-green-500/30"
+                    : "border-violet-500"
                 }
               `}
             />
 
             {challengedPlayer && (
               <div className="text-sm text-gray-100 mt-1 space-y-1">
-                <p>Player: <span className="font-semibold text-green-400">{challengedPlayer.name}</span></p>
+                <p>
+                  Player:{" "}
+                  <span className="font-semibold text-green-400">
+                    {challengedPlayer.name}
+                  </span>
+                </p>
                 <p className="font-medium text-green-400">
                   Same Section ({targetSectionIndex + 1})
                 </p>
               </div>
             )}
-            
+
             {selectedNumber && !isValidRankForSection(selectedNumber) && (
               <p className="text-md font-semibold text-red-400 mt-1 text-justify ">
                 can only post results against players in your minileague section
-                Rank <span className="text-yellow-400">{selectedNumber}</span> not in your section. <span className="text-yellow-400">Available: {availableRanks.slice(0, 6).join(', ')}{availableRanks.length > 6 ? '...' : ''}</span> 
+                Rank <span className="text-yellow-400">{selectedNumber}</span>{" "}
+                not in your section.{" "}
+                <span className="text-yellow-400">
+                  Available: {availableRanks.slice(0, 6).join(", ")}
+                  {availableRanks.length > 6 ? "..." : ""}
+                </span>
               </p>
             )}
           </div>
 
-          <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
+          {/* <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
             {numberButtons.map((num) => (
               <motion.button
                 key={num}
@@ -473,7 +526,7 @@ const MovePlayerMinileague = ({
                 style={{ touchAction: "manipulation" }}
                 whileTap={{ scale: 0.95 }}
                 className="
-                  h-12
+                  h-8
                   w-full
                   bg-gray-700
                   text-gray-100
@@ -490,21 +543,93 @@ const MovePlayerMinileague = ({
                 {num}
               </motion.button>
             ))}
+          </div> */}
+
+          <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
+            {numberButtons.map((num) => {
+              if (num === 0) {
+                return (
+                  <div key="zero-row" className="contents">
+                    <div />
+                    <motion.button
+                      onClick={() => handleNumberClick(num)}
+                      style={{ touchAction: "manipulation" }}
+                      whileTap={{ scale: 0.95 }}
+                      className="
+              h-8
+              w-full
+              bg-gray-700
+              text-gray-100
+              hover:bg-violet-600
+              transition-all
+              text-xl
+              font-bold
+              rounded-xl
+              shadow-lg
+              border
+              border-gray-600
+            "
+                    >
+                      {num}
+                    </motion.button>
+                    <div />
+                  </div>
+                );
+              }
+
+              return (
+                <motion.button
+                  key={num}
+                  onClick={() => handleNumberClick(num)}
+                  style={{ touchAction: "manipulation" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="
+          h-8
+          w-full
+          bg-gray-700
+          text-gray-100
+          hover:bg-violet-600
+          transition-all
+          text-xl
+          font-bold
+          rounded-xl
+          shadow-lg
+          border
+          border-gray-600
+        "
+                >
+                  {num}
+                </motion.button>
+              );
+            })}
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 mt-6">
-          <Button variant="outline" onClick={handleBackspace} className="w-full sm:w-auto bg-gray-700 text-gray-300">
+        <div className="flex flex-col sm:flex-row gap-3 mt-2">
+          <Button
+            variant="outline"
+            onClick={handleBackspace}
+            className="w-full sm:w-auto bg-gray-700 text-gray-300"
+          >
             <ArrowLeft className="w-4 h-4 mr-1" /> Backspace
           </Button>
 
-          <Button variant="destructive" onClick={handleCancel} className="w-full sm:w-auto">
+          <Button
+            variant="destructive"
+            onClick={handleCancel}
+            className="w-full sm:w-auto"
+          >
             <X className="w-4 h-4 mr-1" /> Cancel
           </Button>
 
           <Button
             onClick={handleEnter}
-            disabled={!selectedNumber || !resultType || (ladderType === "minileague" && !score) || !challengedPlayer}
+            disabled={
+              !selectedNumber ||
+              !resultType ||
+              (ladderType === "minileague" && !score) ||
+              !challengedPlayer
+            }
             className="w-full sm:w-auto bg-gradient-to-r from-violet-600 to-purple-600 text-white font-bold disabled:bg-gray-600"
           >
             <CheckCircle className="w-4 h-4 mr-1" /> Post Result
@@ -521,17 +646,20 @@ const MovePlayerMinileague = ({
                 ) : (
                   <XCircle className="text-red-500 h-5 w-5 animate-pulse" />
                 )}
-                Confirm {isWin ? 'WIN' : 'LOSS'}
+                Confirm {isWin ? "WIN" : "LOSS"}
               </AlertDialogTitle>
               <AlertDialogDescription className="text-gray-200 mt-4 space-y-4 text-sm">
                 {/* Match Details Card */}
                 <div>
-                  <div className={`py-3 px-4 rounded text-md font-bold mx-auto w-fit ${
-                    isWin 
-                      ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
-                      : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                  }`}>
-                    {isWin ? 'WIN' : ' LOSS'} ({score}) vs #{selectedNumber} ({challengedPlayer?.name})
+                  <div
+                    className={`py-3 px-4 rounded text-md font-bold mx-auto w-fit ${
+                      isWin
+                        ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                        : "bg-red-500/20 text-red-300 border border-red-500/30"
+                    }`}
+                  >
+                    {isWin ? "WIN" : " LOSS"} ({score}) vs #{selectedNumber} (
+                    {challengedPlayer?.name})
                   </div>
                 </div>
 
@@ -541,8 +669,8 @@ const MovePlayerMinileague = ({
                     <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="text-red-200 font-semibold text-sm">
-                        Please verify all details carefully.
-                        This action cannot be undone.
+                        Please verify all details carefully. This action cannot
+                        be undone.
                       </p>
                     </div>
                   </div>
@@ -553,12 +681,12 @@ const MovePlayerMinileague = ({
               <AlertDialogCancel className="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-600 h-11">
                 <ArrowLeft className="h-4 w-4 mr-2" /> Go Back
               </AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={confirmMove} 
+              <AlertDialogAction
+                onClick={confirmMove}
                 className={`w-full sm:w-auto h-11 font-semibold ${
-                  isWin 
-                    ? 'bg-green-600 hover:bg-green-700 border-green-500/50' 
-                    : 'bg-red-600 hover:bg-red-700 border-red-500/50'
+                  isWin
+                    ? "bg-green-600 hover:bg-green-700 border-green-500/50"
+                    : "bg-red-600 hover:bg-red-700 border-red-500/50"
                 }`}
                 disabled={isConfirming}
               >
@@ -569,8 +697,12 @@ const MovePlayerMinileague = ({
                   </>
                 ) : (
                   <>
-                    {isWin ? <CheckCircle className="h-4 w-4 mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
-                    {isWin ? 'Confirm WIN & Post' : 'Confirm LOSS & Post'}
+                    {isWin ? (
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Upload className="h-4 w-4 mr-2" />
+                    )}
+                    {isWin ? "Confirm WIN & Post" : "Confirm LOSS & Post"}
                   </>
                 )}
               </AlertDialogAction>

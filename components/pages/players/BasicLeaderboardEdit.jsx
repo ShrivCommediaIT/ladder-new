@@ -71,7 +71,7 @@ export const BasicLeaderboardEdit = ({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="min-w-full md:min-w-[700px] lg:min-w-[900px] bg-gray-900 text-white">
-        <DialogTitle className="text-xl font-bold border-b border-gray-700 p-4">
+        <DialogTitle className="text-xl font-bold border-b border-gray-700 p-1">
           {selectedPlayer?.name || "Player"}
         </DialogTitle>
 
@@ -124,13 +124,13 @@ export const BasicLeaderboardEdit = ({
 
             {/* ACTIVITY TAB - PASS onClose */}
             <TabsContent value="activity">
-              <div className="max-h-[50vh] overflow-auto text-white">
+              <div className="max-h-[60vh] overflow-auto text-white">
                 <BasicLeaderboardActivityEntryCard
                   ladderId={ladder_id}
                   skillNumber={skillNumber}
                   playerId={playerId}
                   skillActivityId={skillActivityId}
-                  onClose={handleChildClose} // ✅ PASS HERE
+                  onClose={handleChildClose}
                   initialActivity={skillNumber}
                 />
               </div>

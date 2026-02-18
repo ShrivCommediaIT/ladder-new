@@ -117,9 +117,9 @@ export const BasicLeaderboardUserEdit = ({
               </Select>
             </div>
 
-            {/* 🔥 ACTIVITY TAB - PASS onClose */}
+            {/* ACTIVITY TAB - PASS onClose */}
             <TabsContent value="activity">
-              <div className="max-h-[50vh] overflow-auto">
+              <div className="max-h-[70vh] overflow-auto">
                 <BasicLeaderboardUserActivityEntryCard
                   ladderId={ladder_id}
                   skillNumber={skillNumber}

@@ -26,7 +26,7 @@ export const MinileagueEditPlayer = ({
   open = true,
   onClose = () => {},
   currentId = null,
-  ladderId: propLadderId, // RECEIVE LADDER ID
+  ladderId: propLadderId,
   setLoading = () => {},
   sectionIndex = null,
 }) => {
@@ -52,8 +52,6 @@ if (userData.user_type === "admin") {
 } else {
   userId = userData.id || null;
 }
-
-
 
   const playersStore = useSelector((state) => state.player?.players || {});
   const { error: moveError, result } =
@@ -157,7 +155,7 @@ if (userData.user_type === "admin") {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="min-w-full md:min-w-[700px] lg:min-w-[900px] bg-gray-900 text-white">
-        <DialogTitle className="text-xl font-bold border-b border-gray-700 p-4">
+        <DialogTitle className="text-xl font-bold border-b border-gray-700 ">
           {selectedPlayer?.name}
           {sectionName && (
             <span className="ml-2 text-sm text-blue-400">{sectionName}</span>
@@ -254,6 +252,9 @@ if (userData.user_type === "admin") {
           </Tabs>
         </motion.div>
       </DialogContent>
+
+
+      
     </Dialog>
   );
 };

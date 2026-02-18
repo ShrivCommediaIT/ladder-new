@@ -872,10 +872,10 @@ export default function BasicLeaderboardActivityEntryCard({
 
   return (
     <>
-      <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
+      <Card className="w-full mx-auto bg-slate-900 text-white border-none p-1">
     
         {/* HEADER - FIXED */}
-        <div className="mb-2">
+        <div className="">
           <p className="text-[11px] uppercase tracking-wide text-sky-300">
             Skill Selected Number : {selectedActivity}
           </p>
@@ -884,7 +884,7 @@ export default function BasicLeaderboardActivityEntryCard({
           {loadingSkill ? (
             <p className="text-xs text-slate-400">Loading skill...</p>
           ) : (
-            <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
+            <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal leading-relaxed">
               Skill Name : {skillDesc || "No skill description"}
             </p>
           )}
@@ -893,14 +893,14 @@ export default function BasicLeaderboardActivityEntryCard({
           {loadingSkill ? (
             <p className="text-xs text-slate-400">Loading target...</p>
           ) : (
-            <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
+            <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal leading-relaxed">
               Target : {skillTarget ? Math.abs(skillTarget) : "No target"}
             </p>
           )}
         </div>
 
         {/* ACTIVITY BUTTONS */}
-        <div className="flex flex-wrap gap-1.5 mb-2">
+        <div className="flex flex-wrap gap-1.5 mb-1">
           {activityNumbers.map((n) => (
             <button
               key={n}
@@ -928,12 +928,12 @@ export default function BasicLeaderboardActivityEntryCard({
         />
 
         {/* NUMPAD */}
-        <div className="grid grid-cols-3 gap-2 mt-2">
+        <div className="grid grid-cols-3 gap-2">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
             <button
               key={d}
               onClick={() => handleDigit(String(d))}
-              className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
+              className="h-8 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
             >
               {d}
             </button>
@@ -961,7 +961,7 @@ export default function BasicLeaderboardActivityEntryCard({
         <Button
           disabled={saving}
           onClick={handleEnter}
-          className="w-full mt-3 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-lg"
+          className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-lg"
         >
           {saving ? "Saving..." : "Enter"}
         </Button>
