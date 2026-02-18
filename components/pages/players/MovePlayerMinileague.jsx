@@ -365,7 +365,7 @@ const MoveNumberMinileague = ({
           </div>
         )}
 
-        <h3 className="text-sm sm:text-lg font-bold text-violet-200 text-center">
+        <h3 className="text-sm mb-2 sm:text-lg font-bold text-violet-200 text-center">
           Record Match Result 
           <span className="text-sm text-blue-400 block">
             {sectionName}
@@ -444,7 +444,7 @@ const MoveNumberMinileague = ({
         )}
 
         {/* Rank Input + Numpad */}
-        <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-2 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
+        <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-3 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
           <div className="w-full md:w-1/2 flex flex-col items-center md:items-start">
             <p className="text-base font-medium mb-2 text-gray-300">
               Enter Challenged Rank 
@@ -477,7 +477,7 @@ const MoveNumberMinileague = ({
             />
 
             {challengedPlayer && (
-              <div className="text-sm text-gray-100 mt-1 space-y-1">
+              <div className="text-sm text-gray-100 mt-2 space-y-1">
                 <p>Player: <span className="font-semibold text-green-400">{challengedPlayer.name}</span></p>
                 <p className="font-medium text-green-400">
                   Same Section ({targetSectionIndex + 1})
@@ -561,7 +561,7 @@ const MoveNumberMinileague = ({
 
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 mt-2">
+        <div className="flex flex-col sm:flex-row gap-3 mt-7">
           <Button variant="outline" onClick={handleBackspace} className="w-full sm:w-auto bg-gray-700 text-gray-300">
             <ArrowLeft className="w-4 h-4 mr-1" /> Backspace
           </Button>

@@ -727,7 +727,7 @@ const processedSections = invertRanking
 const finalSections = React.useMemo(() => {
   const q = searchQuery.trim().toLowerCase();
 
-  // ✅ NORMAL MODE — unchanged
+  //  NORMAL MODE — unchanged
   if (!q) {
     return processedSections.map((sec) => ({
       label: sec?.section,
@@ -739,7 +739,7 @@ const finalSections = React.useMemo(() => {
     }));
   }
 
-  // ✅ SEARCH MODE
+  // SEARCH MODE
   const sections = [];
 
   processedSections.forEach((sec) => {
@@ -765,7 +765,7 @@ const finalSections = React.useMemo(() => {
       sections.push({
         label: sec?.section,
         players,
-        blankCount: 0, // hide blanks in search
+        blankCount: 0,
       });
     }
   });
@@ -812,7 +812,7 @@ const finalSections = React.useMemo(() => {
                   key={player.id}
                   player={{ ...player, sectionIndex: idx }}
                   rank={player.rank || globalIndex + 1}
-                  isAllowed={true} // ✅ Everyone allowed now
+                  isAllowed={true} // Everyone allowed now
                   canEdit={
                     user?.user_type === "admin" || user?.id === player?.user_id
                   }
