@@ -43,7 +43,6 @@ const MoveNumberMinileague = ({
   const fallbackLadderId = Number(searchParams.get("ladder_id")) || null;
   const effectiveLadderId = ladderId || fallbackLadderId;
 
-  
 
   // Existing state
   const [selectedNumber, setSelectedNumber] = useState("");
@@ -64,7 +63,7 @@ const MoveNumberMinileague = ({
   );
   const ladderType = ladderDetails?.type?.trim().toLowerCase() || "minileague";
 
-  // 🔥 FIXED: Get current player rank from multiple sources with fallback
+  // FIXED: Get current player rank from multiple sources with fallback
   const currentPlayerRank = useMemo(() => {
     // Priority 1: Use passed currentRank
     if (currentRank != null && !isNaN(Number(currentRank)) && Number(currentRank) > 0) {
@@ -198,7 +197,7 @@ const MoveNumberMinileague = ({
     setIsWin(false);
   };
 
-  // 🔥 ENHANCED: Updated confirmMove with loading states
+  // ENHANCED: Updated confirmMove with loading states
   const confirmMove = async () => {
   
 
@@ -555,10 +554,6 @@ const MoveNumberMinileague = ({
   })}
 </div>
 
-
-
-
-
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mt-7">
@@ -579,7 +574,7 @@ const MoveNumberMinileague = ({
           </Button>
         </div>
 
-        {/* 🔥 ENHANCED Confirm Dialog with Win/Loss */}
+        {/* ENHANCED Confirm Dialog with Win/Loss */}
         <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
           <AlertDialogContent className="bg-gray-900 border-violet-500 text-gray-100 w-[92vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
             <AlertDialogHeader>

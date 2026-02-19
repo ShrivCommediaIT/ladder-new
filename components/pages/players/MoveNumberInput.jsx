@@ -82,10 +82,8 @@ const MoveNumberInput = ({
     setBetDescription("");
   };
 
-  // ✅ FIXED: Correct payload structure
+  // FIXED: Correct payload structure
   const confirmMove = async () => {
-    console.log("Starting confirmMove...");
-    
     if (!user_id || !ladder_id || !currentId) {
       toast.error("Missing required information.");
       setShowConfirm(false);
@@ -95,10 +93,10 @@ const MoveNumberInput = ({
     try {
       setLoading(true);
       
-      // ✅ PERFECT Payload for each API
+      // PERFECT Payload for each API
       let payload;
       
-      if (ladderType === "best5") {
+      if (ladderType === "best5" || "best3" || "winlose") {
         // Best of 5 API payload (NO move_from_user_id)
         payload = {
           ladder_id,
@@ -107,7 +105,7 @@ const MoveNumberInput = ({
           move_to_rank: Number(selectedNumber),
           score,
           move_from_rank: currentRank,
-          bet: betDescription || "",
+          bet: betDescription,
         };
         
         const result = await dispatch(movePlayerBestOf5(payload)).unwrap();
