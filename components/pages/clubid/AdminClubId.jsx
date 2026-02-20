@@ -321,7 +321,7 @@ useEffect(() => {
       <Card className="md:w-1/2 w-full rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg text-white">
         <div className="px-6 py-3 border-b border-white/20 flex justify-between ">
           <span className="text-sm tracking-widest font-bold">
-            Sub Admin List
+            Section Admin List
           </span>
           <span className="text-sm tracking-widest font-bold">
             Club Id: {clubIdFixed}
@@ -334,11 +334,11 @@ useEffect(() => {
               <TableRow className=" rounded-md hover:bg-transparent transition text-md">
                 <TableHead className="text-white font-semibold">#</TableHead>
                 <TableHead className="text-white font-semibold">
-                  Sub-admin
+                  Section-admin
                 </TableHead>
                 {/* <TableHead className="text-white font-semibold">ClubId</TableHead> */}
                 <TableHead className="text-white font-semibold">
-                  Sports
+                  Section Name
                 </TableHead>
                 <TableHead className="text-white font-semibold">PIN</TableHead>
                 <TableHead className="text-white font-semibold">
@@ -354,7 +354,7 @@ useEffect(() => {
                     colSpan={6}
                     className="text-center text-slate-300 py-6"
                   >
-                    No sub admin created
+                    No Section admin created
                   </TableCell>
                 </TableRow>
               ) : (
@@ -416,7 +416,7 @@ useEffect(() => {
       <Card className="md:w-1/2 w-full rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg text-white">
         <CardHeader className="text-center">
           <CardTitle className="text-xl font-extrabold tracking-wide">
-            Generate Sub Admin Club ID
+            Generate Section Admin Club ID
           </CardTitle>
         </CardHeader>
 
@@ -431,7 +431,7 @@ useEffect(() => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Sub-admin Name</FormLabel>
+                    <FormLabel>Section admin Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -448,7 +448,7 @@ useEffect(() => {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Sports Name</FormLabel>
+                    <FormLabel>Section Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -498,7 +498,7 @@ useEffect(() => {
                 disabled={loading}
                 className="w-full rounded-xl bg-teal-800 hover:bg-teal-700 shadow-lg"
               >
-                {loading ? "Creating..." : "Generate Sub Admin"}
+                {loading ? "Creating..." : "Generate Section Admin"}
               </Button>
               {errorMessage && (
                 <p className="text-center text-red-400 text-sm">
@@ -516,7 +516,7 @@ useEffect(() => {
       >
         <div className="p-6 flex flex-col h-full">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Edit Sub Admin</h2>
+            <h2 className="text-lg font-semibold">Edit Section Admin</h2>
             <Button
               onClick={() => setIsDrawerOpen(false)}
               className="bg-red-500 h-8 w-8 rounded-full hover:bg-red-600 text-white px-2 py-1 cursor-pointer"
@@ -553,7 +553,7 @@ useEffect(() => {
 
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Sports Name
+                  Section Name
                 </label>
                 <input
                   type="text"
@@ -568,25 +568,7 @@ useEffect(() => {
                   required
                 />
               </div>
-{/* 
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Club ID
-                </label>
-                <input
-                  type="text"
-                  value={selectedAdmin.clubId}
-                  onChange={(e) =>
-                    setSelectedAdmin({
-                      ...selectedAdmin,
-                      clubId: e.target.value,
-                    })
-                  }
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-                  required
-                  readOnly
-                />
-              </div> */}
+
 
               <div>
                 <label className="block text-sm font-medium mb-1">PIN</label>

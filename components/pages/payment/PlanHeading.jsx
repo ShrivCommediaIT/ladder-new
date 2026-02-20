@@ -43,7 +43,7 @@ export default function PlanHeading() {
           Online Sports Solutions
         </h1>
 
-        <p className="text-sm sm:text-lg bg-[#2A4151] rounded-lg shadow py-4 font-semibold mb-2 text-white">
+        <p className="text-sm sm:text-lg bg-slate-900 italic rounded-lg shadow py-4 font-semibold mb-2 text-white">
           Automated Ladders, Minileagues, Leaderboards, Skills & Performance
           Challenge Boards and so much more
         </p>

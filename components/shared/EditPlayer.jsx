@@ -67,7 +67,7 @@ export const EditPlayer = ({
   const status = useSelector((s) => s?.playerStatus) || {};
   const image = useSelector((s) => s?.profileImage) || {};
 
-  const [activeTab, setActiveTab] = useState("move");
+  const [activeTab, setActiveTab] = useState("");
   const [challengedPlayer, setChallengedPlayer] = useState("");
   const [showEditSkeleton, setShowEditSkeleton] = useState(false);
 
@@ -167,7 +167,7 @@ export const EditPlayer = ({
             </div>
 
             {/* MOBILE */}
-            <div className="sm:hidden mb-4">
+            {/* <div className="sm:hidden mb-4">
               <Select value={activeTab} onValueChange={setActiveTab}>
                 <SelectTrigger className="w-full bg-gray-800 text-white">
                   <SelectValue />
@@ -180,7 +180,26 @@ export const EditPlayer = ({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
+
+<div className="sm:hidden mb-4">
+  <Select
+    value={activeTab}
+    onValueChange={(val) => setActiveTab(val)}
+  >
+    <SelectTrigger className="w-full bg-gray-800 text-white">
+      <SelectValue placeholder="Select" />
+    </SelectTrigger>
+
+    <SelectContent className="bg-gray-800 text-white">
+      {tabs.map((tab) => (
+        <SelectItem key={tab.value} value={tab.value}>
+          {tab.label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
 
             {/* CONTENT */}
             <motion.div

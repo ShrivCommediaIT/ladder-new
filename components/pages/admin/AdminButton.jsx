@@ -1,5 +1,3 @@
-
-
 // ========================= 16-01-2026 ... Prakash Code .... working without inverted button
 
 // import React, { useState, useEffect } from "react";
@@ -430,21 +428,7 @@
 
 // export default AdminButton;
 
-
-
-
-
-
-
-
-
-
-
-
-
 // ============================ 03-02-2026 ... Prakash Code ... working with inverted button
-
-
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -620,7 +604,7 @@ const AdminButton = () => {
       );
 
       setConfirmOpen(false);
-      setOpenUploadDialog(true);
+      // setOpenUploadDialog(true);
       toast.success("Leaderboard reset successfully!");
       refreshLeaderboard();
     } catch {
@@ -685,7 +669,7 @@ const AdminButton = () => {
               disabled={zeroLoading}
               className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold rounded-xl py-8 w-full shadow-lg"
             >
-             <Zap size={20} /> {zeroLoading ? "RESETTING..." : "ZERO ALL"}
+              <Zap size={20} /> {zeroLoading ? "RESETTING..." : "ZERO ALL"}
             </Button>
 
             <Button
@@ -696,7 +680,7 @@ const AdminButton = () => {
               disabled={updateLoading}
               className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold rounded-xl py-8 w-full shadow-lg"
             >
-               <RotateCw size={20} /> {updateLoading ? "UPDATING..." : "UPDATE"}
+              <RotateCw size={20} /> {updateLoading ? "UPDATING..." : "UPDATE"}
             </Button>
           </>
         )}
@@ -725,7 +709,7 @@ const AdminButton = () => {
             disabled={resetLoading}
             className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
           >
-           <RefreshCw size={20} /> {resetLoading ? "RESETTING..." : "RESET"}
+            <RefreshCw size={20} /> {resetLoading ? "RESETTING..." : "RESET"}
           </Button>
         )}
 
@@ -808,7 +792,7 @@ const AdminButton = () => {
           <DialogTrigger asChild>
             {isSkill && (
               <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
-               <Zap size={20} /> SETUP
+                <Zap size={20} /> SETUP
               </Button>
             )}
           </DialogTrigger>
@@ -823,9 +807,19 @@ const AdminButton = () => {
         {/* PURCHASE LADDER */}
         <Button
           onClick={handleUpgrade}
-          className="bg-[#6766CC] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
+          className="bg-[#6766CC] bg-[length:200%_100%] animate-gradient-x 
+  border border-gray-400 text-white font-bold uppercase 
+  rounded-xl py-8 px-24 w-full shadow-lg 
+  flex flex-col items-center justify-center gap-1 
+  text-xs text-center leading-snug"
         >
-         <CreditCard size={20} /> PURCHASE
+          <CreditCard size={20} />
+
+          <span>PURCHASE</span>
+
+          <span className="text-[8px] normal-case font-semibold text-white/80">
+            Ignore if Club has a Licence
+          </span>
         </Button>
       </div>
 
@@ -834,13 +828,13 @@ const AdminButton = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-600">
-              ⚠️ Do you want to reset ?
+              Do you want to reset ?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-800">
               {confirmType === "zero" &&
                 "This will reset ALL scores to ZERO. This action cannot be undone!"}
               {confirmType === "update" &&
-                "This will update the Mini League rankings."}
+                "This will move two up and two down."}
               {confirmType === "reset" &&
                 "This will completely DELETE the entire leaderboard. All data will be lost !"}
               {confirmType === "reset_skill" &&

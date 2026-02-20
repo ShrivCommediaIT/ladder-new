@@ -327,7 +327,7 @@ export default function LoginByClubForm() {
                             onChange={field.onChange}
                             className="h-4 w-4"
                           />
-                          <span className="text-sm font-medium">Sub Admin</span>
+                          <span className="text-sm font-medium">Section Admin</span>
                         </label>
                       </div>
                     </FormControl>

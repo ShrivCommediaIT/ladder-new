@@ -25,13 +25,10 @@ import { format } from "date-fns";
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
-/* ✅ ZOD Schema */
 const schema = z
   .object({
     name: z.string().min(1, "Name is required"),
-    dob: z.date({
-      required_error: "Date of birth is required",
-    }),
+    dob: z.date().optional(), // optional now
     password: z.string().regex(/^\d{4}$/, "PIN must be 4 digits"),
     confirmPassword: z.string(),
   })
@@ -61,29 +58,25 @@ export default function RegisterUser({ ladderId, ladderType }) {
   const { errors } = formState;
 
   /* ✅ SUBMIT */
-  const onSubmit = async (values) => {
-  if (!values.dob) {
+const onSubmit = async (values) => {
+  if (ladderType === "skill" && !values.dob) {
     toast.error("Please select date of birth");
     return;
   }
-
-  // ✅ DOB → DD/MM/YYYY string
-  const dobString = format(values.dob, "dd/MM/yyyy");
 
   const payload = {
     user_id: values.name,
     password: values.password,
     name: values.name,
-
-    // ✅ DOB goes in AGE field (as you requested)
-    age: dobString,
-
     user_type: "user",
     ladder_id: ladderId,
     ladder_type: ladderType,
   };
 
-  console.log("FINAL PAYLOAD:", payload);
+  // ✅ Add age only for skill ladder
+  if (ladderType === "skill") {
+    payload.age = format(values.dob, "dd/MM/yyyy");
+  }
 
   try {
     setLoading(true);
@@ -140,41 +133,45 @@ export default function RegisterUser({ ladderId, ladderType }) {
             </div>
 
             {/* DOB PICKER */}
-            <div>
-              <Label className="text-teal-400 mb-1">Date of Birth:(Only for age related solutions)</Label>
+          {ladderType === "skill" && (
+  <div>
+    <Label className="text-teal-400 mb-1">
+      Date of Birth:(Only for age related solutions)
+    </Label>
 
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start cursor-pointer bg-gray-900 border-gray-700 text-white"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {watch("dob")
-                      ? format(watch("dob"), "dd/MM/yyyy")
-                      : "Select Date of birth"}
-                  </Button>
-                </PopoverTrigger>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className="w-full justify-start cursor-pointer bg-gray-900 border-gray-700 text-white"
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {watch("dob")
+            ? format(watch("dob"), "dd/MM/yyyy")
+            : "Select Date of birth"}
+        </Button>
+      </PopoverTrigger>
 
-                <PopoverContent className="w-auto p-0 cursor-pointer bg-slate-300 border-gray-700">
-                  <Calendar
-                    mode="single"
-                    selected={watch("dob")}
-                    onSelect={(date) =>
-                      setValue("dob", date, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      })
-                    }
-                    captionLayout="dropdown"
-                    fromYear={1920}
-                    toYear={new Date().getFullYear()}
-                  />
-                </PopoverContent>
-              </Popover>
+      <PopoverContent className="w-auto p-0 cursor-pointer bg-slate-300 border-gray-700">
+        <Calendar
+          mode="single"
+          selected={watch("dob")}
+          onSelect={(date) =>
+            setValue("dob", date, {
+              shouldValidate: true,
+              shouldDirty: true,
+            })
+          }
+          captionLayout="dropdown"
+          fromYear={1920}
+          toYear={new Date().getFullYear()}
+        />
+      </PopoverContent>
+    </Popover>
 
-              <p className="text-red-400 text-xs">{errors.dob?.message}</p>
-            </div>
+    <p className="text-red-400 text-xs">{errors.dob?.message}</p>
+  </div>
+)}
 
             {/* PIN */}
             <div>

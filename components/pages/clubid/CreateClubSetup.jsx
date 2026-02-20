@@ -287,7 +287,7 @@ export default function CreateClubSetup() {
                   : "text-white hover:bg-white/10"
               }`}
           >
-            Sub Admin
+            Section Admin
           </button>
 
           {/* --- INFO POPOVER START --- */}
