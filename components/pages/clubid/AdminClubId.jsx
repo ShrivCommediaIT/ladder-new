@@ -69,6 +69,8 @@ export default function AdminClubId() {
   const [successDialog, setSuccessDialog] = useState(false);
   const [pinAlertOpen, setPinAlertOpen] = useState(false);
 
+  const [loginPinExistAlert, setLoginPinExistAlert] = useState(false);
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
 
@@ -202,6 +204,8 @@ useEffect(() => {
     const userId = storedUser ? JSON.parse(storedUser)?.id : null;
     if (!userId) return alert("User not logged in");
 
+    
+
     setLoading(true);
     setErrorMessage("");
 
@@ -235,8 +239,19 @@ useEffect(() => {
         },
       );
 
+
+   // Login PIN Exist popup
+if (
+  res.data?.status === 400 &&
+  res.data?.error_message === "Login pin Exist!"
+) {
+  setLoginPinExistAlert(true);
+  return;
+}
+
+
       if (res.data?.status === false) {
-        setErrorMessage(res.data?.message || "Sub-admin creation failed");
+        setErrorMessage(res.data?.message || "Section-admin creation failed");
       } else {
        
         await fetchSubAdmins();
@@ -675,6 +690,32 @@ useEffect(() => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+
+
+      {/* LOGIN PIN EXIST ALERT */}
+<AlertDialog
+  open={loginPinExistAlert}
+  onOpenChange={setLoginPinExistAlert}
+>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle className="text-red-600">
+        Duplicate PIN
+      </AlertDialogTitle>
+
+      <AlertDialogDescription>
+        This PIN already exists. Please choose a different 4-digit PIN.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+
+    <AlertDialogFooter>
+      <AlertDialogAction className="bg-red-600 hover:bg-red-700">
+        OK
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
     </div>
   );
 }
