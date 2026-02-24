@@ -319,7 +319,7 @@ export default function AdminPage() {
             </h1>
 
             <div className="flex flex-wrap items-center gap-2 text-sm sm:text-lg text-white">
-              <p>Important Information</p>
+              <p>Important</p>
               <span>-</span>
 
               {/* INFO POPOVER */}
