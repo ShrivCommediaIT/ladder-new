@@ -343,8 +343,13 @@ const LadderList = ({ userId }) => {
     }
   };
 
-  const initialLadders = allLadders?.slice(0, 5);
-  const visibleLadders = seeAll ? allLadders : initialLadders;
+
+const filteredLadders = allLadders?.filter(
+  (ladder) => ladder.created_by !== "demo"
+);
+
+const initialLadders = filteredLadders?.slice(0, 5);
+const visibleLadders = seeAll ? filteredLadders : initialLadders;
 
   return (
     <div className="w-full px-2 sm:px-0">

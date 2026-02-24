@@ -368,8 +368,16 @@ export default function BasicLeaderboardSetUpSkill({
             ))}
           </div>
 
-          <div className="bg-[#14283a] flex justify-between items-center w-full px-3 py-3 border-t border-white/20">
-            <div className="flex justify-center gap-4">
+          <div className="bg-[#14283a] flex justify-between items-center w-full px-8 py-3 border-t border-white/20">
+         
+            <div className="flex items-center justify-end mx-4">
+              <BasicLeaderboardPrintSkillsSheet
+                skills={safeSkillsForPrint}
+                ladderId={ladderId}
+                className="hidden"
+              />
+            </div>
+               <div className="flex justify-center gap-4">
               <Button
                 size="sm"
                 disabled={saving}
@@ -378,13 +386,6 @@ export default function BasicLeaderboardSetUpSkill({
               >
                 {saving ? "Saving..." : "Update Skills"}
               </Button>
-            </div>
-            <div className="flex items-center justify-end mx-4">
-              <BasicLeaderboardPrintSkillsSheet
-                skills={safeSkillsForPrint}
-                ladderId={ladderId}
-                className="hidden"
-              />
             </div>
           </div>
         </Card>

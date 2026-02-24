@@ -7,6 +7,7 @@ import MinileagueAddPlayer from "./MinileagueAddPlayer";
 import BestAddPlayer from "./BestAddPlayer";
 import AddPlayerSkill from "./AddPlayerSkill";
 
+
 const AddPlayer = ({ ladderId, onClose, onSuccessRefresh }) => { // ✅ Both props
   const searchParams = useSearchParams();
   const typeFromParams = searchParams.get("type");

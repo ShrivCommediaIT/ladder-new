@@ -23,11 +23,12 @@ const ActivityLog = () => {
   // Local deleting state for smoother UX
   const [deletingId, setDeletingId] = useState(null);
 
+
   useEffect(() => {
-    if (ladder_id) {
-      dispatch(fetchUserActivity({ ladder_id: Number(ladder_id) }));
-    }
-  }, [ladder_id, dispatch]);
+  if (ladder_id) {
+    dispatch(fetchUserActivity({ ladder_id: Number(ladder_id) }));
+  }
+}, [ladder_id, dispatch]);
 
   const activities = data?.data || [];
 

@@ -626,7 +626,7 @@ const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
             className="hidden"
           />
 
-          {/* 🟣 Cropping Overlay */}
+          {/* Cropping Overlay */}
           <AnimatePresence>
             {cropping && (
               <motion.div
@@ -698,7 +698,7 @@ const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
             </Button>
           </motion.div>
 
-          {/* 💚 Success Message */}
+          {/* Success Message */}
           <AnimatePresence>
             {success && (
               <motion.p
@@ -713,7 +713,7 @@ const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
             )}
           </AnimatePresence>
 
-          {/* ❌ Error Message */}
+          {/* Error Message */}
           {error && (
             <motion.p
               initial={{ opacity: 0 }}

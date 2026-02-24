@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 import axios from "axios";
 
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { fetchUserActivity } from "@/redux/slices/activitySlice";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,51 +53,59 @@ export default function BestAddPlayer({ onClose }) {
     }
   };
 
-  const handleSubmit = async () => {
-    // Ab validation sirf name aur ladder_id par hogi
-    if (!name || !ladder_id) {
-      setWelcomeMsg("Please fill all required fields including ladder ID.");
+const handleSubmit = async () => {
+  // Validation
+  if (!name || !ladder_id) {
+    setWelcomeMsg("Please fill all required fields including ladder ID.");
+    setShowDialog(true);
+    return;
+  }
+
+  setSubmitting(true);
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("email", name); 
+  formData.append("ladder_id", ladder_id);
+
+  if (rank) formData.append("rank", rank);
+  if (phone) formData.append("phone", phone);
+  if (profileFile) formData.append("file", profileFile);
+
+  try {
+    const response = await axios.post(
+      "https://ne-games.com/leaderBoard/api/user/addbyadmin",
+      formData,
+      { headers: { APPKEY } }
+    );
+
+    if (response.data.status === 200) {
+
+      setWelcomeMsg(`Welcome ${name}! ${response.data.success_message}`);
       setShowDialog(true);
-      return;
+
+      setLoading(true);
+
+      // Leaderboard refresh
+      await dispatch(fetchLeaderboard({ ladder_id }));
+
+      // ⭐ Instant activity refresh (NEW FIX)
+      await dispatch(fetchUserActivity({ ladder_id: Number(ladder_id) }));
+
+      setLoading(false);
+
+    } else {
+      setWelcomeMsg(response.data.message || "Something went wrong.");
+      setShowDialog(true);
     }
 
-    setSubmitting(true);
-
-    const formData = new FormData();
-    formData.append("name", name);
-    // ✅ Internally Email field mein 'name' hi pass kar rahe hain
-    formData.append("email", name); 
-    formData.append("ladder_id", ladder_id);
-    
-    if (rank) formData.append("rank", rank);
-    if (phone) formData.append("phone", phone);
-    if (profileFile) formData.append("file", profileFile);
-
-    try {
-      const response = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/addbyadmin",
-        formData,
-        { headers: { APPKEY } }
-      );
-
-      if (response.data.status === 200) {
-        setWelcomeMsg(`Welcome ${name}! ${response.data.success_message}`);
-        setShowDialog(true);
-
-        setLoading(true);
-        await dispatch(fetchLeaderboard({ ladder_id }));
-        setLoading(false);
-      } else {
-        setWelcomeMsg(response.data.message || "Something went wrong.");
-        setShowDialog(true);
-      }
-    } catch (error) {
-      setWelcomeMsg(error.response?.data?.message || error.message);
-      setShowDialog(true);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  } catch (error) {
+    setWelcomeMsg(error.response?.data?.message || error.message);
+    setShowDialog(true);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (loading) {
     return (

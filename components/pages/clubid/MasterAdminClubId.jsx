@@ -85,39 +85,58 @@ export default function AccessCodeParts() {
     fetchSavedClub();
   }, [drawerForm]);
 
-  const handleSubmit = async (values) => {
-    if (!userId) return alert("User not logged in");
-    setLoading(true);
-    setErrorMessage("");
+const handleSubmit = async (values) => {
+  if (!userId) return alert("User not logged in");
 
-    try {
-      const payload = {
-        user_id: userId,
-        login_id: values.part1.toUpperCase(),
-        password: values.part2,
-        user_type: "admin",
-      };
+  setLoading(true);
+  setErrorMessage("");
 
-      const res = await axios.post("https://ne-games.com/leaderBoard/api/app/user/create", payload, {
+  try {
+    const payload = {
+      user_id: userId,
+      login_id: values.part1.toUpperCase(),
+      password: values.part2,
+      user_type: "admin",
+    };
+
+    const res = await axios.post(
+      "https://ne-games.com/leaderBoard/api/app/user/create",
+      payload,
+      {
         headers: {
           APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
           "Content-Type": "application/json",
         },
-      });
-
-      if (res.data?.status === false) {
-        setErrorMessage(res.data?.message || "Action failed");
-      } else {
-        setSavedData({ clubId: values.part1, clubPin: values.part2 });
-        setSuccessDialog(true);
-        form.reset();
       }
-    } catch (err) {
-      setErrorMessage("Server error occurred");
-    } finally {
-      setLoading(false);
+    );
+
+    // Club ID already exist case
+    if (res.data?.status === 400) {
+      alert("Club ID already exists");
+      return;
     }
-  };
+
+    // Other errors
+    if (res.data?.status === false) {
+      setErrorMessage(res.data?.message || "Action failed");
+      return;
+    }
+
+    // Success case
+    setSavedData({
+      clubId: values.part1,
+      clubPin: values.part2,
+    });
+
+    setSuccessDialog(true);
+    form.reset();
+
+  } catch (err) {
+    setErrorMessage("Server error occurred");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDrawerSubmit = (values) => {
     setPendingUpdateValues(values);

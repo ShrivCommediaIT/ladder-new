@@ -8,14 +8,19 @@ import { uploadProfileImage } from "@/redux/slices/profileImageSlice";
 import { resetProfileImageState } from "@/redux/slices/profileImageSlice";
 import { fetchUserProfile } from "@/redux/slices/profileSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
-import { toast } from "react-toastify"; // ✅ IMPORTED
+import { toast } from "react-toastify"; 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Cropper from "react-easy-crop";
 import defaultAvatar from "@/public/logo.jpg";
+import { useSearchParams } from "next/navigation";
 
 const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
+
+  const searchParams = useSearchParams();
+const ladderType = searchParams.get("type");
+
   const dispatch = useDispatch();
   const { loading, success, error } = useSelector(
     (state) => state.profileImage
@@ -42,12 +47,12 @@ const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
     }
   }, [file]);
 
-  // ✅ FIXED: Real-time refresh + auto-close after upload success
+  // FIXED: Real-time refresh + auto-close after upload success
   useEffect(() => {
     if (success) {
       // toast.success("Profile image updated successfully! ⏳ Refreshing...");
       
-      // ✅ REAL-TIME REFRESH - 800ms delay for smooth UX
+      // REAL-TIME REFRESH - 800ms delay for smooth UX
       const timer = setTimeout(() => {
         // Refresh leaderboard data
         if (ladderId) {
@@ -112,11 +117,11 @@ const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
     });
 
     setFile(croppedFile);
-    setPreview(URL.createObjectURL(croppedBlob)); // ✅ instant update
+    setPreview(URL.createObjectURL(croppedBlob)); // instant update
     setCropping(false);
   };
 
-  // ✅ FIXED: Simple upload handler
+  // FIXED: Simple upload handler
   const handleUpload = () => {
     if (!userId || !file) {
       toast.error("Please select an image first!");
@@ -149,7 +154,7 @@ const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
           className="hidden"
         />
 
-        {/* 🟣 CROPPING OVERLAY */}
+        {/* CROPPING OVERLAY */}
         {cropping && (
           <div className="fixed inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50 p-4">
             <div className="relative w-full max-w-sm h-[50vh] bg-white rounded-2xl overflow-hidden shadow-2xl">
@@ -185,7 +190,7 @@ const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
           </div>
         )}
 
-        {/* 🟢 UPLOAD BUTTON */}
+        {/* UPLOAD BUTTON */}
         <Button
           onClick={handleUpload}
           disabled={loading || !file || !userId}

@@ -96,7 +96,7 @@ const MoveNumberInput = ({
       // PERFECT Payload for each API
       let payload;
       
-      if (ladderType === "best5" || "best3" || "winlose") {
+      if (ladderType === "best5" || ladderType === "best3") {
         // Best of 5 API payload (NO move_from_user_id)
         payload = {
           ladder_id,
@@ -140,7 +140,7 @@ const MoveNumberInput = ({
 
     } catch (err) {
       console.error("Error Details:", err);
-      toast.error(err?.message || "Result Already Posted" );
+      toast.error(err?.message );
     } finally {
       setLoading(false);
     }
@@ -542,9 +542,5 @@ export default MoveNumberInput;
 
 
 
-
-
-
-
-
+// =========================================================================== 222222222222
 

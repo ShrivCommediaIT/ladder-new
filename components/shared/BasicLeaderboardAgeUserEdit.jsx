@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -16,8 +14,16 @@ import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CalendarIcon } from "lucide-react";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
-const EditPlayerDetails = ({
+const BasicLeaderboardAgeUserEdit = ({
   userId,
   ladderId,
   selectedPlayer,
@@ -25,15 +31,15 @@ const EditPlayerDetails = ({
 }) => {
   const dispatch = useDispatch();
 
-
   const { loading, successMessage, error } = useSelector(
-    (state) => state.editdetail
+    (state) => state.editdetail,
   );
 
   const [form, setForm] = useState({
     id: "",
     user_id: "",
     name: "",
+    dob: null,
     phone: "",
   });
 
@@ -44,8 +50,10 @@ const EditPlayerDetails = ({
     if (selectedPlayer) {
       setForm({
         id: (selectedPlayer.id ?? selectedPlayer.user_id)?.toString() || "",
-        user_id: (selectedPlayer.user_id ?? selectedPlayer.id)?.toString() || "",
+        user_id:
+          (selectedPlayer.user_id ?? selectedPlayer.id)?.toString() || "",
         name: selectedPlayer.name || "",
+        dob: selectedPlayer.dob ? new Date(selectedPlayer.dob) : null,
         phone: selectedPlayer.phone || "",
       });
     } else if (userId) {
@@ -54,6 +62,7 @@ const EditPlayerDetails = ({
         id: userId.toString(),
         user_id: userId.toString(),
         name: "",
+        dob: null,
         phone: "",
       });
     }
@@ -75,6 +84,7 @@ const EditPlayerDetails = ({
     const formData = {
       id: form.id,
       name: form.name,
+      dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
       phone: form.phone,
     };
 
@@ -91,7 +101,7 @@ const EditPlayerDetails = ({
         if (ladderId) {
           dispatch(fetchLeaderboard({ ladder_id: ladderId }));
           dispatch(
-            fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" })
+            fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" }),
           );
         }
 
@@ -110,7 +120,7 @@ const EditPlayerDetails = ({
   }, [successMessage, error, dispatch, ladderId, onClose]);
 
   return (
-    <Card className="max-w-md mx-auto mt-6 shadow-xl rounded-2xl bg-gray-800 border border-gray-600">
+    <Card className="max-w-full mx-auto mt-6 shadow-xl rounded-2xl bg-gray-800 border border-gray-600">
       <CardContent className="p-6 space-y-4">
         {selectedPlayer?.name && (
           <div className="text-center bg-blue-900/50 border border-blue-500/50 rounded-lg p-3">
@@ -153,6 +163,47 @@ const EditPlayerDetails = ({
 
             <div>
               <Label
+                htmlFor="name"
+                className="text-gray-300 font-semibold py-2 text-lg"
+              >
+                Date of Birth
+              </Label>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-start cursor-pointer bg-gray-900 border-gray-700 text-white"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+
+                    {form.dob
+                      ? format(form.dob, "dd/MM/yyyy")
+                      : "Select Date of Birth"}
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-auto p-0 cursor-pointer bg-slate-300 border-gray-700">
+                  <Calendar
+                    mode="single"
+                    selected={form.dob}
+                    onSelect={(date) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        dob: date,
+                      }))
+                    }
+                    captionLayout="dropdown"
+                    fromYear={1920}
+                    toYear={new Date().getFullYear()}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div>
+              <Label
                 htmlFor="phone"
                 className="text-gray-300 font-semibold py-2 text-lg"
               >
@@ -191,4 +242,4 @@ const EditPlayerDetails = ({
   );
 };
 
-export default EditPlayerDetails;
+export default BasicLeaderboardAgeUserEdit;

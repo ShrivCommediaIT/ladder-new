@@ -18,6 +18,9 @@ import { useSearchParams } from "next/navigation";
 
 import PlayerImage from "./PlayerImage";
 import BasicLeaderboardUserActivityEntryCard from "./BasicLeaderboardUserActivityEntryCard";
+import BasicLeaderboardAgeUserEdit from "./BasicLeaderboardAgeUserEdit";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const BasicLeaderboardUserEdit = ({
   open = true,
@@ -44,6 +47,8 @@ export const BasicLeaderboardUserEdit = ({
 
   const selectedPlayer = players.find((p) => Number(p.id) === Number(playerId));
 
+    const [showEditSkeleton, setShowEditSkeleton] = useState(false);
+
   useEffect(() => {
     if (result?.success_message) {
       toast.success(result.success_message);
@@ -61,6 +66,7 @@ export const BasicLeaderboardUserEdit = ({
   const tabs = [
     { value: "activity", label: "Activity No." },
     { value: "load", label: "Upload Avatar" },
+    { value: "edit", label: "Edit Player" },
   ];
 
   // 🔥 FORWARD onClose TO CHILD COMPONENTS
@@ -70,7 +76,7 @@ export const BasicLeaderboardUserEdit = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="min-w-full md:min-w-[700px] lg:min-w-[900px] bg-gray-900 text-white">
+      <DialogContent className="min-w-md md:min-w-[700px] lg:min-w-[900px] bg-gray-900 text-white">
         <DialogTitle className="text-xl font-bold border-b border-gray-700 p-4">
           {selectedPlayer?.name || "Player"}
         </DialogTitle>
@@ -139,6 +145,22 @@ export const BasicLeaderboardUserEdit = ({
                 onClose={handleChildClose} // ✅ PASS HERE TOO
               />
             </TabsContent>
+
+            <TabsContent value="edit">
+  {showEditSkeleton ? (
+    <div className="space-y-3">
+      <Skeleton className="h-10 w-full bg-white/10" />
+      <Skeleton className="h-10 w-full bg-white/10" />
+    </div>
+  ) : (
+    <BasicLeaderboardAgeUserEdit
+      selectedPlayer={selectedPlayer}
+      userId={selectedPlayer?.id}      
+      ladderId={ladder_id}
+      onClose={onClose}
+    />
+  )}
+</TabsContent>
           </Tabs>
         </motion.div>
       </DialogContent>
