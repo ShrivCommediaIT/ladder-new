@@ -115,6 +115,21 @@ const MoveNumberInput = ({
     setBetDescription("");
   };
 
+
+  const isFormValid =
+  user_id &&
+  ladder_id &&
+  currentId &&
+  selectedNumber &&
+  !isNaN(selectedNumber) &&
+  resultType &&
+  challengedPlayer &&
+  (
+    ladderType !== "best3" && ladderType !== "best5"
+      ? true
+      : score
+  );
+
   const handleEnter = () => {
     if (!user_id || !ladder_id || !currentId) return;
 
@@ -136,7 +151,7 @@ const MoveNumberInput = ({
 
       let payload;
 
-      if (ladderType === "best5") {
+      if (ladderType === "best5" || ladderType === "best3") {
         payload = {
           ladder_id,
           match_status: resultType,
@@ -144,7 +159,7 @@ const MoveNumberInput = ({
           move_to_rank: Number(selectedNumber),
           move_from_rank: currentRank,
           score,
-          bet: betDescription || "",
+          bet: betDescription,
         };
         await dispatch(movePlayerBestOf5(payload)).unwrap();
       } else {
@@ -167,7 +182,7 @@ const MoveNumberInput = ({
 
       resetForm();
       setShowConfirm(false);
-      setShowSuccess(true); // ✅ Show success dialog
+      setShowSuccess(true); // Show success dialog
     } catch (err) {
       console.err(err?.message || "Failed to submit result.");
     } finally {
@@ -241,18 +256,6 @@ const MoveNumberInput = ({
         className="text-center text-3xl mb-2 bg-black text-green-400 border border-gray-700"
       />
 
-      {/* <div className="grid grid-cols-3 gap-3 mb-2">
-        {numberButtons.map((num) => (
-          <Button
-            key={num}
-            onClick={() => handleNumberClick(num)}
-            className="py-2 text-lg bg-gray-800 hover:bg-gray-700"
-          >
-            {num}
-          </Button>
-        ))}
-      </div> */}
-
       <div className="grid grid-cols-3 gap-3 mb-2">
   {numberButtons.map((num) => {
     if (num === 0) {
@@ -291,11 +294,16 @@ const MoveNumberInput = ({
           <X />Cancel
         </Button>
         <Button
-          onClick={handleEnter}
-          className="flex-1 bg-green-500 hover:bg-green-600 text-black"
-        >
-          <CheckCircle />POST
-        </Button>
+  onClick={handleEnter}
+  disabled={!isFormValid}
+  className={`flex-1 text-black ${
+    isFormValid
+      ? "bg-green-500 hover:bg-green-600"
+      : "bg-gray-600 cursor-not-allowed"
+  }`}
+>
+  <CheckCircle />POST
+</Button>
       </div>
 
       {/* -------------------- CONFIRM DIALOG -------------------- */}

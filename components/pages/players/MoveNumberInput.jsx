@@ -483,7 +483,7 @@ const handleEnter = () => {
           </AlertDialogTitle>
 
           <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
-            You are confirming the result for rank <b>#{selectedNumber}</b>.
+            The score should be in the confirmation message <b>#{selectedNumber}</b>.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

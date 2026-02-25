@@ -204,8 +204,6 @@ useEffect(() => {
     const userId = storedUser ? JSON.parse(storedUser)?.id : null;
     if (!userId) return alert("User not logged in");
 
-    
-
     setLoading(true);
     setErrorMessage("");
 

@@ -278,6 +278,9 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     }
   }, [dispatch, ladderId]);
 
+
+
+
   const handleSkillClick = useCallback(
     (playerId, skillNumber) => {
       const player = data.find((p) => p.id === playerId);

@@ -1,11 +1,14 @@
-
-
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import { FaLongArrowAltDown, FaLongArrowAltUp, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {
+  FaLongArrowAltDown,
+  FaLongArrowAltUp,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 import digitalTwin from "@/public/digital-twin.gif";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,35 +24,76 @@ const ActivityLogUser = ({ ladderId }) => {
   const [totalPages, setTotalPages] = useState(1);
   const ACTIVITIES_PER_PAGE = 10;
 
-  // Fetch activities with pagination
-  const fetchActivities = useCallback(async (page = 1) => {
-    if (!ladderId) return setLoading(false);
-    
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/activity?ladder_id=${ladderId}&page=${page}&limit=${ACTIVITIES_PER_PAGE}`,
-        { headers: { "Content-Type": "application/json", APPKEY } }
-      );
-      
-      const data = res.data?.data || [];
-      setActivities(data);
-      
-      // Calculate total pages (assuming API returns total_count)
-      const totalCount = res.data?.total_count || res.data?.meta?.total || data.length;
-      setTotalPages(Math.ceil(totalCount / ACTIVITIES_PER_PAGE));
-      
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch activities");
-      setActivities([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [ladderId]);
 
-  useEffect(() => {
-    fetchActivities(1);
-  }, [fetchActivities]);
+
+
+  // Fetch activities with pagination
+const fetchActivities = useCallback(async (page = 1) => {
+
+  if (!ladderId) return;
+
+  try {
+
+    setError("");
+
+    if(page === 1) setLoading(true);
+
+    const response = await axios.get(
+      `https://ne-games.com/leaderBoard/api/user/activity?ladder_id=${ladderId}&page=${page}&limit=${ACTIVITIES_PER_PAGE}`,
+      {
+        headers: { APPKEY },
+      }
+    );
+
+    const data =
+      response?.data?.data ||
+      response?.data?.activities ||
+      response?.data?.result ||
+      [];
+
+    setActivities(Array.isArray(data) ? data : []);
+
+    const totalCount =
+      response?.data?.total_count ||
+      response?.data?.meta?.total ||
+      data.length;
+
+    setTotalPages(Math.max(1, Math.ceil(totalCount / ACTIVITIES_PER_PAGE)));
+
+  } catch (err) {
+
+    setError("");
+    setActivities([]);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+}, [ladderId, ACTIVITIES_PER_PAGE]);
+
+
+useEffect(() => {
+
+  if (!ladderId) return;
+
+  setCurrentPage(1);
+
+  fetchActivities(1);
+
+}, [ladderId, fetchActivities]);
+
+
+useEffect(() => {
+  if (!ladderId) return;
+
+  const interval = setInterval(() => {
+    fetchActivities(currentPage);
+  }, 3000); // 3 sec fast refresh
+
+  return () => clearInterval(interval);
+}, [ladderId, currentPage, fetchActivities]);
 
   // Pagination handlers
   const goToPage = (page) => {
@@ -61,15 +105,37 @@ const ActivityLogUser = ({ ladderId }) => {
 
   const renderActivities = () => {
     return activities.map((activity, index) => {
-      const progress = activity.progress?.toLowerCase();
+      const progress =
+        activity.progress?.toLowerCase() ||
+        activity.direction?.toLowerCase() ||
+        activity.type?.toLowerCase() ||
+        "";
+      // const icon =
+      //   progress === "up" ? (
+      //     <FaLongArrowAltUp
+      //       className="text-green-400 drop-shadow-lg"
+      //       size={20}
+      //     />
+      //   ) : progress === "down" ? (
+      //     <FaLongArrowAltDown
+      //       className="text-pink-400 drop-shadow-lg"
+      //       size={20}
+      //     />
+      //   ) : (
+      //     <div className="w-5 h-5 bg-gray-600 rounded-full" />
+      //   );
+
+
       const icon =
-        progress === "up" ? (
-          <FaLongArrowAltUp className="text-green-400 drop-shadow-lg" size={20} />
-        ) : progress === "down" ? (
-          <FaLongArrowAltDown className="text-pink-400 drop-shadow-lg" size={20} />
-        ) : (
-          <div className="w-5 h-5 bg-gray-600 rounded-full" />
-        );
+  progress.includes("up") || progress.includes("win") ? (
+    <FaLongArrowAltUp className="text-green-400 drop-shadow-lg" size={20} />
+  ) : progress.includes("down") ||
+    progress.includes("loss") ||
+    progress.includes("lose") ? (
+    <FaLongArrowAltDown className="text-pink-400 drop-shadow-lg" size={20} />
+  ) : (
+    <div className="w-5 h-5 bg-gray-600 rounded-full" />
+  );
 
       return (
         <motion.div
@@ -83,21 +149,19 @@ const ActivityLogUser = ({ ladderId }) => {
                      hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm"
         >
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 mt-1">
-              {icon}
-            </div>
+            <div className="flex-shrink-0 mt-1">{icon}</div>
             <div className="flex-1 min-w-0">
-                          <p className="text-base md:text-lg font-medium text-white break-words break-all whitespace-normal overflow-hidden">
-  {activity.message}
-</p>
+              <p className="text-base md:text-lg font-medium text-white break-words break-all whitespace-normal overflow-hidden">
+                {activity.message}
+              </p>
 
               <p className="text-xs text-slate-400 mt-1 font-medium">
-                {new Date(activity.created_at).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
+                {new Date(activity.created_at).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
               </p>
             </div>
@@ -132,7 +196,7 @@ const ActivityLogUser = ({ ladderId }) => {
                    hover:text-emerald-400 disabled:text-slate-400"
       >
         <FaChevronLeft size={14} />
-      </button>
+      </button>,
     );
 
     // Page numbers
@@ -143,13 +207,13 @@ const ActivityLogUser = ({ ladderId }) => {
           onClick={() => goToPage(i)}
           className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all duration-200 
                      border border-slate-600/50 min-w-[44px] ${
-            i === currentPage
-              ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25"
-              : "bg-slate-800/50 hover:bg-slate-700 hover:text-emerald-400 text-slate-200"
-          }`}
+                       i === currentPage
+                         ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                         : "bg-slate-800/50 hover:bg-slate-700 hover:text-emerald-400 text-slate-200"
+                     }`}
         >
           {i}
-        </button>
+        </button>,
       );
     }
 
@@ -166,7 +230,7 @@ const ActivityLogUser = ({ ladderId }) => {
                    hover:text-emerald-400 disabled:text-slate-400"
       >
         <FaChevronRight size={14} />
-      </button>
+      </button>,
     );
 
     return pages;
@@ -181,7 +245,7 @@ const ActivityLogUser = ({ ladderId }) => {
       <Card className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-none shadow-2xl overflow-hidden">
         <CardContent className="p-0">
           {/* Header */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
@@ -237,7 +301,9 @@ const ActivityLogUser = ({ ladderId }) => {
                   <div className="w-20 h-20 mx-auto mb-4 bg-red-500/10 rounded-2xl border-2 border-red-500/30 flex items-center justify-center">
                     <span className="text-3xl">⚠️</span>
                   </div>
-                  <p className="text-xl font-semibold text-red-400 mb-2">{error}</p>
+                  <p className="text-xl font-semibold text-red-400 mb-2">
+                    {error}
+                  </p>
                   <button
                     onClick={() => fetchActivities(currentPage)}
                     className="px-6 py-2 bg-emerald-500/80 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-emerald-500/25"
@@ -254,8 +320,12 @@ const ActivityLogUser = ({ ladderId }) => {
                   <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-slate-800 to-slate-700 rounded-3xl flex items-center justify-center shadow-xl">
                     <span className="text-4xl">📭</span>
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-300 mb-2">No Activities Yet</h3>
-                  <p className="text-slate-500 text-lg">Your activity log is empty. Play some matches!</p>
+                  <h3 className="text-2xl font-bold text-slate-300 mb-2">
+                    No Activities Yet
+                  </h3>
+                  <p className="text-slate-500 text-lg">
+                    Your activity log is empty. Play some matches!
+                  </p>
                 </motion.div>
               ) : (
                 renderActivities()

@@ -160,10 +160,10 @@ const BasicLeaderboardAgeUserEdit = ({
                 className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
               />
             </div>
-{/* 
+
             <div>
               <Label
-                htmlFor="name"
+                htmlFor="dob"
                 className="text-gray-300 font-semibold py-2 text-lg"
               >
                 Date of Birth
@@ -171,20 +171,16 @@ const BasicLeaderboardAgeUserEdit = ({
 
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start cursor-pointer bg-gray-900 border-gray-700 text-white"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-
-                    {form.dob
-                      ? format(form.dob, "dd/MM/yyyy")
-                      : "Select Date of Birth"}
-                  </Button>
+                  <Input
+                    id="dob"
+                    readOnly
+                    value={form.dob ? format(form.dob, "dd/MM/yyyy") : ""}
+                    placeholder="Enter Date of Birth"
+                    className="text-white text-start px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12 cursor-pointer"
+                  />
                 </PopoverTrigger>
 
-                <PopoverContent className="w-auto p-0 cursor-pointer bg-slate-300 border-gray-700">
+                <PopoverContent className="w-auto p-0 bg-slate-300 border-gray-700">
                   <Calendar
                     mode="single"
                     selected={form.dob}
@@ -200,44 +196,7 @@ const BasicLeaderboardAgeUserEdit = ({
                   />
                 </PopoverContent>
               </Popover>
-            </div> */}
-
-            <div>
-  <Label
-    htmlFor="dob"
-    className="text-gray-300 font-semibold py-2 text-lg"
-  >
-    Date of Birth
-  </Label>
-
-  <Popover>
-    <PopoverTrigger asChild>
-      <Input
-        id="dob"
-        readOnly
-        value={form.dob ? format(form.dob, "dd/MM/yyyy") : ""}
-        placeholder="Enter Date of Birth"
-        className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12 cursor-pointer"
-      />
-    </PopoverTrigger>
-
-    <PopoverContent className="w-auto p-0 bg-slate-300 border-gray-700">
-      <Calendar
-        mode="single"
-        selected={form.dob}
-        onSelect={(date) =>
-          setForm((prev) => ({
-            ...prev,
-            dob: date,
-          }))
-        }
-        captionLayout="dropdown"
-        fromYear={1920}
-        toYear={new Date().getFullYear()}
-      />
-    </PopoverContent>
-  </Popover>
-</div>
+            </div>
 
             <div>
               <Label
@@ -252,7 +211,6 @@ const BasicLeaderboardAgeUserEdit = ({
                 type="tel"
                 value={form.phone}
                 onChange={handleChange}
-                required
                 placeholder="Enter phone number"
                 className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
               />

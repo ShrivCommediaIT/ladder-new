@@ -18,16 +18,36 @@ const ActivityLog = () => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladder_id = searchParams.get("ladder_id");
+  // const { loading, data, error } = useSelector((state) => state.activity);
   const { loading, data, error } = useSelector((state) => state.activity);
+
+const [firstLoad, setFirstLoad] = useState(true);
 
   // Local deleting state for smoother UX
   const [deletingId, setDeletingId] = useState(null);
 
 
+
+  useEffect(() => {
+  if (!loading) {
+    setFirstLoad(false);
+  }
+}, [loading]);
+
   useEffect(() => {
   if (ladder_id) {
     dispatch(fetchUserActivity({ ladder_id: Number(ladder_id) }));
   }
+}, [ladder_id, dispatch]);
+
+useEffect(() => {
+  if (!ladder_id) return;
+
+  const interval = setInterval(() => {
+    dispatch(fetchUserActivity({ ladder_id: Number(ladder_id) }));
+  }, 3000);
+
+  return () => clearInterval(interval);
 }, [ladder_id, dispatch]);
 
   const activities = data?.data || [];
@@ -130,7 +150,7 @@ const ActivityLog = () => {
           </motion.h2>
           {/* Scrollable Body */}
           <div className="w-full max-h-[400px] overflow-y-auto px-2 pr-3 space-y-3 scrollbar-thin scrollbar-thumb-purple-400 scrollbar-track-transparent hover:scrollbar-thumb-purple-500">
-            {loading ? (
+            {firstLoad && loading ? (
               <div className="space-y-4">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <motion.div

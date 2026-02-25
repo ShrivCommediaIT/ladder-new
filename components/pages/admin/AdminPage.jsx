@@ -53,7 +53,7 @@ export default function AdminPage() {
   const [ladderType, setLadderType] = useState("winlose");
   const [duplicateWarning, setDuplicateWarning] = useState(null);
 
-  const [solutionsOpen, setSolutionsOpen] = useState(false);
+  const [solutionsOpen, setSolutionsOpen] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
 
   const { allLadders } = useSelector((state) => state.fetchLadder);
@@ -390,10 +390,27 @@ export default function AdminPage() {
           <div className="lg:col-span-3 space-y-6">
             {/* LADDER TYPES */}
             <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-5">
-              <div className="flex items-center justify-start gap-4 mb-3">
+           
+                <DemoLadder />
+              
+            </div>
+
+            {/* LADDER LIST */}
+            <div className="rounded-2xl bg-black/20 border border-white/10 p-3">
+              <div className="">
+                <LadderList userId={user?.id} />
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT SIDE CREATE PANEL */}
+          <div className="lg:col-span-2 max-h-auto border-white/10 p-4 sm:p-6 rounded-md">
+                
+
+                   <div className="flex items-center justify-start gap-4 ">
                 <h3 className="text-lg font-semibold text-cyan-400 flex items-center gap-2">
                   <Layers className="h-5 w-5" />
-                  Solutions Available
+                  Solutions Information
                 </h3>
 
                 <Popover open={solutionsOpen} onOpenChange={setSolutionsOpen}>
@@ -409,33 +426,21 @@ export default function AdminPage() {
                   <PopoverContent
                     side="top"
                     align="center"
-                    className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700 text-slate-900 px-3 py-4 rounded-lg shadow-2xl z-50 backdrop-blur-md"
+                    className="w-[90vw] sm:w-lg bg-gray-300 border-slate-700 text-slate-900 px-3 py-4 rounded-lg shadow-2xl z-50 backdrop-blur-md"
                   >
-                    {/* Yaha apna content component daal do */}
+               
                     <div className="text-sm">
                       <AdminHideShowInfo />
                     </div>
                   </PopoverContent>
                 </Popover>
               </div>
-
-              <LadderInfo />
-            </div>
-
-            {/* LADDER LIST */}
-            <div className="rounded-2xl bg-black/20 border border-white/10 p-3">
-              <div className="">
-                <LadderList userId={user?.id} />
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT SIDE CREATE PANEL */}
-          <div className="lg:col-span-2 max-h-auto border-white/10 p-4 sm:p-6 rounded-md">
                 
-                <DemoLadder />
 
           </div>
+
+
+
         </div>
       </div>
 
