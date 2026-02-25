@@ -185,3 +185,4 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
 };
 
 export default UploadPlayerLists;
+

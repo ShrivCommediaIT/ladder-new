@@ -442,9 +442,6 @@ const AdminButton = () => {
       {/* UPLOAD CSV */}
       <Dialog open={openUploadDialog} onOpenChange={setOpenUploadDialog}>
         <DialogContent className="bg-gray-400 rounded-lg border border-[#313546] sm:max-w-xl">
-          {/* <DialogHeader>
-            <DialogTitle className="text-white">Upload CSV</DialogTitle>
-          </DialogHeader> */}
           <UploadPlayerLists
             ladderId={ladderId}
             onSuccessClose={() => {

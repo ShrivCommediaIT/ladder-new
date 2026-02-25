@@ -211,7 +211,7 @@ const MoveNumberInput = ({
       </h2>
 
       {/* Beat / Lost */}
-      <div className="flex justify-center gap-6 mb-2">
+      {/* <div className="flex justify-center gap-6 mb-2">
         {["beat", "lost"].map((type) => (
           <div
             key={type}
@@ -225,7 +225,20 @@ const MoveNumberInput = ({
             {type === "beat" ? "Beat" : "Lost"}
           </div>
         ))}
-      </div>
+      </div> */}
+
+      <div className="flex justify-center gap-6 mb-2">
+  <div
+    onClick={() => setResultType("beat")}
+    className={`px-5 py-1 rounded-full cursor-pointer transition ${
+      resultType === "beat"
+        ? "bg-green-500 text-black font-semibold"
+        : "bg-gray-700 hover:bg-gray-600"
+    }`}
+  >
+    Beat
+  </div>
+</div>
 
       <PlayerBet
         betDescription={betDescription}
@@ -296,7 +309,7 @@ const MoveNumberInput = ({
         <Button
   onClick={handleEnter}
   disabled={!isFormValid}
-  className={`flex-1 text-black ${
+  className={`flex-1 text-white ${
     isFormValid
       ? "bg-green-500 hover:bg-green-600"
       : "bg-gray-600 cursor-not-allowed"

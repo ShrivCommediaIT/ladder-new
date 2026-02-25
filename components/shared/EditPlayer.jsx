@@ -226,6 +226,8 @@ export const EditPlayer = ({
                   userId={userId}
                 />
               </TabsContent>
+
+              
 <TabsContent value="edit">
   {showEditSkeleton ? (
     <div className="space-y-3">

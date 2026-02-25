@@ -14,10 +14,10 @@ const MovePlayerBox = () => {
 
   const ladderId = searchParams.get("ladder_id");
 
-  // ✅ URL se direct type lo (highest priority)
+  // URL se direct type lo (highest priority)
   const paramLadderType = searchParams.get("ladder_type");
 
-  // ✅ Redux se fallback
+  // Redux se fallback
   const playerLadderType = useSelector(
     (state) => state.player?.players?.[ladderId]?.ladderDetails?.type
   );
@@ -26,7 +26,7 @@ const MovePlayerBox = () => {
     (state) => state.minileague?.ladderDetails?.type
   );
 
-  // ✅ Final type decide
+  // Final type decide
   const ladderType =
     paramLadderType || playerLadderType || miniLeagueLadderType;
 
@@ -36,7 +36,7 @@ const MovePlayerBox = () => {
     return <MinileagueMovePlayerBox />;
   }
 
-  // ✅ best5 + winlose + best3 => Best5MovePlayerBox
+  // best5 + winlose + best3 => Best5MovePlayerBox
   if (["best5", "winlose", "best3"].includes(ladderType)) {
     return <Best5MovePlayerBox  open={open} onClose={() => setOpen(false)} />;
   }

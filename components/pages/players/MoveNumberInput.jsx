@@ -96,35 +96,74 @@ const MoveNumberInput = ({
       // PERFECT Payload for each API
       let payload;
       
+      // if (ladderType === "best5" || ladderType === "best3") {
+      //   // Best of 5 API payload (NO move_from_user_id)
+      //   payload = {
+      //     ladder_id,
+      //     match_status: resultType,
+      //     user_id,
+      //     move_to_rank: Number(selectedNumber),
+      //     score,
+      //     move_from_rank: currentRank,
+      //     bet: betDescription,
+      //   };
+        
+      //   const result = await dispatch(movePlayerBestOf5(payload)).unwrap();
+        
+      // } else {
+      //   // Normal API payload (WITH move_from_user_id)
+      //   payload = {
+      //     user_id,
+      //     ladder_id,
+      //     match_status: resultType,
+      //     move_from_user_id: currentId,
+      //     move_to_rank: Number(selectedNumber),
+      //     move_from_rank: currentRank,
+      //     score,
+      //     bet: betDescription,
+      //   };
+        
+        
+      //   await dispatch(movePlayer(payload)).unwrap();
+      // }
+
+
       if (ladderType === "best5" || ladderType === "best3") {
-        // Best of 5 API payload (NO move_from_user_id)
-        payload = {
-          ladder_id,
-          match_status: resultType,
-          user_id,
-          move_to_rank: Number(selectedNumber),
-          score,
-          move_from_rank: currentRank,
-          bet: betDescription,
-        };
-        
-        const result = await dispatch(movePlayerBestOf5(payload)).unwrap();
-        
-      } else {
-        // Normal API payload (WITH move_from_user_id)
-        payload = {
-          user_id,
-          ladder_id,
-          match_status: resultType,
-          move_from_user_id: currentId,
-          move_to_rank: Number(selectedNumber),
-          move_from_rank: currentRank,
-          score,
-        };
-        
-        
-        await dispatch(movePlayer(payload)).unwrap();
-      }
+  payload = {
+    ladder_id,
+    match_status: resultType,
+    user_id,
+    move_to_rank: Number(selectedNumber),
+    score,
+    move_from_rank: currentRank,
+
+    // ✅ Only send bet for beat/lost
+    ...(resultType === "beat" || resultType === "lost"
+      ? { bet: betDescription }
+      : {}),
+  };
+
+  await dispatch(movePlayerBestOf5(payload)).unwrap();
+
+} else {
+
+  payload = {
+    user_id,
+    ladder_id,
+    match_status: resultType,
+    move_from_user_id: currentId,
+    move_to_rank: Number(selectedNumber),
+    move_from_rank: currentRank,
+    score,
+
+    // ✅ Only send bet for beat/lost
+    ...(resultType === "beat" || resultType === "lost"
+      ? { bet: betDescription }
+      : {}),
+  };
+
+  await dispatch(movePlayer(payload)).unwrap();
+}
 
       // Refresh data
       await Promise.all([
@@ -276,7 +315,7 @@ const handleEnter = () => {
           </label>
         </div>
 
-           <div className="flex items-center gap-2">
+           {/* <div className="flex items-center gap-2">
           <Checkbox
             id="lost"
             checked={resultType === "lost"}
@@ -286,7 +325,7 @@ const handleEnter = () => {
           <label htmlFor="lost" className="text-base font-medium cursor-pointer">
             Lost
           </label>
-        </div>
+        </div> */}
        </div>
 
         <PlayerBet betDescription={betDescription} setBetDescription={setBetDescription} />

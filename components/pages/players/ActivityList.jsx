@@ -26,8 +26,6 @@ const [firstLoad, setFirstLoad] = useState(true);
   // Local deleting state for smoother UX
   const [deletingId, setDeletingId] = useState(null);
 
-
-
   useEffect(() => {
   if (!loading) {
     setFirstLoad(false);

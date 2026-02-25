@@ -31,16 +31,16 @@ import {
 import { useSelector } from "react-redux";
 
 // live key
-const stripePromise = loadStripe(
-  "pk_live_51LFh2OJsNwj9rybc0tvpLTAqLfEweHmbDAkv3YukrUIXrIxtXPd7tqBvGxSSZEA55r3KlH2V7AZETbQhuqwn4OqT00NdPDedFd"
-);
+// const stripePromise = loadStripe(
+//   "pk_live_51LFh2OJsNwj9rybc0tvpLTAqLfEweHmbDAkv3YukrUIXrIxtXPd7tqBvGxSSZEA55r3KlH2V7AZETbQhuqwn4OqT00NdPDedFd"
+// );
 
 // ------------------------------------
 // testing
 
-// const stripePromise = loadStripe(
-//   "pk_test_51LFh2OJsNwj9rybczkrJhz3tV7ve8NEGquIRdIt0TqqMlBEZaZmeoIHkITvpPdPBFW36Cwgbztkj44iiN4igjc4300OB2xb1bU"
-// );
+const stripePromise = loadStripe(
+  "pk_test_51LFh2OJsNwj9rybczkrJhz3tV7ve8NEGquIRdIt0TqqMlBEZaZmeoIHkITvpPdPBFW36Cwgbztkj44iiN4igjc4300OB2xb1bU"
+);
 
 // -------------------------------------
 

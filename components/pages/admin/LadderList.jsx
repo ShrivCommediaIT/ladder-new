@@ -496,6 +496,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel
+          className="text-black"
           onClick={() => setDeleteLadderId(null)}
         >
           Cancel

@@ -53,7 +53,7 @@ export default function AdminPage() {
   const [ladderType, setLadderType] = useState("winlose");
   const [duplicateWarning, setDuplicateWarning] = useState(null);
 
-  const [solutionsOpen, setSolutionsOpen] = useState(true);
+  const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
   const { allLadders } = useSelector((state) => state.fetchLadder);

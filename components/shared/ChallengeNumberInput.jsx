@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Copy } from "lucide-react"; 
+import { useSearchParams } from "next/navigation";
 
 import { fetchUserByRank } from "@/redux/slices/fetchUserByRank";
 import {
@@ -30,6 +31,11 @@ const Challenge = ({ userId }) => {
   const [localLoading, setLocalLoading] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const searchParams = useSearchParams();
+
+const ladderId = searchParams.get("ladder_id");
+const ladderType = searchParams.get("ladder_type");
+
   const dispatch = useDispatch();
 
   const { loading: challengeLoading, error: challengeError } = useSelector(
@@ -40,19 +46,30 @@ const Challenge = ({ userId }) => {
     (state) => state.userByRank
   );
 
-  const user = useSelector((state) => state.user?.user || null);
-  const ladderId = user?.ladder_id || null;
+  // const user = useSelector((state) => state.user?.user || null);
+  // const ladderId = user?.ladder_id || null;
 
   useEffect(() => {
     const timer = setTimeout(() => setLocalLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (challengeNumber && ladderId) {
-      dispatch(fetchUserByRank({ rank: challengeNumber, ladder_id: ladderId }));
-    }
-  }, [challengeNumber, ladderId, dispatch]);
+  // useEffect(() => {
+  //   if (challengeNumber && ladderId) {
+  //     dispatch(fetchUserByRank({ rank: challengeNumber, ladder_id: ladderId }));
+  //   }
+  // }, [challengeNumber, ladderId, dispatch]);
+
+useEffect(() => {
+  if (challengeNumber && ladderId) {
+    dispatch(
+      fetchUserByRank({
+        rank: Number(challengeNumber),
+        ladder_id: ladderId,
+      })
+    );
+  }
+}, [challengeNumber, ladderId, dispatch]);
 
   const handleKeyClick = (num) => {
     if (challengeNumber.length < 4) {
