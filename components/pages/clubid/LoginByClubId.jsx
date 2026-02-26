@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -99,138 +98,84 @@ export default function LoginByClubForm() {
     alert("Credentials copied to clipboard!");
   };
 
-  // const handleSubmit = async (values) => {
-  //   setLoading(true);
-
-  //   try {
-  //     const payload = {
-  //       login_id: values.clubId,
-  //       password: values.pin,
-  //       user_type: values.userType,
-  //     };
-
-  //     const res = await axios.post(
-  //       "https://ne-games.com/leaderBoard/api/app/user/login",
-  //       JSON.stringify(payload),
-  //       {
-  //         headers: {
-  //           APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-  //           "Content-Type": "application/json",
-  //         },
-  //       },
-  //     );
-
-  //     // Status 200 check
-  //     if (res.data?.status !== 200 || !res.data?.data) {
-  //       setDialogTitle("Login Failed");
-  //       setDialogMessage(res.data?.message || "Invalid Club ID or PIN");
-  //       setOpen(true);
-  //       return;
-  //     }
-
-  //     // SUCCESS LOGIC: Seedha storage me save karo aur redirect karo
-  //     const storageKey = values.userType === "sub_admin" ? "subAdmin" : "userData";
-  //     const user = values.userType === "sub_admin" 
-  //       ? { ...res.data.subadmin, isLoggedIn: true } 
-  //       : { ...res.data.data, isLoggedIn: true };
-
-  //     localStorage.setItem(storageKey, JSON.stringify(user));
-      
-  //     const route = values.userType === "sub_admin" ? subAdminPage : adminPage;
-  //     router.push(route);
-
-  //   } catch (err) {
-  //     setDialogTitle("Network Error");
-  //     setDialogMessage(err?.response?.data?.message || "Something went wrong. Please try again.");
-  //     setOpen(true);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
   const handleSubmit = async (values) => {
-  setLoading(true);
+    setLoading(true);
 
-  const payload = {
-    login_id: values.clubId,
-    password: values.pin,
-    user_type: values.userType,
-  };
+    const payload = {
+      login_id: values.clubId,
+      password: values.pin,
+      user_type: values.userType,
+    };
 
-  const config = {
-    headers: {
-      APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-      "Content-Type": "application/json",
-    },
-    timeout: 10000, // 10 sec timeout
-  };
+    const config = {
+      headers: {
+        APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
+        "Content-Type": "application/json",
+      },
+      timeout: 10000, // 10 sec timeout
+    };
 
-  try {
-    let res;
-
-    // ✅ First try
     try {
-      res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/app/user/login",
-        payload,
-        config
-      );
-    } catch (e) {
-      // ✅ Retry once automatically
-      res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/app/user/login",
-        payload,
-        config
-      );
-    }
+      let res;
 
-    // ✅ Response check
-    if (res.data?.status !== 200 || !res.data) {
-      setDialogTitle("Login Failed");
-      setDialogMessage(res.data?.message || "Invalid Club ID or PIN");
+      // ✅ First try
+      try {
+        res = await axios.post(
+          "https://ne-games.com/leaderBoard/api/app/user/login",
+          payload,
+          config,
+        );
+      } catch (e) {
+        // ✅ Retry once automatically
+        res = await axios.post(
+          "https://ne-games.com/leaderBoard/api/app/user/login",
+          payload,
+          config,
+        );
+      }
+
+      // ✅ Response check
+      if (res.data?.status !== 200 || !res.data) {
+        setDialogTitle("Login Failed");
+        setDialogMessage(res.data?.message || "Invalid Club ID or PIN");
+        setOpen(true);
+        return;
+      }
+
+      // ✅ Success storage logic
+      const storageKey =
+        values.userType === "sub_admin" ? "subAdmin" : "userData";
+
+      const user =
+        values.userType === "sub_admin"
+          ? { ...res.data.subadmin, isLoggedIn: true }
+          : { ...res.data.data, isLoggedIn: true };
+
+      localStorage.setItem(storageKey, JSON.stringify(user));
+
+      const route = values.userType === "sub_admin" ? subAdminPage : adminPage;
+
+      router.push(route);
+    } catch (err) {
+      console.log("LOGIN ERROR:", err);
+
+      let message = "Something went wrong. Please try again.";
+
+      if (err.code === "ECONNABORTED") {
+        message = "Server timeout. Please try again.";
+      } else if (!err.response) {
+        message = "Network error or CORS blocked the request.";
+      } else if (err.response?.data?.message) {
+        message = err.response.data.message;
+      }
+
+      setDialogTitle("Network Error");
+      setDialogMessage(message);
       setOpen(true);
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    // ✅ Success storage logic
-    const storageKey =
-      values.userType === "sub_admin" ? "subAdmin" : "userData";
-
-    const user =
-      values.userType === "sub_admin"
-        ? { ...res.data.subadmin, isLoggedIn: true }
-        : { ...res.data.data, isLoggedIn: true };
-
-    localStorage.setItem(storageKey, JSON.stringify(user));
-
-    const route =
-      values.userType === "sub_admin" ? subAdminPage : adminPage;
-
-    router.push(route);
-
-  } catch (err) {
-    console.log("LOGIN ERROR:", err);
-
-    let message = "Something went wrong. Please try again.";
-
-    if (err.code === "ECONNABORTED") {
-      message = "Server timeout. Please try again.";
-    } else if (!err.response) {
-      message = "Network error or CORS blocked the request.";
-    } else if (err.response?.data?.message) {
-      message = err.response.data.message;
-    }
-
-    setDialogTitle("Network Error");
-    setDialogMessage(message);
-    setOpen(true);
-
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#312e81] px-4 py-12">
@@ -246,7 +191,10 @@ export default function LoginByClubForm() {
 
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-6"
+            >
               {/* Club ID */}
               <FormField
                 control={form.control}
@@ -263,7 +211,11 @@ export default function LoginByClubForm() {
                           maxLength={8}
                           className="pl-10"
                           onChange={(e) =>
-                            field.onChange(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))
+                            field.onChange(
+                              e.target.value
+                                .toUpperCase()
+                                .replace(/[^A-Z]/g, ""),
+                            )
                           }
                         />
                       </div>
@@ -288,7 +240,13 @@ export default function LoginByClubForm() {
                             ref={(el) => (pinRefs.current[idx] = el)}
                             maxLength={1}
                             value={digit}
-                            onChange={(e) => handlePinChange(idx, e.target.value)}
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            autoComplete="one-time-code"
+                            onChange={(e) =>
+                              handlePinChange(idx, e.target.value)
+                            }
                             className="text-center text-lg font-medium"
                           />
                         ))}
@@ -327,7 +285,9 @@ export default function LoginByClubForm() {
                             onChange={field.onChange}
                             className="h-4 w-4"
                           />
-                          <span className="text-sm font-medium">Section Admin</span>
+                          <span className="text-sm font-medium">
+                            Section Admin
+                          </span>
                         </label>
                       </div>
                     </FormControl>
@@ -340,10 +300,21 @@ export default function LoginByClubForm() {
               {userData.login_id && (
                 <div className="rounded-lg border bg-muted/40 p-4 flex items-center justify-between text-sm">
                   <div className="space-y-1">
-                    <p><span className="font-medium">ID:</span> {userData.login_id}</p>
-                    <p><span className="font-medium">PIN:</span> {userData.password}</p>
+                    <p>
+                      <span className="font-medium">ID:</span>{" "}
+                      {userData.login_id}
+                    </p>
+                    <p>
+                      <span className="font-medium">PIN:</span>{" "}
+                      {userData.password}
+                    </p>
                   </div>
-                  <Button type="button" variant="outline" size="sm" onClick={handleCopy}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopy}
+                  >
                     Copy
                   </Button>
                 </div>
@@ -370,12 +341,15 @@ export default function LoginByClubForm() {
             </form>
           </Form>
 
-               <div className="mt-6 text-center text-sm text-black ">
-              Already have an account?{" "}
-              <Link href={loginPage} className="text-blue-600 font-medium hover:underline cursor-pointer ">
-                Login with admin
-              </Link>
-            </div>
+          <div className="mt-6 text-center text-sm text-black ">
+            Already have an account?{" "}
+            <Link
+              href={loginPage}
+              className="text-blue-600 font-medium hover:underline cursor-pointer "
+            >
+              Login with admin
+            </Link>
+          </div>
         </CardContent>
       </Card>
 
