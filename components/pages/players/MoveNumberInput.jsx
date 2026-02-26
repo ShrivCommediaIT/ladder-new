@@ -521,9 +521,11 @@ const handleEnter = () => {
             <CheckCircle className="text-green-500 h-5 w-5" /> Confirm Result
           </AlertDialogTitle>
 
-          <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
-            The score should be in the confirmation message <b>#{selectedNumber}</b>.
-          </AlertDialogDescription>
+         <AlertDialogDescription className="text-start text-lg text-white">
+  {`${selectedPlayer?.name || "Player"} beat ${
+    challengedPlayer?.name || "Player"
+  } ${score || ""}`}
+</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter className="mt-5 flex flex-col sm:flex-row gap-3">

@@ -40,11 +40,11 @@ const MoveNumberInput = ({
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
-  // ✅ ladderId from URL
+  // ladderId from URL
   const ladder_id = Number(searchParams.get("ladder_id"));
   const ladderTypeFromUrl = searchParams.get("ladder_type");
 
-  // ✅ logged in user id
+  // logged in user id
   const user_id = Number(userId);
 
   const players =
