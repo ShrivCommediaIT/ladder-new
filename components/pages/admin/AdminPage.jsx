@@ -55,6 +55,7 @@ export default function AdminPage() {
 
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [openQuick, setOpenQuick] = useState(false);
 
   const { allLadders } = useSelector((state) => state.fetchLadder);
 
@@ -319,27 +320,30 @@ export default function AdminPage() {
             </h1>
 
             <div className="flex flex-wrap items-center gap-2 text-sm sm:text-lg text-white">
-              <p>Important</p>
+              <p>Getting Started</p>
               <span>-</span>
 
               {/* INFO POPOVER */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button className="underline text-cyan-300">
-                    Please Read
-                  </button>
-                </PopoverTrigger>
+               <Popover open={openQuick} onOpenChange={setOpenQuick}>
 
-                <PopoverContent
-                  side="top"
-                  align="center"
-                  className="w-[95vw] sm:w-xl max-h-[70vh] overflow-y-auto 
-                     bg-gray-300 border-slate-700 text-slate-900 
-                     px-3 py-4 rounded-lg shadow-2xl z-50"
-                >
-                  <AdminImportantInfo />
-                </PopoverContent>
-              </Popover>
+    <PopoverTrigger asChild>
+      <button
+        onClick={() => setOpenQuick(true)}
+        className="grid place-items-center cursor-pointer underline text-cyan-300"
+      >
+        Quick Guide
+      </button>
+    </PopoverTrigger>
+
+    <PopoverContent
+      side="top"
+      align="center"
+      className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700 text-slate-900 px-2 py-4 rounded-lg shadow-2xl z-50 backdrop-blur-md"
+    >
+      <AdminImportantInfo onClose={() => setOpenQuick(false)} />
+    </PopoverContent>
+
+  </Popover>
 
               {/* RIGHT SIDE — USER DETAILS */}
               <div className="self-start sm:self-auto">
@@ -358,26 +362,31 @@ export default function AdminPage() {
               Admin Dashboard
             </h1>
 
-            <div className="flex items-center gap-1">
-              <p className="text-lg text-white">Important Information</p> -
-              {/* --- INFO POPOVER START --- */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button className="grid place-items-center cursor-pointer underline text-cyan-300">
-                    {/* <Info className="w-4 h-4" /> */}
-                    Please Read
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  side="top"
-                  align="center"
-                  className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700 text-slate-900 px-2 py-4 rounded-lg shadow-2xl z-50 backdrop-blur-md"
-                >
-                  <AdminImportantInfo />
-                </PopoverContent>
-              </Popover>
-              {/* --- INFO POPOVER END --- */}
-            </div>
+           <div className="flex items-center gap-1">
+  <p className="text-lg text-white">Getting Started</p> -
+
+  <Popover open={openQuick} onOpenChange={setOpenQuick}>
+
+    <PopoverTrigger asChild>
+      <button
+        onClick={() => setOpenQuick(true)}
+        className="grid place-items-center cursor-pointer underline text-cyan-300"
+      >
+        Quick Guide
+      </button>
+    </PopoverTrigger>
+
+    <PopoverContent
+      side="top"
+      align="center"
+      className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700 text-slate-900 px-2 py-4 rounded-lg shadow-2xl z-50 backdrop-blur-md"
+    >
+      <AdminImportantInfo onClose={() => setOpenQuick(false)} />
+    </PopoverContent>
+
+  </Popover>
+
+</div>
           </div>
 
           <div>

@@ -70,6 +70,8 @@ const MoveNumberInput = ({
   const [score, setScore] = useState("");
   const [betDescription, setBetDescription] = useState("");
 
+  const [showRankAlert, setShowRankAlert] = useState(false);
+
   /* -------------------- DATA -------------------- */
   const challengedPlayer =
     players.find((p) => p.rank === Number(selectedNumber)) || null;
@@ -130,20 +132,43 @@ const MoveNumberInput = ({
       : score
   );
 
+  // const handleEnter = () => {
+  //   if (!user_id || !ladder_id || !currentId) return;
+
+  //   if (!selectedNumber || isNaN(selectedNumber)) return;
+
+  //   if (!resultType) return;
+
+  //   if ((ladderType === "best3" || ladderType === "best5") && !score)
+  //     return;
+
+  //   if (!challengedPlayer) return;
+
+  //   setShowConfirm(true);
+  // };
+
+
   const handleEnter = () => {
-    if (!user_id || !ladder_id || !currentId) return;
+  if (!user_id || !ladder_id || !currentId) return;
 
-    if (!selectedNumber || isNaN(selectedNumber)) return;
+  if (!selectedNumber || isNaN(selectedNumber)) return;
 
-    if (!resultType) return;
+  if (!resultType) return;
 
-    if ((ladderType === "best3" || ladderType === "best5") && !score)
-      return;
+  if ((ladderType === "best3" || ladderType === "best5") && !score)
+    return;
 
-    if (!challengedPlayer) return;
+  if (!challengedPlayer) return;
 
-    setShowConfirm(true);
-  };
+  // BLOCK SELF OR LOWER RANK
+  if (Number(selectedNumber) >= Number(currentRank)) {
+    setShowRankAlert(true);
+    return;
+  }
+
+  // ✅ VALID
+  setShowConfirm(true);
+};
 
   const confirmMove = async () => {
     try {
@@ -354,6 +379,32 @@ const MoveNumberInput = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={showRankAlert} onOpenChange={setShowRankAlert}>
+  <AlertDialogContent className="bg-gray-900 border-red-500 text-gray-100 w-[92vw] sm:max-w-md">
+    
+    <AlertDialogHeader>
+      <AlertDialogTitle className="text-xl font-bold text-red-400">
+        Invalid Challenge!
+      </AlertDialogTitle>
+
+      <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
+        
+        You can only challenge higher ranked players.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+
+    <AlertDialogFooter className="mt-5">
+      <AlertDialogAction
+        onClick={() => setShowRankAlert(false)}
+        className="bg-red-600 hover:bg-red-700"
+      >
+        OK
+      </AlertDialogAction>
+    </AlertDialogFooter>
+
+  </AlertDialogContent>
+</AlertDialog>
     </motion.div>
   );
 };

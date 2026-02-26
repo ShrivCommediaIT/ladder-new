@@ -357,11 +357,11 @@ const AddRemoveBox = ({ ladderId, onSuccessRefresh }) => {
             </DialogTrigger>
             <AnimatePresence>
               {moveOpen && (
-                <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#3a2c1f] to-[#322b1e] border border-[#1a1f2b] p-4 sm:p-6 rounded-xl shadow-2xl">
+                <DialogContent className=" overflow-y-auto bg-tansparent border-none ">
                   <motion.div
                     initial="hidden"
                     animate="visible"
-                    exit="exit"
+                    // exit="exit"
                     variants={modalVariants}
                   >
                     <DialogTitle className="sr-only">Move Player</DialogTitle>

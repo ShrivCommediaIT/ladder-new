@@ -8,7 +8,7 @@ import Best5MovePlayerBox from "./Best5MovePlayerBox";
 
 const MovePlayerBox = () => {
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const searchParams = useSearchParams();
 
@@ -37,9 +37,18 @@ const MovePlayerBox = () => {
   }
 
   // best5 + winlose + best3 => Best5MovePlayerBox
-  if (["best5", "winlose", "best3"].includes(ladderType)) {
-    return <Best5MovePlayerBox  open={open} onClose={() => setOpen(false)} />;
-  }
+  // if (["best5", "winlose", "best3"].includes(ladderType)) {
+  //   return <Best5MovePlayerBox  open={open} onClose={() => setOpen(false)} />;
+  // }
+
+if (["best5", "winlose", "best3"].includes(ladderType)) {
+  return (
+    <Best5MovePlayerBox
+      open={open}
+      onClose={() => setOpen(false)}
+    />
+  );
+}
 
   return (
     <div className="text-center text-white py-20 text-xl">

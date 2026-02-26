@@ -46,6 +46,8 @@ const MoveNumberInput = ({
   const [score, setScore] = useState("");
   const [betDescription, setBetDescription] = useState("");
   const [showSectionAlert, setShowSectionAlert] = useState(false);
+
+  const [showRankAlert, setShowRankAlert] = useState(false);
   
   const numberButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
   
@@ -96,37 +98,6 @@ const MoveNumberInput = ({
       // PERFECT Payload for each API
       let payload;
       
-      // if (ladderType === "best5" || ladderType === "best3") {
-      //   // Best of 5 API payload (NO move_from_user_id)
-      //   payload = {
-      //     ladder_id,
-      //     match_status: resultType,
-      //     user_id,
-      //     move_to_rank: Number(selectedNumber),
-      //     score,
-      //     move_from_rank: currentRank,
-      //     bet: betDescription,
-      //   };
-        
-      //   const result = await dispatch(movePlayerBestOf5(payload)).unwrap();
-        
-      // } else {
-      //   // Normal API payload (WITH move_from_user_id)
-      //   payload = {
-      //     user_id,
-      //     ladder_id,
-      //     match_status: resultType,
-      //     move_from_user_id: currentId,
-      //     move_to_rank: Number(selectedNumber),
-      //     move_from_rank: currentRank,
-      //     score,
-      //     bet: betDescription,
-      //   };
-        
-        
-      //   await dispatch(movePlayer(payload)).unwrap();
-      // }
-
 
       if (ladderType === "best5" || ladderType === "best3") {
   payload = {
@@ -231,6 +202,20 @@ const handleEnter = () => {
   const targetSectionIndex = Math.floor(
     (Number(challengedPlayer.rank) - 1) / Number(preset)
   );
+
+
+  // ❌ BLOCK SELF OR LOWER RANK
+if (Number(selectedNumber) >= Number(currentRank)) {
+  setShowRankAlert(true);
+  return;
+}
+
+
+// BLOCK CROSS-SECTION
+if (currentSectionIndex !== targetSectionIndex) {
+  setShowSectionAlert(true);
+  return;
+}
 
   // BLOCK CROSS-SECTION
   if (currentSectionIndex !== targetSectionIndex) {
@@ -568,6 +553,34 @@ const handleEnter = () => {
         OK, Got It
       </AlertDialogAction>
     </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
+
+{/* ❌ INVALID RANK ALERT */}
+<AlertDialog open={showRankAlert} onOpenChange={setShowRankAlert}>
+  <AlertDialogContent className="bg-gray-900 border-red-500 text-gray-100 w-[92vw] sm:max-w-md">
+    
+    <AlertDialogHeader>
+      <AlertDialogTitle className="text-xl font-bold text-red-400">
+        Invalid Challenge!
+      </AlertDialogTitle>
+
+      <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
+        
+        You can only challenge higher ranked players.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+
+    <AlertDialogFooter className="mt-5">
+      <AlertDialogAction
+        onClick={() => setShowRankAlert(false)}
+        className="bg-red-600 hover:bg-red-700"
+      >
+        OK
+      </AlertDialogAction>
+    </AlertDialogFooter>
+
   </AlertDialogContent>
 </AlertDialog>
   </motion.div>

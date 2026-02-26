@@ -23,7 +23,7 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("userData"); 
+      const raw = localStorage.getItem("userData") || localStorage.getItem("subAdmin"); 
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
@@ -34,6 +34,7 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
       }
     }
   }, []);
+
 
   // redux first, fallback localStorage
   const user = reduxUser || localUser;
@@ -133,7 +134,7 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
       </div>
 
       {/* ADMIN ONLY */}
-      {user?.user_type === "admin" && (
+      {user?.user_type === "admin" || user?.user_type === "sub_admin" && (
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <Input
             type="file"
@@ -161,11 +162,13 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
       )}
 
       {/* NOT ADMIN MESSAGE */}
-      {user && user.user_type !== "admin" && (
-        <p className="text-center text-red-500 font-medium">
-          Only admin can upload CSV
-        </p>
-      )}
+      {user &&
+  user.user_type !== "admin" &&
+  user.user_type !== "sub_admin" && (
+    <p className="text-center text-red-500 font-medium">
+      Only admin or sub admin can upload CSV
+    </p>
+)}
 
       {/* PROGRESS */}
       {progress > 0 && (
@@ -185,4 +188,3 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
 };
 
 export default UploadPlayerLists;
-
