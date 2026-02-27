@@ -239,16 +239,14 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
 
-  // Trigger flower celebration
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
-    // Auto hide after 4 seconds (random 3-5s)
     setTimeout(
       () => {
         setShowCelebration(false);
       },
       4000 + Math.random() * 1000,
-    ); // 4-5 seconds
+    );
   }, []);
 
   const refreshLeaderboard = useCallback(
@@ -277,8 +275,6 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       dispatch(fetchSkillLeaderboard({ ladder_id: ladderId, type: "skill" }));
     }
   }, [dispatch, ladderId]);
-
-
 
 
   const handleSkillClick = useCallback(
@@ -338,9 +334,7 @@ const filteredPlayers = React.useMemo(() => {
 
   return (
     <>
-      {/*  FULLSCREEN FLOWER CELEBRATION ONLY */}
-      {/* <FlowerCelebration isVisible={showCelebration} /> */}
-
+      
       <main className="min-h-screen flex justify-center relative z-10">
         <div className="w-full max-w-2xl px-2 space-y-4">
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />

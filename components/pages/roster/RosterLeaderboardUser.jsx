@@ -11,7 +11,7 @@ import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import Logo from "@/public/logo1.png";
 import LadderLinkPanel from "../players/LadderLinkPanel";
 
-// ✅ Player Card
+// Player Card
 const PlayerCard = ({ player, rank }) => {
   const playerImageUrl = player.image
     ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
@@ -44,7 +44,7 @@ const PlayerCard = ({ player, rank }) => {
   );
 };
 
-// ✅ MAIN COMPONENT — ROSTER ONLY
+// MAIN COMPONENT — ROSTER ONLY
 const RosterLeaderboard = () => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -74,7 +74,7 @@ const RosterLeaderboard = () => {
   }, [loadRoster]);
 
 
-  // ✅ search + alphabet priority sort
+  // search + alphabet priority sort
 const cleaned = searchQuery.toLowerCase().trim();
 
 let working = data || [];
@@ -118,7 +118,7 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
     : data;
 
 
-  // ✅ group by gradebar preset (roster section)
+  // group by gradebar preset (roster section)
   const groupSize = 6;
 
   const sections = [];

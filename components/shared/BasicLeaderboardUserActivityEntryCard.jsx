@@ -25,9 +25,10 @@ export default function BasicLeaderboardActivityEntryCard({
   onClose,
 }) {
   const [selectedActivity, setSelectedActivity] = useState(
-    initialActivity || 1
+    initialActivity || 1,
   );
   const [value, setValue] = useState("0");
+  const [witnessBy, setWitnessBy] = useState("");
   const [skillSign, setSkillSign] = useState("+"); // dynamic sign from API
   const [skillDesc, setSkillDesc] = useState("");
   const [loadingSkill, setLoadingSkill] = useState(true);
@@ -61,18 +62,18 @@ export default function BasicLeaderboardActivityEntryCard({
               skill_number: selectedActivity,
             },
             headers: { APPKEY },
-          }
+          },
         );
 
         const data = res.data?.data || {};
         setSkillDesc(data.skill_description || "");
-        setSkillTarget(data.target || "No target"); // ✅ SET TARGET
+        setSkillTarget(data.target || "No target"); // SET TARGET
         setSkillSign(data.skill_sign === "-" ? "-" : "+");
         setValue("0");
       } catch (err) {
         console.error("Skill fetch failed", err);
         setSkillDesc("");
-        setSkillTarget("No target"); // ✅ ERROR STATE
+        setSkillTarget("No target"); // ERROR STATE
         setSkillSign("+");
         setValue("0");
       } finally {
@@ -110,12 +111,11 @@ export default function BasicLeaderboardActivityEntryCard({
   };
 
 
-  const handleEnter = useCallback(async () => {
+const handleEnter = useCallback(async () => {
   if (!skillActivityId || !playerId) return;
 
   const num = Math.abs(Number(value) || 0);
 
-  // ZERO BLOCK
   if (num === 0) {
     setOpenZeroAlert(true);
     return;
@@ -126,38 +126,38 @@ export default function BasicLeaderboardActivityEntryCard({
 
     const finalScore = skillSign === "-" ? -num : num;
 
+    // Agar API strictly FormData mangti hai, toh niche wala logic dekhein
     const payload = {
-      user_id: Number(playerId),
-      skill_activity_id: Number(skillActivityId),
+      user_id: playerId,
+      skill_activity_id: skillActivityId,
       score: finalScore,
+      witness_by: witnessBy.trim() || "test user" // trim() lagaya taki khali spaces na jayein
     };
 
-    await axios.post(
+    console.log("Sending Payload:", payload);
+
+    const res = await axios.post(
       "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
-      payload,
+      payload, // Direct object bhejein
       {
         headers: {
-          APPKEY,
-          "Content-Type": "application/json",
+          APPKEY: APPKEY,
+          "Content-Type": "application/json", // Explicitly set karein
         },
       }
     );
 
+    console.log("Response:", res.data);
     setOpenSuccess(true);
 
-    setTimeout(() => {
-      setOpenSuccess(false);
-      if (onClose) onClose();
-    }, 1500);
   } catch (err) {
-    console.error("Failed to save score:", err);
-    alert("Failed to save score");
+    console.error("Error Detail:", err.response?.data || err);
+    // Alert dikhayein agar error aaye
+    alert("Failed to save: " + (err.response?.data?.message || "Unknown error"));
   } finally {
     setSaving(false);
   }
-}, [skillActivityId, playerId, value, skillSign, onClose]);
-
-
+}, [skillActivityId, playerId, value, skillSign, witnessBy]);
 
   const handleSuccessClose = useCallback(() => {
     setOpenSuccess(false);
@@ -167,28 +167,6 @@ export default function BasicLeaderboardActivityEntryCard({
   return (
     <>
       <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
-        {/* HEADER */}
-        {/* <div className="mb-2">
-          <p className="text-[11px] uppercase tracking-wide text-sky-300">
-            Skill Selected Number : {selectedActivity}
-          </p>
-
-          {loadingSkill ? (
-            <p className="text-xs text-slate-400">Loading skill...</p>
-          ) : (
-            <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-              Skill Selected Name : {skillDesc || "No skill description"}
-            </p>
-          )}
-
-          {loadingSkill ? (
-            <p className="text-xs text-slate-400">Loading skill...</p>
-          ) : (
-            <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-              Skill Target : {skillDesc || "No skill description"}
-            </p>
-          )}
-        </div> */}
 
         {/* HEADER - FIXED */}
         <div className="mb-2">
@@ -237,11 +215,23 @@ export default function BasicLeaderboardActivityEntryCard({
         </div>
 
         {/* SCORE ENTRY */}
-        <Input
-          value={value}
-          onChange={handleInputChange}
-          className="text-center text-lg text-black font-semibold bg-slate-200"
-        />
+
+        <div className="flex items-center gap-2">
+          <Input
+            value={value}
+            onChange={handleInputChange}
+            className="text-center text-lg text-black font-semibold bg-slate-200"
+          />
+
+          <Input
+            placeholder="Witness by (optional)"
+            value={witnessBy}
+            onChange={(e) => setWitnessBy(e.target.value)}
+            type="text"
+            maxLength={50}
+            className="text-start text-sm text-black font-semibold bg-slate-200"
+          />
+        </div>
 
         {/* NUMPAD */}
         <div className="grid grid-cols-3 gap-2 mt-2">
@@ -291,7 +281,8 @@ export default function BasicLeaderboardActivityEntryCard({
               Score Saved
             </DialogTitle>
             <DialogDescription className="text-lg">
-              Activity #{selectedActivity} updated with score <b>{Math.abs(value)}</b>
+              Activity #{selectedActivity} updated with score{" "}
+              <b>{Math.abs(value)}</b>
             </DialogDescription>
           </DialogHeader>
 
@@ -307,28 +298,28 @@ export default function BasicLeaderboardActivityEntryCard({
       </Dialog>
 
       {/* ZERO SCORE ALERT */}
-<Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-  <DialogContent className="max-w-sm">
-    <DialogHeader>
-      <DialogTitle className="text-red-500 text-xl">
-        Invalid Score
-      </DialogTitle>
-      <DialogDescription className="text-lg">
-        Zero score is not allowed
-      </DialogDescription>
-    </DialogHeader>
+      <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-red-500 text-xl">
+              Invalid Score
+            </DialogTitle>
+            <DialogDescription className="text-lg">
+              Zero score is not allowed
+            </DialogDescription>
+          </DialogHeader>
 
-    <div className="flex justify-end mt-4">
-      <Button
-        onClick={() => setOpenZeroAlert(false)}
-        className="bg-red-500 hover:bg-red-400 text-black font-semibold"
-      >
-        OK
-      </Button>
-    </div>
-  </DialogContent>
-</Dialog>
-
+          <div className="flex justify-end mt-4">
+            <Button
+              onClick={() => setOpenZeroAlert(false)}
+              className="bg-red-500 hover:bg-red-400 text-black font-semibold"
+            >
+              OK
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
+

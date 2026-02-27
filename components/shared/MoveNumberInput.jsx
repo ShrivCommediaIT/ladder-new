@@ -345,7 +345,7 @@ const MoveNumberInput = ({
       </div>
 
       {/* -------------------- CONFIRM DIALOG -------------------- */}
-      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+      {/* <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Result</AlertDialogTitle>
@@ -361,7 +361,43 @@ const MoveNumberInput = ({
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
+
+      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+  <AlertDialogContent className="bg-gray-900 border-violet-500 text-gray-100 w-[92vw] sm:max-w-md">
+    
+    <AlertDialogHeader>
+
+      <AlertDialogTitle className="text-xl font-bold text-violet-400 flex items-center gap-2">
+        <CheckCircle className="text-green-500 h-5 w-5" />
+        Confirm Result
+      </AlertDialogTitle>
+
+      <AlertDialogDescription className="text-start text-lg text-white">
+        {`${selectedPlayer?.name || "Player"} beat ${
+          challengedPlayer?.name || "Player"
+        } ${score || ""}`}
+      </AlertDialogDescription>
+
+    </AlertDialogHeader>
+
+    <AlertDialogFooter className="mt-5 flex flex-col sm:flex-row gap-3">
+      
+      <AlertDialogCancel className="w-full text-gray-800 sm:w-auto">
+        Go Back
+      </AlertDialogCancel>
+
+      <AlertDialogAction
+        onClick={confirmMove}
+        className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+      >
+        Confirm & Post
+      </AlertDialogAction>
+
+    </AlertDialogFooter>
+
+  </AlertDialogContent>
+</AlertDialog>
 
       {/* -------------------- SUCCESS ALERT -------------------- */}
       <AlertDialog open={showSuccess} onOpenChange={setShowSuccess}>

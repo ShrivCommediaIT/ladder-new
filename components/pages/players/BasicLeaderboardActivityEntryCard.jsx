@@ -1,5 +1,3 @@
-//           working version below.................
-
 // "use client";
 
 // import { useEffect, useState, useCallback } from "react";
@@ -27,7 +25,7 @@
 //   onClose,
 // }) {
 //   const [selectedActivity, setSelectedActivity] = useState(
-//     initialActivity || 1
+//     initialActivity || 1,
 //   );
 //   const [value, setValue] = useState("0");
 //   const [skillSign, setSkillSign] = useState("+"); // dynamic sign from API
@@ -36,6 +34,9 @@
 //   const [saving, setSaving] = useState(false);
 //   const [openSuccess, setOpenSuccess] = useState(false);
 //   const [skillTarget, setSkillTarget] = useState("");
+
+//   const [openZeroAlert, setOpenZeroAlert] = useState(false);
+//   const [witnessBy, setWitnessBy] = useState("");
 
 //   // Update selected activity if initialActivity changes
 //   useEffect(() => {
@@ -60,7 +61,7 @@
 //               skill_number: selectedActivity,
 //             },
 //             headers: { APPKEY },
-//           }
+//           },
 //         );
 
 //         const data = res.data?.data || {};
@@ -109,26 +110,29 @@
 //   };
 
 //   /* ---------------- SAVE & AUTO CLOSE ⚡ ---------------- */
+
 //   const handleEnter = useCallback(async () => {
 //     if (!skillActivityId || !playerId) return;
+
+//     const num = Math.abs(Number(value) || 0);
+
+//     // ZERO BLOCK
+//     if (num === 0) {
+//       setOpenZeroAlert(true);
+//       return;
+//     }
 
 //     try {
 //       setSaving(true);
 
-//       // const payload = {
-//       //   user_id: Number(playerId),
-//       //   skill_activity_id: Number(skillActivityId),
-//       //   score: Number(value), // negative numbers handled
-//       // };
-
-//       const num = Math.abs(Number(value) || 0);
 //       const finalScore = skillSign === "-" ? -num : num;
 
-//       const payload = {
-//         user_id: Number(playerId),
-//         skill_activity_id: Number(skillActivityId),
-//         score: finalScore
-//       };
+//      const payload = {
+//   user_id: Number(playerId),
+//   skill_activity_id: Number(skillActivityId),
+//   score: finalScore,
+//   witness_by: witnessBy?.trim() || null
+// };
 
 //       await axios.post(
 //         "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
@@ -138,22 +142,17 @@
 //             APPKEY,
 //             "Content-Type": "application/json",
 //           },
-//         }
+//         },
 //       );
 
 //       setOpenSuccess(true);
-
-//       setTimeout(() => {
-//         setOpenSuccess(false);
-//         if (onClose) onClose();
-//       }, 1500);
 //     } catch (err) {
 //       console.error("Failed to save score:", err);
 //       alert("Failed to save score");
 //     } finally {
 //       setSaving(false);
 //     }
-//   }, [skillActivityId, playerId, value, onClose]);
+//   }, [skillActivityId, playerId, value, skillSign, onClose]);
 
 //   const handleSuccessClose = useCallback(() => {
 //     setOpenSuccess(false);
@@ -162,10 +161,9 @@
 
 //   return (
 //     <>
-//       <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
-    
+//       <Card className="w-full mx-auto bg-slate-900 text-white border-none p-1">
 //         {/* HEADER - FIXED */}
-//         <div className="mb-2">
+//         <div className="">
 //           <p className="text-[11px] uppercase tracking-wide text-sky-300">
 //             Skill Selected Number : {selectedActivity}
 //           </p>
@@ -174,7 +172,7 @@
 //           {loadingSkill ? (
 //             <p className="text-xs text-slate-400">Loading skill...</p>
 //           ) : (
-//             <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
+//             <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal leading-relaxed">
 //               Skill Name : {skillDesc || "No skill description"}
 //             </p>
 //           )}
@@ -183,14 +181,14 @@
 //           {loadingSkill ? (
 //             <p className="text-xs text-slate-400">Loading target...</p>
 //           ) : (
-//             <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
+//             <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal leading-relaxed">
 //               Target : {skillTarget ? Math.abs(skillTarget) : "No target"}
 //             </p>
 //           )}
 //         </div>
 
 //         {/* ACTIVITY BUTTONS */}
-//         <div className="flex flex-wrap gap-1.5 mb-2">
+//         <div className="flex flex-wrap gap-1.5 mb-1">
 //           {activityNumbers.map((n) => (
 //             <button
 //               key={n}
@@ -211,19 +209,31 @@
 //         </div>
 
 //         {/* SCORE ENTRY */}
-//         <Input
+          
+//           <div className="flex items-center gap-2">
+//                     <Input
 //           value={value}
 //           onChange={handleInputChange}
 //           className="text-center text-lg text-black font-semibold bg-slate-200"
 //         />
 
+// <Input
+//   placeholder="Witness by (optional)"
+//   value={witnessBy}
+//   onChange={(e) => setWitnessBy(e.target.value)}
+//   type="text"
+//   maxLength={50}
+//   className="text-center text-sm text-black font-semibold bg-slate-200"
+// />
+//           </div>
+
 //         {/* NUMPAD */}
-//         <div className="grid grid-cols-3 gap-2 mt-2">
+//         <div className="grid grid-cols-3 gap-2">
 //           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
 //             <button
 //               key={d}
 //               onClick={() => handleDigit(String(d))}
-//               className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
+//               className="h-8 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
 //             >
 //               {d}
 //             </button>
@@ -251,7 +261,7 @@
 //         <Button
 //           disabled={saving}
 //           onClick={handleEnter}
-//           className="w-full mt-3 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-lg"
+//           className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-lg"
 //         >
 //           {saving ? "Saving..." : "Enter"}
 //         </Button>
@@ -265,7 +275,8 @@
 //               Score Saved
 //             </DialogTitle>
 //             <DialogDescription className="text-lg">
-//               Activity #{selectedActivity} updated with score <b>{Math.abs(value)}</b>
+//               Activity #{selectedActivity} updated with score{" "}
+//               <b>{Math.abs(value)}</b>
 //             </DialogDescription>
 //           </DialogHeader>
 
@@ -273,6 +284,29 @@
 //             <Button
 //               onClick={handleSuccessClose}
 //               className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold"
+//             >
+//               OK
+//             </Button>
+//           </div>
+//         </DialogContent>
+//       </Dialog>
+
+//       {/* ZERO SCORE ALERT */}
+//       <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
+//         <DialogContent className="max-w-sm">
+//           <DialogHeader>
+//             <DialogTitle className="text-red-500 text-xl">
+//               Invalid Score
+//             </DialogTitle>
+//             <DialogDescription className="text-lg">
+//               Zero score is not allowed
+//             </DialogDescription>
+//           </DialogHeader>
+
+//           <div className="flex justify-end mt-4">
+//             <Button
+//               onClick={() => setOpenZeroAlert(false)}
+//               className="bg-red-500 hover:bg-red-400 text-black font-semibold"
 //             >
 //               OK
 //             </Button>
@@ -292,367 +326,7 @@
 
 
 
-
-
-
-
-
-
-
-// ======================================= Post activity
-
-// "use client";
-
-// import { useEffect, useState, useCallback } from "react";
-// import axios from "axios";
-// import { Card } from "@/components/ui/card";
-// import { Input } from "@/components/ui/input";
-// import { Button } from "@/components/ui/button";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogHeader,
-//   DialogTitle,
-// } from "@/components/ui/dialog";
-
-// const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-// const activityNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
-
-// export default function BasicLeaderboardActivityEntryCard({
-//   ladderId,
-//   playerId,
-//   skillActivityId,
-//   initialActivity,
-//   onClose,
-// }) {
-//   const [selectedActivity, setSelectedActivity] = useState(
-//     initialActivity || 1
-//   );
-//   const [value, setValue] = useState("0");
-//   const [skillSign, setSkillSign] = useState("+"); // dynamic sign from API
-//   const [skillDesc, setSkillDesc] = useState("");
-//   const [loadingSkill, setLoadingSkill] = useState(true);
-//   const [saving, setSaving] = useState(false);
-//   const [openSuccess, setOpenSuccess] = useState(false);
-//   const [skillTarget, setSkillTarget] = useState("");
-
-//   // Update selected activity if initialActivity changes
-//   useEffect(() => {
-//     if (initialActivity) {
-//       setSelectedActivity(initialActivity);
-//       setValue(skillSign === "-" ? "-0" : "0");
-//     }
-//   }, [initialActivity, skillSign]);
-
-//   /* ---------------- FETCH SKILL DESCRIPTION ---------------- */
-//   // useEffect(() => {
-//   //   if (!selectedActivity || !ladderId) return;
-
-//   //   const fetchSkill = async () => {
-//   //     try {
-//   //       setLoadingSkill(true);
-//   //       const res = await axios.get(
-//   //         "https://ne-games.com/leaderBoard/api/user/getskillBynumber",
-//   //         {
-//   //           params: {
-//   //             ladder_id: ladderId,
-//   //             skill_number: selectedActivity,
-//   //           },
-//   //           headers: { APPKEY },
-//   //         }
-//   //       );
-
-//   //       const data = res.data?.data || {};
-//   //       setSkillDesc(data.skill_description || "");
-//   //       setSkillSign(data.skill_sign === "-" ? "-" : "+"); // set dynamic sign
-//   //       setValue(data.skill_sign === "-" ? "-0" : "0"); // initialize value with sign
-//   //     } catch (err) {
-//   //       console.error("Skill fetch failed", err);
-//   //       setSkillDesc("");
-//   //       setSkillSign("+");
-//   //       setValue("0");
-//   //     } finally {
-//   //       setLoadingSkill(false);
-//   //     }
-//   //   };
-
-//   //   fetchSkill();
-//   // }, [selectedActivity, ladderId]);
-
-
-
-
-// // Update the fetchSkill useEffect
-// useEffect(() => {
-//   if (!selectedActivity || !ladderId) return;
-
-//   const fetchSkill = async () => {
-//     try {
-//       setLoadingSkill(true);
-//       const res = await axios.get(
-//         "https://ne-games.com/leaderBoard/api/user/getskillBynumber",
-//         {
-//           params: {
-//             ladder_id: ladderId,
-//             skill_number: selectedActivity,
-//           },
-//           headers: { APPKEY },
-//         }
-//       );
-
-//       const data = res.data?.data || {};
-//       setSkillDesc(data.skill_description || "");
-//       setSkillTarget(data.target || "No target"); // ✅ SET TARGET
-//       setSkillSign(data.skill_sign === "-" ? "-" : "+");
-//       setValue(data.skill_sign === "-" ? "-0" : "0");
-//     } catch (err) {
-//       console.error("Skill fetch failed", err);
-//       setSkillDesc("");
-//       setSkillTarget("No target"); // ✅ ERROR STATE
-//       setSkillSign("+");
-//       setValue("0");
-//     } finally {
-//       setLoadingSkill(false);
-//     }
-//   };
-
-//   fetchSkill();
-// }, [selectedActivity, ladderId]);
-
-
-//   /* ---------------- INPUT HANDLERS ---------------- */
-//   const handleDigit = (d) => {
-//     setValue((prev) => {
-//       // if prev is just "-" or "0", replace it
-//       if (prev === "0" || prev === "-0")
-//         return prev.startsWith("-") ? `-${d}` : d;
-//       return prev + d;
-//     });
-//   };
-
-//   const handleBackspace = () => {
-//     setValue((prev) => {
-//       if (prev.length <= 1 || prev === "-0") return "0";
-//       return prev.slice(0, -1);
-//     });
-//   };
-
-//   const handleClear = () => {
-//     setValue(skillSign === "-" ? "-0" : "0");
-//   };
-
-//   const handleInputChange = (e) => {
-//     const val = e.target.value;
-//     // allow digits and optional leading minus
-//     if (/^-?\d*$/.test(val)) setValue(val || (skillSign === "-" ? "-0" : "0"));
-//   };
-
-//   /* ---------------- SAVE & AUTO CLOSE ⚡ ---------------- */
-//   const handleEnter = useCallback(async () => {
-//     if (!skillActivityId || !playerId) return;
-
-//     try {
-//       setSaving(true);
-
-//       const payload = {
-//         user_id: Number(playerId),
-//         skill_activity_id: Number(skillActivityId),
-//         score: Number(value), // negative numbers handled
-//       };
-
-//       console.log("Payload : ", payload);
-
-//       await axios.post(
-//         "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
-//         payload,
-//         {
-//           headers: {
-//             APPKEY,
-//             "Content-Type": "application/json",
-//           },
-//         }
-//       );
-
-//       setOpenSuccess(true);
-
-//       setTimeout(() => {
-//         setOpenSuccess(false);
-//         if (onClose) onClose();
-//       }, 1500);
-//     } catch (err) {
-//       console.error("Failed to save score:", err);
-//       alert("Failed to save score");
-//     } finally {
-//       setSaving(false);
-//     }
-//   }, [skillActivityId, playerId, value, onClose]);
-
-//   const handleSuccessClose = useCallback(() => {
-//     setOpenSuccess(false);
-//     if (onClose) onClose();
-//   }, [onClose]);
-
-//   return (
-//     <>
-//       <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
-//         {/* HEADER */}
-//         {/* <div className="mb-2">
-//           <p className="text-[11px] uppercase tracking-wide text-sky-300">
-//             Skill Selected Number : {selectedActivity}
-//           </p>
-
-//           {loadingSkill ? (
-//             <p className="text-xs text-slate-400">Loading skill...</p>
-//           ) : (
-//             <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-//               Skill Selected Name : {skillDesc || "No skill description"}
-//             </p>
-//           )}
-
-//           {loadingSkill ? (
-//             <p className="text-xs text-slate-400">Loading skill...</p>
-//           ) : (
-//             <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-//               Skill Target : {skillDesc || "No skill description"}
-//             </p>
-//           )}
-//         </div> */}
-
-//         {/* HEADER - FIXED */}
-// <div className="mb-2">
-//   <p className="text-[11px] uppercase tracking-wide text-sky-300">
-//     Skill Selected Number : {selectedActivity}
-//   </p>
-
-//   {/* SKILL NAME */}
-//   {loadingSkill ? (
-//     <p className="text-xs text-slate-400">Loading skill...</p>
-//   ) : (
-//     <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-//       Skill Name : {skillDesc || "No skill description"}
-//     </p>
-//   )}
-
-//   {/* SKILL TARGET */}
-//   {loadingSkill ? (
-//     <p className="text-xs text-slate-400">Loading target...</p>
-//   ) : (
-//     <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-//       Target : {skillTarget}
-//     </p>
-//   )}
-// </div>
-
-
-//         {/* ACTIVITY BUTTONS */}
-//         <div className="flex flex-wrap gap-1.5 mb-2">
-//           {activityNumbers.map((n) => (
-//             <button
-//               key={n}
-//               onClick={() => {
-//                 setSelectedActivity(n);
-//                 setValue(skillSign === "-" ? "-0" : "0");
-//               }}
-//               className={`w-7 h-7 rounded-md border text-[11px] transition-all duration-200
-//                 ${
-//                   selectedActivity === n
-//                     ? "bg-sky-400 text-black border-white scale-110 shadow-md"
-//                     : "bg-slate-800 border-slate-600 hover:bg-slate-700 hover:scale-105"
-//                 }`}
-//             >
-//               {n}
-//             </button>
-//           ))}
-//         </div>
-
-//         {/* SCORE ENTRY */}
-//         <Input
-//           value={value}
-//           onChange={handleInputChange}
-//           className="text-center text-lg text-black font-semibold bg-slate-200"
-//         />
-
-//         {/* NUMPAD */}
-//         <div className="grid grid-cols-3 gap-2 mt-2">
-//           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
-//             <button
-//               key={d}
-//               onClick={() => handleDigit(String(d))}
-//               className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
-//             >
-//               {d}
-//             </button>
-//           ))}
-//           <button
-//             onClick={handleClear}
-//             className="h-9 bg-red-500 text-black rounded hover:bg-slate-400 active:scale-95 transition-all"
-//           >
-//             clear
-//           </button>
-//           <button
-//             onClick={() => handleDigit("0")}
-//             className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
-//           >
-//             0
-//           </button>
-//           <button
-//             onClick={handleBackspace}
-//             className="h-9 bg-red-300 text-black rounded hover:bg-slate-400 active:scale-95 transition-all"
-//           >
-//             ⌫
-//           </button>
-//         </div>
-
-//         <Button
-//           disabled={saving}
-//           onClick={handleEnter}
-//           className="w-full mt-3 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-lg"
-//         >
-//           {saving ? "Saving..." : "Enter"}
-//         </Button>
-//       </Card>
-
-//       {/* AUTO-CLOSE SUCCESS DIALOG */}
-//       <Dialog open={openSuccess} onOpenChange={handleSuccessClose}>
-//         <DialogContent className="max-w-sm">
-//           <DialogHeader>
-//             <DialogTitle className="text-emerald-500 text-xl">
-//               Score Saved
-//             </DialogTitle>
-//             <DialogDescription className="text-lg">
-//               Activity #{selectedActivity} updated with score <b>{value}</b>
-//             </DialogDescription>
-//           </DialogHeader>
-
-//           <div className="flex justify-end mt-4">
-//             <Button
-//               onClick={handleSuccessClose}
-//               className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold"
-//             >
-//               OK
-//             </Button>
-//           </div>
-//         </DialogContent>
-//       </Dialog>
-//     </>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-// ======================================= with zero not accepted ===================
-
-
+// =========================================== fix it version =======================
 
 "use client";
 
@@ -670,7 +344,6 @@ import {
 } from "@/components/ui/dialog";
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
 const activityNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
 
 export default function BasicLeaderboardActivityEntryCard({
@@ -680,30 +353,24 @@ export default function BasicLeaderboardActivityEntryCard({
   initialActivity,
   onClose,
 }) {
-  const [selectedActivity, setSelectedActivity] = useState(
-    initialActivity || 1
-  );
+  const [selectedActivity, setSelectedActivity] = useState(initialActivity || 1);
   const [value, setValue] = useState("0");
-  const [skillSign, setSkillSign] = useState("+"); // dynamic sign from API
+  const [witnessBy, setWitnessBy] = useState("");
+  const [skillSign, setSkillSign] = useState("+");
   const [skillDesc, setSkillDesc] = useState("");
   const [loadingSkill, setLoadingSkill] = useState(true);
   const [saving, setSaving] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [skillTarget, setSkillTarget] = useState("");
-
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
 
-  
-
-  // Update selected activity if initialActivity changes
   useEffect(() => {
     if (initialActivity) {
       setSelectedActivity(initialActivity);
       setValue("0");
     }
-  }, [initialActivity, skillSign]);
+  }, [initialActivity]);
 
-  // Update the fetchSkill useEffect
   useEffect(() => {
     if (!selectedActivity || !ladderId) return;
 
@@ -713,157 +380,87 @@ export default function BasicLeaderboardActivityEntryCard({
         const res = await axios.get(
           "https://ne-games.com/leaderBoard/api/user/getskillBynumber",
           {
-            params: {
-              ladder_id: ladderId,
-              skill_number: selectedActivity,
-            },
+            params: { ladder_id: ladderId, skill_number: selectedActivity },
             headers: { APPKEY },
           }
         );
 
         const data = res.data?.data || {};
         setSkillDesc(data.skill_description || "");
-        setSkillTarget(data.target || "No target"); //  SET TARGET
+        setSkillTarget(data.target || "No target");
         setSkillSign(data.skill_sign === "-" ? "-" : "+");
         setValue("0");
       } catch (err) {
         console.error("Skill fetch failed", err);
-        setSkillDesc("");
-        setSkillTarget("No target"); //  ERROR STATE
-        setSkillSign("+");
-        setValue("0");
       } finally {
         setLoadingSkill(false);
       }
     };
-
     fetchSkill();
   }, [selectedActivity, ladderId]);
 
   /* ---------------- INPUT HANDLERS ---------------- */
   const handleDigit = (d) => {
-    setValue((prev) => {
-      // if prev is just "-" or "0", replace it
-      if (prev === "0") return d;
-      return prev + d;
-    });
+    setValue((prev) => (prev === "0" ? d : prev + d));
   };
 
   const handleBackspace = () => {
-    setValue((prev) => {
-      if (prev.length <= 1) return "0";
-      return prev.slice(0, -1);
-    });
+    setValue((prev) => (prev.length <= 1 ? "0" : prev.slice(0, -1)));
   };
 
-  const handleClear = () => {
-    setValue("0");
-  };
+  const handleClear = () => setValue("0");
 
   const handleInputChange = (e) => {
     const val = e.target.value;
-    // allow digits and optional leading minus
     if (/^\d*$/.test(val)) setValue(val || "0");
   };
 
-  /* ---------------- SAVE & AUTO CLOSE ⚡ ---------------- */
-  // const handleEnter = useCallback(async () => {
-  //   if (!skillActivityId || !playerId) return;
-
-  //   try {
-  //     setSaving(true);
-
-  //     // const payload = {
-  //     //   user_id: Number(playerId),
-  //     //   skill_activity_id: Number(skillActivityId),
-  //     //   score: Number(value), // negative numbers handled
-  //     // };
-
-  //     const num = Math.abs(Number(value) || 0);
-  //     const finalScore = skillSign === "-" ? -num : num;
-
-  //     const payload = {
-  //       user_id: Number(playerId),
-  //       skill_activity_id: Number(skillActivityId),
-  //       score: finalScore
-  //     };
-
-  //     await axios.post(
-  //       "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
-  //       payload,
-  //       {
-  //         headers: {
-  //           APPKEY,
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     setOpenSuccess(true);
-
-  //     setTimeout(() => {
-  //       setOpenSuccess(false);
-  //       if (onClose) onClose();
-  //     }, 1500);
-  //   } catch (err) {
-  //     console.error("Failed to save score:", err);
-  //     alert("Failed to save score");
-  //   } finally {
-  //     setSaving(false);
-  //   }
-  // }, [skillActivityId, playerId, value, onClose]);
-
-
-
-
+  /* ---------------- SAVE LOGIC ---------------- */
   const handleEnter = useCallback(async () => {
-  if (!skillActivityId || !playerId) return;
+    if (!skillActivityId || !playerId) return;
 
-  const num = Math.abs(Number(value) || 0);
+    const num = Math.abs(Number(value) || 0);
+    if (num === 0) {
+      setOpenZeroAlert(true);
+      return;
+    }
 
-  // 🚫 ZERO BLOCK
-  if (num === 0) {
-    setOpenZeroAlert(true);
-    return;
-  }
+    try {
+      setSaving(true);
+      const finalScore = skillSign === "-" ? -num : num;
 
-  try {
-    setSaving(true);
+      // 100% string ensure karne ke liye fallback
+      const witnessValue = witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "test user";
 
-    const finalScore = skillSign === "-" ? -num : num;
+      // PHP/Laravel Backend ke liye URLSearchParams sabse stable hota hai
+      const params = new URLSearchParams();
+      params.append("user_id", String(playerId));
+      params.append("skill_activity_id", String(skillActivityId));
+      params.append("score", String(finalScore));
+      params.append("witness_by", witnessValue);
 
-    const payload = {
-      user_id: Number(playerId),
-      skill_activity_id: Number(skillActivityId),
-      score: finalScore,
-    };
+      console.log("Submitting Payload:", Object.fromEntries(params));
 
-    await axios.post(
-      "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
-      payload,
-      {
-        headers: {
-          APPKEY,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+      const res = await axios.post(
+        "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
+        params,
+        {
+          headers: {
+            APPKEY: APPKEY,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
-    setOpenSuccess(true);
-
-    setTimeout(() => {
-      setOpenSuccess(false);
-      if (onClose) onClose();
-    }, 1500);
-  } catch (err) {
-    console.error("Failed to save score:", err);
-    alert("Failed to save score");
-  } finally {
-    setSaving(false);
-  }
-}, [skillActivityId, playerId, value, skillSign, onClose]);
-
-
+      console.log("Response:", res.data);
+      setOpenSuccess(true);
+    } catch (err) {
+      console.error("Error Detail:", err.response?.data || err);
+      alert("Failed to save: " + (err.response?.data?.message || "Error"));
+    } finally {
+      setSaving(false);
+    }
+  }, [skillActivityId, playerId, value, skillSign, witnessBy]);
 
   const handleSuccessClose = useCallback(() => {
     setOpenSuccess(false);
@@ -872,35 +469,26 @@ export default function BasicLeaderboardActivityEntryCard({
 
   return (
     <>
-      <Card className="w-full mx-auto bg-slate-900 text-white border-none p-1">
-    
-        {/* HEADER - FIXED */}
-        <div className="">
+      <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
+        <div className="mb-2">
           <p className="text-[11px] uppercase tracking-wide text-sky-300">
             Skill Selected Number : {selectedActivity}
           </p>
-
-          {/* SKILL NAME */}
           {loadingSkill ? (
             <p className="text-xs text-slate-400">Loading skill...</p>
           ) : (
-            <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal leading-relaxed">
-              Skill Name : {skillDesc || "No skill description"}
-            </p>
-          )}
-
-          {/* SKILL TARGET */}
-          {loadingSkill ? (
-            <p className="text-xs text-slate-400">Loading target...</p>
-          ) : (
-            <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal leading-relaxed">
-              Target : {skillTarget ? Math.abs(skillTarget) : "No target"}
-            </p>
+            <>
+              <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words leading-relaxed">
+                Skill Name : {skillDesc || "No skill description"}
+              </p>
+              <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium leading-relaxed">
+                Target : {skillTarget ? Math.abs(Number(skillTarget)) : "No target"}
+              </p>
+            </>
           )}
         </div>
 
-        {/* ACTIVITY BUTTONS */}
-        <div className="flex flex-wrap gap-1.5 mb-1">
+        <div className="flex flex-wrap gap-1.5 mb-2">
           {activityNumbers.map((n) => (
             <button
               key={n}
@@ -908,111 +496,77 @@ export default function BasicLeaderboardActivityEntryCard({
                 setSelectedActivity(n);
                 setValue("0");
               }}
-              className={`w-7 h-7 rounded-md border text-[11px] transition-all duration-200
-                ${
-                  selectedActivity === n
-                    ? "bg-sky-400 text-black border-white scale-110 shadow-md"
-                    : "bg-slate-800 border-slate-600 hover:bg-slate-700 hover:scale-105"
-                }`}
+              className={`w-7 h-7 rounded-md border text-[11px] transition-all
+                ${selectedActivity === n 
+                  ? "bg-sky-400 text-black border-white scale-110 shadow-md" 
+                  : "bg-slate-800 border-slate-600 hover:bg-slate-700"}`}
             >
               {n}
             </button>
           ))}
         </div>
 
-        {/* SCORE ENTRY */}
-        <Input
-          value={value}
-          onChange={handleInputChange}
-          className="text-center text-lg text-black font-semibold bg-slate-200"
-        />
+        <div className="flex items-center gap-2 mb-2">
+          <Input
+            value={value}
+            readOnly
+            className="text-center text-lg text-black font-semibold bg-slate-200"
+          />
+          <Input
+            placeholder="Witness by (optional)"
+            value={witnessBy}
+            onChange={(e) => setWitnessBy(e.target.value)}
+            className="text-start text-sm text-black font-semibold bg-slate-200"
+          />
+        </div>
 
-        {/* NUMPAD */}
         <div className="grid grid-cols-3 gap-2">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
             <button
               key={d}
               onClick={() => handleDigit(String(d))}
-              className="h-8 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
+              className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all font-bold"
             >
               {d}
             </button>
           ))}
-          <button
-            onClick={handleClear}
-            className="h-9 bg-red-500 text-black rounded hover:bg-slate-400 active:scale-95 transition-all"
-          >
-            clear
-          </button>
-          <button
-            onClick={() => handleDigit("0")}
-            className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
-          >
-            0
-          </button>
-          <button
-            onClick={handleBackspace}
-            className="h-9 bg-red-300 text-black rounded hover:bg-slate-400 active:scale-95 transition-all"
-          >
-            ⌫
-          </button>
+          <button onClick={handleClear} className="h-9 bg-red-500 text-white rounded font-bold uppercase text-[10px]">Clear</button>
+          <button onClick={() => handleDigit("0")} className="h-9 bg-white text-black rounded font-bold">0</button>
+          <button onClick={handleBackspace} className="h-9 bg-orange-400 text-white rounded font-bold">⌫</button>
         </div>
 
         <Button
           disabled={saving}
           onClick={handleEnter}
-          className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-lg"
+          className="w-full mt-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-11 shadow-lg"
         >
-          {saving ? "Saving..." : "Enter"}
+          {saving ? "Saving..." : "Submit Score"}
         </Button>
       </Card>
 
-      {/* AUTO-CLOSE SUCCESS DIALOG */}
+      {/* Dialogs */}
       <Dialog open={openSuccess} onOpenChange={handleSuccessClose}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-emerald-500 text-xl">
-              Score Saved
-            </DialogTitle>
+            <DialogTitle className="text-emerald-500 text-xl font-bold">Score Saved</DialogTitle>
             <DialogDescription className="text-lg">
-              Activity #{selectedActivity} updated with score <b>{Math.abs(value)}</b>
+              Recorded score: <b>{value}</b> <br/>
+              Witness: <b>{witnessBy || "test user"}</b>
             </DialogDescription>
           </DialogHeader>
-
-          <div className="flex justify-end mt-4">
-            <Button
-              onClick={handleSuccessClose}
-              className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold"
-            >
-              OK
-            </Button>
-          </div>
+          <Button onClick={handleSuccessClose} className="bg-emerald-500 text-black font-bold mt-4">OK</Button>
         </DialogContent>
       </Dialog>
 
-      {/* ZERO SCORE ALERT */}
-<Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-  <DialogContent className="max-w-sm">
-    <DialogHeader>
-      <DialogTitle className="text-red-500 text-xl">
-        Invalid Score
-      </DialogTitle>
-      <DialogDescription className="text-lg">
-        Zero score is not allowed
-      </DialogDescription>
-    </DialogHeader>
-
-    <div className="flex justify-end mt-4">
-      <Button
-        onClick={() => setOpenZeroAlert(false)}
-        className="bg-red-500 hover:bg-red-400 text-black font-semibold"
-      >
-        OK
-      </Button>
-    </div>
-  </DialogContent>
-</Dialog>
-
+      <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-red-500 text-xl font-bold">Invalid Score</DialogTitle>
+            <DialogDescription className="text-lg">Zero score is not allowed</DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => setOpenZeroAlert(false)} className="bg-red-500 text-white mt-4 font-bold">OK</Button>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

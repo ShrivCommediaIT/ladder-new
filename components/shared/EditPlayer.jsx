@@ -149,7 +149,7 @@ const allTabs = [
   { value: "challenge", label: "Challenge" },
 ];
 
-/* ✅ If roster → only Edit + Upload */
+/* If roster → only Edit + Upload */
 
 const tabs =
   ladderType === "roster"
