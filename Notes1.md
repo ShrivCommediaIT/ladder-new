@@ -125,3 +125,43 @@ password = 111
               <GenerateAccessCodes />
             </div> */}
           </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          <!-- ================================ -->
+
+
+              <Dialog
+          open={openAddPlayerDialog}
+          onOpenChange={setOpenAddPlayerDialog}
+        >
+          <DialogTrigger asChild>
+            <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
+              <PlusCircle size={20} /> ADD/REMOVE/MOVE
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="sr-only">Manage Players</DialogTitle>
+            </DialogHeader>
+            {/*  AddRemoveBox automatically handles: skill=add/remove only, others=add/remove/move */}
+            <AddRemoveBox
+              ladderId={ladderId}
+              onSuccessRefresh={
+                isSkill ? refreshSkillLeaderboard : refreshLeaderboard
+              }
+            />
+          </DialogContent>
+        </Dialog>

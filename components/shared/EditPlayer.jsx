@@ -30,6 +30,8 @@ import StatusPlayer from "./StatusPlayer";
 import { clearStatusMessage } from "@/redux/slices/playerStatusSlice";
 import { resetProfileImageState } from "@/redux/slices/profileImageSlice";
 
+import { useSearchParams } from "next/navigation";
+
 export const EditPlayer = ({
   open = true,
   onClose = () => {},
@@ -42,6 +44,9 @@ export const EditPlayer = ({
   /* -------------------- USER FROM LOCALSTORAGE -------------------- */
 
   const [localUser, setLocalUser] = useState(null);
+
+  const searchParams = useSearchParams();
+  const ladderType = searchParams.get("ladder_type");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -126,14 +131,36 @@ export const EditPlayer = ({
     }
   }, [activeTab]);
 
-  const tabs = [
-    { value: "move", label: "Result" },
-    // { value: "status", label: "Status" },
-    { value: "edit", label: "Edit" },
-    { value: "load", label: "Upload" },
-    { value: "stats", label: "Stats" },
-    { value: "challenge", label: "Challenge" },
-  ];
+  // const tabs = [
+  //   { value: "move", label: "Result" },
+  //   // { value: "status", label: "Status" },
+  //   { value: "edit", label: "Edit" },
+  //   { value: "load", label: "Upload" },
+  //   { value: "stats", label: "Stats" },
+  //   { value: "challenge", label: "Challenge" },
+  // ];
+
+
+const allTabs = [
+  { value: "move", label: "Result" },
+  { value: "edit", label: "Edit" },
+  { value: "load", label: "Upload" },
+  { value: "stats", label: "Stats" },
+  { value: "challenge", label: "Challenge" },
+];
+
+/* ✅ If roster → only Edit + Upload */
+
+const tabs =
+  ladderType === "roster"
+    ? allTabs.filter((t) => t.value === "edit" || t.value === "load")
+    : allTabs;
+
+    useEffect(() => {
+  if (tabs.length > 0) {
+    setActiveTab(tabs[0].value);
+  }
+}, [ladderType]);
 
   /* -------------------- UI -------------------- */
 
