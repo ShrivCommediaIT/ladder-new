@@ -100,7 +100,7 @@ const handleEdit = async () => {
     });
 
     if (res.data.status == 200 || res.data.status === "success") {
-      // ✅ update localStorage
+      // update localStorage
       const updated = { ...user, name, phone };
 
       if (localStorage.getItem("subAdmin")) {

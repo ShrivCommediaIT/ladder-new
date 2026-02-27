@@ -28,7 +28,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
       ? Number(scoreObj.input_score)
       : null;
 
-  // ✅ display priority = input_score first
+  // display priority = input_score first
   const displayScore =
     inputScore !== null && !isNaN(inputScore) ? inputScore : score;
 
@@ -51,7 +51,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     if (mode === "+") {
       isTargetAchieved = score >= target;
     } else {
-      // ✅ SAME as working component
+      // SAME as working component
       isTargetAchieved = score >= Math.abs(target);
     }
   }
@@ -247,7 +247,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [openSort, setOpenSort] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false); // ✅ FIXED: UNCOMMENTED
+  const [isRefreshing, setIsRefreshing] = useState(false); // FIXED: UNCOMMENTED
   const [showRemove, setShowRemove] = useState(false);
   
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -255,10 +255,10 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const currentUser = data.find((p) => p.id == currentUserId);
   const myRank = currentUser?.rank;
 
-  // ✅ REFRESH KEY TO CONTROL RELOADS (STOPS INFINITE LOOP)
+  // REFRESH KEY TO CONTROL RELOADS (STOPS INFINITE LOOP)
   const refreshKey = useRef(0);
 
-  // ✅ REFRESH FUNCTION FIRST
+  // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
     (skillNo = 0) => {
       if (!ladderId || isRefreshing) return;
@@ -271,13 +271,13 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
           sortbyskillnumber: skillNo,
         }),
       ).finally(() => {
-        setIsRefreshing(false); // ✅ FIXED: was setIsRefreshing(true)
+        setIsRefreshing(false); // FIXED: was setIsRefreshing(true)
       });
     },
     [dispatch, ladderId, isRefreshing],
   );
 
-  // ✅ MANUAL REFRESH HANDLERS (only when explicitly called)
+  // MANUAL REFRESH HANDLERS (only when explicitly called)
   const handleSelfRemove = useCallback(() => {
     setShowRemove(true);
   }, []);
@@ -437,7 +437,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
         <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
           <BasicLeaderboardUserRemove
             ladderId={ladderId}
-            myRank={myRank} // ✅ PASS ACTUAL RANK
+            myRank={myRank} 
             onClose={handleRemoveClose}
             onSuccessRefresh={handleRemoveSuccess}
           />

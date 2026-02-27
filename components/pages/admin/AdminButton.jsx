@@ -71,10 +71,6 @@ const AdminButton = () => {
 
   const isDemoLadder = demoLadder?.toLowerCase() === "demo";
 
-  // const ladderType = typeFromParams || playerLadderType || miniLeagueLadderType;
-  // const isMiniLeague = ladderType === "minileague";
-  // const isSkill = ladderType === "skill";
-
     const ladderType = typeFromParams || playerLadderType || miniLeagueLadderType;
 
     const isMiniLeague = ladderType === "minileague";
@@ -301,7 +297,7 @@ const AdminButton = () => {
     {resetLoading ? "RESETTING..." : "RESET"}
   </Button>
 )}
-        {/* FIXED: AddRemoveBox - ALL LADDER TYPES (handles internal logic) */}
+     
     {!isRoster && (
   <Dialog
     open={openAddPlayerDialog}
