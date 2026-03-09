@@ -179,7 +179,7 @@ export default function SubAdminDashboard() {
       toast.error("Solution name already exists — choose another");
       return;
     }
-
+    console.log("ladderType:", ladderType);
     try {
       // CREATE LADDER
       const ladderResult = await dispatch(
@@ -446,7 +446,7 @@ export default function SubAdminDashboard() {
                 <Label className="text-md text-white">Choose Type : </Label>
                 <select
                   value={ladderType}
-                  onChange={(e) => setLadderType(e.target.value)}
+                  onChange={(e) => {setLadderType(e.target.value); console.log("ladderType:", e.target.value);}}
                   className="mt-1 h-11 w-full rounded-xl bg-white/10 border border-white/10 px-3 text-white"
                 >
                   <option className="bg-black" value="winlose">
@@ -464,9 +464,17 @@ export default function SubAdminDashboard() {
                   <option className="bg-black" value="skill">
                     Skills/Performance Leaderboards
                   </option>
-                  <option className="bg-black" value="roster">
+                   <option className="bg-black" value="roster">
                     Roster
                   </option>
+                   <option className="bg-black" value="positive">
+                    Positive LeaderBoard
+                  </option>
+                  <option className="bg-black" value="negative">
+                    Negative LeaderBoard
+                  </option>
+                 
+                  
                 </select>
               </div>
 

@@ -31,6 +31,7 @@ export default function BasicLeaderboardSetUpSkill({
   onClose = () => {},
   onSkillsUpdated = () => {},
 }) {
+  
   const [rows, setRows] = useState(initialRows);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -42,6 +43,7 @@ export default function BasicLeaderboardSetUpSkill({
 
   const searchParams = useSearchParams();
   const ladderId = searchParams.get("ladder_id");
+  const ladderType = searchParams.get("type");
 
   const handlePrintSkills = () => {
     const printTrigger = document.getElementById("print-trigger");
@@ -129,7 +131,7 @@ export default function BasicLeaderboardSetUpSkill({
           return {
             skill_number: row.id,
             skill_description: String(row.description || "").trim(),
-            skill_sign: row.mode === "plus" ? "+" : "-",
+            skill_sign: "-",
             target: targetNum,
             unit: String(row.unit || "").trim(),
           };
@@ -280,15 +282,15 @@ export default function BasicLeaderboardSetUpSkill({
           {/* FIXED: Single line header with proper alignment */}
           <div className="sm:px-2 px-8 py-1  border-b border-white/10">
             <div className="flex items-end gap-2 text-white text-xs font-medium ">
-              <div className="w-20 flex items-center">Skill No.</div>
+             {(ladderType !== "positive" && ladderType !== "negative" ) ? <div className="w-20 flex items-center">Skill No.</div> : null}
               <div className="w-[120px]">Target</div>
-              <div className="w-[200px]">Skill Name</div>
-              <div className="w-[120px] translate">Units Of Measurement</div>
+              <div className="w-[200px]">{(ladderType !== "positive" && ladderType !== "negative" ) ?"Skill Name":"Activity"}</div>
+             {( ladderType !== "negative" ) && <div className="w-[120px] translate">Units Of Measurement</div>}
             </div>
           </div>
 
           <div className="max-h-[25vh] overflow-y-auto py-2 space-y-1.5">
-            {rows.map((row) => (
+            {(ladderType !== "positive" && ladderType !== "negative" ) ? rows.map((row) => (
               <div key={row.id} className="flex items-start ">
                 {/* Skill No. + +/- */}
                 <div className="flex flex-col w-20 pt-1">
@@ -365,18 +367,57 @@ export default function BasicLeaderboardSetUpSkill({
                   />
                 </div>
               </div>
-            ))}
+            )):
+           <div className="flex items-start p-3">
+                {/* Skill No. + +/- */}
+                <div className="flex gap-2 w-[250px] items-start flex-1">
+                  <Textarea
+                    rows={1}
+                    placeholder="Target"
+                    value={
+                      rows[0].target !== "" ? Math.abs(Number(rows[0].target)) : ""
+                    }
+                    onChange={(e) =>
+                      updateRow(1, { target: e.target.value })
+                    }
+                    className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
+                  />
+
+                  <Textarea
+                    rows={1}
+                    placeholder={`Skill 1 description`}
+                    value={String(rows[0].description || "")}
+                    onChange={(e) =>
+                      updateRow(1, { description: e.target.value })
+                    }
+                    className="bg-white text-black text-xs w-[300px] rounded-md border border-slate-400 p-2 resize-none leading-tight"
+                  />
+
+                 { (ladderType !== "negative") && (
+                  <Textarea
+                    rows={1}
+                    placeholder="Unit"
+                    value={rows[0].unit}
+                    onChange={(e) =>
+                      updateRow(1, { unit: e.target.value })
+                    }
+                    className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
+                  />)}
+                </div>
+              </div>
+            }
           </div>
 
-          <div className="bg-[#14283a] flex justify-between items-center w-full px-8 py-3 border-t border-white/20">
+          <div className={`bg-[#14283a] flex justify-between items-center w-full px-8 py-3 border-t border-white/20`}>
          
-            <div className="flex items-center justify-end mx-4">
+             {(ladderType !== "positive" && ladderType !== "negative" ) ? 
+             <div className="flex items-center justify-end mx-4">
               <BasicLeaderboardPrintSkillsSheet
                 skills={safeSkillsForPrint}
                 ladderId={ladderId}
                 className="hidden"
               />
-            </div>
+            </div>:null}
                <div className="flex justify-center gap-4">
               <Button
                 size="sm"

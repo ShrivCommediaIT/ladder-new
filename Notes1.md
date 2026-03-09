@@ -62,7 +62,7 @@ password = 111
                   className="mt-1 h-11 w-full rounded-xl bg-white/10 border border-white/10 px-3 text-white"
                 >
                   <option className="bg-black" value="winlose">
-                    Win / Lose Ladder
+                    Win / Lose Ladder 
                   </option>
                   <option className="bg-black" value="best3">
                     Best of 3 Ladder
@@ -79,6 +79,7 @@ password = 111
                   <option className="bg-black" value="roster">
                     Roster
                   </option>
+                 
                 </select>
               </div>
 

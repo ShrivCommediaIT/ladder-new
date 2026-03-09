@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useSearchParams } from "next/navigation";
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
@@ -38,6 +39,8 @@ export default function BasicLeaderboardActivityEntryCard({
 
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
 
+   const searchParams = useSearchParams();
+    const type = searchParams.get("type");
 
   // Update selected activity if initialActivity changes
   useEffect(() => {
@@ -85,14 +88,20 @@ export default function BasicLeaderboardActivityEntryCard({
   }, [selectedActivity, ladderId]);
 
   /* ---------------- INPUT HANDLERS ---------------- */
-  const handleDigit = (d) => {
-    setValue((prev) => {
-      // if prev is just "-" or "0", replace it
-      if (prev === "0") return d;
-      return prev + d;
-    });
-  };
+const handleDigit = (d) => {
+  setValue((prev) => {
+    // block first dot
+    if (d === "." && !prev) return prev;
 
+    // block multiple dots
+    if (d === "." && prev.includes(".")) return prev;
+
+    // replace leading zero
+    if (prev === "0" && d !== ".") return d;
+
+    return prev + d;
+  });
+};
   const handleBackspace = () => {
     setValue((prev) => {
       if (prev.length <= 1) return "0";
@@ -115,7 +124,7 @@ const handleEnter = useCallback(async () => {
   if (!skillActivityId || !playerId) return;
 
   const num = Math.abs(Number(value) || 0);
-
+  console.log("handleEnter==>", num)
   if (num === 0) {
     setOpenZeroAlert(true);
     return;
@@ -125,6 +134,7 @@ const handleEnter = useCallback(async () => {
     setSaving(true);
 
     const finalScore = skillSign === "-" ? -num : num;
+  console.log("handleEnter==>11", finalScore)
 
     // Agar API strictly FormData mangti hai, toh niche wala logic dekhein
     const payload = {
@@ -170,9 +180,9 @@ const handleEnter = useCallback(async () => {
 
         {/* HEADER - FIXED */}
         <div className="mb-2">
-          <p className="text-[11px] uppercase tracking-wide text-sky-300">
+          {(type != "positive" && type != "negative") &&  <p className="text-[11px] uppercase tracking-wide text-sky-300">
             Skill Selected Number : {selectedActivity}
-          </p>
+          </p>}
 
           {/* SKILL NAME */}
           {loadingSkill ? (
@@ -194,7 +204,7 @@ const handleEnter = useCallback(async () => {
         </div>
 
         {/* ACTIVITY BUTTONS */}
-        <div className="flex flex-wrap gap-1.5 mb-2">
+       {(type != "positive" && type != "negative") && <div className="flex flex-wrap gap-1.5 mb-2">
           {activityNumbers.map((n) => (
             <button
               key={n}
@@ -213,6 +223,7 @@ const handleEnter = useCallback(async () => {
             </button>
           ))}
         </div>
+        }
 
         {/* SCORE ENTRY */}
 
@@ -223,46 +234,65 @@ const handleEnter = useCallback(async () => {
             className="text-center text-lg text-black font-semibold bg-slate-200"
           />
 
-          <Input
+          {(type != "positive" && type != "negative") &&<Input
             placeholder="Witness by (optional)"
             value={witnessBy}
             onChange={(e) => setWitnessBy(e.target.value)}
             type="text"
             maxLength={50}
             className="text-start text-sm text-black font-semibold bg-slate-200"
-          />
+          />}
         </div>
 
         {/* NUMPAD */}
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
-            <button
-              key={d}
-              onClick={() => handleDigit(String(d))}
-              className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
-            >
-              {d}
-            </button>
-          ))}
+      <div className="grid grid-cols-3 gap-2 mt-2">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
+          <button
+            key={d}
+            onClick={() => handleDigit(String(d))}
+            className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
+          >
+            {d}
+          </button>
+        ))}
+
+        {/* clear + dot */}
+        <div className="col-span-1 grid grid-cols-12 gap-2">
           <button
             onClick={handleClear}
-            className="h-9 bg-red-500 text-black rounded hover:bg-slate-400 active:scale-95 transition-all"
+            className={`h-9 bg-red-500 text-black rounded transition-all ${
+              type === "positive" || type === "negative"
+                ? "col-span-8"
+                : "col-span-12"
+            }`}
           >
             clear
           </button>
-          <button
-            onClick={() => handleDigit("0")}
-            className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
-          >
-            0
-          </button>
-          <button
-            onClick={handleBackspace}
-            className="h-9 bg-red-300 text-black rounded hover:bg-slate-400 active:scale-95 transition-all"
-          >
-            ⌫
-          </button>
+
+          {(type === "positive" || type === "negative") && (
+            <button
+              onClick={() => handleDigit(".")}
+              className="col-span-4 h-9 bg-white  text-black rounded"
+            >
+              .
+            </button>
+          )}
         </div>
+
+        <button
+          onClick={() => handleDigit("0")}
+          className="h-9 bg-white text-black rounded"
+        >
+          0
+        </button>
+
+        <button
+          onClick={handleBackspace}
+          className="h-9 bg-red-300 text-black rounded"
+        >
+          ⌫
+        </button>
+      </div>
 
         <Button
           disabled={saving}

@@ -41,7 +41,7 @@ export const BasicLeaderboardUserEdit = ({
   // ✅ Skill ladder id (priority: props > params)
   const ladder_id =
     Number(propLadderId) || Number(searchParams.get("ladder_id"));
-
+  const type = searchParams.get("type")
   // ✅ Player data (skill leaderboard)
   const players = useSelector((state) => state.skillLeaderboard?.data || []);
 
@@ -91,17 +91,18 @@ export const BasicLeaderboardUserEdit = ({
                     key={tab.value}
                     value={tab.value}
                     className="
-          text-gray-300
-          data-[state=active]:text-white
-          data-[state=active]:bg-gray-700
-          data-[state=active]:shadow-md
-          transition-all duration-200
-        "
+                    text-gray-300
+                    data-[state=active]:text-white
+                    data-[state=active]:bg-gray-700
+                    data-[state=active]:shadow-md
+                    transition-all duration-200
+                  "
                   >
                     {tab.label}
                   </TabsTrigger>
                 ))}
               </TabsList>
+     
             </div>
 
             {/* MOBILE DROPDOWN */}

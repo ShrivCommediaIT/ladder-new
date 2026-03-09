@@ -76,7 +76,8 @@ const AdminButton = () => {
     const isMiniLeague = ladderType === "minileague";
     const isSkill = ladderType === "skill";
     const isRoster = typeFromParams === "roster";
-
+    const isPositive = typeFromParams === "positive";
+    const isNegative = typeFromParams === "negative";
   const [openAddPlayerDialog, setOpenAddPlayerDialog] = useState(false);
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
   const [openSkillDialog, setOpenSkillDialog] = useState(false);
@@ -265,7 +266,7 @@ const AdminButton = () => {
         )}
 
         {/* SKILL LADDER RESET */}
-        {isSkill && (
+        {(isSkill  || isPositive || isNegative) && (
           <Button
             onClick={() => {
               setConfirmType("reset_skill");
@@ -280,7 +281,7 @@ const AdminButton = () => {
 
  
 
-{!isMiniLeague && !isSkill && !isRoster && (
+{!isMiniLeague && !isSkill && !isRoster && !isPositive && !isNegative &&  (
   <Button
     onClick={() => {
       if (isDemoLadder) {
@@ -334,7 +335,7 @@ const AdminButton = () => {
 )}
 
         {/* SKILL SPECIFIC BUTTONS */}
-        {isSkill && (
+        {(isSkill  || isPositive || isNegative) && (
           <>
             {!isSorted ? (
               <Button
@@ -386,7 +387,7 @@ const AdminButton = () => {
         {/* SET UP SKILL */}
         <Dialog open={openSkillDialog} onOpenChange={setOpenSkillDialog}>
           <DialogTrigger asChild>
-            {isSkill && (
+            {(isSkill  || isPositive || isNegative) && (
               <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
                 <Zap size={20} /> SETUP
               </Button>

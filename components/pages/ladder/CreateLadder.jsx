@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +19,8 @@ const CreateLadder = () => {
   const router = useRouter();
 
   const user = useSelector((state) => state.user?.user);
+  
+  
   const loading = useSelector((state) => state.createLadder?.loading);
 
   const [ladderName, setLadderName] = useState("");
@@ -33,27 +35,31 @@ const CreateLadder = () => {
       toast.error("Ladder name must exactly match your registered name.");
       return;
     }
+  useEffect(() => {
+    console.log("user calling");
+    
+        dispatch(createLadder({ user_id: user.id, name: ladderName }))
+        .unwrap()
+        .then((res) => {
+          toast.success(res?.success_message || "Ladder created successfully.");
+          setLadderName("");
 
-    dispatch(createLadder({ user_id: user.id, name: ladderName }))
-      .unwrap()
-      .then((res) => {
-        toast.success(res?.success_message || "Ladder created successfully.");
-        setLadderName("");
+          const createdLadderId = res?.data?.ladder_id;
+          if (createdLadderId) {
+            dispatch(setLadderId(createdLadderId));
+          }
 
-        const createdLadderId = res?.data?.ladder_id;
-        if (createdLadderId) {
-          dispatch(setLadderId(createdLadderId));
-        }
+          // ✅ Redirect to login page with success message flag
+          setTimeout(() => {
+            // router.push("/login-page?from=ladder");
+            router.push(`/login-page?from=ladder&ladderName=${encodeURIComponent(ladderName)}`);
+          }, 1000);
+        })
+        .catch((err) => {
+          toast.error(err?.message || "Failed to create ladder. Please try again.");
+        });
+  }, [])
 
-        // ✅ Redirect to login page with success message flag
-        setTimeout(() => {
-          // router.push("/login-page?from=ladder");
-          router.push(`/login-page?from=ladder&ladderName=${encodeURIComponent(ladderName)}`);
-        }, 1000);
-      })
-      .catch((err) => {
-        toast.error(err?.message || "Failed to create ladder. Please try again.");
-      });
   };
 
   return (

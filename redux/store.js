@@ -31,11 +31,15 @@ import changePasswordReducer from "./slices/changePassword"
 import miniLeagueReducer from "./slices/minileagueSlice";
 import moveToMiniLeagueReducer  from "./slices/minileagueMovingSlice";
 import basicLeaderboardReducer from "./slices/BasicLeaderboardSlice";
+import positiveLeaderBoardReducer from "./slices/positiveLeaderBoardSlice";
+import negativeLeaderBoardReducer from "./slices/negativeLeaderBoardSlice";
+
 import rosterReducer from "./slices/rosterSlice";
 import rosterLeaderboardReducer from "./slices/rosterLeaderboardSlice";
 
 import clubReducer from "./slices/clubSlice"; 
 import authClubReducer from "./slices/loginClub";
+import { positive } from "zod";
 
 
 const persistConfig = {
@@ -61,6 +65,8 @@ const persistConfig = {
     "minileague",
     "minileaguePlayerMoving",
     "skillLeaderboard",
+    "positiveLeaderBoard",
+    "negativeLeaderBoard",
     "club",
     "roster",
     "rosterLeaderboard",
@@ -92,6 +98,8 @@ const rootReducer = combineReducers({
   minileague: miniLeagueReducer,
   minileaguePlayerMoving: moveToMiniLeagueReducer,
   skillLeaderboard: basicLeaderboardReducer,
+  positiveLeaderBoard: positiveLeaderBoardReducer,
+  negativeLeaderBoard: negativeLeaderBoardReducer,
   club: clubReducer,
   user: authClubReducer,
   roster: rosterReducer,
