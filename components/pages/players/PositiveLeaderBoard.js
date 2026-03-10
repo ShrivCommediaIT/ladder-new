@@ -92,7 +92,6 @@ const PlayerCard = ({
     if (achievedTargets > 0) {
       onTargetAchieved(player.name, achievedTargets);
     }
-    console.log("player", player)
   }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
 
   const getRankBySkillNumber = (ranks, skillNumber) => {
@@ -149,7 +148,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
   const { data = [], loading } = useSelector(
-    (state) => state.skillLeaderboard || {},
+    (state) => state.positiveLeaderBoard || {},
   );
 
   // CELEBRATION STATE ONLY
@@ -253,11 +252,11 @@ const filteredPlayers = React.useMemo(() => {
 
 
   const playerData = useSelector((state) => state.positiveLeaderBoard.data);
-
+  console.log("playerData", playerData)
   return (
     <>
       
-      <main className="min-h-screen flex justify-center relative z-10">
+      <main className="min-h-screen flex justify-center relative">
         <div className="w-full max-w-2xl px-2 space-y-4">
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           <LadderLinkPanel ladderId={ladderId} ladderType="positive" />

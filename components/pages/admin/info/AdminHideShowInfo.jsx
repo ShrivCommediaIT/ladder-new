@@ -58,17 +58,6 @@ const AdminHideShowInfo = () => {
             when required.
           </p>
         </div>
-
-        {/* Go Live Section */}
-        <div className="bg-amber-400/10 p-3 rounded-lg border border-black">
-          <p className="font-semibold text-black">
-            When You’re Ready to Go Live
-          </p>
-          <p>
-            Delete the demo solutions once you no longer need them.
-          </p>
-        </div>
-
       </div>
     </>
   );

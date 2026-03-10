@@ -332,16 +332,16 @@ export default function SubAdminDashboard() {
                     </span> */}
                     <p
                       className="
-      relative overflow-hidden
-      text-sm sm:text-lg font-semibold text-white/90 capitalize
-      px-4 py-1 rounded-md 
-      bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
-      backdrop-blur-md
+                      relative overflow-hidden
+                      text-sm sm:text-lg font-semibold text-white/90 capitalize
+                      px-4 py-1 rounded-md 
+                      bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
+                      backdrop-blur-md
 
-      transition-all duration-700 ease-out
-      hover:scale-[1.04]
-      hover:shadow-[0_0_20px_rgba(240,172,255,0.25)]
-    "
+                      transition-all duration-700 ease-out
+                      hover:scale-[1.04]
+                      hover:shadow-[0_0_20px_rgba(240,172,255,0.25)]
+                    "
                     >
                       {subAdmin?.sport_name || "N/A"}
                     </p>
@@ -428,17 +428,22 @@ export default function SubAdminDashboard() {
               {/* LADDER NAME */}
               <div>
                 <Label className="text-md text-white">
-                  Name :{" "}
-                  <span className="text-xs text-gray-300">
-                    Example: Hockey - Under 16s Challenge
-                  </span>
+                  Name :
                 </Label>
+                <div className="flex gap-2">
+                <Input
+                  value={subAdmin?.sport_name}
+                  className="mt-1 w-25 h-11 rounded-xl bg-white/10 border-white/10 text-white"
+                  placeholder="Enter - Sport Then Title of Solution"
+                  readOnly
+                />
                 <Input
                   value={ladderName}
                   onChange={(e) => setLadderName(e.target.value)}
                   className="mt-1 h-11 rounded-xl bg-white/10 border-white/10 text-white"
-                  placeholder="Enter - Sport Then Title of Solution"
+                  placeholder="Name of the Solution"
                 />
+                </div>
               </div>
 
               {/* TYPE SELECT */}

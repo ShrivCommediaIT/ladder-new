@@ -104,7 +104,11 @@ const PlayerCard = ({
   
 
   return (
-    <Card onClick={() => onSkillClick(player.id, player.skills[0].skill_number)} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
+    <Card onClick={() => {
+    const skillNumber = player.skills?.[0]?.skill_number;
+    if (!skillNumber) return;
+    onSkillClick(player.id, skillNumber);
+  }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
       <div    className="flex-1 min-w-0 curcer-pointer">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">
@@ -150,7 +154,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
   const { data = [], loading } = useSelector(
-    (state) => state.skillLeaderboard || {},
+    (state) => state.negativeLeaderBoard || {},
   );
 
   // CELEBRATION STATE ONLY
@@ -253,12 +257,11 @@ const filteredPlayers = React.useMemo(() => {
 }, [data, searchQuery]);
 
 
-  const playerData = useSelector((state) => state.positiveLeaderBoard.data);
-  console.log("playerData", playerData)
+  const playerData = useSelector((state) => state.negativeLeaderBoard.data);
   return (
     <>
       
-      <main className="min-h-screen flex justify-center relative z-10">
+      <main className="min-h-screen flex justify-center relative">
         <div className="w-full max-w-2xl px-2 space-y-4">
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           <LadderLinkPanel ladderId={ladderId} ladderType="negative" />
