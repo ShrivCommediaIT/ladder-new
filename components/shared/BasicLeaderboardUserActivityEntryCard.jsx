@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,12 +36,12 @@ export default function BasicLeaderboardActivityEntryCard({
   const [saving, setSaving] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [skillTarget, setSkillTarget] = useState("");
-
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
-
-   const searchParams = useSearchParams();
-    const type = searchParams.get("type");
-
+  const DEFAULT_TIME = "00:00:000";
+  const [time, setTime] = useState(DEFAULT_TIME);
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type");
+  const timeRef = useRef(null);
   // Update selected activity if initialActivity changes
   useEffect(() => {
     if (initialActivity) {
@@ -88,29 +88,174 @@ export default function BasicLeaderboardActivityEntryCard({
   }, [selectedActivity, ladderId]);
 
   /* ---------------- INPUT HANDLERS ---------------- */
-const handleDigit = (d) => {
-  setValue((prev) => {
-    // block first dot
-    if (d === "." && !prev) return prev;
 
-    // block multiple dots
-    if (d === "." && prev.includes(".")) return prev;
+  const handleDigit = (d) => {
+    if (type !== "negative") return;
 
-    // replace leading zero
-    if (prev === "0" && d !== ".") return d;
+    const input = timeRef.current;
+    if (!input) return;
 
-    return prev + d;
-  });
-};
+    let pos = input.selectionStart;
+
+    let current = input.value || time;
+
+    let [min, sec, ms] = current.split(":");
+
+    // ---------- MIN ----------
+    if (pos <= 2) {
+      let p = pos;
+
+      let newMin =
+        min.slice(0, p) +
+        d +
+        min.slice(p + 1);
+
+      newMin = newMin.slice(0, 2);
+
+      if (parseInt(newMin) > 59) return;
+
+      const result =
+        `${newMin.padStart(2, "0")}:${sec}:${ms}`;
+
+      setTime(result);
+
+      setTimeout(() => {
+        let next = Math.min(pos + 1, 2);
+        input.setSelectionRange(next, next);
+      });
+
+      return;
+    }
+
+    // ---------- SEC ----------
+    if (pos > 2 && pos <= 5) {
+      let p = pos - 3;
+
+      let newSec =
+        sec.slice(0, p) +
+        d +
+        sec.slice(p + 1);
+
+      newSec = newSec.slice(0, 2);
+
+      if (parseInt(newSec) > 59) return;
+
+      const result =
+        `${min}:${newSec.padStart(2, "0")}:${ms}`;
+
+      setTime(result);
+
+      setTimeout(() => {
+        let next = pos + 1;
+        if (next === 5) next = 6;
+        input.setSelectionRange(next, next);
+      });
+
+      return;
+    }
+
+    // ---------- MS ----------
+    if (pos > 5) {
+      let p = pos - 6;
+
+      let newMs =
+        ms.slice(0, p) +
+        d +
+        ms.slice(p + 1);
+
+      newMs = newMs.slice(0, 3);
+
+      if (parseInt(newMs) > 999) return;
+
+      const result =
+        `${min}:${sec}:${newMs.padStart(3, "0")}`;
+
+      setTime(result);
+
+      setTimeout(() => {
+        let next = Math.min(pos + 1, 8);
+        input.setSelectionRange(next, next);
+      });
+    }
+  };
+
   const handleBackspace = () => {
-    setValue((prev) => {
-      if (prev.length <= 1) return "0";
-      return prev.slice(0, -1);
-    });
+    if (type !== "negative") return;
+
+    const input = timeRef.current;
+    if (!input) return;
+
+    let pos = input.selectionStart;
+
+    if (pos === 0) return;
+
+    let [min, sec, ms] = time.split(":");
+
+    // -------- MIN --------
+    if (pos <= 2) {
+      let p = pos - 1;
+
+      if (p < 0) return;
+
+      let arr = min.split("");
+      arr[p] = "0";
+
+      const result = `${arr.join("")}:${sec}:${ms}`;
+
+      setTime(result);
+
+      setTimeout(() => {
+        input.setSelectionRange(p, p);
+      });
+
+      return;
+    }
+
+    // -------- SEC --------
+    if (pos > 2 && pos <= 5) {
+      let p = pos - 4;
+
+      if (p < 0) return;
+
+      let arr = sec.split("");
+      arr[p] = "0";
+
+      const result = `${min}:${arr.join("")}:${ms}`;
+
+      setTime(result);
+
+      setTimeout(() => {
+        input.setSelectionRange(pos - 1, pos - 1);
+      });
+
+      return;
+    }
+
+    // -------- MS --------
+    if (pos > 5) {
+      let p = pos - 7;
+
+      if (p < 0) return;
+
+      let arr = ms.split("");
+      arr[p] = "0";
+
+      const result = `${min}:${sec}:${arr.join("")}`;
+
+      setTime(result);
+
+      setTimeout(() => {
+        input.setSelectionRange(pos - 1, pos - 1);
+      });
+    }
   };
 
   const handleClear = () => {
-    setValue("0");
+    if (type === "negative") {
+      setTime("00:00:000");
+    } else {
+      setValue("0");
+    }
   };
 
   const handleInputChange = (e) => {
@@ -119,55 +264,122 @@ const handleDigit = (d) => {
     if (/^\d*$/.test(val)) setValue(val || "0");
   };
 
+  const handleInputChangeTime = (e) => {
+    if (type !== "negative") return;
 
-const handleEnter = useCallback(async () => {
-  if (!skillActivityId || !playerId) return;
+    let val = e.target.value;
+    console.log("handleInputChangeTime==>", val)
+    if (!/^[0-9:]*$/.test(val)) return;
 
-  const num = Math.abs(Number(value) || 0);
-  console.log("handleEnter==>", num)
-  if (num === 0) {
+    if (val.length > 9) return;
+
+    let parts = val.split(":");
+
+    if (parts.length !== 3) {
+      setTime(val);
+      return;
+    }
+
+    let min = parts[0] || "0";
+    let sec = parts[1] || "0";
+    let ms = parts[2] || "0";
+
+    // limit length per block
+    if (min.length > 2) return;
+    if (sec.length > 2) return;
+    if (ms.length > 3) return;
+
+    // limit values
+    if (parseInt(min) > 59) return;
+    if (parseInt(sec) > 59) return;
+    if (parseInt(ms) > 999) return;
+
+    setTime(val);
+  };
+
+  const formatTimeForApi = (t) => {
+    if (!t) return null;
+
+    const [min = "00", sec = "00", ms = "000"] = t.split(":");
+
+    // zero check
+    if (
+      min === "00" &&
+      sec === "00" &&
+      ms === "000"
+    ) {
+      return null;
+    }
+
+    return `${parseInt(min)}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}`;
+  };
+
+  const handleEnter = useCallback(async () => {
+    if (!skillActivityId || !playerId) return;
+
+    let finalScore;
+    let URl;
+    if (type === "negative") {
+  URl = "user/postResultNegativeSkillboard";
+
+  let currentTime =
+    timeRef.current?.value || time;
+
+  const formattedTime =
+    formatTimeForApi(currentTime);
+
+  if (!formattedTime) {
     setOpenZeroAlert(true);
     return;
   }
 
-  try {
-    setSaving(true);
+  finalScore = formattedTime; // ✅ correct format
+} else {
+      URl = "user/postResultPositiveSkillboard";
+      const num = Math.abs(Number(value) || 0);
 
-    const finalScore = skillSign === "-" ? -num : num;
-  console.log("handleEnter==>11", finalScore)
-
-    // Agar API strictly FormData mangti hai, toh niche wala logic dekhein
-    const payload = {
-      user_id: playerId,
-      skill_activity_id: skillActivityId,
-      score: finalScore,
-      witness_by: witnessBy.trim() || "test user" // trim() lagaya taki khali spaces na jayein
-    };
-
-    console.log("Sending Payload:", payload);
-
-    const res = await axios.post(
-      "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
-      payload, // Direct object bhejein
-      {
-        headers: {
-          APPKEY: APPKEY,
-          "Content-Type": "application/json", // Explicitly set karein
-        },
+      if (num === 0) {
+        setOpenZeroAlert(true);
+        return;
       }
-    );
 
-    console.log("Response:", res.data);
-    setOpenSuccess(true);
+      finalScore = skillSign === "-" ? -num : num;
+    }
 
-  } catch (err) {
-    console.error("Error Detail:", err.response?.data || err);
-    // Alert dikhayein agar error aaye
-    alert("Failed to save: " + (err.response?.data?.message || "Unknown error"));
-  } finally {
-    setSaving(false);
-  }
-}, [skillActivityId, playerId, value, skillSign, witnessBy]);
+    try {
+      setSaving(true);
+
+      // Agar API strictly FormData mangti hai, toh niche wala logic dekhein
+      const payload = {
+        user_id: playerId,
+        skill_activity_id: skillActivityId,
+        score: finalScore,
+        witness_by: witnessBy.trim() || "test user" // trim() lagaya taki khali spaces na jayein
+      };
+
+    
+
+      const res = await axios.post(
+        `https://ne-games.com/leaderBoard/api/${URl}`,
+        payload, // Direct object bhejein
+        {
+          headers: {
+            APPKEY: APPKEY,
+            "Content-Type": "application/json", // Explicitly set karein
+          },
+        }
+      );
+
+      setOpenSuccess(true);
+
+    } catch (err) {
+      console.error("Error Detail:", err.response?.data || err);
+      // Alert dikhayein agar error aaye
+      alert("Failed to save: " + (err.response?.data?.message || "Unknown error"));
+    } finally {
+      setSaving(false);
+    }
+  }, [skillActivityId, playerId, value, skillSign, witnessBy]);
 
   const handleSuccessClose = useCallback(() => {
     setOpenSuccess(false);
@@ -189,7 +401,7 @@ const handleEnter = useCallback(async () => {
             <p className="text-xs text-slate-400">Loading skill...</p>
           ) : (
             <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-              Skill Name : {skillDesc || "No skill description"}
+              Skill Name :   {skillDesc || "No skill description"}
             </p>
           )}
 
@@ -228,10 +440,32 @@ const handleEnter = useCallback(async () => {
         {/* SCORE ENTRY */}
 
         <div className="flex items-center gap-2">
+          {/* <Input
+            ref={timeRef}
+            value={type === "negative" ? time : value}
+            onChange={type === "negative" ? handleInputChangeTime : handleInputChange}
+            className={`text-center text-lg  ${type === "negative" ? "bg-slate-800 text-white" : "bg-slate-200 text-black"} font-semibold`}
+          /> */}
+
           <Input
-            value={value}
-            onChange={handleInputChange}
-            className="text-center text-lg text-black font-semibold bg-slate-200"
+            ref={timeRef}
+            value={type === "negative" ? time : value}
+            onChange={
+              type === "negative"
+                ? handleInputChangeTime
+                : handleInputChange
+            }
+            onClick={(e) => {
+              if (type !== "negative") return;
+
+              let pos = e.target.selectionStart;
+
+              if (pos === 2) pos = 3;
+              if (pos === 5) pos = 6;
+
+              e.target.setSelectionRange(pos, pos);
+            }}
+            className={`text-center text-lg  ${type === "negative" ? "bg-slate-800 text-white" : "bg-slate-200 text-black"} font-semibold`}
           />
 
           {(type != "positive" && type != "negative") &&<Input
@@ -261,7 +495,7 @@ const handleEnter = useCallback(async () => {
           <button
             onClick={handleClear}
             className={`h-9 bg-red-500 text-black rounded transition-all ${
-              type === "positive" || type === "negative"
+              type === "positive"
                 ? "col-span-8"
                 : "col-span-12"
             }`}
@@ -269,7 +503,7 @@ const handleEnter = useCallback(async () => {
             clear
           </button>
 
-          {(type === "positive" || type === "negative") && (
+          {(type === "positive") && (
             <button
               onClick={() => handleDigit(".")}
               className="col-span-4 h-9 bg-white  text-black rounded"
