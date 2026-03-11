@@ -252,7 +252,6 @@ const filteredPlayers = React.useMemo(() => {
 
 
   const playerData = useSelector((state) => state.positiveLeaderBoard.data);
-  console.log("playerData", playerData)
   return (
     <>
       
