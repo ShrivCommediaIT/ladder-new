@@ -30,7 +30,10 @@ const PlayerCard = ({
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
     const skillObj = skills?.find((s) => s.skill_number === skillNumber);
-
+    const witnessBy =
+    scoreObj?.witness_by ||
+    skillObj?.witness_by ||
+    "";
     const score = scoreObj ? Number(scoreObj.score) : 0; // 🔒 internal logic
     const inputScore =
       scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
@@ -65,6 +68,7 @@ const PlayerCard = ({
     }
 
     return {
+      witnessBy,
       score,
       displayScore,
       target,
@@ -131,22 +135,6 @@ const PlayerCard = ({
 
         {player.skills?.length > 0 ? (
           <>
-            {/* Skill Numbers */}
-            {/* <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
-              {player.skills.map((skill, i) => (
-                <div
-                  key={i}
-                  onClick={() => onSkillClick(player.id, skill.skill_number)}
-                  className="cursor-pointer min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded bg-white hover:bg-emerald-500 transition-all hover:scale-110"
-                  title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
-                >
-                  {skill.skill_number}
-                </div>
-              ))}
-            </div> */}
-
-            {/* Skill Numbers */}
-            {/* Skill Numbers */}
             <div className="flex gap-[3px] overflow-y-visible pb-2 mb-1">
               {player.skills.map((skill, i) => {
                 const isNegative = skill.skill_sign === "-";
@@ -179,7 +167,6 @@ const PlayerCard = ({
                   player.skills || [],
                   skill.skill_number,
                 );
-
                 return (
                   <div
                     key={i}
@@ -187,7 +174,7 @@ const PlayerCard = ({
                       scoreData.isTargetAchieved
                         ? "bg-green-400 text-black shadow-md font-semibold"
                         : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
-                    }`}
+                    } ${scoreData.witnessBy ? "underline decoration-blue decoration-[3px]" : ""}`}
                     title={`Score: ${scoreData.score} | Target: ${
                       scoreData.target || "N/A"
                     }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}

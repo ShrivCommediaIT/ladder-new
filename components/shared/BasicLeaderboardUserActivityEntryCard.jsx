@@ -41,6 +41,7 @@ export default function BasicLeaderboardActivityEntryCard({
   const [time, setTime] = useState(DEFAULT_TIME);
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
+  const ladderType = searchParams.get("ladder_type");
   const timeRef = useRef(null);
   // Update selected activity if initialActivity changes
   useEffect(() => {
@@ -93,7 +94,7 @@ export default function BasicLeaderboardActivityEntryCard({
     if (!input) return;
 
     // ================= NEGATIVE (TIME) =================
-    if (type === "negative") {
+    if (type === "negative" || ladderType === "negative") {
       let pos = input.selectionStart;
 
       let current = input.value || time;
@@ -303,10 +304,9 @@ export default function BasicLeaderboardActivityEntryCard({
   };
 
   const handleInputChangeTime = (e) => {
-    if (type !== "negative") return;
+    if (type !== "negative" || ladderType !== "negative") return;
 
     let val = e.target.value;
-    console.log("handleInputChangeTime==>", val)
     if (!/^[0-9:]*$/.test(val)) return;
 
     if (val.length > 9) return;
@@ -348,7 +348,6 @@ export default function BasicLeaderboardActivityEntryCard({
     ) {
       return null;
     }
-    console.log("formatTimeForApi==>", `${parseInt(min)}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}` )
     return `${min.padStart(2, "0")}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}`;
   };
 
@@ -357,7 +356,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
     let finalScore;
     let URl;
-    if (type === "negative") {
+    if (type === "negative" || ladderType === "negative") {
       URl = "user/postResultNegativeSkillboard";
 
       let currentTime =
@@ -391,7 +390,7 @@ export default function BasicLeaderboardActivityEntryCard({
         user_id: playerId,
         skill_activity_id: skillActivityId,
         score: finalScore,
-        witness_by: witnessBy.trim() || "test user" // trim() lagaya taki khali spaces na jayein
+        witness_by: witnessBy.trim() || "test user"
       };
 
     
@@ -429,7 +428,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
         {/* HEADER - FIXED */}
         <div className="mb-2">
-          {(type != "positive" && type != "negative") &&  <p className="text-[11px] uppercase tracking-wide text-sky-300">
+          {(type != "positive" && type != "negative"  && ladderType != "positive" && ladderType != "negative") &&  <p className="text-[11px] uppercase tracking-wide text-sky-300">
             Skill Selected Number : {selectedActivity}
           </p>}
 
@@ -453,7 +452,7 @@ export default function BasicLeaderboardActivityEntryCard({
         </div>
 
         {/* ACTIVITY BUTTONS */}
-       {(type != "positive" && type != "negative") && <div className="flex flex-wrap gap-1.5 mb-2">
+       {(type != "positive" && type != "negative" && ladderType != "positive" && ladderType != "negative") && <div className="flex flex-wrap gap-1.5 mb-2">
           {activityNumbers.map((n) => (
             <button
               key={n}
@@ -479,26 +478,23 @@ export default function BasicLeaderboardActivityEntryCard({
         <div className="flex items-center gap-2">
          <Input
             ref={timeRef}
-            value={type === "negative" ? time : value}
+            value={(type === "negative" || ladderType === "negative") ? time : value}
             onChange={
-              type === "negative"
+              (type === "negative" || ladderType === "negative")
                 ? handleInputChangeTime
                 : handleInputChange
             }
             onClick={(e) => {
               if (type !== "negative") return;
-
               let pos = e.target.selectionStart;
-
               if (pos === 2) pos = 3;
               if (pos === 5) pos = 6;
-
               e.target.setSelectionRange(pos, pos);
             }}
-            className={`text-center text-lg ${type === "negative" ? "bg-slate-800 text-white" : "bg-slate-200 text-black"} font-semibold`}
+            className={`text-center text-lg ${(type === "negative" || ladderType === "negative") ? "bg-slate-800 text-white" : "bg-slate-200 text-black"} font-semibold`}
           />
-
-          {(type != "positive" && type != "negative") &&<Input
+          {(type != "positive" && type != "negative" && ladderType != "positive" && ladderType != "negative") &&
+          <Input
             placeholder="Witness by (optional)"
             value={witnessBy}
             onChange={(e) => setWitnessBy(e.target.value)}
@@ -507,7 +503,6 @@ export default function BasicLeaderboardActivityEntryCard({
             className="text-start text-sm text-black font-semibold bg-slate-200"
           />}
         </div>
-
         {/* NUMPAD */}
       <div className="grid grid-cols-3 gap-2 mt-2">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
@@ -525,7 +520,7 @@ export default function BasicLeaderboardActivityEntryCard({
           <button
             onClick={handleClear}
             className={`h-9 bg-red-500 text-black rounded transition-all ${
-              type === "positive"
+              (type === "positive" || ladderType === "positive")
                 ? "col-span-8"
                 : "col-span-12"
             }`}
@@ -533,7 +528,7 @@ export default function BasicLeaderboardActivityEntryCard({
             clear
           </button>
 
-          {(type === "positive") && (
+          {((type === "positive" || ladderType === "positive")) && (
             <button
               onClick={() => handleDigit(".")}
               className="col-span-4 h-9 bg-white  text-black rounded"
@@ -576,7 +571,7 @@ export default function BasicLeaderboardActivityEntryCard({
             </DialogTitle>
             <DialogDescription className="text-lg">
               Activity #{selectedActivity} updated with score{" "}
-              <b>{Math.abs(value)}</b>
+              <b>{type === "negative" || ladderType === "negative" ? time : Math.abs(value)}</b>
             </DialogDescription>
           </DialogHeader>
 

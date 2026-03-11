@@ -18,6 +18,7 @@ import { useSearchParams } from "next/navigation";
 
 import PlayerImage from "./PlayerImage";
 import BasicLeaderboardActivityEntryCard from "./BasicLeaderboardActivityEntryCard";
+import BasicLeaderboardAgeUserEdit from "@/components/shared/BasicLeaderboardAgeUserEdit";
 
 export const BasicLeaderboardEdit = ({
   open = true,
@@ -29,6 +30,7 @@ export const BasicLeaderboardEdit = ({
 }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
+  const [showEditSkeleton, setShowEditSkeleton] = useState(false);
 
   const playerId = currentId ? Number(currentId) : null;
 
@@ -61,8 +63,8 @@ export const BasicLeaderboardEdit = ({
   const tabs = [
     { value: "activity", label: "Activity No." },
     { value: "load", label: "Upload Avatar" },
+    { value: "edit", label: "Edit Player" },
   ];
-
   // 🔥 FORWARD onClose TO CHILD COMPONENTS
   const handleChildClose = useCallback(() => {
     onClose(); // Trigger parent refresh
@@ -74,14 +76,8 @@ export const BasicLeaderboardEdit = ({
         <DialogTitle className="text-xl font-bold border-b border-gray-700 p-1">
           {selectedPlayer?.name || "Player"}
         </DialogTitle>
-
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <Tabs
-            value={selectedTab}
-            onValueChange={setSelectedTab}
-            className="text-white"
-          >
-       
+          <Tabs value={selectedTab} onValueChange={setSelectedTab}>
             {/* DESKTOP TABS */}
             <div className="hidden sm:block">
               <TabsList className="w-full bg-gray-800 border border-gray-700">
@@ -90,17 +86,18 @@ export const BasicLeaderboardEdit = ({
                     key={tab.value}
                     value={tab.value}
                     className="
-          text-gray-300
-          data-[state=active]:text-white
-          data-[state=active]:bg-gray-700
-          data-[state=active]:shadow-md
-          transition-all duration-200
-        "
+                    text-gray-300
+                    data-[state=active]:text-white
+                    data-[state=active]:bg-gray-700
+                    data-[state=active]:shadow-md
+                    transition-all duration-200
+                  "
                   >
                     {tab.label}
                   </TabsTrigger>
                 ))}
               </TabsList>
+     
             </div>
 
             {/* MOBILE DROPDOWN */}
@@ -124,7 +121,7 @@ export const BasicLeaderboardEdit = ({
 
             {/* ACTIVITY TAB - PASS onClose */}
             <TabsContent value="activity">
-              <div className="max-h-[60vh] overflow-auto text-white">
+              <div className="max-h-[70vh] overflow-auto">
                 <BasicLeaderboardActivityEntryCard
                   ladderId={ladder_id}
                   skillNumber={skillNumber}
@@ -143,6 +140,22 @@ export const BasicLeaderboardEdit = ({
                 ladderId={ladder_id}
                 onClose={handleChildClose} // ✅ PASS HERE TOO
               />
+            </TabsContent>
+
+            <TabsContent value="edit">
+                {showEditSkeleton ? (
+                  <div className="space-y-3">
+                    <Skeleton className="h-10 w-full bg-white/10" />
+                    <Skeleton className="h-10 w-full bg-white/10" />
+                  </div>
+                ) : (
+                  <BasicLeaderboardAgeUserEdit
+                    selectedPlayer={selectedPlayer}
+                    userId={selectedPlayer?.id}      
+                    ladderId={ladder_id}
+                    onClose={onClose}
+                  />
+                )}
             </TabsContent>
           </Tabs>
         </motion.div>

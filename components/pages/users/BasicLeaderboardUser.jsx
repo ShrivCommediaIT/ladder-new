@@ -14,6 +14,8 @@ import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUser
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
+import axios from "axios";
+import BasicLeaderboardPrintSkillsSheet from "../admin/BasicLeaderboardPrintSkillsSheet";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -77,139 +79,116 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
     : Logo;
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10">
-            <Image
-              src={playerImageUrl}
-              alt={player?.name}
-              width={80}
-              height={80}
-              className="object-cover rounded"
-              unoptimized
-            />
-          </div>
-          <div className="flex-1 min-w-0 space-y-1">
-            <p className="text-white font-semibold truncate">{player.name}</p>
-            {isEditable && <p className="text-xs text-emerald-400">{}</p>}
-          </div>
-          <div className="flex flex-col items-center mr-1">
-            <span className="bg-yellow-200 text-black px-4 py-1 rounded-sm font-semibold border">
-              {Math.abs(player.total_point || 0)}
-            </span>
-            <p className="text-[10px] text-white mt-1">Total Pts</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-9 h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black">
-              {overallRank}
+      <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10">
+              <Image
+                src={playerImageUrl}
+                alt={player?.name}
+                width={80}
+                height={80}
+                className="object-cover rounded"
+                unoptimized
+              />
             </div>
-            <p className="text-[10px] text-white mt-1">Overall Rank</p>
+            <div className="flex-1 min-w-0 space-y-1">
+              <p className="text-white font-semibold truncate">{player.name}</p>
+              {isEditable && <p className="text-xs text-emerald-400">{}</p>}
+            </div>
+            <div className="flex flex-col items-center mr-1">
+              <span className="bg-yellow-200 text-black px-4 py-1 rounded-sm font-semibold border">
+                {Math.abs(player.total_point || 0)}
+              </span>
+              <p className="text-[10px] text-white mt-1">Total Pts</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-9 h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black">
+                {overallRank}
+              </div>
+              <p className="text-[10px] text-white mt-1">Overall Rank</p>
+            </div>
           </div>
+
+          {player.skills?.length > 0 ? (
+            <>
+              <div className="flex gap-[3px] overflow-y-visible pb-1 mb-1">
+                {player.skills.map((skill, i) => {
+                  const isNegative = skill.skill_sign === "-";
+
+                  return (
+                    <div
+                      key={i}
+                      onClick={() =>
+                        isEditable && onSkillClick(player.id, skill.skill_number)
+                      }
+                      className={`relative min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded transition-all ${
+                        isEditable
+                          ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
+                          : "cursor-not-allowed bg-white opacity-40"
+                      }`}
+                      title={
+                        isEditable
+                          ? `Edit Skill ${skill.skill_number}: ${skill.skill_description}`
+                          : "Only own skills can be edited"
+                      }
+                    >
+                      {/* Minus sign above number */}
+                      {isNegative && (
+                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
+                          −
+                        </span>
+                      )}
+                      {skill.skill_number}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
+                {player.skills.map((skill, i) => {
+                  const scoreData = getScoreBySkillNumber(
+                    player.scores || [],
+                    player.skills || [],
+                    skill.skill_number,
+                  );
+
+                  return (
+                    <div
+                      key={i}
+                      className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 ${
+                        scoreData.isTargetAchieved
+                          ? "bg-green-400 hover:bg-green-400 text-black shadow-md border-green-300 ring-1 ring-green-400/50"
+                          : "bg-yellow-200 text-black border-[#2a5a58] hover:bg-yellow-300"
+                      }`}
+                      title={`Score: ${scoreData.score || 0} | Target: ${
+                        scoreData.target || "N/A"
+                      }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
+                    >
+                      {Math.abs(scoreData.displayScore || 0)}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-[3px] overflow-x-auto pb-1">
+                {player.skills.map((skill, i) => (
+                  <div
+                    key={i}
+                    className="min-w-[24px] h-6 flex items-center justify-center rounded font-bold text-[10px] bg-blue-200 text-black shadow-sm border border-gray-200"
+                  >
+                    {getRankBySkillNumber(player.ranks || [], skill.skill_number)}
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
+              No skills data
+            </div>
+          )}
         </div>
-
-        {player.skills?.length > 0 ? (
-          <>
-            {/* <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
-              {player.skills.map((skill, i) => (
-                <div
-                  key={i}
-                  onClick={() =>
-                    isEditable && onSkillClick(player.id, skill.skill_number)
-                  }
-                  className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded transition-all ${
-                    isEditable
-                      ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
-                      : "cursor-not-allowed bg-white opacity-40"
-                  }`}
-                  title={
-                    isEditable
-                      ? `Edit Skill ${skill.skill_number}: ${skill.skill_description}`
-                      : "Only own skills can be edited"
-                  }
-                >
-                  {skill.skill_number}
-                </div>
-              ))}
-            </div> */}
-
-            <div className="flex gap-[3px] overflow-y-visible pb-1 mb-1">
-              {player.skills.map((skill, i) => {
-                const isNegative = skill.skill_sign === "-";
-
-                return (
-                  <div
-                    key={i}
-                    onClick={() =>
-                      isEditable && onSkillClick(player.id, skill.skill_number)
-                    }
-                    className={`relative min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded transition-all ${
-                      isEditable
-                        ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
-                        : "cursor-not-allowed bg-white opacity-40"
-                    }`}
-                    title={
-                      isEditable
-                        ? `Edit Skill ${skill.skill_number}: ${skill.skill_description}`
-                        : "Only own skills can be edited"
-                    }
-                  >
-                    {/* Minus sign above number */}
-                    {isNegative && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
-                        −
-                      </span>
-                    )}
-                    {skill.skill_number}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
-              {player.skills.map((skill, i) => {
-                const scoreData = getScoreBySkillNumber(
-                  player.scores || [],
-                  player.skills || [],
-                  skill.skill_number,
-                );
-
-                return (
-                  <div
-                    key={i}
-                    className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 ${
-                      scoreData.isTargetAchieved
-                        ? "bg-green-400 hover:bg-green-400 text-black shadow-md border-green-300 ring-1 ring-green-400/50"
-                        : "bg-yellow-200 text-black border-[#2a5a58] hover:bg-yellow-300"
-                    }`}
-                    title={`Score: ${scoreData.score || 0} | Target: ${
-                      scoreData.target || "N/A"
-                    }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
-                  >
-                    {Math.abs(scoreData.displayScore || 0)}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex gap-[3px] overflow-x-auto pb-1">
-              {player.skills.map((skill, i) => (
-                <div
-                  key={i}
-                  className="min-w-[24px] h-6 flex items-center justify-center rounded font-bold text-[10px] bg-blue-200 text-black shadow-sm border border-gray-200"
-                >
-                  {getRankBySkillNumber(player.ranks || [], skill.skill_number)}
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
-            No skills data
-          </div>
-        )}
-      </div>
-    </Card>
+      </Card>
   );
 };
 
@@ -221,6 +200,15 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const { data = [], loading } = useSelector(
     (state) => state.skillLeaderboard || {},
   );
+const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+const initialRows = Array.from({ length: 12 }, (_, i) => ({
+  id: i + 1,
+  description: "",
+  target: "",
+  mode: "plus",
+  unit: "",
+}));
+  const [rows, setRows] = useState(initialRows);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -257,6 +245,51 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   // REFRESH KEY TO CONTROL RELOADS (STOPS INFINITE LOOP)
   const refreshKey = useRef(0);
+
+
+    useEffect(() => {
+    if (!ladderId) return;
+
+    const fetchSkillSetup = async () => {
+      try {
+        const res = await axios.get(
+          `https://ne-games.com/leaderBoard/api/user/getskillsetup?ladder_id=${ladderId}`,
+          { headers: { APPKEY } },
+        );
+
+        const apiSkills = res.data?.data || [];
+
+        setRows((prevRows) =>
+          prevRows.map((row) => {
+            const found = apiSkills.find(
+              (s) => Number(s.skill_number) === row.id,
+            );
+            return found
+              ? {
+                  ...row,
+                  description: String(found.skill_description || ""),
+                  target: String(found.target || ""),
+                  unit: String(found.unit || ""),
+                  mode: found.skill_sign === "-" ? "minus" : "plus",
+                }
+              : row;
+          }),
+        );
+      } catch (error) {
+        console.error("Failed to fetch skill setup", error);
+      } 
+    };
+
+    fetchSkillSetup();
+  }, []);
+
+   const safeSkillsForPrint = rows.map((row) => ({
+    id: row.id,
+    description: String(row.description || ""),
+    target: String(row.target || ""),
+    unit: String(row.unit || ""),
+    mode: row.mode,
+  }));
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
@@ -399,6 +432,12 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
                   Click here to leave this solution
                 </Button>
               )}
+
+              <BasicLeaderboardPrintSkillsSheet
+                skills={safeSkillsForPrint}
+                ladderId={ladderId}
+                className="hidden"
+              />
             </div>
           </div>
 

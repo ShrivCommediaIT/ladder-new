@@ -221,7 +221,7 @@ export default function BasicLeaderboardActivityEntryCard({
             <DialogTitle className="text-emerald-500 text-xl font-bold">Score Saved</DialogTitle>
             <DialogDescription className="text-lg">
               Recorded score: <b>{value}</b> <br/>
-              Witness: <b>{witnessBy || "test user"}</b>
+              Witness: <b>{witnessBy }</b>
             </DialogDescription>
           </DialogHeader>
           <Button onClick={handleSuccessClose} className="bg-emerald-500 text-black font-bold mt-4">OK</Button>

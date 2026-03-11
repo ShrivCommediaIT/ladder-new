@@ -32,22 +32,22 @@ export const BasicLeaderboardUserEdit = ({
 }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
-
   const playerId = currentId ? Number(currentId) : null;
 
   const { error: moveError, result } =
     useSelector((state) => state?.playerMoving) || {};
-
   // ✅ Skill ladder id (priority: props > params)
   const ladder_id =
     Number(propLadderId) || Number(searchParams.get("ladder_id"));
   const type = searchParams.get("type")
   // ✅ Player data (skill leaderboard)
-  const players = useSelector((state) => state.skillLeaderboard?.data || []);
+  const playersSkills = useSelector((state) => state.skillLeaderboard?.data || []);
+  const playersPositive = useSelector((state) => state.positiveLeaderBoard?.data || []);
+  const playersNegative = useSelector((state) => state.negativeLeaderBoard?.data || []);
 
-  const selectedPlayer = players.find((p) => Number(p.id) === Number(playerId));
-
+  
     const [showEditSkeleton, setShowEditSkeleton] = useState(false);
+    const [selectedPlayer, setPlayers] = useState([]);
 
   useEffect(() => {
     if (result?.success_message) {
@@ -60,6 +60,19 @@ export const BasicLeaderboardUserEdit = ({
       dispatch(clearMoveResult());
     }
   }, [result, moveError, dispatch]);
+
+  useEffect(() => {
+    if (type === "skill" && playersSkills){
+      const selectedPlayer = playersSkills.find((p) => Number(p.id) === Number(playerId));
+      setPlayers(selectedPlayer)
+    }else if (type === "positive" && playersPositive) {
+      const selectedPlayer = playersPositive.find((p) => Number(p.id) === Number(playerId));
+      setPlayers(selectedPlayer)
+    }else if (type === "negative" && playersNegative) {
+      const selectedPlayer = playersNegative.find((p) => Number(p.id) === Number(playerId));
+      setPlayers(selectedPlayer)
+    }
+  }, []);
 
   const [selectedTab, setSelectedTab] = useState("activity");
 
@@ -148,20 +161,20 @@ export const BasicLeaderboardUserEdit = ({
             </TabsContent>
 
             <TabsContent value="edit">
-  {showEditSkeleton ? (
-    <div className="space-y-3">
-      <Skeleton className="h-10 w-full bg-white/10" />
-      <Skeleton className="h-10 w-full bg-white/10" />
-    </div>
-  ) : (
-    <BasicLeaderboardAgeUserEdit
-      selectedPlayer={selectedPlayer}
-      userId={selectedPlayer?.id}      
-      ladderId={ladder_id}
-      onClose={onClose}
-    />
-  )}
-</TabsContent>
+              {showEditSkeleton ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-10 w-full bg-white/10" />
+                  <Skeleton className="h-10 w-full bg-white/10" />
+                </div>
+              ) : (
+                <BasicLeaderboardAgeUserEdit
+                  selectedPlayer={selectedPlayer}
+                  userId={selectedPlayer?.id}      
+                  ladderId={ladder_id}
+                  onClose={onClose}
+                />
+              )}
+            </TabsContent>
           </Tabs>
         </motion.div>
       </DialogContent>

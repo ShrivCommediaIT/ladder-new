@@ -160,7 +160,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
-
+ const [currentUserId, setCurrentUserId] = useState(null);
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
     setTimeout(
@@ -185,6 +185,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     },
     [dispatch, ladderId, selectedPositiveFilter],
   );
+  
 
   useEffect(() => {
     if (onPlayerAdded) {
@@ -198,7 +199,23 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     }
   }, [dispatch, ladderId]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser && parsedUser.id) {
+            setCurrentUserId(Number(parsedUser.id));
+          }
+        } catch (err) {
+          console.error("Failed to parse user from localStorage", err);
+        }
+      }
+    }
+  }, []);
 
+  
   const handleSkillClick = useCallback(
 
     (playerId, skillNumber) => {
@@ -217,7 +234,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       setSelectedSkillActivityId(skillObj.id);
       setOpenEdit(true);
     },
-    [data],
+    [data, currentUserId],
   );
 
   const handleEditClose = useCallback(() => {
@@ -275,12 +292,11 @@ const filteredPlayers = React.useMemo(() => {
           </div>
         </div>
       </main>
-
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardUserEdit
           open={openEdit}
           onClose={handleEditClose}
-          currentId={selectedPlayerId}
+          currentId={selectedPlayerId && selectedPlayerId}
           ladderId={ladderId}
           skillNumber={selectedSkillNumber}
           skillActivityId={selectedSkillActivityId}
