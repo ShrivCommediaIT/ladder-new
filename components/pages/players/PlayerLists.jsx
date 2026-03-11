@@ -18,6 +18,7 @@ import Info from "@/components/shared/Info";
 import AdminEditPhone from "@/components/shared/AdminEditPhone";
 import { useSearchParams, useRouter } from "next/navigation";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
+import MusicDownloadList from "./MusicDownloadList";
 
 export const PlayerLists = () => {
   const dispatch = useDispatch();
@@ -143,6 +144,7 @@ export const PlayerLists = () => {
           <AdminEditPhone />
           <AdminButton />
           <LadderRulesCard />
+          <MusicDownloadList/>
           <ActivityLog ladderId={currentLadderId} />
         </div>
       </div>

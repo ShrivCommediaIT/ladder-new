@@ -7,14 +7,13 @@ import { Card } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
-import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import PlayerSearchInput from "../players/PlayerSearchInput";
 import BasicLeaderboardShort from "../admin/BasicLeaderboardShort";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
-import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
+import { fetchNegativeLeaderboard } from "@/redux/slices/negativeLeaderBoardSlice";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -116,12 +115,12 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
 };
 
 /* ---------------- MAIN COMPONENT ---------------- */
-const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
+const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
   const { data = [], loading } = useSelector(
-      (state) => state.positiveLeaderBoard || {},
+      (state) => state.negativeLeaderBoard || {},
     );
 
   useEffect(() => {
@@ -166,9 +165,9 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
     (skillNo = selectedPositiveFilter) => {
       if (ladderId) {
         dispatch(
-          fetchPositiveLeaderboard({
+          fetchNegativeLeaderboard({
             ladder_id: ladderId,
-            type: "positive",
+            type: "negative",
             sortbyskillnumber: skillNo,
           }),
         );
@@ -210,47 +209,26 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
     refreshLeaderboard(0);
   }, [refreshLeaderboard]);
 
-//   const handleSkillClick = useCallback(
-//     (playerId, skillNumber) => {
-//       if (playerId != currentUserId) return;
-
-//       const player = data.find((p) => p.id === playerId);
-      
-//       if (!player) return;
-//       const skillObj = player.skills.find(
-//         (s) => s.skill_number === skillNumber,
-//       );
-//       if (!skillObj) return;
-
-//       setSelectedPlayerId(playerId);
-//       setSelectedSkillNumber(skillNumber);
-//       setSelectedSkillActivityId(skillObj.id);
-//       setOpenEdit(true);
-//     },
-//     [data, currentUserId],
-//   );
-
   const handleSkillClick = useCallback(
-  
-      (playerId, skillNumber) => {
-  
-  
-        const player = data.find((p) => p.id === playerId);
-        if (!player) return;
-  
-        const skillObj = player.skills.find(
-          (s) => s.skill_number === skillNumber,
-        );
+    (playerId, skillNumber) => {
         
-        if (!skillObj) return;
-        setSelectedPlayerId(playerId);
-        setSelectedSkillNumber(skillNumber);
-        setSelectedSkillActivityId(skillObj.id);
-        setOpenEdit(true);
-      },
-      [data],
-    );
-    
+      if (playerId != currentUserId) return;
+
+      const player = data.find((p) => p.id === playerId);
+      
+      if (!player) return;
+      const skillObj = player.skills.find(
+        (s) => s.skill_number === skillNumber,
+      );
+      if (!skillObj) return;
+
+      setSelectedPlayerId(playerId);
+      setSelectedSkillNumber(skillNumber);
+      setSelectedSkillActivityId(skillObj.id);
+      setOpenEdit(true);
+    },
+    [data, currentUserId],
+  );
 
   const handleEditClose = useCallback(() => {
     setOpenEdit(false);
@@ -381,4 +359,4 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
   );
 };
 
-export default PositiveLeaderboardUser;
+export default NegativeLeaderboardUser;

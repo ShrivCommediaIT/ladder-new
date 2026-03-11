@@ -30,7 +30,6 @@ const BasicLeaderboardAgeUserEdit = ({
   onClose = () => {},
 }) => {
   const dispatch = useDispatch();
-
   const { loading, successMessage, error } = useSelector(
     (state) => state.editdetail,
   );

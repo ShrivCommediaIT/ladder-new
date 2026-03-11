@@ -182,11 +182,13 @@ export default function SubAdminDashboard() {
     console.log("ladderType:", ladderType);
     try {
       // CREATE LADDER
+      const firstnameCapitalized =  subAdmin.sport_name.charAt(0).toUpperCase() + subAdmin.sport_name.slice(1)
+
       const ladderResult = await dispatch(
         createLadder({
           user_id: subAdmin.user_id,
           created_by: subAdmin.id,
-          name: cleanName,
+          name: firstnameCapitalized + " " + cleanName,
           type: ladderType,
         }),
       ).unwrap();
