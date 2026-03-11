@@ -232,6 +232,8 @@ import BasicLeaderboardUser from "@/components/pages/users/BasicLeaderboardUser"
 
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
+import PositiveLeaderboard from "@/components/pages/players/PositiveLeaderBoard";
+import PositiveLeaderboardUser from "@/components/pages/users/positiveLeaderBoardUser";
 
 function UserPageRedirectRouter() {
   const dispatch = useDispatch();
@@ -273,6 +275,8 @@ function UserPageRedirectRouter() {
 
   const isMiniLeague = ladderType === "minileague";
   const isSkill = ladderType === "skill";
+  const isPositive = ladderType === "positive";
+  const isNegative = ladderType === "negative";
 
   // ---------------- FETCH DATA ----------------
   useEffect(() => {
@@ -298,6 +302,15 @@ function UserPageRedirectRouter() {
 
     if (isSkill) {
       return <BasicLeaderboardUser ladderId={ladderId} />;
+    }
+
+    if (isPositive || isNegative) {
+      return (
+        <PositiveLeaderboardUser
+          ladderId={ladderId}
+          ladderType={ladderType}
+        />
+      );
     }
 
     return (

@@ -88,167 +88,203 @@ export default function BasicLeaderboardActivityEntryCard({
   }, [selectedActivity, ladderId]);
 
   /* ---------------- INPUT HANDLERS ---------------- */
-
   const handleDigit = (d) => {
-    if (type !== "negative") return;
-
     const input = timeRef.current;
     if (!input) return;
 
-    let pos = input.selectionStart;
+    // ================= NEGATIVE (TIME) =================
+    if (type === "negative") {
+      let pos = input.selectionStart;
 
-    let current = input.value || time;
+      let current = input.value || time;
 
-    let [min, sec, ms] = current.split(":");
+      let [min, sec, ms] = current.split(":");
 
-    // ---------- MIN ----------
-    if (pos <= 2) {
-      let p = pos;
+      // ---------- MIN ----------
+      if (pos <= 2) {
+        let p = pos;
 
-      let newMin =
-        min.slice(0, p) +
-        d +
-        min.slice(p + 1);
+        let newMin =
+          min.slice(0, p) +
+          d +
+          min.slice(p + 1);
 
-      newMin = newMin.slice(0, 2);
+        newMin = newMin.slice(0, 2);
 
-      if (parseInt(newMin) > 59) return;
+        if (parseInt(newMin) > 59) return;
 
-      const result =
-        `${newMin.padStart(2, "0")}:${sec}:${ms}`;
+        const result =
+          `${newMin.padStart(2, "0")}:${sec}:${ms}`;
 
-      setTime(result);
+        setTime(result);
 
-      setTimeout(() => {
-        let next = Math.min(pos + 1, 2);
-        input.setSelectionRange(next, next);
-      });
+        setTimeout(() => {
+          let next = Math.min(pos + 1, 2);
+          input.setSelectionRange(next, next);
+        });
 
-      return;
+        return;
+      }
+
+      // ---------- SEC ----------
+      if (pos > 2 && pos <= 5) {
+        let p = pos - 3;
+
+        let newSec =
+          sec.slice(0, p) +
+          d +
+          sec.slice(p + 1);
+
+        newSec = newSec.slice(0, 2);
+
+        if (parseInt(newSec) > 59) return;
+
+        const result =
+          `${min}:${newSec.padStart(2, "0")}:${ms}`;
+
+        setTime(result);
+
+        setTimeout(() => {
+          let next = pos + 1;
+          if (next === 5) next = 6;
+          input.setSelectionRange(next, next);
+        });
+
+        return;
+      }
+
+      // ---------- MS ----------
+      if (pos > 5) {
+        let p = pos - 6;
+
+        let newMs =
+          ms.slice(0, p) +
+          d +
+          ms.slice(p + 1);
+
+        newMs = newMs.slice(0, 3);
+
+        if (parseInt(newMs) > 999) return;
+
+        const result =
+          `${min}:${sec}:${newMs.padStart(3, "0")}`;
+
+        setTime(result);
+
+        setTimeout(() => {
+          let next = Math.min(pos + 1, 8);
+          input.setSelectionRange(next, next);
+        });
+
+        return;
+      }
     }
 
-    // ---------- SEC ----------
-    if (pos > 2 && pos <= 5) {
-      let p = pos - 3;
+    // ================= POSITIVE / NORMAL =================
+    else {
+      setValue((prev) => {
+        // prevent first dot
+        if (d === "." && !prev) return prev;
 
-      let newSec =
-        sec.slice(0, p) +
-        d +
-        sec.slice(p + 1);
+        // prevent multiple dots
+        if (d === "." && prev.includes(".")) return prev;
 
-      newSec = newSec.slice(0, 2);
+        // replace 0
+        if (prev === "0" && d !== ".") return d;
 
-      if (parseInt(newSec) > 59) return;
-
-      const result =
-        `${min}:${newSec.padStart(2, "0")}:${ms}`;
-
-      setTime(result);
-
-      setTimeout(() => {
-        let next = pos + 1;
-        if (next === 5) next = 6;
-        input.setSelectionRange(next, next);
-      });
-
-      return;
-    }
-
-    // ---------- MS ----------
-    if (pos > 5) {
-      let p = pos - 6;
-
-      let newMs =
-        ms.slice(0, p) +
-        d +
-        ms.slice(p + 1);
-
-      newMs = newMs.slice(0, 3);
-
-      if (parseInt(newMs) > 999) return;
-
-      const result =
-        `${min}:${sec}:${newMs.padStart(3, "0")}`;
-
-      setTime(result);
-
-      setTimeout(() => {
-        let next = Math.min(pos + 1, 8);
-        input.setSelectionRange(next, next);
+        return prev + d;
       });
     }
   };
 
-  const handleBackspace = () => {
-    if (type !== "negative") return;
+    const handleBackspace = () => {
+      const input = timeRef.current;
 
-    const input = timeRef.current;
-    if (!input) return;
+      // ================= NEGATIVE (TIME) =================
+      if (type === "negative") {
+        if (!input) return;
 
-    let pos = input.selectionStart;
+        let pos = input.selectionStart;
 
-    if (pos === 0) return;
+        if (pos === 0) return;
 
-    let [min, sec, ms] = time.split(":");
+        let [min, sec, ms] = time.split(":");
 
-    // -------- MIN --------
-    if (pos <= 2) {
-      let p = pos - 1;
+        // -------- MIN --------
+        if (pos <= 2) {
+          let p = pos - 1;
 
-      if (p < 0) return;
+          if (p < 0) return;
 
-      let arr = min.split("");
-      arr[p] = "0";
+          let arr = min.split("");
+          arr[p] = "0";
 
-      const result = `${arr.join("")}:${sec}:${ms}`;
+          const result = `${arr.join("")}:${sec}:${ms}`;
 
-      setTime(result);
+          setTime(result);
 
-      setTimeout(() => {
-        input.setSelectionRange(p, p);
-      });
+          setTimeout(() => {
+            input.setSelectionRange(p, p);
+          });
 
-      return;
-    }
+          return;
+        }
 
-    // -------- SEC --------
-    if (pos > 2 && pos <= 5) {
-      let p = pos - 4;
+        // -------- SEC --------
+        if (pos > 2 && pos <= 5) {
+          let p = pos - 4;
 
-      if (p < 0) return;
+          if (p < 0) return;
 
-      let arr = sec.split("");
-      arr[p] = "0";
+          let arr = sec.split("");
+          arr[p] = "0";
 
-      const result = `${min}:${arr.join("")}:${ms}`;
+          const result = `${min}:${arr.join("")}:${ms}`;
 
-      setTime(result);
+          setTime(result);
 
-      setTimeout(() => {
-        input.setSelectionRange(pos - 1, pos - 1);
-      });
+          setTimeout(() => {
+            input.setSelectionRange(pos - 1, pos - 1);
+          });
 
-      return;
-    }
+          return;
+        }
 
-    // -------- MS --------
-    if (pos > 5) {
-      let p = pos - 7;
+        // -------- MS --------
+        if (pos > 5) {
+          let p = pos - 7;
 
-      if (p < 0) return;
+          if (p < 0) return;
 
-      let arr = ms.split("");
-      arr[p] = "0";
+          let arr = ms.split("");
+          arr[p] = "0";
 
-      const result = `${min}:${sec}:${arr.join("")}`;
+          const result = `${min}:${sec}:${arr.join("")}`;
 
-      setTime(result);
+          setTime(result);
 
-      setTimeout(() => {
-        input.setSelectionRange(pos - 1, pos - 1);
-      });
-    }
-  };
+          setTimeout(() => {
+            input.setSelectionRange(pos - 1, pos - 1);
+          });
+        }
+
+        return;
+      }
+
+      // ================= POSITIVE / NORMAL =================
+      else {
+        setValue((prev) => {
+          if (!prev) return "0";
+
+          // remove last char
+          let newVal = prev.slice(0, -1);
+
+          if (newVal === "" || newVal === "-") return "0";
+
+          return newVal;
+        });
+      }
+    };
 
   const handleClear = () => {
     if (type === "negative") {
@@ -260,8 +296,10 @@ export default function BasicLeaderboardActivityEntryCard({
 
   const handleInputChange = (e) => {
     const val = e.target.value;
-    // allow digits and optional leading minus
-    if (/^\d*$/.test(val)) setValue(val || "0");
+
+    if (/^\d*\.?\d*$/.test(val)) {
+      setValue(val || "0");
+    }
   };
 
   const handleInputChangeTime = (e) => {
@@ -310,8 +348,8 @@ export default function BasicLeaderboardActivityEntryCard({
     ) {
       return null;
     }
-
-    return `${parseInt(min)}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}`;
+    console.log("formatTimeForApi==>", `${parseInt(min)}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}` )
+    return `${min.padStart(2, "0")}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}`;
   };
 
   const handleEnter = useCallback(async () => {
@@ -320,31 +358,30 @@ export default function BasicLeaderboardActivityEntryCard({
     let finalScore;
     let URl;
     if (type === "negative") {
-  URl = "user/postResultNegativeSkillboard";
+      URl = "user/postResultNegativeSkillboard";
 
-  let currentTime =
-    timeRef.current?.value || time;
+      let currentTime =
+        timeRef.current?.value || time;
 
-  const formattedTime =
-    formatTimeForApi(currentTime);
+      const formattedTime =
+        formatTimeForApi(currentTime);
 
-  if (!formattedTime) {
-    setOpenZeroAlert(true);
-    return;
-  }
-
-  finalScore = formattedTime; // ✅ correct format
-} else {
-      URl = "user/postResultPositiveSkillboard";
-      const num = Math.abs(Number(value) || 0);
-
-      if (num === 0) {
+      if (!formattedTime) {
         setOpenZeroAlert(true);
         return;
       }
+     finalScore = "00:" + formattedTime; 
+    } else {
+          URl = "user/postResultSkillboard";
+          const num = Math.abs(Number(value) || 0);
 
-      finalScore = skillSign === "-" ? -num : num;
-    }
+          if (num === 0) {
+            setOpenZeroAlert(true);
+            return;
+          }
+
+          finalScore = skillSign === "-" ? -num : num;
+        }
 
     try {
       setSaving(true);
@@ -440,14 +477,7 @@ export default function BasicLeaderboardActivityEntryCard({
         {/* SCORE ENTRY */}
 
         <div className="flex items-center gap-2">
-          {/* <Input
-            ref={timeRef}
-            value={type === "negative" ? time : value}
-            onChange={type === "negative" ? handleInputChangeTime : handleInputChange}
-            className={`text-center text-lg  ${type === "negative" ? "bg-slate-800 text-white" : "bg-slate-200 text-black"} font-semibold`}
-          /> */}
-
-          <Input
+         <Input
             ref={timeRef}
             value={type === "negative" ? time : value}
             onChange={
@@ -465,7 +495,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
               e.target.setSelectionRange(pos, pos);
             }}
-            className={`text-center text-lg  ${type === "negative" ? "bg-slate-800 text-white" : "bg-slate-200 text-black"} font-semibold`}
+            className={`text-center text-lg ${type === "negative" ? "bg-slate-800 text-white" : "bg-slate-200 text-black"} font-semibold`}
           />
 
           {(type != "positive" && type != "negative") &&<Input
