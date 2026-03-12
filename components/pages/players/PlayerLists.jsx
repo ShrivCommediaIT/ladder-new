@@ -27,7 +27,6 @@ export const PlayerLists = () => {
   // ✅ Fixed: Use miniLeague data instead of activity data for ladder info
   const miniLeagueData = useSelector((state) => state.miniLeague?.data);
   const ladder = miniLeagueData || useSelector((state) => state.activity?.data?.data);
-  const ladderType = useSelector((state) => state.ladder?.data?.type);
 
   const [loadingPlayers, setLoadingPlayers] = useState(true);
   const [loadingActivity, setLoadingActivity] = useState(true);
@@ -37,6 +36,8 @@ export const PlayerLists = () => {
 
   const searchParams = useSearchParams();
   const ladderId = searchParams.get("ladder_id");
+  const ladderType = searchParams.get("ladder_type");
+  const type = searchParams.get("type");
   const shouldPrint = searchParams.get("print");
 
   // 🔹 Trigger print if query param is present
@@ -144,7 +145,7 @@ export const PlayerLists = () => {
           <AdminEditPhone />
           <AdminButton />
           <LadderRulesCard />
-          <MusicDownloadList/>
+         {(type === "skill" || ladderType === "skill") && <MusicDownloadList/>}
           <ActivityLog ladderId={currentLadderId} />
         </div>
       </div>

@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSearchParams } from "next/navigation";
+import { set } from "date-fns";
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
@@ -37,8 +38,10 @@ export default function BasicLeaderboardActivityEntryCard({
   const [openSuccess, setOpenSuccess] = useState(false);
   const [skillTarget, setSkillTarget] = useState("");
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
-  const DEFAULT_TIME = "00:00:000";
-  const [time, setTime] = useState(DEFAULT_TIME);
+  const [activeTime, setActiveTime] = useState("min");
+  const [min, setMin] = useState("00");
+  const [sec, setSec] = useState("00");
+  const [ms, setMs] = useState("000");
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
   const ladderType = searchParams.get("ladder_type");
@@ -89,207 +92,78 @@ export default function BasicLeaderboardActivityEntryCard({
   }, [selectedActivity, ladderId]);
 
   /* ---------------- INPUT HANDLERS ---------------- */
-  const handleDigit = (d) => {
-    const input = timeRef.current;
-    if (!input) return;
+ const handleDigit = (d) => {
 
-    // ================= NEGATIVE (TIME) =================
-    if (type === "negative" || ladderType === "negative") {
-      let pos = input.selectionStart;
+  if (type === "negative" || ladderType === "negative") {
 
-      let current = input.value || time;
-
-      let [min, sec, ms] = current.split(":");
-
-      // ---------- MIN ----------
-      if (pos <= 2) {
-        let p = pos;
-
-        let newMin =
-          min.slice(0, p) +
-          d +
-          min.slice(p + 1);
-
-        newMin = newMin.slice(0, 2);
-
-        if (parseInt(newMin) > 59) return;
-
-        const result =
-          `${newMin.padStart(2, "0")}:${sec}:${ms}`;
-
-        setTime(result);
-
-        setTimeout(() => {
-          let next = Math.min(pos + 1, 2);
-          input.setSelectionRange(next, next);
-        });
-
-        return;
-      }
-
-      // ---------- SEC ----------
-      if (pos > 2 && pos <= 5) {
-        let p = pos - 3;
-
-        let newSec =
-          sec.slice(0, p) +
-          d +
-          sec.slice(p + 1);
-
-        newSec = newSec.slice(0, 2);
-
-        if (parseInt(newSec) > 59) return;
-
-        const result =
-          `${min}:${newSec.padStart(2, "0")}:${ms}`;
-
-        setTime(result);
-
-        setTimeout(() => {
-          let next = pos + 1;
-          if (next === 5) next = 6;
-          input.setSelectionRange(next, next);
-        });
-
-        return;
-      }
-
-      // ---------- MS ----------
-      if (pos > 5) {
-        let p = pos - 6;
-
-        let newMs =
-          ms.slice(0, p) +
-          d +
-          ms.slice(p + 1);
-
-        newMs = newMs.slice(0, 3);
-
-        if (parseInt(newMs) > 999) return;
-
-        const result =
-          `${min}:${sec}:${newMs.padStart(3, "0")}`;
-
-        setTime(result);
-
-        setTimeout(() => {
-          let next = Math.min(pos + 1, 8);
-          input.setSelectionRange(next, next);
-        });
-
-        return;
-      }
-    }
-
-    // ================= POSITIVE / NORMAL =================
-    else {
-      setValue((prev) => {
-        // prevent first dot
-        if (d === "." && !prev) return prev;
-
-        // prevent multiple dots
-        if (d === "." && prev.includes(".")) return prev;
-
-        // replace 0
-        if (prev === "0" && d !== ".") return d;
-
-        return prev + d;
+    if (activeTime === "min") {
+      setMin((p) => {
+        let v = (p + d).slice(-2);
+        if (Number(v) > 59) return p;
+        return v;
       });
     }
+
+    if (activeTime === "sec") {
+      setSec((p) => {
+        let v = (p + d).slice(-2);
+        if (Number(v) > 59) return p;
+        return v;
+      });
+    }
+
+    if (activeTime === "ms") {
+      setMs((p) => {
+        let v = (p + d).slice(-3);
+        if (Number(v) > 999) return p;
+        return v;
+      });
+    }
+
+    return;
+  }
+
+  // normal mode
+  setValue((prev) => {
+    if (d === "." && !prev) return prev;
+    if (d === "." && prev.includes(".")) return prev;
+    if (prev === "0" && d !== ".") return d;
+    return prev + d;
+  });
+};
+
+  const handleBackspace = () => {
+
+    if (type === "negative" || ladderType === "negative") {
+
+      if (activeTime === "min") {
+        setMin((p) => p.slice(0, -1) || "0");
+      }
+
+      if (activeTime === "sec") {
+        setSec((p) => p.slice(0, -1) || "0");
+      }
+
+      if (activeTime === "ms") {
+        setMs((p) => p.slice(0, -1) || "0");
+      }
+
+      return;
+    }
+
+    setValue((prev) => {
+      if (!prev) return "0";
+      let newVal = prev.slice(0, -1);
+      if (newVal === "" || newVal === "-") return "0";
+      return newVal;
+    });
   };
-
-    const handleBackspace = () => {
-      const input = timeRef.current;
-
-      // ================= NEGATIVE (TIME) =================
-      if (type === "negative") {
-        if (!input) return;
-
-        let pos = input.selectionStart;
-
-        if (pos === 0) return;
-
-        let [min, sec, ms] = time.split(":");
-
-        // -------- MIN --------
-        if (pos <= 2) {
-          let p = pos - 1;
-
-          if (p < 0) return;
-
-          let arr = min.split("");
-          arr[p] = "0";
-
-          const result = `${arr.join("")}:${sec}:${ms}`;
-
-          setTime(result);
-
-          setTimeout(() => {
-            input.setSelectionRange(p, p);
-          });
-
-          return;
-        }
-
-        // -------- SEC --------
-        if (pos > 2 && pos <= 5) {
-          let p = pos - 4;
-
-          if (p < 0) return;
-
-          let arr = sec.split("");
-          arr[p] = "0";
-
-          const result = `${min}:${arr.join("")}:${ms}`;
-
-          setTime(result);
-
-          setTimeout(() => {
-            input.setSelectionRange(pos - 1, pos - 1);
-          });
-
-          return;
-        }
-
-        // -------- MS --------
-        if (pos > 5) {
-          let p = pos - 7;
-
-          if (p < 0) return;
-
-          let arr = ms.split("");
-          arr[p] = "0";
-
-          const result = `${min}:${sec}:${arr.join("")}`;
-
-          setTime(result);
-
-          setTimeout(() => {
-            input.setSelectionRange(pos - 1, pos - 1);
-          });
-        }
-
-        return;
-      }
-
-      // ================= POSITIVE / NORMAL =================
-      else {
-        setValue((prev) => {
-          if (!prev) return "0";
-
-          // remove last char
-          let newVal = prev.slice(0, -1);
-
-          if (newVal === "" || newVal === "-") return "0";
-
-          return newVal;
-        });
-      }
-    };
 
   const handleClear = () => {
     if (type === "negative") {
-      setTime("00:00:000");
+      setMin("00");
+      setSec("00");
+      setMs("000");
     } else {
       setValue("0");
     }
@@ -303,37 +177,27 @@ export default function BasicLeaderboardActivityEntryCard({
     }
   };
 
-  const handleInputChangeTime = (e) => {
-    if (type !== "negative" || ladderType !== "negative") return;
+const handleInputChangeTime = (val, type) => {
+  if (!/^\d*$/.test(val)) return;
 
-    let val = e.target.value;
-    if (!/^[0-9:]*$/.test(val)) return;
+  if (type === "min") {
+    if (val.length > 2) return;
+    if (Number(val) > 59) return;
+    setMin(val);
+  }
 
-    if (val.length > 9) return;
+  if (type === "sec") {
+    if (val.length > 2) return;
+    if (Number(val) > 59) return;
+    setSec(val);
+  }
 
-    let parts = val.split(":");
-
-    if (parts.length !== 3) {
-      setTime(val);
-      return;
-    }
-
-    let min = parts[0] || "0";
-    let sec = parts[1] || "0";
-    let ms = parts[2] || "0";
-
-    // limit length per block
-    if (min.length > 2) return;
-    if (sec.length > 2) return;
-    if (ms.length > 3) return;
-
-    // limit values
-    if (parseInt(min) > 59) return;
-    if (parseInt(sec) > 59) return;
-    if (parseInt(ms) > 999) return;
-
-    setTime(val);
-  };
+  if (type === "ms") {
+    if (val.length > 3) return;
+    if (Number(val) > 999) return;
+    setMs(val);
+  }
+};
 
   const formatTimeForApi = (t) => {
     if (!t) return null;
@@ -341,11 +205,7 @@ export default function BasicLeaderboardActivityEntryCard({
     const [min = "00", sec = "00", ms = "000"] = t.split(":");
 
     // zero check
-    if (
-      min === "00" &&
-      sec === "00" &&
-      ms === "000"
-    ) {
+    if (min === "00" && sec === "00" && ms === "000") {
       return null;
     }
     return `${min.padStart(2, "0")}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}`;
@@ -358,29 +218,18 @@ export default function BasicLeaderboardActivityEntryCard({
     let URl;
     if (type === "negative" || ladderType === "negative") {
       URl = "user/postResultNegativeSkillboard";
+      finalScore = "00:" + `${min.padStart(2, "0")}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}`;
+    } else {
+      URl = "user/postResultSkillboard";
+      const num = Math.abs(Number(value) || 0);
 
-      let currentTime =
-        timeRef.current?.value || time;
-
-      const formattedTime =
-        formatTimeForApi(currentTime);
-
-      if (!formattedTime) {
+      if (num === 0) {
         setOpenZeroAlert(true);
         return;
       }
-     finalScore = "00:" + formattedTime; 
-    } else {
-          URl = "user/postResultSkillboard";
-          const num = Math.abs(Number(value) || 0);
 
-          if (num === 0) {
-            setOpenZeroAlert(true);
-            return;
-          }
-
-          finalScore = skillSign === "-" ? -num : num;
-        }
+      finalScore = skillSign === "-" ? -num : num;
+    }
 
     try {
       setSaving(true);
@@ -390,10 +239,8 @@ export default function BasicLeaderboardActivityEntryCard({
         user_id: playerId,
         skill_activity_id: skillActivityId,
         score: finalScore,
-        witness_by: witnessBy.trim() || "test user"
+        witness_by: witnessBy.trim() || "test user",
       };
-
-    
 
       const res = await axios.post(
         `https://ne-games.com/leaderBoard/api/${URl}`,
@@ -403,19 +250,29 @@ export default function BasicLeaderboardActivityEntryCard({
             APPKEY: APPKEY,
             "Content-Type": "application/json", // Explicitly set karein
           },
-        }
+        },
       );
 
       setOpenSuccess(true);
-
     } catch (err) {
       console.error("Error Detail:", err.response?.data || err);
       // Alert dikhayein agar error aaye
-      alert("Failed to save: " + (err.response?.data?.message || "Unknown error"));
+      alert(
+        "Failed to save: " + (err.response?.data?.message || "Unknown error"),
+      );
     } finally {
       setSaving(false);
     }
-  }, [skillActivityId, playerId, value, skillSign, witnessBy]);
+  }, [skillActivityId,
+  playerId,
+  value,
+  skillSign,
+  witnessBy,
+  min,
+  sec,
+  ms,
+  type,
+  ladderType,]);
 
   const handleSuccessClose = useCallback(() => {
     setOpenSuccess(false);
@@ -425,19 +282,23 @@ export default function BasicLeaderboardActivityEntryCard({
   return (
     <>
       <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
-
         {/* HEADER - FIXED */}
         <div className="mb-2">
-          {(type != "positive" && type != "negative"  && ladderType != "positive" && ladderType != "negative") &&  <p className="text-[11px] uppercase tracking-wide text-sky-300">
-            Skill Selected Number : {selectedActivity}
-          </p>}
+          {type != "positive" &&
+            type != "negative" &&
+            ladderType != "positive" &&
+            ladderType != "negative" && (
+              <p className="text-[11px] uppercase tracking-wide text-sky-300">
+                Skill Selected Number : {selectedActivity}
+              </p>
+            )}
 
           {/* SKILL NAME */}
           {loadingSkill ? (
             <p className="text-xs text-slate-400">Loading skill...</p>
           ) : (
             <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-              Skill Name :   {skillDesc || "No skill description"}
+              Skill Name : {skillDesc || "No skill description"}
             </p>
           )}
 
@@ -452,106 +313,152 @@ export default function BasicLeaderboardActivityEntryCard({
         </div>
 
         {/* ACTIVITY BUTTONS */}
-       {(type != "positive" && type != "negative" && ladderType != "positive" && ladderType != "negative") && <div className="flex flex-wrap gap-1.5 mb-2">
-          {activityNumbers.map((n) => (
-            <button
-              key={n}
-              onClick={() => {
-                setSelectedActivity(n);
-                setValue("0");
-              }}
-              className={`w-7 h-7 rounded-md border text-[11px] transition-all duration-200
+        {type != "positive" &&
+          type != "negative" &&
+          ladderType != "positive" &&
+          ladderType != "negative" && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {activityNumbers.map((n) => (
+                <button
+                  key={n}
+                  onClick={() => {
+                    setSelectedActivity(n);
+                    setValue("0");
+                  }}
+                  className={`w-7 h-7 rounded-md border text-[11px] transition-all duration-200
                 ${
                   selectedActivity === n
                     ? "bg-sky-400 text-black border-white scale-110 shadow-md"
                     : "bg-slate-800 border-slate-600 hover:bg-slate-700 hover:scale-105"
                 }`}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
-        }
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          )}
 
         {/* SCORE ENTRY */}
 
-        <div className="flex items-center gap-2">
-         <Input
-            ref={timeRef}
-            value={(type === "negative" || ladderType === "negative") ? time : value}
-            onChange={
-              (type === "negative" || ladderType === "negative")
-                ? handleInputChangeTime
-                : handleInputChange
-            }
-            onClick={(e) => {
-              if (type !== "negative") return;
-              let pos = e.target.selectionStart;
-              if (pos === 2) pos = 3;
-              if (pos === 5) pos = 6;
-              e.target.setSelectionRange(pos, pos);
-            }}
-            className={`text-center text-lg ${(type === "negative" || ladderType === "negative") ? "bg-slate-800 text-white" : "bg-slate-200 text-black"} font-semibold`}
-          />
-          {(type != "positive" && type != "negative" && ladderType != "positive" && ladderType != "negative") &&
-          <Input
-            placeholder="Witness by (optional)"
-            value={witnessBy}
-            onChange={(e) => setWitnessBy(e.target.value)}
-            type="text"
-            maxLength={50}
-            className="text-start text-sm text-black font-semibold bg-slate-200"
-          />}
+        <div
+          className={`flex items-center gap-2 w-full ${
+            type === "negative" || ladderType === "negative"
+              ? "justify-center bg-slate-800"
+              : "justify-start"
+          }`}
+        >
+          {type !== "negative" && ladderType !== "negative" && (
+            <Input
+              placeholder="Enter score"
+              value={value}
+              onChange={handleInputChange}
+              className={`text-center text-lg font-semibold`}
+            />
+          )}
+
+          {(type === "negative" || ladderType === "negative") && (
+            <div className="flex items-center justify-center gap-2 text-lg">
+              <Input
+                placeholder="00"
+                value={min}
+                maxLength={2}
+                onClick={() => setActiveTime("min")}
+                onChange={(e) => handleInputChangeTime(e.target.value, "min")}
+                className="w-12 h-10 text-center text-sm text-white font-semibold 
+                bg-slate-800 border-0 outline-none ring-0
+                focus:ring-0 focus:outline-none
+                focus-visible:ring-0 focus-visible:outline-none"
+              />
+              :
+              <Input
+                placeholder="00"
+                value={sec}
+                maxLength={2}
+                onClick={() => setActiveTime("sec")}
+                onChange={(e) => handleInputChangeTime(e.target.value, "sec")}
+                className="w-12 h-10 text-center text-sm text-white font-semibold 
+                bg-slate-800 border-0 outline-none ring-0
+                focus:ring-0 focus:outline-none
+                focus-visible:ring-0 focus-visible:outline-none"
+              />
+              :
+              <Input
+                placeholder="000"
+                value={ms}
+                maxLength={3}
+                onClick={() => setActiveTime("ms")}
+                onChange={(e) => handleInputChangeTime(e.target.value, "ms")}
+                className="w-14 h-10 text-center text-sm text-white font-semibold 
+                bg-slate-800 border-0 outline-none ring-0
+                focus:ring-0 focus:outline-none
+                focus-visible:ring-0 focus-visible:outline-none"
+              />
+            </div>
+          )}
+
+          {type != "positive" &&
+            type != "negative" &&
+            ladderType != "positive" &&
+            ladderType != "negative" && (
+              <Input
+                placeholder="Witness by (optional)"
+                value={witnessBy}
+                onChange={(e) => setWitnessBy(e.target.value)}
+                type="text"
+                maxLength={50}
+                className="text-start text-sm text-black font-semibold bg-slate-200"
+              />
+            )}
         </div>
         {/* NUMPAD */}
-      <div className="grid grid-cols-3 gap-2 mt-2">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
-          <button
-            key={d}
-            onClick={() => handleDigit(String(d))}
-            className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
-          >
-            {d}
-          </button>
-        ))}
-
-        {/* clear + dot */}
-        <div className="col-span-1 grid grid-cols-12 gap-2">
-          <button
-            onClick={handleClear}
-            className={`h-9 bg-red-500 text-black rounded transition-all ${
-              (type === "positive" || ladderType === "positive")
-                ? "col-span-8"
-                : "col-span-12"
-            }`}
-          >
-            clear
-          </button>
-
-          {((type === "positive" || ladderType === "positive")) && (
+        <div className="grid grid-cols-3 gap-2 mt-2">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
             <button
-              onClick={() => handleDigit(".")}
-              className="col-span-4 h-9 bg-white  text-black rounded"
+              key={d}
+              onClick={() => handleDigit(String(d))}
+              className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
             >
-              .
+              {d}
             </button>
-          )}
+          ))}
+
+          {/* clear + dot */}
+          <div className="col-span-1 grid grid-cols-12 gap-2">
+            <button
+              onClick={handleClear}
+              className={`h-9 bg-red-500 text-black rounded transition-all ${
+                type === "positive" || ladderType === "positive"
+                  ? "col-span-8"
+                  : "col-span-12"
+              }`}
+            >
+              clear
+            </button>
+
+            {(type === "positive" || ladderType === "positive") && (
+              <button
+                onClick={() => handleDigit(".")}
+                className="col-span-4 h-9 bg-white  text-black rounded"
+              >
+                .
+              </button>
+            )}
+          </div>
+
+          <button
+            onClick={() => handleDigit("0")}
+            className="h-9 bg-white text-black rounded"
+          >
+            0
+          </button>
+
+          <button
+            onClick={handleBackspace}
+            className="h-9 bg-red-300 text-black rounded"
+          >
+            ⌫
+          </button>
         </div>
-
-        <button
-          onClick={() => handleDigit("0")}
-          className="h-9 bg-white text-black rounded"
-        >
-          0
-        </button>
-
-        <button
-          onClick={handleBackspace}
-          className="h-9 bg-red-300 text-black rounded"
-        >
-          ⌫
-        </button>
-      </div>
 
         <Button
           disabled={saving}
@@ -571,7 +478,11 @@ export default function BasicLeaderboardActivityEntryCard({
             </DialogTitle>
             <DialogDescription className="text-lg">
               Activity #{selectedActivity} updated with score{" "}
-              <b>{type === "negative" || ladderType === "negative" ? time : Math.abs(value)}</b>
+              <b>
+                {type === "negative" || ladderType === "negative"
+                  ? `${min}:${sec}.${ms}`
+                  : Math.abs(value)}
+              </b>
             </DialogDescription>
           </DialogHeader>
 
@@ -611,4 +522,3 @@ export default function BasicLeaderboardActivityEntryCard({
     </>
   );
 }
-
