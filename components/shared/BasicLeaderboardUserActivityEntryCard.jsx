@@ -13,7 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSearchParams } from "next/navigation";
-import { set } from "date-fns";
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
@@ -31,21 +30,25 @@ export default function BasicLeaderboardActivityEntryCard({
   );
   const [value, setValue] = useState("0");
   const [witnessBy, setWitnessBy] = useState("");
-  const [skillSign, setSkillSign] = useState("+"); // dynamic sign from API
+  const [skillSign, setSkillSign] = useState("+"); 
   const [skillDesc, setSkillDesc] = useState("");
   const [loadingSkill, setLoadingSkill] = useState(true);
   const [saving, setSaving] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [skillTarget, setSkillTarget] = useState("");
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
-  const [activeTime, setActiveTime] = useState("min");
-  const [min, setMin] = useState("00");
-  const [sec, setSec] = useState("00");
-  const [ms, setMs] = useState("000");
+  const [timeParts, setTimeParts] = useState({
+    min: "",
+    sec: "",
+    ms: "",
+  });
+
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
   const ladderType = searchParams.get("ladder_type");
-  const timeRef = useRef(null);
+  const minRef = useRef(null);
+  const secRef = useRef(null);
+  const msRef = useRef(null);
   // Update selected activity if initialActivity changes
   useEffect(() => {
     if (initialActivity) {
@@ -92,65 +95,101 @@ export default function BasicLeaderboardActivityEntryCard({
   }, [selectedActivity, ladderId]);
 
   /* ---------------- INPUT HANDLERS ---------------- */
- const handleDigit = (d) => {
+  const handleDigit = (d) => {
+    if (type === "negative" || ladderType === "negative") {
+      if (document.activeElement === minRef.current) {
+        setTimeParts((p) => {
+          let v = (p.min + d).slice(-2);
+          if (Number(v) > 59) return p;
 
-  if (type === "negative" || ladderType === "negative") {
+          if (v.length === 2) secRef.current?.focus();
 
-    if (activeTime === "min") {
-      setMin((p) => {
-        let v = (p + d).slice(-2);
-        if (Number(v) > 59) return p;
-        return v;
-      });
+          return { ...p, min: v };
+        });
+
+        return;
+      }
+
+      if (document.activeElement === secRef.current) {
+        setTimeParts((p) => {
+          let v = (p.sec + d).slice(-2);
+          if (Number(v) > 59) return p;
+
+          if (v.length === 2) msRef.current?.focus();
+
+          return { ...p, sec: v };
+        });
+
+        return;
+      }
+
+      if (document.activeElement === msRef.current) {
+        setTimeParts((p) => {
+          let v = (p.ms + d).slice(-3);
+          return { ...p, ms: v };
+        });
+
+        return;
+      }
+
+      minRef.current?.focus();
+      return;
     }
 
-    if (activeTime === "sec") {
-      setSec((p) => {
-        let v = (p + d).slice(-2);
-        if (Number(v) > 59) return p;
-        return v;
-      });
-    }
-
-    if (activeTime === "ms") {
-      setMs((p) => {
-        let v = (p + d).slice(-3);
-        if (Number(v) > 999) return p;
-        return v;
-      });
-    }
-
-    return;
-  }
-
-  // normal mode
-  setValue((prev) => {
-    if (d === "." && !prev) return prev;
-    if (d === "." && prev.includes(".")) return prev;
-    if (prev === "0" && d !== ".") return d;
-    return prev + d;
-  });
-};
+    setValue((prev) => prev + d);
+  };
 
   const handleBackspace = () => {
-
     if (type === "negative" || ladderType === "negative") {
+      const active = document.activeElement;
 
-      if (activeTime === "min") {
-        setMin((p) => p.slice(0, -1) || "0");
+      // MIN
+      if (active === minRef.current) {
+        setTimeParts((p) => ({
+          ...p,
+          min: p.min.slice(0, -1),
+        }));
+        return;
       }
 
-      if (activeTime === "sec") {
-        setSec((p) => p.slice(0, -1) || "0");
+      // SEC
+      if (active === secRef.current) {
+        setTimeParts((p) => {
+          if (!p.sec) {
+            minRef.current?.focus();
+            return p;
+          }
+
+          return {
+            ...p,
+            sec: p.sec.slice(0, -1),
+          };
+        });
+
+        return;
       }
 
-      if (activeTime === "ms") {
-        setMs((p) => p.slice(0, -1) || "0");
+      // MS
+      if (active === msRef.current) {
+        setTimeParts((p) => {
+          if (!p.ms) {
+            secRef.current?.focus();
+            return p;
+          }
+
+          return {
+            ...p,
+            ms: p.ms.slice(0, -1),
+          };
+        });
+
+        return;
       }
 
       return;
     }
 
+    // normal mode
     setValue((prev) => {
       if (!prev) return "0";
       let newVal = prev.slice(0, -1);
@@ -160,15 +199,20 @@ export default function BasicLeaderboardActivityEntryCard({
   };
 
   const handleClear = () => {
-    if (type === "negative") {
-      setMin("00");
-      setSec("00");
-      setMs("000");
-    } else {
-      setValue("0");
-    }
-  };
+    if (type === "negative" || ladderType === "negative") {
+      setTimeParts({
+        min: "",
+        sec: "",
+        ms: "",
+      });
 
+      minRef.current?.focus();
+
+      return;
+    }
+
+    setValue("0");
+  };
   const handleInputChange = (e) => {
     const val = e.target.value;
 
@@ -177,38 +221,26 @@ export default function BasicLeaderboardActivityEntryCard({
     }
   };
 
-const handleInputChangeTime = (val, type) => {
-  if (!/^\d*$/.test(val)) return;
+  const handleTimeChange = (type, value) => {
+    if (!/^\d*$/.test(value)) return;
 
-  if (type === "min") {
-    if (val.length > 2) return;
-    if (Number(val) > 59) return;
-    setMin(val);
-  }
+    setTimeParts((prev) => {
+      const newVal = { ...prev, [type]: value };
 
-  if (type === "sec") {
-    if (val.length > 2) return;
-    if (Number(val) > 59) return;
-    setSec(val);
-  }
+      if (type === "min") {
+        if (value.length === 2) {
+          secRef.current?.focus();
+        }
+      }
 
-  if (type === "ms") {
-    if (val.length > 3) return;
-    if (Number(val) > 999) return;
-    setMs(val);
-  }
-};
+      if (type === "sec") {
+        if (value.length === 2) {
+          msRef.current?.focus();
+        }
+      }
 
-  const formatTimeForApi = (t) => {
-    if (!t) return null;
-
-    const [min = "00", sec = "00", ms = "000"] = t.split(":");
-
-    // zero check
-    if (min === "00" && sec === "00" && ms === "000") {
-      return null;
-    }
-    return `${min.padStart(2, "0")}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}`;
+      return newVal;
+    });
   };
 
   const handleEnter = useCallback(async () => {
@@ -218,7 +250,9 @@ const handleInputChangeTime = (val, type) => {
     let URl;
     if (type === "negative" || ladderType === "negative") {
       URl = "user/postResultNegativeSkillboard";
-      finalScore = "00:" + `${min.padStart(2, "0")}:${sec.padStart(2, "0")}.${ms.padStart(3, "0")}`;
+      finalScore =
+        "00:" +
+        `${timeParts.min.padStart(2, "0")}:${timeParts.sec.padStart(2, "0")}.${timeParts.ms.padStart(3, "0")}`;
     } else {
       URl = "user/postResultSkillboard";
       const num = Math.abs(Number(value) || 0);
@@ -263,16 +297,16 @@ const handleInputChangeTime = (val, type) => {
     } finally {
       setSaving(false);
     }
-  }, [skillActivityId,
-  playerId,
-  value,
-  skillSign,
-  witnessBy,
-  min,
-  sec,
-  ms,
-  type,
-  ladderType,]);
+  }, [
+    skillActivityId,
+    playerId,
+    value,
+    skillSign,
+    witnessBy,
+    timeParts,
+    type,
+    ladderType,
+  ]);
 
   const handleSuccessClose = useCallback(() => {
     setOpenSuccess(false);
@@ -359,11 +393,11 @@ const handleInputChangeTime = (val, type) => {
           {(type === "negative" || ladderType === "negative") && (
             <div className="flex items-center justify-center gap-2 text-lg">
               <Input
-                placeholder="00"
-                value={min}
+                ref={minRef}
+                value={timeParts.min}
                 maxLength={2}
-                onClick={() => setActiveTime("min")}
-                onChange={(e) => handleInputChangeTime(e.target.value, "min")}
+                placeholder="00"
+                onChange={(e) => handleTimeChange("min", e.target.value)}
                 className="w-12 h-10 text-center text-sm text-white font-semibold 
                 bg-slate-800 border-0 outline-none ring-0
                 focus:ring-0 focus:outline-none
@@ -371,11 +405,11 @@ const handleInputChangeTime = (val, type) => {
               />
               :
               <Input
-                placeholder="00"
-                value={sec}
+                ref={secRef}
+                value={timeParts.sec}
                 maxLength={2}
-                onClick={() => setActiveTime("sec")}
-                onChange={(e) => handleInputChangeTime(e.target.value, "sec")}
+                placeholder="00"
+                onChange={(e) => handleTimeChange("sec", e.target.value)}
                 className="w-12 h-10 text-center text-sm text-white font-semibold 
                 bg-slate-800 border-0 outline-none ring-0
                 focus:ring-0 focus:outline-none
@@ -383,11 +417,11 @@ const handleInputChangeTime = (val, type) => {
               />
               :
               <Input
-                placeholder="000"
-                value={ms}
+                ref={msRef}
+                value={timeParts.ms}
                 maxLength={3}
-                onClick={() => setActiveTime("ms")}
-                onChange={(e) => handleInputChangeTime(e.target.value, "ms")}
+                placeholder="000"
+                onChange={(e) => handleTimeChange("ms", e.target.value)}
                 className="w-14 h-10 text-center text-sm text-white font-semibold 
                 bg-slate-800 border-0 outline-none ring-0
                 focus:ring-0 focus:outline-none
@@ -415,6 +449,7 @@ const handleInputChangeTime = (val, type) => {
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
             <button
               key={d}
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit(String(d))}
               className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
             >
@@ -422,9 +457,9 @@ const handleInputChangeTime = (val, type) => {
             </button>
           ))}
 
-          {/* clear + dot */}
           <div className="col-span-1 grid grid-cols-12 gap-2">
             <button
+              onMouseDown={(e) => e.preventDefault()}
               onClick={handleClear}
               className={`h-9 bg-red-500 text-black rounded transition-all ${
                 type === "positive" || ladderType === "positive"
@@ -437,8 +472,9 @@ const handleInputChangeTime = (val, type) => {
 
             {(type === "positive" || ladderType === "positive") && (
               <button
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleDigit(".")}
-                className="col-span-4 h-9 bg-white  text-black rounded"
+                className="col-span-4 h-9 bg-white text-black rounded"
               >
                 .
               </button>
@@ -446,6 +482,7 @@ const handleInputChangeTime = (val, type) => {
           </div>
 
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => handleDigit("0")}
             className="h-9 bg-white text-black rounded"
           >
@@ -453,6 +490,7 @@ const handleInputChangeTime = (val, type) => {
           </button>
 
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={handleBackspace}
             className="h-9 bg-red-300 text-black rounded"
           >
@@ -480,7 +518,7 @@ const handleInputChangeTime = (val, type) => {
               Activity #{selectedActivity} updated with score{" "}
               <b>
                 {type === "negative" || ladderType === "negative"
-                  ? `${min}:${sec}.${ms}`
+                  ? `${timeParts.min}:${timeParts.sec}.${timeParts.ms}`
                   : Math.abs(value)}
               </b>
             </DialogDescription>

@@ -28,7 +28,6 @@ const PlayerCard = ({
   const playerImageUrl = player?.image
     ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
     : Logo;
-
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
     const skillObj = skills?.find((s) => s.skill_number === skillNumber);
@@ -93,12 +92,6 @@ const PlayerCard = ({
       onTargetAchieved(player.name, achievedTargets);
     }
   }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
-
-  const getRankBySkillNumber = (ranks, skillNumber) => {
-    const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
-    return rankObj ? rankObj.rank : "-";
-  };
-
   
 
   return (
@@ -129,10 +122,10 @@ const PlayerCard = ({
         <div  className="flex  justify-between mr-1">
           <div className="flex flex-col items-center mr-1">
             <span className="bg-white flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border">
-              {player.total_point || 0}
+              {player &&  player?.scores[0]?.input_score || 0}
             </span>
           </div>
-            {player.skills?.length > 0 ?null : (
+            {player && player?.skills?.length > 0 ?null : (
             <div className="h-7 p-3 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
                 No skills data
             </div>

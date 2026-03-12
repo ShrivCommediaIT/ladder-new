@@ -100,7 +100,7 @@ export default function BasicLeaderboardActivityEntryCard({
       const finalScore = skillSign === "-" ? -num : num;
 
       // 100% string ensure karne ke liye fallback
-      const witnessValue = witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "test user";
+      const witnessValue = witnessBy && witnessBy.trim() !== "" && witnessBy.trim() 
 
       // PHP/Laravel Backend ke liye URLSearchParams sabse stable hota hai
       const params = new URLSearchParams();
@@ -109,7 +109,6 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("score", String(finalScore));
       params.append("witness_by", witnessValue);
 
-      console.log("Submitting Payload:", Object.fromEntries(params));
 
       const res = await axios.post(
         "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
@@ -122,7 +121,6 @@ export default function BasicLeaderboardActivityEntryCard({
         }
       );
 
-      console.log("Response:", res.data);
       setOpenSuccess(true);
     } catch (err) {
       console.error("Error Detail:", err.response?.data || err);
