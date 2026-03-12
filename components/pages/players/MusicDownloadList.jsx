@@ -9,12 +9,12 @@ const musicList = [
   {
     title: "Quiet - for 1, 60 sec with 30 rest x 10",
     file:
-      "https://ne-games.com/leaderBoard/public/admin/SSP%20Quiet%20Exercise%20Track%20for%202,%2020x60%20secs,%20alternate%20exercising.mp3",
+      "https://ne-games.com/leaderBoard/public/admin/SSP%20Loud%20Exercise%20Track%20for%202,%2020x60%20secs,%20alternate%20exercising.mp3",
   },
   {
     title: "Loud - for 2, 20x60 secs, alternate exercising",
     file:
-      "https://ne-games.com/leaderBoard/public/admin/SSP%20Loud%20Exercise%20Track%20for%202,%2020x60%20secs,%20alternate%20exercising.mp3",
+      "https://ne-games.com/leaderBoard/public/admin/SSP%20Quiet%20Exercise%20Track%20for%202,%2020x60%20secs,%20alternate%20exercising.mp3",
   },
   {
     title: "Quiet - for 2, 20x60 secs, alternate exercising",

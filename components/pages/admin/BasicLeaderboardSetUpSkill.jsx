@@ -43,7 +43,8 @@ export default function BasicLeaderboardSetUpSkill({
 
   const searchParams = useSearchParams();
   const ladderId = searchParams.get("ladder_id");
-  const ladderType = searchParams.get("type");
+  const type = searchParams.get("type");
+  const ladderType = searchParams.get("ladder_type");
 
   const handlePrintSkills = () => {
     const printTrigger = document.getElementById("print-trigger");
@@ -189,7 +190,7 @@ export default function BasicLeaderboardSetUpSkill({
             </button>
           </div>
 
-          <div className="max-h-[20vh] sm:max-h-[20vh] md:max-h-[20vh] overflow-y-auto">
+          {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") && (<div className="max-h-[20vh] sm:max-h-[20vh] md:max-h-[20vh] overflow-y-auto">
             <div className=" bg-gray-100 ">
               <div className="text-gray-950 text-[11px] mb-2 text-justify sm:text-[14px] md:text-[14px] px-3 sm:px-4 md:px-6 leading-relaxed">
                 <div className="w-full flex items-center justify-center gap-3 py-2">
@@ -271,7 +272,7 @@ export default function BasicLeaderboardSetUpSkill({
                 “best performance” but achievable for that skill/performance.
               </p>
             </div>
-          </div>
+          </div>)}
 
           {loading && (
             <p className="text-center text-white text-sm py-3">
@@ -282,15 +283,15 @@ export default function BasicLeaderboardSetUpSkill({
           {/* FIXED: Single line header with proper alignment */}
           <div className="sm:px-2 px-8 py-1  border-b border-white/10">
             <div className="flex items-end gap-2 text-white text-xs font-medium ">
-             {(ladderType !== "positive" && ladderType !== "negative" ) ? <div className="w-20 flex items-center">Skill No.</div> : null}
+             {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : null}
               <div className="w-[120px]">Target</div>
-              <div className="w-[200px]">{(ladderType !== "positive" && ladderType !== "negative" ) ?"Skill Name":"Activity"}</div>
-             {( ladderType !== "negative" ) && <div className="w-[120px] translate">Units Of Measurement</div>}
+              <div className="w-[200px]">{(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ?"Skill Name":"Activity"}</div>
+             {( type !== "negative" && ladderType !== "negative" ) && <div className="w-[120px] translate">Units Of Measurement</div>}
             </div>
           </div>
 
           <div className="max-h-[25vh] overflow-y-auto py-2 space-y-1.5">
-            {(ladderType !== "positive" && ladderType !== "negative" ) ? rows.map((row) => (
+            {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? rows.map((row) => (
               <div key={row.id} className="flex items-start ">
                 {/* Skill No. + +/- */}
                 <div className="flex flex-col w-20 pt-1">
@@ -393,7 +394,7 @@ export default function BasicLeaderboardSetUpSkill({
                     className="bg-white text-black text-xs w-[300px] rounded-md border border-slate-400 p-2 resize-none leading-tight"
                   />
 
-                 { (ladderType !== "negative") && (
+                 { (type !== "negative" && ladderType !== "negative") && (
                   <Textarea
                     rows={1}
                     placeholder="Unit"
@@ -410,7 +411,7 @@ export default function BasicLeaderboardSetUpSkill({
 
           <div className={`bg-[#14283a] flex justify-between items-center w-full px-8 py-3 border-t border-white/20`}>
          
-             {(ladderType !== "positive" && ladderType !== "negative" ) ? 
+             {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? 
              <div className="flex items-center justify-end mx-4">
               <BasicLeaderboardPrintSkillsSheet
                 skills={safeSkillsForPrint}

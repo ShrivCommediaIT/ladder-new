@@ -106,7 +106,7 @@ export default function ChatSupport() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-slate-900 text-white text-2xl shadow-lg border border-slate-700"
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-white text-slate-900 text-2xl shadow-lg border border-slate-700"
         >
           💬
         </button>

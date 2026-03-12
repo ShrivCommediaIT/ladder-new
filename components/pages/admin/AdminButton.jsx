@@ -45,6 +45,8 @@ import {
   CreditCard,
   Zap,
 } from "lucide-react"; // import lucide icons
+import { fetchNegativeLeaderboard } from "@/redux/slices/negativeLeaderBoardSlice";
+import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
 // import InvertRankButton from "./InvertRankButton";
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
@@ -56,6 +58,7 @@ const AdminButton = () => {
 
   const ladderId = searchParams.get("ladder_id");
   const typeFromParams = searchParams.get("type");
+  const ladderTypeFromParams = searchParams.get("ladder_type");
 
   const playerLadderType = useSelector(
     (state) => state.player?.players?.[ladderId]?.ladderDetails?.type,
@@ -109,17 +112,39 @@ const AdminButton = () => {
     }
   };
 
-  const refreshSkillLeaderboard = (skillNo = 0) => {
-    if (ladderId) {
-      dispatch(
-        fetchSkillLeaderboard({
-          ladder_id: ladderId,
-          type: "skill",
-          sortbyskillnumber: skillNo,
-        }),
-      );
-    }
-  };
+const refreshSkillLeaderboard = (skillNo = 0) => {
+  if (!ladderId) return;
+
+  let laddartype;
+  let fetchSliceLeaderboard;
+
+  if (
+    typeFromParams === "positive" ||
+    ladderTypeFromParams === "positive"
+  ) {
+    laddartype = "positive";
+    fetchSliceLeaderboard = fetchPositiveLeaderboard;
+  } 
+  else if (
+    typeFromParams === "negative" ||
+    ladderTypeFromParams === "negative"
+  ) {
+    laddartype = "negative";
+    fetchSliceLeaderboard = fetchNegativeLeaderboard;
+  } 
+  else {
+    laddartype = "skill";
+    fetchSliceLeaderboard = fetchSkillLeaderboard;
+  }
+
+  dispatch(
+    fetchSliceLeaderboard({
+      ladder_id: ladderId,
+      type: laddartype,
+      sortbyskillnumber: skillNo,
+    })
+  );
+};
 
   useEffect(() => {
     if (ladderId) dispatch(fetchGradebars(ladderId));
