@@ -29,7 +29,7 @@ const PlayerCard = ({
   const playerImageUrl = player?.image
     ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
     : Logo;
-
+  console.log("player==>", player)
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
     const skillObj = skills?.find((s) => s.skill_number === skillNumber);
@@ -93,15 +93,23 @@ const PlayerCard = ({
     if (achievedTargets > 0) {
       onTargetAchieved(player.name, achievedTargets);
     }
-    console.log("player", player)
   }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
 
-  const getRankBySkillNumber = (ranks, skillNumber) => {
-    const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
-    return rankObj ? rankObj.rank : "-";
-  };
+ const toTotalSeconds = (score) => {
+  if (!score) return 0;
 
-  
+  const [hh, mm, secMs] = score.split(":");
+  const [ss, ms = "0"] = secMs.split(".");
+
+  const total =
+    Number(hh) * 3600 +
+    Number(mm) * 60 +
+    Number(ss) +
+    Number(ms) / 100;
+
+  return total;
+};
+
 
   return (
     <Card onClick={() => {
@@ -135,10 +143,10 @@ const PlayerCard = ({
         <div  className="flex  justify-between mr-1">
           <div className="flex flex-col items-center mr-1">
             <span className="bg-white flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border">
-              {player.total_point || 0}
+              {toTotalSeconds(player && player?.scores[0]?.negative_ladder_score) || 0}
             </span>
           </div>
-            {player.skills?.length > 0 ?null : (
+            {player && player?.skills?.length > 0 ?null : (
             <div className="h-7 p-3 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
                 No skills data
             </div>

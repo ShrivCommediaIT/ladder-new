@@ -132,7 +132,7 @@ export default function BasicLeaderboardSetUpSkill({
           return {
             skill_number: row.id,
             skill_description: String(row.description || "").trim(),
-            skill_sign: "-",
+            skill_sign: rows.mode,
             target: targetNum,
             unit: String(row.unit || "").trim(),
           };
@@ -291,7 +291,8 @@ export default function BasicLeaderboardSetUpSkill({
           </div>
 
           <div className="max-h-[25vh] overflow-y-auto py-2 space-y-1.5">
-            {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? rows.map((row) => (
+            {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ?
+             rows.map((row) => (
               <div key={row.id} className="flex items-start ">
                 {/* Skill No. + +/- */}
                 <div className="flex flex-col w-20 pt-1">
