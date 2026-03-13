@@ -7,8 +7,10 @@ import { store, persistor } from "@/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import AppInit from '@/components/AppInit';
 import SupportChatBot from '@/helper/SupportChatBot';
+import { usePathname } from "next/navigation";
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
   return (
     <html lang="en">
        <body>
@@ -16,7 +18,7 @@ export default function RootLayout({ children }) {
            <PersistGate loading={null} persistor={persistor}>
             <AppInit />
             {children}
-            <SupportChatBot />
+            {(pathname != "/login-page") && <SupportChatBot />}
            </PersistGate>
          </Provider>
        </body>

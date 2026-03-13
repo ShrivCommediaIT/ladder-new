@@ -102,10 +102,10 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
                 <div  className="flex  justify-between mr-1">
                   <div className="flex flex-col items-center mr-1">
                     <span className="bg-white flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border">
-                      {player.total_point || 0}
+                      {player &&  player?.scores[0]?.input_score || 0}
                     </span>
                   </div>
-                    {player.skills?.length > 0 ?null : (
+                    {player && player?.skills?.length > 0 ?null : (
                     <div className="h-7 p-3 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
                         No skills data
                     </div>
@@ -210,25 +210,6 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
     refreshLeaderboard(0);
   }, [refreshLeaderboard]);
 
-//   const handleSkillClick = useCallback(
-//     (playerId, skillNumber) => {
-//       if (playerId != currentUserId) return;
-
-//       const player = data.find((p) => p.id === playerId);
-      
-//       if (!player) return;
-//       const skillObj = player.skills.find(
-//         (s) => s.skill_number === skillNumber,
-//       );
-//       if (!skillObj) return;
-
-//       setSelectedPlayerId(playerId);
-//       setSelectedSkillNumber(skillNumber);
-//       setSelectedSkillActivityId(skillObj.id);
-//       setOpenEdit(true);
-//     },
-//     [data, currentUserId],
-//   );
 
   const handleSkillClick = useCallback(
   

@@ -82,8 +82,6 @@ export default function ChatSupport() {
       }
     );
 
-    console.log(res.data);
-
     setShowForm(false);
     setSubmitted(true);
 
