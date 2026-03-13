@@ -29,7 +29,6 @@ const PlayerCard = ({
   const playerImageUrl = player?.image
     ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
     : Logo;
-  console.log("player==>", player)
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
     const skillObj = skills?.find((s) => s.skill_number === skillNumber);
@@ -95,20 +94,20 @@ const PlayerCard = ({
     }
   }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
 
- const toTotalSeconds = (score) => {
-  if (!score) return 0;
+  const toTotalSeconds = (score) => {
+    if (!score) return 0;
 
-  const [hh, mm, secMs] = score.split(":");
-  const [ss, ms = "0"] = secMs.split(".");
+    const [hh, mm, secMs] = score.split(":");
+    const [ss, ms = "0"] = secMs.split(".");
 
-  const total =
-    Number(hh) * 3600 +
-    Number(mm) * 60 +
-    Number(ss) +
-    Number(ms) / 100;
+    const total =
+      Number(hh) * 3600 +
+      Number(mm) * 60 +
+      Number(ss) +
+      Number(ms) / 100;
 
-  return total;
-};
+    return total;
+  };
 
 
   return (

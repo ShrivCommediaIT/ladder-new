@@ -136,7 +136,12 @@ export default function BasicLeaderboardActivityEntryCard({
       return;
     }
 
-    setValue((prev) => prev + d);
+    setValue((prev) => {
+        if (d === "." && !prev) return prev;
+        if (d === "." && prev.includes(".")) return prev;
+        if (prev === "0" && d !== ".") return d;
+        return prev + d;
+    })
   };
 
   const handleBackspace = () => {
@@ -217,7 +222,7 @@ export default function BasicLeaderboardActivityEntryCard({
     const val = e.target.value;
 
     if (/^\d*\.?\d*$/.test(val)) {
-      setValue(val || "0");
+      setValue(val );
     }
   };
 
@@ -273,7 +278,7 @@ export default function BasicLeaderboardActivityEntryCard({
         user_id: playerId,
         skill_activity_id: skillActivityId,
         score: finalScore,
-        witness_by: witnessBy.trim() || "test user",
+        witness_by: witnessBy.trim(),
       };
 
       const res = await axios.post(
@@ -312,6 +317,14 @@ export default function BasicLeaderboardActivityEntryCard({
     setOpenSuccess(false);
     if (onClose) onClose();
   }, [onClose]);
+
+  const formatTime = (timeParts) => {
+  const min = (timeParts.min || "").padStart(2, "0");
+  const sec = (timeParts.sec || "").padStart(2, "0");
+  const ms = (timeParts.ms || "").padStart(3, "0");
+
+    return `${min}:${sec}.${ms}`;
+  };
 
   return (
     <>
@@ -518,8 +531,8 @@ export default function BasicLeaderboardActivityEntryCard({
               Activity #{selectedActivity} updated with score{" "}
               <b>
                 {type === "negative" || ladderType === "negative"
-                  ? `${timeParts.min}:${timeParts.sec}.${timeParts.ms}`
-                  : Math.abs(value)}
+                ? formatTime(timeParts)
+                : Math.abs(value)}
               </b>
             </DialogDescription>
           </DialogHeader>
