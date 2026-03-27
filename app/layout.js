@@ -1,5 +1,3 @@
-
-// app/layout.js (or wherever your Redux Provider is)
 "use client";
 import './globals.css'
 import { Provider } from "react-redux";
@@ -8,9 +6,22 @@ import { PersistGate } from "redux-persist/integration/react";
 import AppInit from '@/components/AppInit';
 import SupportChatBot from '@/helper/SupportChatBot';
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from 'react';
 
 export default function RootLayout({ children }) {
-  const pathname = usePathname();
+  const [userType, setUserType] = useState("")
+
+useEffect(() => {
+  const parsed = JSON.parse(localStorage.getItem("userData") || "null");
+  const role = parsed?.user_type;
+
+  if (role === "admin" || role === "sub_admin") {
+    setUserType(role);
+  } else {
+    setUserType(null);
+  }
+}, []);
+
   return (
     <html lang="en">
        <body>
@@ -18,29 +29,10 @@ export default function RootLayout({ children }) {
            <PersistGate loading={null} persistor={persistor}>
             <AppInit />
             {children}
-            {(pathname != "/login-page") && <SupportChatBot />}
+            {(userType == "admin") && <SupportChatBot />}
            </PersistGate>
          </Provider>
        </body>
      </html>
   );
 }
-
-
-
-
-// ========== hydration error fix
-
-// export default function RootLayout({ children }) {
-//   return (
-//     <html lang="en">
-//       <body suppressHydrationWarning>
-//         <Provider store={store}>
-//           <PersistGate loading={null} persistor={persistor}>
-//             {children}
-//           </PersistGate>
-//         </Provider>
-//       </body>
-//     </html>
-//   );
-// }

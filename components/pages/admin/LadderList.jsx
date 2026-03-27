@@ -367,7 +367,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
             <div className="flex items-center justify-between px-1 sm:px-2 pt-2">
               <h3 className="text-base sm:text-lg font-semibold text-cyan-300 flex items-center gap-2">
                 <ListChecks className="h-4 w-4 sm:h-5 sm:w-5" />
-                Your Solutions
+                Your Competitions
               </h3>
 
               <Button

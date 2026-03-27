@@ -41,7 +41,7 @@ const AdminHideShowInfo = () => {
           </ul>
           <p className="mt-2">
             You will now be in that section’s dashboard, where you can create
-            solutions specifically for that sport.
+            competitions specifically for that sport.
           </p>
           <p className="mt-1">
             You can repeat this process to create multiple sections for
@@ -51,7 +51,7 @@ const AdminHideShowInfo = () => {
 
         {/* All Solutions Section */}
         <div className="bg-cyan-500/10 p-3 rounded-lg border border-black">
-          <p className="font-semibold text-black">All Solutions</p>
+          <p className="font-semibold text-black">All Competitions</p>
           <p>
             Every solution created by a section will automatically appear on
             the Main Admin Dashboard for central oversight and quick management
