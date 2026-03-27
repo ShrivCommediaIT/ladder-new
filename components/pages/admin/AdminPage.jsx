@@ -424,7 +424,7 @@ const [openQuickMobile, setOpenQuickMobile] = useState(false);
                    <div className="flex items-center justify-start gap-4 ">
                 <h3 className="text-lg font-semibold text-cyan-400 flex items-center gap-2">
                   <Layers className="h-5 w-5" />
-                  Solutions Information
+                  Competitions Information
                 </h3>
 
                 <Popover open={solutionsOpen} onOpenChange={setSolutionsOpen}>

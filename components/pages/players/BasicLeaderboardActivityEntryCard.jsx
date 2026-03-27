@@ -33,7 +33,8 @@ export default function BasicLeaderboardActivityEntryCard({
   const [openSuccess, setOpenSuccess] = useState(false);
   const [skillTarget, setSkillTarget] = useState("");
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
-
+  const [zeroAction, setZeroAction] = useState(null);
+  // "ok" | "reset" | null
   useEffect(() => {
     if (initialActivity) {
       setSelectedActivity(initialActivity);
@@ -80,37 +81,22 @@ export default function BasicLeaderboardActivityEntryCard({
 
   const handleClear = () => setValue("0");
 
-  const handleInputChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*$/.test(val)) setValue(val || "0");
-  };
 
   /* ---------------- SAVE LOGIC ---------------- */
-  const handleEnter = useCallback(async () => {
-    if (!skillActivityId || !playerId) return;
-
-    const num = Math.abs(Number(value) || 0);
-    if (num === 0) {
-      setOpenZeroAlert(true);
-      return;
-    }
-
+  const submitScore = async (finalScore) => {
     try {
       setSaving(true);
-      const finalScore = skillSign === "-" ? -num : num;
 
-      // 100% string ensure karne ke liye fallback
-      const witnessValue = witnessBy && witnessBy.trim() !== "" && witnessBy.trim() 
+      const witnessValue =
+        witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
 
-      // PHP/Laravel Backend ke liye URLSearchParams sabse stable hota hai
       const params = new URLSearchParams();
       params.append("user_id", String(playerId));
       params.append("skill_activity_id", String(skillActivityId));
       params.append("score", String(finalScore));
       params.append("witness_by", witnessValue);
 
-
-      const res = await axios.post(
+      await axios.post(
         "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
         params,
         {
@@ -128,7 +114,41 @@ export default function BasicLeaderboardActivityEntryCard({
     } finally {
       setSaving(false);
     }
-  }, [skillActivityId, playerId, value, skillSign, witnessBy]);
+  };
+
+  const handleEnter = useCallback(async () => {
+    if (!skillActivityId || !playerId) return;
+
+    const num = Math.abs(Number(value) || 0);
+
+    if (value === "-") {
+      setOpenZeroAlert(true);
+      setZeroAction("onlyReset");
+      return;
+    }
+
+    if (num === 0) {
+      setOpenZeroAlert(true);
+      setZeroAction("both");
+      return;
+    }
+
+    const finalScore = skillSign === "-" ? -num : num;
+    submitScore(finalScore);
+
+  }, [skillActivityId, playerId, value, skillSign]);
+
+  const handleZeroConfirm = (type) => {
+    setOpenZeroAlert(false);
+
+    if (type === "ok") {
+      submitScore(0);
+    } else if (type === "reset") {
+      setValue("-")
+      submitScore("-");
+    }
+  };
+
 
   const handleSuccessClose = useCallback(() => {
     setOpenSuccess(false);
@@ -165,8 +185,8 @@ export default function BasicLeaderboardActivityEntryCard({
                 setValue("0");
               }}
               className={`w-7 h-7 rounded-md border text-[11px] transition-all
-                ${selectedActivity === n 
-                  ? "bg-sky-400 text-black border-white scale-110 shadow-md" 
+                ${selectedActivity === n
+                  ? "bg-sky-400 text-black border-white scale-110 shadow-md"
                   : "bg-slate-800 border-slate-600 hover:bg-slate-700"}`}
             >
               {n}
@@ -198,9 +218,38 @@ export default function BasicLeaderboardActivityEntryCard({
               {d}
             </button>
           ))}
-          <button onClick={handleClear} className="h-9 bg-red-500 text-white rounded font-bold uppercase text-[10px]">Clear</button>
-          <button onClick={() => handleDigit("0")} className="h-9 bg-white text-black rounded font-bold">0</button>
-          <button onClick={handleBackspace} className="h-9 bg-orange-400 text-white rounded font-bold">⌫</button>
+
+          {/* Last row */}
+          <button
+            onClick={handleClear}
+            className="h-9 bg-red-500 text-white rounded font-bold uppercase text-[10px]"
+          >
+            Clear
+          </button>
+
+          {/* Split 0 into two buttons */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => handleDigit("0")}
+              className="h-9 bg-white text-black rounded font-bold"
+            >
+              0
+            </button>
+
+            <button
+              onClick={() => handleDigit("-")}
+              className="h-9 bg-white text-black rounded font-bold"
+            >
+              -
+            </button>
+          </div>
+
+          <button
+            onClick={handleBackspace}
+            className="h-9 bg-orange-400 text-white rounded font-bold"
+          >
+            ⌫
+          </button>
         </div>
 
         <Button
@@ -218,21 +267,72 @@ export default function BasicLeaderboardActivityEntryCard({
           <DialogHeader>
             <DialogTitle className="text-emerald-500 text-xl font-bold">Score Saved</DialogTitle>
             <DialogDescription className="text-lg">
-              Recorded score: <b>{value}</b> <br/>
-              Witness: <b>{witnessBy }</b>
+              Recorded score: <b>{value}</b> <br />
+              Witness: <b>{witnessBy}</b>
             </DialogDescription>
           </DialogHeader>
           <Button onClick={handleSuccessClose} className="bg-emerald-500 text-black font-bold mt-4">OK</Button>
         </DialogContent>
       </Dialog>
 
+
       <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-red-500 text-xl font-bold">Invalid Score</DialogTitle>
-            <DialogDescription className="text-lg">Zero score is not allowed</DialogDescription>
-          </DialogHeader>
-          <Button onClick={() => setOpenZeroAlert(false)} className="bg-red-500 text-white mt-4 font-bold">OK</Button>
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden">
+
+          {/* HEADER BAR (like system popup) */}
+          <div className="flex items-center justify-between bg-white px-3 py-2 border-b">
+            <span className="font-semibold text-sm"> </span>
+
+            {/* Single Close Button */}
+            <button
+              onClick={() => setOpenZeroAlert(false)}
+              className="text-gray-600 hover:text-black text-lg font-bold"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* BODY */}
+          <div className="flex justify-between gap-4 p-4">
+
+            {/* TEXT */}
+            <div className="text-sm leading-relaxed">
+              {(zeroAction !== "onlyReset") && <p className="font-bold">
+                DO YOU WISH TO ENTER A SCORE OF ZERO?{" "}
+                <span className="font-normal">If so - press OK</span>
+              </p>}
+
+              <p className={`${zeroAction !== "onlyReset"?"mt-3":''}`}>
+                <span className="font-bold">ERROR?</span>{" "}
+                If you wish to correct putting in a score incorrectly that should
+                have gone into another activity, press RESET
+              </p>
+            </div>
+
+            {/* BUTTONS (right side stacked) */}
+            <div className="flex flex-col gap-3 min-w-[90px]">
+
+              {/* OK button → only when NOT "-" */}
+              {zeroAction !== "onlyReset" && (
+                <button
+                  onClick={() => handleZeroConfirm("ok")}
+                  className="bg-green-400 hover:bg-green-500 text-black font-bold py-1 rounded shadow"
+                >
+                  OK
+                </button>
+              )}
+
+              {/* Reset button → always visible */}
+              <button
+                onClick={() => handleZeroConfirm("reset")}
+                className="bg-red-500 hover:bg-red-600 text-black font-bold py-1 rounded shadow"
+              >
+                Reset
+              </button>
+
+            </div>
+
+          </div>
         </DialogContent>
       </Dialog>
     </>

@@ -89,6 +89,7 @@ export default function LoginUser({ ladderId, ladderType }) {
           ladder_id: finalLadderId,
           ladder_type: finalLadderType,
           isLoggedIn: true,
+          ShowBot:false
         })
       );
 
