@@ -119,7 +119,7 @@ export default function OnboardingCard() {
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 14px", fontSize: 13, color: "#94a3b8" }}>
                   <CircleIcon>@</CircleIcon>
-                  praveen
+                  User Name
                 </div>
                 <div style={{ height: 1, background: "#f1f5f9", margin: "4px 0" }} />
                 <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 14px", fontSize: 13, color: "#334155" }}>
