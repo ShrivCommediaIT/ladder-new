@@ -50,7 +50,7 @@ import { motion } from "framer-motion";
 
 /* ---------------- ZOD SCHEMA ---------------- */
 const loginSchema = z.object({
-  username: z.string().min(1, "Username/Email is required").email("Invalid email format"),
+  username: z.string().min(1, "Email is required").email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -197,7 +197,7 @@ export default function LoginPage() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-semibold text-gray-700">Username/Email</FormLabel>
+                      <FormLabel className="font-semibold text-gray-700">Email</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter your email address" 

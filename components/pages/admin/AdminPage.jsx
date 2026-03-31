@@ -46,6 +46,8 @@ import {
 import AdminImportantInfo from "./info/AdminImportantInfo";
 import AdminHideShowInfo from "./info/AdminHideShowInfo";
 import DemoLadder from "./DemoLadder";
+import OnboardingCard from "./OnboardingCard";
+import OnboardingModal from "./OnboardingModal";
 
 export default function AdminPage() {
   const [ladderName, setLadderName] = useState("");
@@ -310,6 +312,7 @@ const [openQuickMobile, setOpenQuickMobile] = useState(false);
         hideProgressBar
         theme="dark"
       />
+      <OnboardingModal />
 
       {/* HEADER MOBILE */}
       <div className="sticky top-0 z-20 sm:hidden flex justify-between px-4 py-3 bg-black/70 backdrop-blur-xl border-b border-white/10">
@@ -424,7 +427,7 @@ const [openQuickMobile, setOpenQuickMobile] = useState(false);
                    <div className="flex items-center justify-start gap-4 ">
                 <h3 className="text-lg font-semibold text-cyan-400 flex items-center gap-2">
                   <Layers className="h-5 w-5" />
-                  Competitions Information
+                  Competitions Information 
                 </h3>
 
                 <Popover open={solutionsOpen} onOpenChange={setSolutionsOpen}>
@@ -444,17 +447,22 @@ const [openQuickMobile, setOpenQuickMobile] = useState(false);
                   >
                
                     <div className="text-sm">
-                      <AdminHideShowInfo />
+                      <AdminHideShowInfo isModel={false} />
+                      {console.log("AdminHideShowInfo==>")}
                     </div>
                   </PopoverContent>
                 </Popover>
               </div>
                 
+              <div className="text-white mt-12">
+                <OnboardingCard />
+                      
+
+              </div>
 
           </div>
 
-
-
+          
         </div>
       </div>
 
