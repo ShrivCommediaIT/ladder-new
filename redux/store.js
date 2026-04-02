@@ -40,7 +40,7 @@ import rosterLeaderboardReducer from "./slices/rosterLeaderboardSlice";
 import clubReducer from "./slices/clubSlice"; 
 import authClubReducer from "./slices/loginClub";
 import { positive } from "zod";
-
+import progressFlowReducer from "./slices/progressFlowSlice";
 
 const persistConfig = {
   key: "root",
@@ -70,6 +70,7 @@ const persistConfig = {
     "club",
     "roster",
     "rosterLeaderboard",
+    "progressFlow"
   ],
 };
 
@@ -104,6 +105,7 @@ const rootReducer = combineReducers({
   user: authClubReducer,
   roster: rosterReducer,
   rosterLeaderboard: rosterLeaderboardReducer,
+  progressFlow:progressFlowReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
