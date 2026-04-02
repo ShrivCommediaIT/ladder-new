@@ -58,7 +58,7 @@ export default function AdminPage() {
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [openQuickDesktop, setOpenQuickDesktop] = useState(false);
-const [openQuickMobile, setOpenQuickMobile] = useState(false);
+  const [openQuickMobile, setOpenQuickMobile] = useState(false);
 
   const { allLadders } = useSelector((state) => state.fetchLadder);
 
@@ -328,28 +328,28 @@ const [openQuickMobile, setOpenQuickMobile] = useState(false);
               <span>Quick Quide</span>
 
               {/* INFO POPOVER */}
- <Popover
-  open={openQuickMobile}
-  onOpenChange={setOpenQuickMobile}
->
-  <PopoverTrigger asChild>
-    <button className="underline text-cyan-300 cursor-pointer">
-      Quick Guide
-    </button>
-  </PopoverTrigger>
+              <Popover
+                open={openQuickMobile}
+                onOpenChange={setOpenQuickMobile}
+              >
+                <PopoverTrigger asChild>
+                  <button className="underline text-cyan-300 cursor-pointer">
+                    Quick Guide
+                  </button>
+                </PopoverTrigger>
 
-  <PopoverContent
-    side="top"
-    align="center"
-    sideOffset={10}
-    className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700
+                <PopoverContent
+                  side="top"
+                  align="center"
+                  sideOffset={10}
+                  className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700
     text-slate-900 px-2 py-4 rounded-lg shadow-2xl backdrop-blur-md"
-  >
-    <AdminImportantInfo
-      onClose={() => setOpenQuickMobile(false)}
-    />
-  </PopoverContent>
-</Popover>
+                >
+                  <AdminImportantInfo
+                    onClose={() => setOpenQuickMobile(false)}
+                  />
+                </PopoverContent>
+              </Popover>
 
               {/* RIGHT SIDE — USER DETAILS */}
               <div className="self-start sm:self-auto">
@@ -368,33 +368,33 @@ const [openQuickMobile, setOpenQuickMobile] = useState(false);
               Admin Dashboard
             </h1>
 
-           <div className="flex items-center gap-1">
-  <p className="text-lg text-white">Getting Started</p> -
+            <div className="flex items-center gap-1">
+              <p className="text-lg text-white">Getting Started</p> -
 
-  <Popover
-  open={openQuickDesktop}
-  onOpenChange={setOpenQuickDesktop}
->
-  <PopoverTrigger asChild>
-    <button className="underline text-cyan-300 cursor-pointer">
-      Quick Guide
-    </button>
-  </PopoverTrigger>
+              <Popover
+                open={openQuickDesktop}
+                onOpenChange={setOpenQuickDesktop}
+              >
+                <PopoverTrigger asChild>
+                  <button className="underline text-cyan-300 cursor-pointer">
+                    Quick Guide
+                  </button>
+                </PopoverTrigger>
 
-  <PopoverContent
-    side="top"
-    align="center"
-    sideOffset={10}
-    className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700
+                <PopoverContent
+                  side="top"
+                  align="center"
+                  sideOffset={10}
+                  className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700
     text-slate-900 px-2 py-4 rounded-lg shadow-2xl backdrop-blur-md"
-  >
-    <AdminImportantInfo
-      onClose={() => setOpenQuickDesktop(false)}
-    />
-  </PopoverContent>
-</Popover>
+                >
+                  <AdminImportantInfo
+                    onClose={() => setOpenQuickDesktop(false)}
+                  />
+                </PopoverContent>
+              </Popover>
 
-</div>
+            </div>
           </div>
 
           <div>
@@ -407,9 +407,9 @@ const [openQuickMobile, setOpenQuickMobile] = useState(false);
           <div className="lg:col-span-3 space-y-6">
             {/* LADDER TYPES */}
             <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-5">
-           
-                <DemoLadder />
-              
+
+              <DemoLadder />
+
             </div>
 
             {/* LADDER LIST */}
@@ -422,47 +422,44 @@ const [openQuickMobile, setOpenQuickMobile] = useState(false);
 
           {/* RIGHT SIDE CREATE PANEL */}
           <div className="lg:col-span-2 max-h-auto border-white/10 p-4 sm:p-6 rounded-md">
-                
 
-                   <div className="flex items-center justify-start gap-4 ">
-                <h3 className="text-lg font-semibold text-cyan-400 flex items-center gap-2">
-                  <Layers className="h-5 w-5" />
-                  Competitions Information 
-                </h3>
 
-                <Popover open={solutionsOpen} onOpenChange={setSolutionsOpen}>
-                  <PopoverTrigger asChild>
-                    <button
-                      onClick={() => setSolutionsOpen(!solutionsOpen)}
-                      className="cursor-pointer underline text-cyan-300 text-sm"
-                    >
-                      {solutionsOpen ? "Hide" : "Show"}
-                    </button>
-                  </PopoverTrigger>
+            <div className="flex items-center justify-start gap-4 ">
+              <h3 className="text-lg font-semibold text-cyan-400 flex items-center gap-2">
+                <Layers className="h-5 w-5" />
+                Competitions Information
+              </h3>
 
-                  <PopoverContent
-                    side="top"
-                    align="center"
-                    className="w-[90vw] sm:w-lg bg-gray-300 border-slate-700 text-slate-900 px-3 py-4 rounded-lg shadow-2xl z-50 backdrop-blur-md"
+              <Popover open={solutionsOpen} onOpenChange={setSolutionsOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    onClick={() => setSolutionsOpen(!solutionsOpen)}
+                    className="cursor-pointer underline text-cyan-300 text-sm"
                   >
-               
-                    <div className="text-sm">
-                      <AdminHideShowInfo isModel={false} />
-                      {console.log("AdminHideShowInfo==>")}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-                
-              <div className="text-white mt-12">
-                <OnboardingCard />
-                      
+                    {solutionsOpen ? "Hide" : "Show"}
+                  </button>
+                </PopoverTrigger>
 
-              </div>
+                <PopoverContent
+                  side="top"
+                  align="center"
+                  className="w-[90vw] sm:w-lg bg-gray-300 border-slate-700 text-slate-900 px-3 py-4 rounded-lg shadow-2xl z-50 backdrop-blur-md"
+                >
 
+                  <div className="text-sm">
+                    <AdminHideShowInfo isModel={false} />
+                    {console.log("AdminHideShowInfo==>")}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="text-white mt-12">
+              <OnboardingCard />
+            </div>
           </div>
 
-          
+
         </div>
       </div>
 
