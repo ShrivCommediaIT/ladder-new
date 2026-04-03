@@ -56,15 +56,6 @@ export default function PlanHeading() {
 
         {/* Upload Info */}
         <div className="">
-          {/* <p className="text-lg sm:text-xl font-medium text-gray-100">
-            Upload an <span className="text-yellow-300 font-semibold">EXCEL CSV</span> file of your players’ details <br />
-            to see exactly how it would look and feel for you.
-          </p>
-
-          <p className="font-semibold text-red-400">
-            No CSV file to hand? - Check out our "demo" ladder
-          </p> */}
-
           {/* Animated Button */}
           <motion.div
             whileHover={{ scale: 1.1 }}
@@ -92,11 +83,6 @@ export default function PlanHeading() {
               ></motion.span>
             </Link>
           </motion.div>
-
-          {/* <p className="text-sm sm:text-base text-gray-200 italic">
-            <span className="font-semibold text-yellow-200">Note:</span> Your free ladder only allows you to test functionality
-            of the top ten players listed
-          </p> */}
         </div>
       </motion.section>
 
@@ -107,12 +93,6 @@ export default function PlanHeading() {
         transition={{ delay: 0.5 }}
         className="relative z-10 mt-8 text-gray-200"
       >
-        {/* <p className="text-sm sm:text-base">
-          Contact:{" "}
-          <span className="underline text-blue-300 cursor-pointer">
-            support@sportssolutionspro.com
-          </span>
-        </p> */}
       </motion.section>
 
       {/* BENEFITS SECTION */}

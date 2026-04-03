@@ -312,7 +312,7 @@ export default function AdminPage() {
         hideProgressBar
         theme="dark"
       />
-      <OnboardingModal />
+      {/* <OnboardingModal /> */}
 
       {/* HEADER MOBILE */}
       <div className="sticky top-0 z-20 sm:hidden flex justify-between px-4 py-3 bg-black/70 backdrop-blur-xl border-b border-white/10">
@@ -448,15 +448,14 @@ export default function AdminPage() {
 
                   <div className="text-sm">
                     <AdminHideShowInfo isModel={false} />
-                    {console.log("AdminHideShowInfo==>")}
                   </div>
                 </PopoverContent>
               </Popover>
             </div>
 
-            <div className="text-white mt-12">
+            {/* <div className="text-white mt-12">
               <OnboardingCard />
-            </div>
+            </div> */}
           </div>
 
 
