@@ -25,6 +25,7 @@ export const BasicLeaderboardEdit = ({
   onClose = () => {},
   currentId = null,
   ladderId: propLadderId,
+  playerName,
   skillNumber,
   skillActivityId,
 }) => {
@@ -74,7 +75,7 @@ export const BasicLeaderboardEdit = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="min-w-full md:min-w-[700px] lg:min-w-[900px] bg-gray-900 text-white">
         <DialogTitle className="text-xl font-bold border-b border-gray-700 p-1">
-          {selectedPlayer?.name || "Player"}
+          {selectedPlayer?.name  || "Player"}
         </DialogTitle>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <Tabs value={selectedTab} onValueChange={setSelectedTab}>
@@ -129,6 +130,7 @@ export const BasicLeaderboardEdit = ({
                   skillActivityId={skillActivityId}
                   onClose={handleChildClose}
                   initialActivity={skillNumber}
+                  playerName={selectedPlayer?.name || "Player"}
                 />
               </div>
             </TabsContent>

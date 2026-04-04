@@ -12,6 +12,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "react-toastify";
+import { updateLadderToken } from "@/helper/helperApi";
+
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 const activityNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -22,6 +25,7 @@ export default function BasicLeaderboardActivityEntryCard({
   skillActivityId,
   initialActivity,
   onClose,
+  playerName
 }) {
   const [selectedActivity, setSelectedActivity] = useState(initialActivity || 1);
   const [value, setValue] = useState("0");
@@ -96,7 +100,7 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("score", String(finalScore));
       params.append("witness_by", witnessValue);
 
-      await axios.post(
+      const skillsPost = await axios.post(
         "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
         params,
         {
@@ -106,6 +110,18 @@ export default function BasicLeaderboardActivityEntryCard({
           },
         }
       );
+
+      if (skillsPost.status == 200) {
+        toast.success("Result posted successfully! ");
+        updateLadderToken({
+          user_id: playerName,
+          ladder_id:ladderId,
+          ladder_type: "skill",
+        })
+      } else {
+        toast.error("Failed to post result. Please try again.");
+      }
+
 
       setOpenSuccess(true);
     } catch (err) {
@@ -302,7 +318,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 <span className="font-normal">If so - press OK</span>
               </p>}
 
-              <p className={`${zeroAction !== "onlyReset"?"mt-3":''}`}>
+              <p className={`${zeroAction !== "onlyReset" ? "mt-3" : ''}`}>
                 <span className="font-bold">ERROR?</span>{" "}
                 If you wish to correct putting in a score incorrectly that should
                 have gone into another activity, press RESET
