@@ -152,6 +152,7 @@ export default function LoginByClubForm() {
           : { ...res.data.data, isLoggedIn: true };
 
       localStorage.setItem(storageKey, JSON.stringify(user));
+      localStorage.setItem("adminDetails", JSON.stringify({ ...res.data.data,}));
 
       const route = values.userType === "sub_admin" ? subAdminPage : adminPage;
 

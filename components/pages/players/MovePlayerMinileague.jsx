@@ -26,6 +26,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import PlayerBet from "./PlayerBet";
+import { updateLadderToken } from "@/helper/helperApi";
 
 const MoveNumberMinileague = ({
   onClose,
@@ -42,7 +43,6 @@ const MoveNumberMinileague = ({
 
   const fallbackLadderId = Number(searchParams.get("ladder_id")) || null;
   const effectiveLadderId = ladderId || fallbackLadderId;
-
 
   // Existing state
   const [selectedNumber, setSelectedNumber] = useState("");
@@ -69,24 +69,24 @@ const MoveNumberMinileague = ({
     if (currentRank != null && !isNaN(Number(currentRank)) && Number(currentRank) > 0) {
       return Number(currentRank);
     }
-    
+
     // Priority 2: Use selectedPlayer rank
     if (selectedPlayer?.rank != null && !isNaN(Number(selectedPlayer.rank)) && Number(selectedPlayer.rank) > 0) {
       return Number(selectedPlayer.rank);
     }
-    
+
     // Priority 3: Lookup from players data
     const effectiveCurrentId = currentId || selectedPlayer?.id;
     if (effectiveCurrentId) {
       const playerInSection = rawMiniLeague
         .flatMap((section) => (section?.users_record || section?.users || []))
         .find((p) => Number(p.id) === Number(effectiveCurrentId));
-      
+
       if (playerInSection?.rank != null && !isNaN(Number(playerInSection.rank)) && Number(playerInSection.rank) > 0) {
         return Number(playerInSection.rank);
       }
     }
-    
+
     console.warn("No valid current player rank found", { currentRank, selectedPlayer, currentId });
     return null;
   }, [currentRank, selectedPlayer, currentId, rawMiniLeague]);
@@ -149,13 +149,13 @@ const MoveNumberMinileague = ({
     ladderType === "best3"
       ? ["2-0", "2-1"]
       : ladderType === "best5" || ladderType === "minileague"
-      ? ["3-0", "3-1", "3-2"]
-      : [];
+        ? ["3-0", "3-1", "3-2"]
+        : [];
 
   // NEW: Open confirm dialog with win/loss detection
   const openConfirmDialog = useCallback(() => {
     if (!score) return;
-    
+
     // Detect win/loss based on resultType and score
     const isUserWin = resultType === "beat";
     setIsWin(isUserWin);
@@ -199,15 +199,15 @@ const MoveNumberMinileague = ({
 
   // ENHANCED: Updated confirmMove with loading states
   const confirmMove = async () => {
-  
 
-  if (!userId || !effectiveLadderId || !effectiveCurrentId) {
-    toast.error("Missing required information.");
-    setShowConfirm(false);
-    return;
-  }
 
-  
+    if (!userId || !effectiveLadderId || !effectiveCurrentId) {
+      toast.error("Missing required information.");
+      setShowConfirm(false);
+      return;
+    }
+
+
 
     if (!challengedPlayer) {
       toast.error("Selected player not found in this section.");
@@ -256,14 +256,25 @@ const MoveNumberMinileague = ({
         challengedPlayer: challengedPlayer ?? null,
       };
 
-      await dispatch(moveMiniLeague(payload)).unwrap();
+      const moveMiniLeagueRes = await dispatch(moveMiniLeague(payload)).unwrap();
+      console.log("moveMiniLeagueRes==>", moveMiniLeagueRes);
+      
+      if (moveMiniLeagueRes.success_message == "Success") {
+        toast.success(`Result posted in Section ${currentSection + 1}`, { autoClose: 2000 });
+        updateLadderToken({
+          user_id: selectedPlayer.name,
+          ladder_id : effectiveLadderId,
+          ladder_type: "minileague",
+        })
+      }else{
+          toast.error("Failed to post result. Please try again.");
+      }
 
       await Promise.all([
         dispatch(fetchMiniLeague({ ladder_id: effectiveLadderId })),
         dispatch(fetchUserActivity({ ladder_id: effectiveLadderId })),
       ]);
 
-      // toast.success(`Result posted in Section ${currentSection + 1}`, { autoClose: 2000 });
       setShowConfirm(false);
       resetForm();
       onClose();
@@ -365,7 +376,7 @@ const MoveNumberMinileague = ({
         )}
 
         <h3 className="text-sm mb-2 sm:text-lg font-bold text-violet-200 text-center">
-          Record Match Result 
+          Record Match Result
           <span className="text-sm text-blue-400 block">
             {sectionName}
             <span className="text-green-400 ml-1">
@@ -433,11 +444,11 @@ const MoveNumberMinileague = ({
             </div>
 
             <div className="py-1 px-2 mt-1 rounded-md bg-yellow-200">
-                <p className="text-center text-black font-semibold">
-                  Please make absolutely certain you enter the correct score.
-                  <br />
-                  <span className="text-red-600">This cannot be undone</span>
-                </p>
+              <p className="text-center text-black font-semibold">
+                Please make absolutely certain you enter the correct score.
+                <br />
+                <span className="text-red-600">This cannot be undone</span>
+              </p>
             </div>
           </div>
         )}
@@ -446,7 +457,7 @@ const MoveNumberMinileague = ({
         <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-3 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
           <div className="w-full md:w-1/2 flex flex-col items-center md:items-start">
             <p className="text-base font-medium mb-2 text-gray-300">
-              Enter Challenged Rank 
+              Enter Challenged Rank
               <span className="text-green-400 font-semibold ml-2">
                 {sectionName}
               </span>
@@ -468,8 +479,8 @@ const MoveNumberMinileague = ({
                 text-violet-400
                 tracking-widest
                 rounded-xl
-                ${selectedNumber && isValidRankForSection(selectedNumber) 
-                  ? 'border-green-500 ring-2 ring-green-500/30' 
+                ${selectedNumber && isValidRankForSection(selectedNumber)
+                  ? 'border-green-500 ring-2 ring-green-500/30'
                   : 'border-violet-500'
                 }
               `}
@@ -483,76 +494,47 @@ const MoveNumberMinileague = ({
                 </p>
               </div>
             )}
-            
+
             {selectedNumber && !isValidRankForSection(selectedNumber) && (
               <p className="text-md font-semibold text-red-400 mt-1 text-justify ">
                 can only post results against players in your minileague section
-                Rank <span className="text-yellow-400">{selectedNumber}</span> not in your section. <span className="text-yellow-400">Available: {availableRanks.slice(0, 6).join(', ')}{availableRanks.length > 6 ? '...' : ''}</span> 
+                Rank <span className="text-yellow-400">{selectedNumber}</span> not in your section. <span className="text-yellow-400">Available: {availableRanks.slice(0, 6).join(', ')}{availableRanks.length > 6 ? '...' : ''}</span>
               </p>
             )}
           </div>
 
-          {/* <div className="w-full md:w-1/3 max-w-xs grid grid-cols-3 gap-2">
-            {numberButtons.map((num) => (
-              <motion.button
-                key={num}
-                onClick={() => handleNumberClick(num)}
-                style={{ touchAction: "manipulation" }}
-                whileTap={{ scale: 0.95 }}
-                className="
-                  h-8
-                  w-full
-                  bg-gray-700
-                  text-gray-100
-                  hover:bg-violet-600
-                  transition-all
-                  text-xl
-                  font-bold
-                  rounded-xl
-                  shadow-lg
-                  border
-                  border-gray-600
-                "
-              >
-                {num}
-              </motion.button>
-            ))}
-          </div> */}
-
-
-
           <div className="w-full md:w-1/4 max-w-xs grid grid-cols-3 gap-2">
-  {numberButtons.map((num) => {
-    if (num === 0) {
-  return (
-    <div key="zero-row" className="contents">
-      <div />
-      <motion.button
-        onClick={() => handleNumberClick(num)}
-        whileTap={{ scale: 0.95 }}
-        className="h-8 w-full bg-gray-700 text-center text-gray-100 hover:bg-violet-600 transition-all text-xl font-bold rounded-xl shadow-lg border border-gray-600"
-      >
-        {num}
-      </motion.button>
-      <div />
-    </div>
-  );
-}
+            {numberButtons.map((num) => {
+              if (num === 0) {
+                return (
+                  <div key="zero-row" className="contents">
+                    <div />
+                    <motion.button
+                      onClick={() => handleNumberClick(num)}
+                      whileTap={{ scale: 0.95 }}
+                      className="h-8 w-full bg-gray-700 text-center text-gray-100 hover:bg-violet-600 transition-all text-xl font-bold rounded-xl shadow-lg border border-gray-600"
+                    >
+                      {num}
+                    </motion.button>
+                    <div />
+                  </div>
+                );
+              }
 
 
-    return (
-      <motion.button
-        key={num}
-        onClick={() => handleNumberClick(num)}
-        style={{ touchAction: "manipulation" }}
-        whileTap={{ scale: 0.95 }}
-        className="h-8 w-full bg-gray-700 text-gray-100 hover:bg-violet-600 transition-all text-xl font-bold rounded-xl shadow-lg border border-gray-600"
-      >
-        {num}
-      </motion.button>
-    );
-  })}
-</div>
+              return (
+                <motion.button
+                  key={num}
+                  onClick={() => handleNumberClick(num)}
+                  style={{ touchAction: "manipulation" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="h-8 w-full bg-gray-700 text-gray-100 hover:bg-violet-600 transition-all text-xl font-bold rounded-xl shadow-lg border border-gray-600"
+                >
+                  {num}
+                </motion.button>
+              );
+            })}
+          </div>
 
         </div>
 
@@ -589,12 +571,11 @@ const MoveNumberMinileague = ({
               <AlertDialogDescription className="text-gray-200 mt-4 space-y-4 text-sm">
                 {/* Match Details Card */}
                 <div>
-                
-                  <div className={`py-3 px-4 rounded text-md font-bold mx-auto w-fit ${
-                    isWin 
-                      ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
-                      : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                  }`}>
+
+                  <div className={`py-3 px-4 rounded text-md font-bold mx-auto w-fit ${isWin
+                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                    : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                    }`}>
                     {isWin ? 'WIN' : ' LOSS'} ({score}) vs #{selectedNumber} ({challengedPlayer?.name})
                   </div>
                 </div>
@@ -608,7 +589,7 @@ const MoveNumberMinileague = ({
                         Please verify all details carefully.
                         This action cannot be undone.
                       </p>
-                   
+
                     </div>
                   </div>
                 </div>
@@ -618,13 +599,12 @@ const MoveNumberMinileague = ({
               <AlertDialogCancel className="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-600 h-11">
                 <ArrowLeft className="h-4 w-4 mr-2" /> Go Back
               </AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={confirmMove} 
-                className={`w-full sm:w-auto h-11 font-semibold ${
-                  isWin 
-                    ? 'bg-green-600 hover:bg-green-700 border-green-500/50' 
-                    : 'bg-red-600 hover:bg-red-700 border-red-500/50'
-                }`}
+              <AlertDialogAction
+                onClick={confirmMove}
+                className={`w-full sm:w-auto h-11 font-semibold ${isWin
+                  ? 'bg-green-600 hover:bg-green-700 border-green-500/50'
+                  : 'bg-red-600 hover:bg-red-700 border-red-500/50'
+                  }`}
                 disabled={isConfirming}
               >
                 {isConfirming ? (

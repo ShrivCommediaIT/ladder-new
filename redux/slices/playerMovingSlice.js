@@ -5,42 +5,6 @@ import axios from "axios";
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
-/* -------------------------------------------------------
-   🔥 1) NORMAL RESULT SAVE API (BEST 3 / WIN-LOSE)
-------------------------------------------------------- */
-// export const movePlayer = createAsyncThunk(
-//   "playerMoving/movePlayer",
-//   async (
-//     { user_id, move_from_user_id, move_to_rank, move_from_rank, ladder_id, match_status, score, bet = "" },
-//     { rejectWithValue }
-//   ) => {
-//     try {
-//       const params = { user_id, ladder_id, match_status, move_to_rank, move_from_user_id, score };
-
-//       if (match_status === "beat" && move_from_rank) params.move_from_rank = move_from_rank;
-//       if (match_status === "lost") params.move_to_rank = move_to_rank;
-
-//       const response = await axios.get(
-//         "https://ne-games.com/leaderBoard/api/user/result/save",
-//         { params, headers: { APPKEY } }
-//       );
-
-//       const data = response.data;
-
-//       if (data.status === 200) {
-//         return {
-//           success_message:
-//             data.message || (match_status === "beat" ? "Move Successful" : "Result Saved (Lost)"),
-//           result: data,
-//         };
-//       } else {
-//         return rejectWithValue(data.message || "Move failed");
-//       }
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data?.message || error.message);
-//     }
-//   }
-// );
 
 
 export const movePlayer = createAsyncThunk(

@@ -13,6 +13,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
+import { updateLadderToken } from "@/helper/helperApi";
 
 const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
@@ -24,6 +26,7 @@ export default function BasicLeaderboardActivityEntryCard({
   skillActivityId,
   initialActivity,
   onClose,
+  playerName
 }) {
   const [selectedActivity, setSelectedActivity] = useState(
     initialActivity || 1,
@@ -253,7 +256,9 @@ export default function BasicLeaderboardActivityEntryCard({
 
     let finalScore;
     let URl;
+    let ladderTypeUpdate
     if (type === "negative" || ladderType === "negative") {
+      ladderTypeUpdate = "negative"
       URl = "user/postResultNegativeSkillboard";
       finalScore =
         "00:" +
@@ -261,7 +266,7 @@ export default function BasicLeaderboardActivityEntryCard({
     } else {
       URl = "user/postResultSkillboard";
       const num = Math.abs(Number(value) || 0);
-
+      ladderTypeUpdate = "positive"
       if (num === 0) {
         setOpenZeroAlert(true);
         return;
@@ -291,6 +296,17 @@ export default function BasicLeaderboardActivityEntryCard({
           },
         },
       );
+
+      if (res.status == 200) {
+        toast.success("Result posted successfully! ");
+        updateLadderToken({
+          user_id: playerName,
+          ladder_id:ladderId,
+          ladder_type: ladderTypeUpdate,
+        })
+      } else {
+        toast.error("Failed to post result. Please try again.");
+      }
 
       setOpenSuccess(true);
     } catch (err) {

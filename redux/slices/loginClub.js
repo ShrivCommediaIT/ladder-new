@@ -1,47 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-
-
-// ---------------------- THUNK ----------------------
-// export const loginClub = createAsyncThunk(
-//   "auth/loginClub",
-//   async ({ club_id, pin }, { rejectWithValue }) => {
-//     try {
-//       const payload = JSON.stringify({
-//         login_id: club_id,   // club_id
-//         password: pin,       // club PIN
-//         user_type: "admin",  // fixed internally
-//       });
-
-//       const res = await axios.post(
-//         "https://ne-games.com/leaderBoard/api/app/user/login",
-//         payload,
-//         {
-//           headers: {
-//             APPKEY:
-//               "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-//             "Content-Type": "application/json",
-//           },
-//         }
-//       );
-
-//       if (res.data?.status === false) {
-//         return rejectWithValue(res.data?.message || "Login failed");
-//       }
-
-//       return res.data; // contains user info, token, etc.
-//     } catch (err) {
-//       return rejectWithValue(
-//         err?.response?.data?.message || err.message || "Server error"
-//       );
-//     }
-//   }
-// );
-
-
-
-
 export const loginClub = createAsyncThunk(
   "auth/loginClub",
   async ({ club_id, pin }, { rejectWithValue, dispatch }) => {
