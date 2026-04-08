@@ -10,7 +10,6 @@ const headers = {
 };
 
 export const updateLadderToken = async (payload) => {
-    console.log("skillsPost==>1", payload);
 
     const adminDetails = JSON.parse(localStorage.getItem("adminDetails"));
     payload.admin_id = adminDetails.id

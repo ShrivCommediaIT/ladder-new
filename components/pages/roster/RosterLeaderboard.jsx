@@ -10,9 +10,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import Logo from "@/public/logo1.png";
 import LadderLinkPanel from "../players/LadderLinkPanel";
+import RedeemModal from "./RedeemModal";
 
 // ✅ Player Card
-const PlayerCard = ({ player, rank }) => {
+const PlayerCard = ({ player, rank, onRedeemClick }) => {
+  
   const playerImageUrl = player.image
     ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
     : Logo;
@@ -29,25 +31,30 @@ const PlayerCard = ({ player, rank }) => {
       {rank}
     </div>
     <div className="min-w-0">
-      <div className="text-white font-semibold text-sm truncate">{player?.name || "N/A"}</div>
-      <div className="text-gray-300 text-xs truncate">{player?.phone || "N/A"}</div>
+      <div className="text-white font-semibold text-sm truncate">{player?.name ?? "N/A"}</div>
+      <div className="text-gray-300 text-xs truncate">{player?.phone ?? "N/A"}</div>
     </div>
   </div>
 
   {/* Status + Tokens */}
   <div className="flex flex-col gap-1 flex-shrink-0 w-[35%]">
     <div className="border border-white text-white text-xs px-2 py-0.5 w-fit">
-      {"status : " + player?.token_status || "Status: Club Icon"}
+      {"status : " + player?.token_status ?? "Status: Club Icon"}
     </div>
     <div className="text-white text-sm">
-      Tokens - {player?.today_token || "N/A"}{" "}
-      <span className="text-[#48aaa8] font-semibold cursor-pointer hover:underline">Redeem</span>
+      Tokens - {player?.today_token ?? "N/A"}{" "}
+     <span
+        onClick={() => onRedeemClick(player)}
+        className="text-[#48aaa8] font-semibold cursor-pointer hover:underline"
+      >
+        Redeem
+      </span>   
     </div>
   </div>
 
   {/* Total */}
   <div className="flex-shrink-0 w-[15%] text-white text-xs">
-    Total = {player?.total_token || "N/A"}
+    Total = {player?.total_token ?? "N/A"}
   </div>
 
   {/* Avatar */}
@@ -73,13 +80,18 @@ const PlayerCard = ({ player, rank }) => {
       </div>
       <div className="flex flex-col min-w-0">
         <div className="border border-white text-white text-[10px] px-1.5 py-0.5 w-fit mb-1 leading-tight">
-           {"status : " + player?.token_status || "Status: Club Legend"}
+           {"status : " + player?.token_status ?? "Status: Club Legend"}
         </div>
-        <div className="text-white font-bold text-xs truncate">{player?.name || "N/A"}</div>
-        <div className="text-gray-300 text-[10px]">{player?.phone || "N/A"}</div>
+        <div className="text-white font-bold text-xs truncate">{player?.name ?? "N/A"}</div>
+        <div className="text-gray-300 text-[10px]">{player?.phone ?? "N/A"}</div>
         <div className="text-white text-[11px] mt-0.5">
-          {player?.today_token || "N/A"} to{" "}
-          <span className="text-[#48aaa8] font-semibold cursor-pointer">Redeem</span>
+          {player?.today_token ?? "N/A"} to{" "}
+          <span
+          onClick={() => onRedeemClick(player)}
+          className="text-[#48aaa8] font-semibold cursor-pointer hover:underline"
+        >
+          Redeem
+        </span>
         </div>
       </div>
     </div>
@@ -88,7 +100,7 @@ const PlayerCard = ({ player, rank }) => {
     <div className="flex flex-col items-center flex-shrink-0">
       <div className="text-white text-[10px] font-medium text-center leading-tight">Total<br />Tokens</div>
       <div className="bg-white text-black font-bold text-base px-3 py-0.5 mt-1 min-w-[44px] text-center rounded-sm">
-        {player?.total_token || "N/A"}
+        {player?.total_token ?? "N/A"}
       </div>
     </div>
 
@@ -102,7 +114,6 @@ const PlayerCard = ({ player, rank }) => {
     </div>
 
   </div>
-
 </div>
   );
 };
@@ -119,12 +130,17 @@ const RosterLeaderboard = () => {
     (state) => state.rosterLeaderboard,
   );
 
+const [selectedPlayer, setSelectedPlayer] = useState(null);
+const [redeemOpen, setRedeemOpen] = useState(false);
+const [historyData, setHistoryData] = useState([]);
+const [loadingHistory, setLoadingHistory] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
   const refreshRef = useRef(false);
 
   // ✅ Fetch roster leaderboard only
   const loadRoster = useCallback(() => {
-    if (!ladderId || refreshRef.current) return;
+    if (!ladderId ?? refreshRef.current) return;
     refreshRef.current = true;
 
     dispatch(fetchRosterLeaderboard({ ladder_id: ladderId })).finally(() => {
@@ -172,15 +188,6 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
   return Number(a.rank || 0) - Number(b.rank || 0);
 });
 
-
-
-  const filtered = cleaned
-    ? data.filter((p) =>
-        p.name?.toLowerCase().replace(/\s+/g, "").includes(cleaned),
-      )
-    : data;
-
-
   // ✅ group by gradebar preset (roster section)
   const groupSize = 6;
 
@@ -194,15 +201,42 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
     });
   }
 
+  const handleRedeemClick = async (player) => {
+  setSelectedPlayer(player);
+  setRedeemOpen(true);
+  setLoadingHistory(true);
+
+  try {
+    const admin = JSON.parse(localStorage.getItem("adminDetails"));
+
+    const res = await fetch(
+      `https://ne-games.com/leaderBoard/api/user/tokenHistory?user_id=${player.name}&admin_id=${admin.id}`,
+      {
+        headers: {
+          APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
+        },
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.status === true) {
+      setHistoryData(data.data || []);
+    } else {
+      setHistoryData([]);
+    }
+  } catch (err) {
+    console.error(err);
+    setHistoryData([]);
+  } finally {
+    setLoadingHistory(false);
+  }
+};
+
+
   return (
     <div className="space-y-5">
       <ToastContainer />
-
-      {/* Ladder Name */}
-      {/* <h1 className="text-3xl font-bold text-white">
-        {ladderDetails?.name || "Roster"}
-      </h1> */}
-
       <div>
         <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />
       </div>
@@ -228,20 +262,25 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
       {!loading &&
         sections.map((section, idx) => (
           <div key={idx}>
-            {/* <div className="bg-gradient-to-r from-[#0f3a4a] to-[#1e60aa] text-white font-bold px-4 py-2 rounded mb-3">
-            {section.label}
-          </div> */}
-
             {section.players.map((player, i) => (
               <PlayerCard
                 key={player.id}
                 player={player}
                 rank={player.rank || i + 1}
+                onRedeemClick={handleRedeemClick}
               />
             ))}
           </div>
         ))}
+        <RedeemModal
+          open={redeemOpen}
+          onClose={() => setRedeemOpen(false)}
+          player={selectedPlayer}
+          history={historyData}
+          loading={loadingHistory}
+        />
     </div>
+    
   );
 };
 
