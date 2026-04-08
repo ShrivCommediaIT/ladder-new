@@ -37,6 +37,7 @@ import { motion } from "framer-motion";
 
 import { importSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { importRoster } from "@/redux/slices/rosterSlice";
+import CreatePanel from "@/components/shared/CreatePanel";
 
 export default function SubAdminDashboard() {
   const [ladderName, setLadderName] = useState("");
@@ -182,7 +183,7 @@ export default function SubAdminDashboard() {
     console.log("ladderType:", ladderType);
     try {
       // CREATE LADDER
-      const firstnameCapitalized =  subAdmin.sport_name.charAt(0).toUpperCase() + subAdmin.sport_name.slice(1)
+      const firstnameCapitalized = subAdmin.sport_name.charAt(0).toUpperCase() + subAdmin.sport_name.slice(1)
 
       const ladderResult = await dispatch(
         createLadder({
@@ -421,153 +422,18 @@ export default function SubAdminDashboard() {
           </div>
 
           {/* RIGHT SIDE CREATE PANEL */}
-          <div className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl p-4 sm:p-6 rounded-3xl">
-            <h3 className="text-lg font-bold text-cyan-400 flex items-center gap-2 mb-4">
-              <Users className="h-5 w-5" /> Create a Solution
-            </h3>
-
-            <div className="space-y-4">
-              {/* LADDER NAME */}
-              <div>
-                <Label className="text-md text-white">
-                  Name :
-                </Label>
-                <div className="flex gap-2">
-                <Input
-                  value={subAdmin?.sport_name}
-                  className="mt-1 w-25 h-11 rounded-xl bg-white/10 border-white/10 text-white"
-                  placeholder="Enter - Sport Then Title of Solution"
-                  readOnly
-                />
-                <Input
-                  value={ladderName}
-                  onChange={(e) => setLadderName(e.target.value)}
-                  className="mt-1 h-11 rounded-xl bg-white/10 border-white/10 text-white"
-                  placeholder="Name of the Solution"
-                />
-                </div>
-              </div>
-
-              {/* TYPE SELECT */}
-              <div>
-                <Label className="text-md text-white">Choose Type : </Label>
-                <select
-                  value={ladderType}
-                  onChange={(e) => {setLadderType(e.target.value); console.log("ladderType:", e.target.value);}}
-                  className="mt-1 h-11 w-full rounded-xl bg-white/10 border border-white/10 px-3 text-white"
-                >
-                  <option className="bg-black" value="winlose">
-                    Win / Lose Ladder
-                  </option>
-                  <option className="bg-black" value="best3">
-                    Best of 3 Ladder
-                  </option>
-                  <option className="bg-black" value="best5">
-                    Best of 5 Ladder
-                  </option>
-                  <option className="bg-black" value="minileague">
-                    MiniLeagues
-                  </option>
-                  <option className="bg-black" value="skill">
-                    Skills/Performance Leaderboards
-                  </option>
-                   <option className="bg-black" value="roster">
-                    Roster
-                  </option>
-                   <option className="bg-black" value="positive">
-                    Positive LeaderBoard
-                  </option>
-                  <option className="bg-black" value="negative">
-                    Negative LeaderBoard
-                  </option>
-                 
-                  
-                </select>
-              </div>
-
-              {/* CSV UPLOAD */}
-              {/* <div>
-                <Label className="text-md text-white">Players CSV</Label>
-                <label className="group flex flex-col items-center justify-center h-32 rounded-2xl border border-dashed border-white/20 bg-white/5 hover:bg-white/10 transition cursor-pointer relative">
-                  <div className="pointer-events-none flex flex-col items-center gap-2">
-                    <UploadCloud className="w-6 h-6 text-cyan-300" />
-                    <p className="text-xs text-white/70">Click or drag CSV</p>
-                  </div>
-
-                  <Input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileChange}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                  />
-                </label>
-
-                {csvFile && (
-                  <div className="flex justify-between mt-2 bg-black/30 border border-white/10 px-3 py-2 rounded-xl">
-                    <span className="text-[11px] text-cyan-300 truncate">
-                      {csvFile.name}
-                    </span>
-                    <span className="text-[10px] text-green-400 font-semibold">
-                      Ready
-                    </span>
-                  </div>
-                )}
-              </div> */}
-
-
-              <div>
-  <Label className="text-md text-white">Players CSV</Label>
-
-    {/* CSV Instruction Text */}
-  <div className="mt-1 text-xs text-white/70 bg-black/40 border border-white/10 rounded-lg p-3">
-    <p className="font-semibold text-white mb-1">CSV Instructions</p>
-    <p>Csv files need to have either:</p>
-    <p>(1) Just names in Column A</p>
-    <p>(2) Names in Column A and Phone Numbers in Column B</p>
-  </div>
-
-  <label className="group flex flex-col items-center justify-center h-32 rounded-2xl border border-dashed border-white/20 bg-white/5 hover:bg-white/10 transition cursor-pointer relative">
-    <div className="pointer-events-none flex flex-col items-center gap-2">
-      <UploadCloud className="w-6 h-6 text-cyan-300" />
-      <p className="text-xs text-white/70">Click or drag CSV</p>
-    </div>
-
-    <Input
-      type="file"
-      accept=".csv"
-      onChange={handleFileChange}
-      className="absolute inset-0 opacity-0 cursor-pointer"
-    />
-  </label>
-
-  {csvFile && (
-    <div className="flex justify-between mt-2 bg-black/30 border border-white/10 px-3 py-2 rounded-xl">
-      <span className="text-[11px] text-cyan-300 truncate">
-        {csvFile.name}
-      </span>
-      <span className="text-[10px] text-green-400 font-semibold">
-        Ready
-      </span>
-    </div>
-  )}
-
-
-</div>
-
-              {/* BUTTON */}
-              <Button
-                onClick={handleCreateLadder}
-                disabled={!ladderName || !csvFile || loading}
-                className="w-full h-12 rounded-2xl text-base font-bold bg-gray-800 border-t border-b border-cyan-500 shadow-xl active:scale-95"
-              >
-                {loading ? "Creating..." : "Create Solution"}
-              </Button>
-            </div>
-
-            {/* <div className="mt-12 flex items-center rounded-md shadow justify-center bg-slate-900">
-              <GenerateAccessCodes />
-            </div> */}
-          </div>
+          <CreatePanel
+            role="subadmin"
+            ladderName={ladderName}
+            setLadderName={setLadderName}
+            ladderType={ladderType}
+            setLadderType={setLadderType}
+            csvFile={csvFile}
+            handleFileChange={handleFileChange}
+            handleCreate={handleCreateLadder}
+            loading={loading}
+            sportName={subAdmin?.sport_name}
+          />
         </div>
       </div>
 

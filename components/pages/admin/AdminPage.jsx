@@ -1,9 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { importRoster } from "@/redux/slices/rosterSlice";
@@ -12,32 +9,21 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import {
   createLadder,
-  clearCreateLadderState,
 } from "@/redux/slices/ladderSlice";
-import { uploadCSV } from "@/redux/slices/leaderboardSlice";
-import { setLadderId } from "@/redux/slices/userSlice";
 import { fetchLadders } from "@/redux/slices/fetchLadderSlice";
 
 import { Card, CardContent } from "@/components/ui/card";
 
 // ⭐ MiniLeague Imports
-import { importMiniLeague } from "@/redux/slices/minileagueSlice";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import Link from "next/link";
 import { Layers, Users, UploadCloud, ListChecks, Play } from "lucide-react";
 
 import UserDetails from "@/components/shared/UserDetails";
 import LadderList from "./LadderList";
-import LadderInfo from "./LadderInfo";
 
-import { motion } from "framer-motion";
-
-import { importSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
-
-import { Info, X } from "lucide-react"; // X icon for close button
 import {
   Popover,
   PopoverContent,
@@ -46,17 +32,14 @@ import {
 import AdminImportantInfo from "./info/AdminImportantInfo";
 import AdminHideShowInfo from "./info/AdminHideShowInfo";
 import DemoLadder from "./DemoLadder";
-import OnboardingCard from "./OnboardingCard";
-import OnboardingModal from "./OnboardingModal";
+import CreatePanel from "@/components/shared/CreatePanel";
 
 export default function AdminPage() {
   const [ladderName, setLadderName] = useState("");
   const [csvFile, setCsvFile] = useState(null);
-  const [ladderType, setLadderType] = useState("winlose");
   const [duplicateWarning, setDuplicateWarning] = useState(null);
 
   const [solutionsOpen, setSolutionsOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
   const [openQuickDesktop, setOpenQuickDesktop] = useState(false);
   const [openQuickMobile, setOpenQuickMobile] = useState(false);
 
@@ -67,39 +50,20 @@ export default function AdminPage() {
 
   const loading = useSelector((state) => state.createLadder?.loading);
 
-  const [user, setUser] = useState(null);
+  const [admin, setAdmin] = useState(null);
 
-  const isAdmin = user?.user_type === "admin";
-  const isClubUser = user?.user_type === "user";
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      // Check for admin first
-      const storedAdmin = localStorage.getItem("userData");
+      const storedAdmin = localStorage.getItem("adminDetails");
       if (storedAdmin) {
         try {
           const parsed = JSON.parse(storedAdmin);
-          const finalUser = parsed.user || parsed; // admin object
-          setUser(finalUser);
-          return; // admin found, return early
+          setAdmin(parsed);
+          return; 
         } catch (err) {
           console.error(err);
         }
       }
-
-      // Check for subAdmin
-      const storedSubAdmin = localStorage.getItem("subAdmin");
-      if (storedSubAdmin) {
-        try {
-          const parsedSub = JSON.parse(storedSubAdmin);
-          const subAdminUser = parsedSub.user || parsedSub; // get subAdmin object
-          setUser(subAdminUser);
-        } catch (err) {
-          console.error(err);
-          setUser(null);
-        }
-      }
-    }
   }, []);
 
   const checkCsvDuplicates = (file) => {
@@ -181,128 +145,98 @@ export default function AdminPage() {
     );
   };
 
-  const handleCreateLadder = async () => {
-    if (duplicateWarning) {
-      toast.warn("Please remove duplicate names first");
+const handleCreateRoster = async () => {
+  const ladderType = "roster";
+
+  // ✅ CSV duplicate check
+  if (duplicateWarning) {
+    toast.warn("Please remove duplicate names first");
+    return;
+  }
+
+  const cleanName = ladderName.trim();
+
+  // ✅ basic validation
+  if (!admin?.id || !cleanName || !csvFile) {
+    toast.warn("Please enter roster name, upload CSV, and ensure login.");
+    return;
+  }
+
+  // ✅ duplicate ladder name check
+  if (ladderExists(cleanName)) {
+    toast.error("Roster name already exists — choose another");
+    return;
+  }
+
+  try {
+    // ✅ CREATE LADDER
+    const ladderResult = await dispatch(
+      createLadder({
+        user_id: admin.id,
+        name: cleanName,
+        type: ladderType,
+      })
+    ).unwrap();
+
+    // ✅ SAFE ID extraction (same as subadmin)
+    const createdLadderId =
+      ladderResult?.data?.ladder_id ??
+      ladderResult?.data?.id ??
+      ladderResult?.data?.data?.ladder_id ??
+      ladderResult?.data?.data?.id ??
+      ladderResult?.ladder_id ??
+      ladderResult?.id ??
+      ladderResult?.insertId ??
+      ladderResult?.ladder?.id;
+
+    if (!createdLadderId) {
+      toast.error("Roster created but ID missing");
       return;
     }
 
-    const cleanName = ladderName.trim();
+    // ✅ IMPORT ROSTER CSV
+    await dispatch(
+      importRoster({
+        file: csvFile,
+        ladder_id: createdLadderId,
+      })
+    ).unwrap();
 
-    if (!user?.id || !cleanName || !csvFile) {
-      toast.warn("Please enter solution name, upload CSV, and ensure login.");
-      return;
+    toast.success("Roster created successfully!");
+
+    // ✅ refresh list (same pattern)
+    dispatch(
+      fetchLadders({
+        userId: admin.id,
+      })
+    );
+
+    // ✅ reset state
+    setLadderName("");
+    setCsvFile(null);
+
+    // ✅ redirect (optional but recommended)
+    setTimeout(() => {
+      router.push(
+        `/player-list?ladder_id=${createdLadderId}&type=roster`
+      );
+    }, 800);
+
+  } catch (error) {
+    console.error(error);
+
+    const msg =
+      error?.response?.data?.error_message ||
+      error?.message ||
+      "Create failed";
+
+    if (msg.toLowerCase().includes("exist")) {
+      toast.error("Roster name already exists");
+    } else {
+      toast.error(msg);
     }
-
-    // FRONTEND DUPLICATE CHECK
-    if (ladderExists(cleanName)) {
-      toast.error("Solution name already exists — choose another");
-      return;
-    }
-
-    try {
-      // CREATE LADDER
-      const ladderResult = await dispatch(
-        createLadder({
-          user_id: user.id,
-          created_by: user.id,
-          name: cleanName,
-          type: ladderType,
-        }),
-      ).unwrap();
-
-      // SAFE LADDER ID EXTRACTOR
-      const createdLadderId =
-        ladderResult?.data?.ladder_id ??
-        ladderResult?.data?.id ??
-        ladderResult?.data?.data?.ladder_id ??
-        ladderResult?.data?.data?.id ??
-        ladderResult?.ladder_id ??
-        ladderResult?.id ??
-        ladderResult?.insertId ??
-        ladderResult?.ladder?.id;
-
-      if (!createdLadderId) {
-        toast.error("Solution created but ID missing");
-        return;
-      }
-
-      dispatch(setLadderId(createdLadderId));
-      dispatch(clearCreateLadderState());
-
-      toast.success("Solution created!");
-
-      // IMPORT CSV BASED ON TYPE
-      if (ladderType === "minileague") {
-        await dispatch(
-          importMiniLeague({
-            file: csvFile,
-            ladder_id: createdLadderId,
-            name: cleanName,
-            type: ladderType,
-          }),
-        ).unwrap();
-
-        toast.success("MiniLeague users imported!");
-      } else if (ladderType === "skill") {
-        await dispatch(
-          importSkillLeaderboard({
-            file: csvFile,
-            ladder_id: createdLadderId,
-          }),
-        ).unwrap();
-
-        toast.success("Skill leaderboard imported!");
-      } else if (ladderType === "roster") {
-        await dispatch(
-          importRoster({
-            file: csvFile,
-            ladder_id: createdLadderId,
-          }),
-        ).unwrap();
-
-        toast.success("Roster imported!");
-      } else {
-        await dispatch(
-          uploadCSV({
-            file: csvFile,
-            ladder_id: createdLadderId,
-            type: ladderType,
-          }),
-        ).unwrap();
-
-        toast.success("Users imported successfully!");
-      }
-
-      // refresh ladder list
-      dispatch(fetchLadders(user.id));
-
-      // reset
-      setLadderName("");
-      setCsvFile(null);
-      setLadderType("winlose");
-
-      // redirect
-      setTimeout(() => {
-        router.push(
-          `/player-list?ladder_id=${createdLadderId}&type=${ladderType}`,
-        );
-      }, 800);
-    } catch (error) {
-      console.error(error);
-
-      const msg =
-        error?.response?.data?.error_message ||
-        error?.message ||
-        "Create failed";
-
-      if (msg.toLowerCase().includes("exist")) {
-        toast.error("Solution name already exists");
-      } else {
-        toast.error(msg);
-      }
-    }
-  };
+  }
+};
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-[#05070f] via-[#0c1224] to-black text-white">
@@ -312,7 +246,6 @@ export default function AdminPage() {
         hideProgressBar
         theme="dark"
       />
-      {/* <OnboardingModal /> */}
 
       {/* HEADER MOBILE */}
       <div className="sticky top-0 z-20 sm:hidden flex justify-between px-4 py-3 bg-black/70 backdrop-blur-xl border-b border-white/10">
@@ -415,7 +348,7 @@ export default function AdminPage() {
             {/* LADDER LIST */}
             <div className="rounded-2xl bg-black/20 border border-white/10 p-3">
               <div className="">
-                <LadderList userId={user?.id} />
+                <LadderList userId={admin?.id} />
               </div>
             </div>
           </div>
@@ -453,9 +386,19 @@ export default function AdminPage() {
               </Popover>
             </div>
 
-            {/* <div className="text-white mt-12">
-              <OnboardingCard />
-            </div> */}
+            <div className="text-white mt-12">
+              <CreatePanel
+                role="admin"
+                ladderName={ladderName}
+                setLadderName={setLadderName}
+                ladderType="roster"
+                setLadderType={() => { }}
+                csvFile={csvFile}
+                handleFileChange={handleFileChange}
+                handleCreate={handleCreateRoster}
+                loading={loading}
+              />
+            </div>
           </div>
 
 
