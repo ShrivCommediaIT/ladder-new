@@ -12,10 +12,9 @@ const APPKEY =
 const ContactAdmin = () => {
     const searchParams = useSearchParams();
     const ladderId = searchParams.get("ladder_id");
-    console.log("ladderId : ", ladderId);
-  const [adminDetails, setAdminDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
+    const [adminDetails, setAdminDetails] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [copied, setCopied] = useState(false);
 
 
   useEffect(() => {

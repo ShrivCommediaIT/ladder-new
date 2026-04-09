@@ -32,6 +32,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import PlayerBet from "../pages/players/PlayerBet";
+import { updateLadderToken } from "@/helper/helperApi";
 
 const MovePlayerMinileague = ({
   onClose,
@@ -44,7 +45,7 @@ const MovePlayerMinileague = ({
   currentSectionIndex,
 }) => {
   const dispatch = useDispatch();
-
+  
   const fallbackLadderId = useSelector((state) => state.user?.user?.ladder_id);
   const effectiveLadderId = ladderId || fallbackLadderId;
 
@@ -251,7 +252,18 @@ const MovePlayerMinileague = ({
         move_to_section: toSectionName,
       };
 
-      await dispatch(moveMiniLeague(payload)).unwrap();
+      const moveMiniLeagueRes = await dispatch(moveMiniLeague(payload)).unwrap();
+            
+            if (moveMiniLeagueRes.success_message == "Success") {
+              toast.success(`Result posted in ${sectionName}`, { autoClose: 2000 });
+              updateLadderToken({
+                user_id: selectedPlayer.name,
+                ladder_id : effectiveLadderId,
+                ladder_type: "minileague",
+              })
+            }else{
+                toast.error("Failed to post result. Please try again.");
+            }
 
       await Promise.all([
         dispatch(fetchMiniLeague({ ladder_id: effectiveLadderId })),

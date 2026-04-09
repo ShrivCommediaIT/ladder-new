@@ -283,7 +283,7 @@ export default function BasicLeaderboardActivityEntryCard({
           <DialogHeader>
             <DialogTitle className="text-emerald-500 text-xl font-bold">Score Saved</DialogTitle>
             <DialogDescription className="text-lg">
-              Recorded score: <b>{value}</b> <br />
+              Recorded score: <b>{value == "-" ? "Reset" :value}</b> <br />
               Witness: <b>{witnessBy}</b>
             </DialogDescription>
           </DialogHeader>

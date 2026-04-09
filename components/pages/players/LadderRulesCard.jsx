@@ -159,10 +159,12 @@ const LadderRulesCard = ({ ladderIdProp }) => {
 
                 {isOpen && (
                   <div className="pt-2">
-                    <p className="mt-2 bg-gray-900/70 p-6 text-gray-200 rounded-xl text-base sm:text-lg max-h-[380px] overflow-y-auto border border-gray-800">
-                      {rule.rules || "No rules available."}
-                    </p>
-
+                    <div
+                      className="mt-2 bg-gray-900/70 p-6 text-gray-200 rounded-xl text-base sm:text-lg max-h-[380px] overflow-y-auto border border-gray-800 space-y-3 leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: rule.rules || "No rules available.",
+                      }}
+                    />
                     <div className="flex flex-col sm:flex-row mt-4 justify-end gap-3 w-full">
                       <Button
                         className="bg-blue-900 text-white hover:bg-blue-950 w-full sm:w-auto flex items-center gap-2"

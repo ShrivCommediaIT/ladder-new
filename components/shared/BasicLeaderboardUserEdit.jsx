@@ -40,6 +40,7 @@ export const BasicLeaderboardUserEdit = ({
   const ladder_id =
     Number(propLadderId) || Number(searchParams.get("ladder_id"));
   const type = searchParams.get("type")
+  const ladderType = searchParams.get("ladder_type")
   // ✅ Player data (skill leaderboard)
   const playersSkills = useSelector((state) => state.skillLeaderboard?.data || []);
   const playersPositive = useSelector((state) => state.positiveLeaderBoard?.data || []);
@@ -62,13 +63,13 @@ export const BasicLeaderboardUserEdit = ({
   }, [result, moveError, dispatch]);
 
   useEffect(() => {
-    if (type === "skill" && playersSkills){
+    if ((type === "skill" || ladderType ==  "skill" ) && playersSkills){
       const selectedPlayer = playersSkills.find((p) => Number(p.id) === Number(playerId));
       setPlayers(selectedPlayer)
-    }else if (type === "positive" && playersPositive) {
+    }else if ((type === "positive"  || ladderType ==  "positive" ) && playersPositive) {
       const selectedPlayer = playersPositive.find((p) => Number(p.id) === Number(playerId));
       setPlayers(selectedPlayer)
-    }else if (type === "negative" && playersNegative) {
+    }else if ((type === "negative" || ladderType ==  "negative" ) && playersNegative) {
       const selectedPlayer = playersNegative.find((p) => Number(p.id) === Number(playerId));
       setPlayers(selectedPlayer)
     }
