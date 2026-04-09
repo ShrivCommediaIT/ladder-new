@@ -11,7 +11,6 @@ const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 const LadderRuleCardUser = ({ ladderIdProp }) => {
   const searchParams = useSearchParams();
   const ladderId = ladderIdProp || searchParams.get("id") || searchParams.get("ladder_id");
-  console.log("ladderId : ", ladderId);
 
   const [loading, setLoading] = useState(true);
   const [openRuleIds, setOpenRuleIds] = useState([]);

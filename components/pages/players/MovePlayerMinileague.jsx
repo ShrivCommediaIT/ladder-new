@@ -257,7 +257,6 @@ const MoveNumberMinileague = ({
       };
 
       const moveMiniLeagueRes = await dispatch(moveMiniLeague(payload)).unwrap();
-      console.log("moveMiniLeagueRes==>", moveMiniLeagueRes);
       
       if (moveMiniLeagueRes.success_message == "Success") {
         toast.success(`Result posted in Section ${currentSection + 1}`, { autoClose: 2000 });

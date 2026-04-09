@@ -9,6 +9,7 @@ import { ArrowLeft, X, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "react-toastify";
 import {
   movePlayer,
   movePlayerBestOf5,
@@ -28,12 +29,13 @@ import {
 import PlayerBet from "../pages/players/PlayerBet";
 
 import { useSearchParams } from "next/navigation";
+import { updateLadderToken } from "@/helper/helperApi";
 
 const MoveNumberInput = ({
-  onClose = () => {},
+  onClose = () => { },
   currentId = null,
   currentRank = null,
-  setLoading = () => {},
+  setLoading = () => { },
   selectedPlayer = {},
   userId = null,
 }) => {
@@ -76,14 +78,14 @@ const MoveNumberInput = ({
   const challengedPlayer =
     players.find((p) => p.rank === Number(selectedNumber)) || null;
 
-  const numberButtons = [1,2,3,4,5,6,7,8,9,0];
+  const numberButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
   const scoreOptions =
     ladderType === "best3"
       ? ["2-0", "2-1"]
       : ladderType === "best5"
-      ? ["3-0", "3-1", "3-2"]
-      : [];
+        ? ["3-0", "3-1", "3-2"]
+        : [];
 
   /* -------------------- EFFECTS -------------------- */
   useEffect(() => {
@@ -119,56 +121,44 @@ const MoveNumberInput = ({
 
 
   const isFormValid =
-  user_id &&
-  ladder_id &&
-  currentId &&
-  selectedNumber &&
-  !isNaN(selectedNumber) &&
-  resultType &&
-  challengedPlayer &&
-  (
-    ladderType !== "best3" && ladderType !== "best5"
-      ? true
-      : score
-  );
-
-  // const handleEnter = () => {
-  //   if (!user_id || !ladder_id || !currentId) return;
-
-  //   if (!selectedNumber || isNaN(selectedNumber)) return;
-
-  //   if (!resultType) return;
-
-  //   if ((ladderType === "best3" || ladderType === "best5") && !score)
-  //     return;
-
-  //   if (!challengedPlayer) return;
-
-  //   setShowConfirm(true);
-  // };
+    user_id &&
+    ladder_id &&
+    currentId &&
+    selectedNumber &&
+    !isNaN(selectedNumber) &&
+    resultType &&
+    challengedPlayer &&
+    (
+      ladderType !== "best3" && ladderType !== "best5"
+        ? true
+        : score
+    );
 
 
   const handleEnter = () => {
-  if (!user_id || !ladder_id || !currentId) return;
 
-  if (!selectedNumber || isNaN(selectedNumber)) return;
 
-  if (!resultType) return;
+    if (!user_id || !ladder_id || !currentId) return;
+console.log("handleEnter==>", user_id, ladder_id, currentId, selectedNumber, selectedNumber);
 
-  if ((ladderType === "best3" || ladderType === "best5") && !score)
-    return;
+    if (!selectedNumber || isNaN(selectedNumber)) return;
 
-  if (!challengedPlayer) return;
+    if (!resultType) return;
 
-  // BLOCK SELF OR LOWER RANK
-  if (Number(selectedNumber) >= Number(currentRank)) {
-    setShowRankAlert(true);
-    return;
-  }
+    if ((ladderType === "best3" || ladderType === "best5") && !score)
+      return;
 
-  // ✅ VALID
-  setShowConfirm(true);
-};
+    if (!challengedPlayer) return;
+
+    // BLOCK SELF OR LOWER RANK
+    if (Number(selectedNumber) >= Number(currentRank)) {
+      setShowRankAlert(true);
+      return;
+    }
+
+    // ✅ VALID
+    setShowConfirm(true);
+  };
 
   const confirmMove = async () => {
     try {
@@ -186,8 +176,19 @@ const MoveNumberInput = ({
           score,
           bet: betDescription,
         };
-        await dispatch(movePlayerBestOf5(payload)).unwrap();
+        const movePlayer = await dispatch(movePlayerBestOf5(payload)).unwrap();
+          if (movePlayer.success_message == "Success") {
+          toast.success("Result posted successfully! ");
+          updateLadderToken({
+            user_id: selectedPlayer.name,
+            ladder_id,
+            ladder_type: ladderType,
+          })
+        } else {
+          toast.error("Failed to post result. Please try again.");
+        }
       } else {
+
         payload = {
           user_id,
           ladder_id,
@@ -197,7 +198,19 @@ const MoveNumberInput = ({
           move_from_rank: currentRank,
           score,
         };
-        await dispatch(movePlayer(payload)).unwrap();
+
+        const movePlayerRes = await dispatch(movePlayer(payload)).unwrap();
+        
+        if (movePlayerRes.success_message == "Success") {
+          toast.success("Result posted successfully! ");
+          updateLadderToken({
+            user_id: selectedPlayer.name,
+            ladder_id,
+            ladder_type: ladderType,
+          })
+        } else {
+          toast.error("Failed to post result. Please try again.");
+        }
       }
 
       await Promise.all([
@@ -253,17 +266,16 @@ const MoveNumberInput = ({
       </div> */}
 
       <div className="flex justify-center gap-6 mb-2">
-  <div
-    onClick={() => setResultType("beat")}
-    className={`px-5 py-1 rounded-full cursor-pointer transition ${
-      resultType === "beat"
-        ? "bg-green-500 text-black font-semibold"
-        : "bg-gray-700 hover:bg-gray-600"
-    }`}
-  >
-    Beat
-  </div>
-</div>
+        <div
+          onClick={() => setResultType("beat")}
+          className={`px-5 py-1 rounded-full cursor-pointer transition ${resultType === "beat"
+              ? "bg-green-500 text-black font-semibold"
+              : "bg-gray-700 hover:bg-gray-600"
+            }`}
+        >
+          Beat
+        </div>
+      </div>
 
       <PlayerBet
         betDescription={betDescription}
@@ -276,11 +288,10 @@ const MoveNumberInput = ({
             <div
               key={s}
               onClick={() => setScore(s)}
-              className={`px-4 py-1 rounded-full cursor-pointer border ${
-                score === s
+              className={`px-4 py-1 rounded-full cursor-pointer border ${score === s
                   ? "bg-blue-500 border-blue-500 text-black font-bold"
                   : "border-gray-600 hover:bg-gray-700"
-              }`}
+                }`}
             >
               {s}
             </div>
@@ -295,33 +306,33 @@ const MoveNumberInput = ({
       />
 
       <div className="grid grid-cols-3 gap-3 mb-2">
-  {numberButtons.map((num) => {
-    if (num === 0) {
-      return (
-        <div key="zero-row" className="contents">
-          <div />
-          <Button
-            onClick={() => handleNumberClick(num)}
-            className="py-2 text-lg bg-gray-800 hover:bg-gray-700"
-          >
-            {num}
-          </Button>
-          <div />
-        </div>
-      );
-    }
+        {numberButtons.map((num) => {
+          if (num === 0) {
+            return (
+              <div key="zero-row" className="contents">
+                <div />
+                <Button
+                  onClick={() => handleNumberClick(num)}
+                  className="py-2 text-lg bg-gray-800 hover:bg-gray-700"
+                >
+                  {num}
+                </Button>
+                <div />
+              </div>
+            );
+          }
 
-    return (
-      <Button
-        key={num}
-        onClick={() => handleNumberClick(num)}
-        className="py-2 text-lg bg-gray-800 hover:bg-gray-700"
-      >
-        {num}
-      </Button>
-    );
-  })}
-</div>
+          return (
+            <Button
+              key={num}
+              onClick={() => handleNumberClick(num)}
+              className="py-2 text-lg bg-gray-800 hover:bg-gray-700"
+            >
+              {num}
+            </Button>
+          );
+        })}
+      </div>
 
 
       <div className="flex gap-3">
@@ -332,72 +343,53 @@ const MoveNumberInput = ({
           <X />Cancel
         </Button>
         <Button
-  onClick={handleEnter}
-  disabled={!isFormValid}
-  className={`flex-1 text-white ${
-    isFormValid
-      ? "bg-green-500 hover:bg-green-600"
-      : "bg-gray-600 cursor-not-allowed"
-  }`}
->
-  <CheckCircle />POST
-</Button>
+          onClick={handleEnter}
+          disabled={!isFormValid}
+          className={`flex-1 text-white ${isFormValid
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-gray-600 cursor-not-allowed"
+            }`}
+        >
+          <CheckCircle />POST 
+        </Button>
       </div>
 
       {/* -------------------- CONFIRM DIALOG -------------------- */}
-      {/* <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Result</AlertDialogTitle>
-            <AlertDialogDescription>
-              Player: {challengedPlayer?.name || "Unknown Player"}
-              {score && ` | Score: ${score}`}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmMove}>
-              Confirm
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog> */}
 
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-  <AlertDialogContent className="bg-gray-900 border-violet-500 text-gray-100 w-[92vw] sm:max-w-md">
-    
-    <AlertDialogHeader>
+        <AlertDialogContent className="bg-gray-900 border-violet-500 text-gray-100 w-[92vw] sm:max-w-md">
 
-      <AlertDialogTitle className="text-xl font-bold text-violet-400 flex items-center gap-2">
-        <CheckCircle className="text-green-500 h-5 w-5" />
-        Confirm Result
-      </AlertDialogTitle>
+          <AlertDialogHeader>
 
-      <AlertDialogDescription className="text-start text-lg text-white">
-        {`${selectedPlayer?.name || "Player"} beat ${
-          challengedPlayer?.name || "Player"
-        } ${score || ""}`}
-      </AlertDialogDescription>
+            <AlertDialogTitle className="text-xl font-bold text-violet-400 flex items-center gap-2">
+              <CheckCircle className="text-green-500 h-5 w-5" />
+              Confirm Result
+            </AlertDialogTitle>
 
-    </AlertDialogHeader>
+            <AlertDialogDescription className="text-start text-lg text-white">
+              {`${selectedPlayer?.name || "Player"} beat ${challengedPlayer?.name || "Player"
+                } ${score || ""}`}
+            </AlertDialogDescription>
 
-    <AlertDialogFooter className="mt-5 flex flex-col sm:flex-row gap-3">
-      
-      <AlertDialogCancel className="w-full text-gray-800 sm:w-auto">
-        Go Back
-      </AlertDialogCancel>
+          </AlertDialogHeader>
 
-      <AlertDialogAction
-        onClick={confirmMove}
-        className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
-      >
-        Confirm & Post
-      </AlertDialogAction>
+          <AlertDialogFooter className="mt-5 flex flex-col sm:flex-row gap-3">
 
-    </AlertDialogFooter>
+            <AlertDialogCancel className="w-full text-gray-800 sm:w-auto">
+              Go Back
+            </AlertDialogCancel>
 
-  </AlertDialogContent>
-</AlertDialog>
+            <AlertDialogAction
+              onClick={confirmMove}
+              className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+            >
+              Confirm & Post 
+            </AlertDialogAction>
+
+          </AlertDialogFooter>
+
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* -------------------- SUCCESS ALERT -------------------- */}
       <AlertDialog open={showSuccess} onOpenChange={setShowSuccess}>
@@ -417,30 +409,30 @@ const MoveNumberInput = ({
       </AlertDialog>
 
       <AlertDialog open={showRankAlert} onOpenChange={setShowRankAlert}>
-  <AlertDialogContent className="bg-gray-900 border-red-500 text-gray-100 w-[92vw] sm:max-w-md">
-    
-    <AlertDialogHeader>
-      <AlertDialogTitle className="text-xl font-bold text-red-400">
-        Invalid Challenge!
-      </AlertDialogTitle>
+        <AlertDialogContent className="bg-gray-900 border-red-500 text-gray-100 w-[92vw] sm:max-w-md">
 
-      <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
-        
-        You can only challenge higher ranked players.
-      </AlertDialogDescription>
-    </AlertDialogHeader>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-red-400">
+              Invalid Challenge!
+            </AlertDialogTitle>
 
-    <AlertDialogFooter className="mt-5">
-      <AlertDialogAction
-        onClick={() => setShowRankAlert(false)}
-        className="bg-red-600 hover:bg-red-700"
-      >
-        OK
-      </AlertDialogAction>
-    </AlertDialogFooter>
+            <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
 
-  </AlertDialogContent>
-</AlertDialog>
+              You can only challenge higher ranked players.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter className="mt-5">
+            <AlertDialogAction
+              onClick={() => setShowRankAlert(false)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 };

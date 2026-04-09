@@ -33,7 +33,7 @@ export default function BasicLeaderboardActivityEntryCard({
   );
   const [value, setValue] = useState("0");
   const [witnessBy, setWitnessBy] = useState("");
-  const [skillSign, setSkillSign] = useState("+"); 
+  const [skillSign, setSkillSign] = useState("+");
   const [skillDesc, setSkillDesc] = useState("");
   const [loadingSkill, setLoadingSkill] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -45,7 +45,8 @@ export default function BasicLeaderboardActivityEntryCard({
     sec: "",
     ms: "",
   });
-
+  const [zeroAction, setZeroAction] = useState(null);
+  const [isConfirmedZero, setIsConfirmedZero] = useState(false);
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
   const ladderType = searchParams.get("ladder_type");
@@ -98,8 +99,63 @@ export default function BasicLeaderboardActivityEntryCard({
   }, [selectedActivity, ladderId]);
 
   /* ---------------- INPUT HANDLERS ---------------- */
+  // const handleDigit = (d) => {
+
+  //   if (type === "negative" || ladderType === "negative") {
+  //     if (document.activeElement === minRef.current) {
+  //       setTimeParts((p) => {
+  //         let v = (p.min + d).slice(-2);
+  //         if (Number(v) > 59) return p;
+
+  //         if (v.length === 2) secRef.current?.focus();
+
+  //         return { ...p, min: v };
+  //       });
+
+  //       return;
+  //     }
+
+  //     if (document.activeElement === secRef.current) {
+  //       setTimeParts((p) => {
+  //         let v = (p.sec + d).slice(-2);
+  //         if (Number(v) > 59) return p;
+
+  //         if (v.length === 2) msRef.current?.focus();
+
+  //         return { ...p, sec: v };
+  //       });
+
+  //       return;
+  //     }
+
+  //     if (document.activeElement === msRef.current) {
+  //       setTimeParts((p) => {
+  //         let v = (p.ms + d).slice(-3);
+  //         return { ...p, ms: v };
+  //       });
+
+  //       return;
+  //     }
+
+  //     minRef.current?.focus();
+  //     return;
+  //   }
+
+  //   setValue((prev) => {
+  //       if (d === "." && !prev) return prev;
+  //       if (d === "." && prev.includes(".")) return prev;
+  //       if (prev === "0" && d !== ".") return d;
+  //       return prev + d;
+  //   })
+  // };
   const handleDigit = (d) => {
+
+    // ✅ NEGATIVE (TIMER MODE)
     if (type === "negative" || ladderType === "negative") {
+
+      // 🚨 Ignore non-digit inputs
+      if (!/^\d$/.test(d)) return;
+
       if (document.activeElement === minRef.current) {
         setTimeParts((p) => {
           let v = (p.min + d).slice(-2);
@@ -109,7 +165,6 @@ export default function BasicLeaderboardActivityEntryCard({
 
           return { ...p, min: v };
         });
-
         return;
       }
 
@@ -122,7 +177,6 @@ export default function BasicLeaderboardActivityEntryCard({
 
           return { ...p, sec: v };
         });
-
         return;
       }
 
@@ -131,7 +185,6 @@ export default function BasicLeaderboardActivityEntryCard({
           let v = (p.ms + d).slice(-3);
           return { ...p, ms: v };
         });
-
         return;
       }
 
@@ -139,14 +192,21 @@ export default function BasicLeaderboardActivityEntryCard({
       return;
     }
 
+    // ✅ NORMAL MODE (unchanged)
     setValue((prev) => {
-        if (d === "." && !prev) return prev;
-        if (d === "." && prev.includes(".")) return prev;
-        if (prev === "0" && d !== ".") return d;
-        return prev + d;
-    })
-  };
+      if (d === "." && !prev) return prev;
+      if (d === "." && prev.includes(".")) return prev;
+      if (prev === "0" && d !== ".") return d;
 
+      // 🔥 Optional: handle "-" properly (only at start)
+      if (d === "-") {
+        if (!prev) return "-";
+        return prev; // ignore if already typing
+      }
+
+      return prev + d;
+    });
+  };
   const handleBackspace = () => {
     if (type === "negative" || ladderType === "negative") {
       const active = document.activeElement;
@@ -225,7 +285,7 @@ export default function BasicLeaderboardActivityEntryCard({
     const val = e.target.value;
 
     if (/^\d*\.?\d*$/.test(val)) {
-      setValue(val );
+      setValue(val);
     }
   };
 
@@ -251,34 +311,66 @@ export default function BasicLeaderboardActivityEntryCard({
     });
   };
 
-  const handleEnter = useCallback(async () => {
+  const handleEnter = useCallback(() => {
+    if (!skillActivityId || !playerId) return;
+
+    const num = Math.abs(Number(value) || 0);
+
+    // 🚨 ALWAYS intercept 0 and "-"
+    if (type !== "negative" && ladderType !== "negative") {
+      console.log("handleDigit==>", type,  ladderType !== "negative");
+      
+      if (value === "-") {
+        setZeroAction("onlyReset");
+        setOpenZeroAlert(true);
+        return;
+      }
+
+      if (num === 0) {
+        setZeroAction("both");
+        setOpenZeroAlert(true);
+        return;
+      }
+    }
+
+
+    // ✅ Normal flow → direct API
+    submitScore(value);
+
+  }, [skillActivityId, playerId, value, skillSign]);
+
+  const submitScore = async (inputScore) => {
     if (!skillActivityId || !playerId) return;
 
     let finalScore;
     let URl;
-    let ladderTypeUpdate
+    let ladderTypeUpdate;
+
     if (type === "negative" || ladderType === "negative") {
-      ladderTypeUpdate = "negative"
       URl = "user/postResultNegativeSkillboard";
+      ladderTypeUpdate = "negative";
+
       finalScore =
         "00:" +
         `${timeParts.min.padStart(2, "0")}:${timeParts.sec.padStart(2, "0")}.${timeParts.ms.padStart(3, "0")}`;
     } else {
       URl = "user/postResultSkillboard";
-      const num = Math.abs(Number(value) || 0);
-      ladderTypeUpdate = "positive"
-      if (num === 0) {
-        setOpenZeroAlert(true);
-        return;
-      }
+      ladderTypeUpdate =
+        type === "positive" || ladderType === "positive"
+          ? "positive"
+          : "skill";
 
-      finalScore = skillSign === "-" ? -num : num;
+      if (inputScore === "-") {
+        finalScore = "-";
+      } else {
+        const num = Math.abs(Number(inputScore) || 0);
+        finalScore = skillSign === "-" ? -num : num;
+      }
     }
 
     try {
       setSaving(true);
 
-      // Agar API strictly FormData mangti hai, toh niche wala logic dekhein
       const payload = {
         user_id: playerId,
         skill_activity_id: skillActivityId,
@@ -288,22 +380,22 @@ export default function BasicLeaderboardActivityEntryCard({
 
       const res = await axios.post(
         `https://ne-games.com/leaderBoard/api/${URl}`,
-        payload, // Direct object bhejein
+        payload,
         {
           headers: {
             APPKEY: APPKEY,
-            "Content-Type": "application/json", // Explicitly set karein
+            "Content-Type": "application/json",
           },
-        },
+        }
       );
 
-      if (res.status == 200) {
-        toast.success("Result posted successfully! ");
+      if (res.status === 200) {
+        toast.success("Result posted successfully!");
         updateLadderToken({
           user_id: playerName,
-          ladder_id:ladderId,
+          ladder_id: ladderId,
           ladder_type: ladderTypeUpdate,
-        })
+        });
       } else {
         toast.error("Failed to post result. Please try again.");
       }
@@ -311,23 +403,13 @@ export default function BasicLeaderboardActivityEntryCard({
       setOpenSuccess(true);
     } catch (err) {
       console.error("Error Detail:", err.response?.data || err);
-      // Alert dikhayein agar error aaye
       alert(
-        "Failed to save: " + (err.response?.data?.message || "Unknown error"),
+        "Failed to save: " + (err.response?.data?.message || "Unknown error")
       );
     } finally {
       setSaving(false);
     }
-  }, [
-    skillActivityId,
-    playerId,
-    value,
-    skillSign,
-    witnessBy,
-    timeParts,
-    type,
-    ladderType,
-  ]);
+  };
 
   const handleSuccessClose = useCallback(() => {
     setOpenSuccess(false);
@@ -335,11 +417,22 @@ export default function BasicLeaderboardActivityEntryCard({
   }, [onClose]);
 
   const formatTime = (timeParts) => {
-  const min = (timeParts.min || "").padStart(2, "0");
-  const sec = (timeParts.sec || "").padStart(2, "0");
-  const ms = (timeParts.ms || "").padStart(3, "0");
+    const min = (timeParts.min || "").padStart(2, "0");
+    const sec = (timeParts.sec || "").padStart(2, "0");
+    const ms = (timeParts.ms || "").padStart(3, "0");
 
     return `${min}:${sec}.${ms}`;
+  };
+
+  const handleZeroConfirm = (type) => {
+    setOpenZeroAlert(false);
+
+    if (type === "ok") {
+      submitScore(0);
+    } else if (type === "reset") {
+      setValue("-");
+      submitScore("-");
+    }
   };
 
   return (
@@ -389,11 +482,10 @@ export default function BasicLeaderboardActivityEntryCard({
                     setValue("0");
                   }}
                   className={`w-7 h-7 rounded-md border text-[11px] transition-all duration-200
-                ${
-                  selectedActivity === n
-                    ? "bg-sky-400 text-black border-white scale-110 shadow-md"
-                    : "bg-slate-800 border-slate-600 hover:bg-slate-700 hover:scale-105"
-                }`}
+                ${selectedActivity === n
+                      ? "bg-sky-400 text-black border-white scale-110 shadow-md"
+                      : "bg-slate-800 border-slate-600 hover:bg-slate-700 hover:scale-105"
+                    }`}
                 >
                   {n}
                 </button>
@@ -404,11 +496,10 @@ export default function BasicLeaderboardActivityEntryCard({
         {/* SCORE ENTRY */}
 
         <div
-          className={`flex items-center gap-2 w-full ${
-            type === "negative" || ladderType === "negative"
+          className={`flex items-center gap-2 w-full ${type === "negative" || ladderType === "negative"
               ? "justify-center bg-slate-800"
               : "justify-start"
-          }`}
+            }`}
         >
           {type !== "negative" && ladderType !== "negative" && (
             <Input
@@ -490,11 +581,10 @@ export default function BasicLeaderboardActivityEntryCard({
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleClear}
-              className={`h-9 bg-red-500 text-black rounded transition-all ${
-                type === "positive" || ladderType === "positive"
+              className={`h-9 bg-red-500 text-black rounded transition-all ${type === "positive" || ladderType === "positive"
                   ? "col-span-8"
                   : "col-span-12"
-              }`}
+                }`}
             >
               clear
             </button>
@@ -510,13 +600,36 @@ export default function BasicLeaderboardActivityEntryCard({
             )}
           </div>
 
-          <button
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => handleDigit("0")}
-            className="h-9 bg-white text-black rounded"
-          >
-            0
-          </button>
+
+
+
+          {type != "positive" &&
+            type != "negative" &&
+            ladderType != "positive" &&
+            ladderType != "negative" ? (<div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => handleDigit("0")}
+                className="h-9 bg-white text-black rounded font-bold"
+              >
+                0
+              </button>
+
+              <button
+                onClick={() => handleDigit("-")}
+                className="h-9 bg-white text-black rounded font-bold"
+              >
+                -
+              </button>
+
+
+            </div>) :
+            (<button
+              onClick={() => handleDigit("0")}
+              className="h-9 bg-white text-black rounded font-bold"
+            >
+              0
+            </button>
+            )}
 
           <button
             onMouseDown={(e) => e.preventDefault()}
@@ -547,8 +660,8 @@ export default function BasicLeaderboardActivityEntryCard({
               Activity #{selectedActivity} updated with score{" "}
               <b>
                 {type === "negative" || ladderType === "negative"
-                ? formatTime(timeParts)
-                : Math.abs(value)}
+                  ? formatTime(timeParts)
+                  : value == "-" ? "Reset" : Math.abs(value)}
               </b>
             </DialogDescription>
           </DialogHeader>
@@ -565,24 +678,63 @@ export default function BasicLeaderboardActivityEntryCard({
       </Dialog>
 
       {/* ZERO SCORE ALERT */}
-      <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-red-500 text-xl">
-              Invalid Score
-            </DialogTitle>
-            <DialogDescription className="text-lg">
-              Zero score is not allowed
-            </DialogDescription>
-          </DialogHeader>
 
-          <div className="flex justify-end mt-4">
-            <Button
+      <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden">
+
+          {/* HEADER BAR (like system popup) */}
+          <div className="flex items-center justify-between bg-white px-3 py-2 border-b">
+            <span className="font-semibold text-sm"> </span>
+
+            {/* Single Close Button */}
+            <button
               onClick={() => setOpenZeroAlert(false)}
-              className="bg-red-500 hover:bg-red-400 text-black font-semibold"
+              className="text-gray-600 hover:text-black text-lg font-bold"
             >
-              OK
-            </Button>
+              ✕
+            </button>
+          </div>
+
+          {/* BODY */}
+          <div className="flex justify-between gap-4 p-4">
+
+            {/* TEXT */}
+            <div className="text-sm leading-relaxed">
+              {(zeroAction !== "onlyReset") && <p className="font-bold">
+                DO YOU WISH TO ENTER A SCORE OF ZERO?{" "}
+                <span className="font-normal">If so - press OK</span>
+              </p>}
+
+              <p className={`${zeroAction !== "onlyReset" ? "mt-3" : ''}`}>
+                <span className="font-bold">ERROR?</span>{" "}
+                If you wish to correct putting in a score incorrectly that should
+                have gone into another activity, press RESET
+              </p>
+            </div>
+
+            {/* BUTTONS (right side stacked) */}
+            <div className="flex flex-col gap-3 min-w-[90px]">
+
+              {/* OK button → only when NOT "-" */}
+              {zeroAction !== "onlyReset" && (
+                <button
+                  onClick={() => handleZeroConfirm("ok")}
+                  className="bg-green-400 hover:bg-green-500 text-black font-bold py-1 rounded shadow"
+                >
+                  OK
+                </button>
+              )}
+
+              {/* Reset button → always visible */}
+              <button
+                onClick={() => handleZeroConfirm("reset")}
+                className="bg-red-500 hover:bg-red-600 text-black font-bold py-1 rounded shadow"
+              >
+                Reset
+              </button>
+
+            </div>
+
           </div>
         </DialogContent>
       </Dialog>

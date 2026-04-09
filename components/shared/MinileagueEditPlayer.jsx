@@ -47,7 +47,8 @@ export const MinileagueEditPlayer = ({
 
   /* ---------------- REDUX ---------------- */
 
-  const ladderType = useSelector((state) => state.ladder?.data?.type);
+  const ladderType = searchParams.get("ladder_type")
+  
 
   const { error: moveError, result } =
     useSelector((state) => state?.playerMoving) || {};
@@ -61,10 +62,12 @@ export const MinileagueEditPlayer = ({
   /* ---------------- FIND PLAYER + SECTION ---------------- */
 
   const findPlayerWithSection = useCallback(() => {
+
     if (!playerId || ladderType !== "minileague") return null;
 
     // 1) Try given sectionIndex first
     if (typeof sectionIndex === "number" && minileagueData[sectionIndex]) {
+      
       const users =
         minileagueData[sectionIndex]?.users_record ||
         minileagueData[sectionIndex]?.users ||

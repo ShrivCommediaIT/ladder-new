@@ -34,9 +34,9 @@ import { useSearchParams } from "next/navigation";
 
 export const EditPlayer = ({
   open = true,
-  onClose = () => {},
+  onClose = () => { },
   currentId = null,
-  setLoading = () => {},
+  setLoading = () => { },
   ladderId = null,
 }) => {
   const dispatch = useDispatch();
@@ -141,26 +141,26 @@ export const EditPlayer = ({
   // ];
 
 
-const allTabs = [
-  { value: "move", label: "Result" },
-  { value: "edit", label: "Edit" },
-  { value: "load", label: "Upload" },
-  { value: "stats", label: "Stats" },
-  { value: "challenge", label: "Challenge" },
-];
+  const allTabs = [
+    { value: "move", label: "Result" },
+    { value: "edit", label: "Edit" },
+    { value: "load", label: "Upload" },
+    { value: "stats", label: "Stats" },
+    { value: "challenge", label: "Challenge" },
+  ];
 
-/* If roster → only Edit + Upload */
+  /* If roster → only Edit + Upload */
 
-const tabs =
-  ladderType === "roster"
-    ? allTabs.filter((t) => t.value === "edit" || t.value === "load")
-    : allTabs;
+  const tabs =
+    ladderType === "roster"
+      ? allTabs.filter((t) => t.value === "edit" || t.value === "load")
+      : allTabs;
 
-    useEffect(() => {
-  if (tabs.length > 0) {
-    setActiveTab(tabs[0].value);
-  }
-}, [ladderType]);
+  useEffect(() => {
+    if (tabs.length > 0) {
+      setActiveTab(tabs[0].value);
+    }
+  }, [ladderType]);
 
   /* -------------------- UI -------------------- */
 
@@ -193,12 +193,15 @@ const tabs =
               </TabsList>
             </div>
 
-            {/* MOBILE */}
-            {/* <div className="sm:hidden mb-4">
-              <Select value={activeTab} onValueChange={setActiveTab}>
+            <div className="sm:hidden mb-4">
+              <Select
+                value={activeTab}
+                onValueChange={(val) => setActiveTab(val)}
+              >
                 <SelectTrigger className="w-full bg-gray-800 text-white">
-                  <SelectValue />
+                  <SelectValue placeholder="Select" />
                 </SelectTrigger>
+
                 <SelectContent className="bg-gray-800 text-white">
                   {tabs.map((tab) => (
                     <SelectItem key={tab.value} value={tab.value}>
@@ -207,26 +210,7 @@ const tabs =
                   ))}
                 </SelectContent>
               </Select>
-            </div> */}
-
-<div className="sm:hidden mb-4">
-  <Select
-    value={activeTab}
-    onValueChange={(val) => setActiveTab(val)}
-  >
-    <SelectTrigger className="w-full bg-gray-800 text-white">
-      <SelectValue placeholder="Select" />
-    </SelectTrigger>
-
-    <SelectContent className="bg-gray-800 text-white">
-      {tabs.map((tab) => (
-        <SelectItem key={tab.value} value={tab.value}>
-          {tab.label}
-        </SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-</div>
+            </div>
 
             {/* CONTENT */}
             <motion.div
@@ -254,22 +238,22 @@ const tabs =
                 />
               </TabsContent>
 
-              
-<TabsContent value="edit">
-  {showEditSkeleton ? (
-    <div className="space-y-3">
-      <Skeleton className="h-10 w-full bg-white/10" />
-      <Skeleton className="h-10 w-full bg-white/10" />
-    </div>
-  ) : (
-    <EditPlayerDetails
-      selectedPlayer={selectedPlayer}   // ✅ correct prop name
-      userId={selectedPlayer?.id}       // ✅ pass explicitly
-      ladderId={ladder_id}
-      onClose={onClose}
-    />
-  )}
-</TabsContent>
+
+              <TabsContent value="edit">
+                {showEditSkeleton ? (
+                  <div className="space-y-3">
+                    <Skeleton className="h-10 w-full bg-white/10" />
+                    <Skeleton className="h-10 w-full bg-white/10" />
+                  </div>
+                ) : (
+                  <EditPlayerDetails
+                    selectedPlayer={selectedPlayer}   // ✅ correct prop name
+                    userId={selectedPlayer?.id}       // ✅ pass explicitly
+                    ladderId={ladder_id}
+                    onClose={onClose}
+                  />
+                )}
+              </TabsContent>
 
 
               <TabsContent value="load">

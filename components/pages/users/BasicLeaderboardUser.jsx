@@ -16,6 +16,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
 import axios from "axios";
 import BasicLeaderboardPrintSkillsSheet from "../admin/BasicLeaderboardPrintSkillsSheet";
+import BasicLeaderboardActivityEntryCard from "../players/BasicLeaderboardActivityEntryCard";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -353,7 +354,6 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
         (s) => s.skill_number === skillNumber,
       );
       if (!skillObj) return;
-
       setSelectedPlayerId(playerId);
       setSelectedSkillNumber(skillNumber);
       setSelectedSkillActivityId(skillObj.id);

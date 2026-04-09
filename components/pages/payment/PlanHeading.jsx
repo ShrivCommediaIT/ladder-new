@@ -44,7 +44,9 @@ export default function PlanHeading() {
         </h1>
 
         <p className="text-sm sm:text-lg bg-slate-900 italic rounded-lg shadow py-4 px-1 font-semibold mb-2 text-white">
-          Automated Ladders, Minileagues, Leaderboards, <br /> <sapn className="px-2">
+          Automated Ladders, Minileagues, Leaderboards, 
+          <br /> 
+          <sapn className="px-2">
               Skills & Performance Challenge Boards and so much more
           </sapn>
         
