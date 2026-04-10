@@ -35,6 +35,8 @@ export default function BasicLeaderboardActivityEntryCard({
   const [loadingSkill, setLoadingSkill] = useState(true);
   const [saving, setSaving] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
+  const [openSuccessResult, setOpenSuccessResult] = useState(false);
+  const [topScore, setTopScore] = useState(0);
   const [skillTarget, setSkillTarget] = useState("");
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
   const [zeroAction, setZeroAction] = useState(null);
@@ -87,7 +89,8 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
   /* ---------------- SAVE LOGIC ---------------- */
-  const submitScore = async (finalScore) => {
+  const submitScore = async (finalScore, bestScore) => {
+
     try {
       setSaving(true);
 
@@ -99,6 +102,10 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("skill_activity_id", String(skillActivityId));
       params.append("score", String(finalScore));
       params.append("witness_by", witnessValue);
+      
+      if (bestScore) {
+        params.append("best_result", bestScore);
+      }
 
       const skillsPost = await axios.post(
         "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
@@ -112,10 +119,12 @@ export default function BasicLeaderboardActivityEntryCard({
       );
 
       if (skillsPost.status == 200) {
+        setOpenSuccess(true);
+
         toast.success("Result posted successfully! ");
         updateLadderToken({
           user_id: playerName,
-          ladder_id:ladderId,
+          ladder_id: ladderId,
           ladder_type: "skill",
         })
       } else {
@@ -123,7 +132,6 @@ export default function BasicLeaderboardActivityEntryCard({
       }
 
 
-      setOpenSuccess(true);
     } catch (err) {
       console.error("Error Detail:", err.response?.data || err);
       alert("Failed to save: " + (err.response?.data?.message || "Error"));
@@ -150,9 +158,9 @@ export default function BasicLeaderboardActivityEntryCard({
     }
 
     const finalScore = skillSign === "-" ? -num : num;
-    submitScore(finalScore);
+    submitScore(finalScore, topScore);
 
-  }, [skillActivityId, playerId, value, skillSign]);
+  }, [skillActivityId, playerId, value, skillSign, topScore]);
 
   const handleZeroConfirm = (type) => {
     setOpenZeroAlert(false);
@@ -170,6 +178,31 @@ export default function BasicLeaderboardActivityEntryCard({
     setOpenSuccess(false);
     if (onClose) onClose();
   }, [onClose]);
+
+  const handleSuccessCloseResult = useCallback(() => {
+    setOpenSuccessResult(false);
+    if (onClose) onClose();
+  }, [onClose]);
+
+  const getBestScore = async () => {
+    if (value == 0 || value == "-"){
+      handleEnter() 
+      return
+    } 
+    const bestScore = await axios.get(
+      `https://ne-games.com/leaderBoard/api/user/getTopScore?user_id=${String(playerId)}&skill_activity_id=${String(skillActivityId)}&score=${String(value)}`,
+      {
+        headers: {
+          APPKEY: APPKEY,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    if (bestScore.status == 200) {
+      setTopScore(bestScore.data.data[0].top_score)
+      setOpenSuccessResult(true)
+    }
+  }
 
   return (
     <>
@@ -270,7 +303,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
         <Button
           disabled={saving}
-          onClick={handleEnter}
+          onClick={getBestScore}
           className="w-full mt-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-11 shadow-lg"
         >
           {saving ? "Saving..." : "Submit Score"}
@@ -283,11 +316,67 @@ export default function BasicLeaderboardActivityEntryCard({
           <DialogHeader>
             <DialogTitle className="text-emerald-500 text-xl font-bold">Score Saved</DialogTitle>
             <DialogDescription className="text-lg">
-              Recorded score: <b>{value == "-" ? "Reset" :value}</b> <br />
+              Recorded score: <b>{value == "-" ? "Reset" : value}</b> <br />
               Witness: <b>{witnessBy}</b>
             </DialogDescription>
           </DialogHeader>
           <Button onClick={handleSuccessClose} className="bg-emerald-500 text-black font-bold mt-4">OK</Button>
+        </DialogContent>
+      </Dialog>
+
+
+
+      <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
+        <DialogContent className="max-w-md p-0 overflow-hidden">
+
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b">
+            <h2 className="text-lg font-semibold text-emerald-600">
+              Enter Result
+            </h2>
+          </div>
+
+          {/* Body */}
+          <div className="px-5 py-4 space-y-4">
+
+            {/* Scores Row */}
+            <div className="flex items-center justify-between text-lg font-bold">
+              <div className="flex items-center gap-2">
+                <span>Today’s Result</span>
+                <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
+                  {value}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span>Your Best Result</span>
+                <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
+                  {topScore || 0}
+                </span>
+              </div>
+            </div>
+
+            {/* Note */}
+            <p className="text-md text-gray-500 italic">
+              Note: If today's result is also your best result, fill in both boxes
+            </p>
+
+            {/* Witness */}
+            <div>
+              <label className="text-md font-medium">Witness: <span className="ml-3 font-bold"> {witnessBy || "—"} </span></label>
+            </div>
+
+            {/* Button */}
+            <Button
+              onClick={async () => {
+                await handleEnter();
+                handleSuccessCloseResult();
+              }}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-md"
+            >
+              Confirm
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
