@@ -1,30 +1,30 @@
-import axios from 'axios';
+// helper/helperApi.js
+// ✅ Uses centralized apiService — no hardcoded URLs or APPKEY
 
-// Base configuration
-const API_BASE_URL = 'https://ne-games.com/leaderBoard/api';
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-// Common headers
-const headers = {
-  'APPKEY': APPKEY,
-  'Content-Type': 'multipart/form-data',   
-};
+import { postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
+/**
+ * Update ladder token for an admin.
+ * Reads admin_id from localStorage.
+ */
 export const updateLadderToken = async (payload) => {
+  const adminDetails = JSON.parse(localStorage.getItem("adminDetails"));
 
-    const adminDetails = JSON.parse(localStorage.getItem("adminDetails"));
-    payload.admin_id = adminDetails.id
-    payload.token = 1
-    
+  const formData = new FormData();
+  formData.append("admin_id", adminDetails.id);
+  formData.append("token", 1);
+
+  // Append any extra payload fields
+  Object.entries(payload).forEach(([key, value]) => {
+    formData.append(key, value);
+  });
+
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/user/updateLadderToken`,
-      payload,
-      { headers }
-    );
-
-    return response.data;
+    const data = await postFormData(API_ENDPOINTS.UPDATE_LADDER_TOKEN, formData);
+    return data;
   } catch (error) {
-    console.error('Error updating ladder token:', error.response?.data || error.message);
-    throw error; 
+    console.error("Error updating ladder token:", error.response?.data || error.message);
+    throw error;
   }
 };

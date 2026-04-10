@@ -1,26 +1,18 @@
+// redux/slices/changePassword.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-const API_URL = "https://ne-games.com/leaderBoard/api/user/change/password";
-const APP_KEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-// Async thunk
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async ({ id, old_password, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        API_URL,
-        { id, old_password, password }, 
-        {
-          headers: {
-            APPKEY: APP_KEY,
-          },
-        }
-      );
-
-      return response.data;
+      const data = await postRequest(API_ENDPOINTS.CHANGE_PASSWORD, {
+        id,
+        old_password,
+        password,
+      });
+      return data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || "Something went wrong, please try again"
@@ -52,7 +44,7 @@ const changePasswordSlice = createSlice({
         state.success = false;
         state.error = null;
       })
-      .addCase(changePassword.fulfilled, (state, action) => {
+      .addCase(changePassword.fulfilled, (state) => {
         state.loading = false;
         state.success = true;
       })

@@ -1,23 +1,8 @@
-// =========================== ==> 25/08/25
-// Prakash
-
+// redux/slices/userSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import { differenceInDays, parseISO } from "date-fns";
-
-// const getUserFromStorage = () => {
-//   if (typeof window !== "undefined") {
-//     try {
-//       const data = localStorage.getItem("userData");
-//       return data ? JSON.parse(data) : null;
-//     } catch {
-//       return null;
-//     }
-//   }
-//   return null;
-// };
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest, postFormData, postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 // ==================== Thunks ====================
 
@@ -28,104 +13,70 @@ const registerUser = createAsyncThunk(
     try {
       const formData = new FormData();
       Object.entries(payload).forEach(([key, value]) =>
-        formData.append(key, value),
+        formData.append(key, value)
       );
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/register",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data", APPKEY } },
-      );
-
-      if (res.data.status !== 200) return rejectWithValue(res.data);
-
-      return res.data;
+      const data = await postFormData(API_ENDPOINTS.REGISTER, formData);
+      if (data.status !== 200) return rejectWithValue(data);
+      return data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data || { message: "Registration failed" },
+        err.response?.data || { message: "Registration failed" }
       );
     }
-  },
+  }
 );
 
 // Login
 const loginUser = createAsyncThunk(
   "user/loginUser",
   async (payload, { rejectWithValue }) => {
-    const url = "https://ne-games.com/leaderBoard/api/user/login";
-
-    const config = {
-      headers: {
-        APPKEY,
-        "Content-Type": "multipart/form-data",
-      },
-      timeout: 10000, // ✅ important
-    };
-
     const formData = new FormData();
     Object.entries(payload).forEach(([key, value]) => {
       formData.append(key, value);
     });
 
     try {
-      // ✅ first attempt
       try {
-        const res = await axios.post(url, formData, config);
-
-        if (res.data?.status !== 200) {
-          return rejectWithValue(res.data);
-        }
-
-        return res.data;
-
+        const data = await postFormData(API_ENDPOINTS.LOGIN, formData);
+        if (data?.status !== 200) return rejectWithValue(data);
+        return data;
       } catch (firstErr) {
-        // ✅ retry once automatically
-        const res = await axios.post(url, formData, config);
-
-        if (res.data?.status !== 200) {
-          return rejectWithValue(res.data);
-        }
-
-        return res.data;
+        // retry once
+        const data = await postFormData(API_ENDPOINTS.LOGIN, formData);
+        if (data?.status !== 200) return rejectWithValue(data);
+        return data;
       }
-
     } catch (err) {
       console.log("LOGIN API ERROR:", err);
-
       if (err.code === "ECONNABORTED") {
         return rejectWithValue({ message: "Server timeout — try again" });
       }
-
       if (!err.response) {
         return rejectWithValue({ message: "Network/CORS error" });
       }
+      return rejectWithValue(err.response.data || { message: "Login failed" });
+    }
+  }
+);
 
+// Fetch Ladder by User ID
+const fetchLadderByUserId = createAsyncThunk(
+  "user/fetchLadderByUserId",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const data = await getRequest(
+        `${API_ENDPOINTS.GET_LADDER_BY_USER_ID}/${userId}`
+      );
+      return data?.data;
+    } catch (err) {
       return rejectWithValue(
-        err.response.data || { message: "Login failed" }
+        err.response?.data || { message: "Ladder fetch failed" }
       );
     }
   }
 );
 
-
-// Fetch Ladder
-const fetchLadderByUserId = createAsyncThunk(
-  "user/fetchLadderByUserId",
-  async (userId, { rejectWithValue }) => {
-    try {
-      const res = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/getLadderByUserId/${userId}`,
-        { headers: { APPKEY } },
-      );
-      return res.data?.data;
-    } catch (err) {
-      return rejectWithValue(
-        err.response?.data || { message: "Ladder fetch failed" },
-      );
-    }
-  },
-);
-
-// ✅ Edit user details (name + phone)
+// Edit user details (name + phone)
 export const editUserDetails = createAsyncThunk(
   "user/editUserDetails",
   async ({ id, user_id, name, phone }, { rejectWithValue }) => {
@@ -136,20 +87,15 @@ export const editUserDetails = createAsyncThunk(
       formData.append("name", name);
       formData.append("phone", phone);
 
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/editDetails",
-        formData,
-        { headers: { APPKEY, "Content-Type": "multipart/form-data" } },
-      );
-
-      if (res.data.status !== 200) return rejectWithValue(res.data);
-      return res.data;
+      const data = await postFormData(API_ENDPOINTS.EDIT_DETAILS, formData);
+      if (data.status !== 200) return rejectWithValue(data);
+      return data;
     } catch (err) {
       return rejectWithValue(
-        err.response?.data || { message: "Update failed" },
+        err.response?.data || { message: "Update failed" }
       );
     }
-  },
+  }
 );
 
 // ==================== Slice ====================
@@ -214,22 +160,17 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-
         const userData = action.payload?.data || null;
         const subscriptionData = action.payload?.subscription || null;
-
         state.user = userData;
         state.subscription = subscriptionData;
         state.successMessage =
           action.payload.success_message || "Login successful!";
         state.error = null;
-
-        // ✅ VERY IMPORTANT
         if (typeof window !== "undefined" && userData) {
           localStorage.setItem("userData", JSON.stringify(userData));
         }
       })
-
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Login failed";
@@ -241,7 +182,7 @@ const userSlice = createSlice({
       if (state.user) state.user.ladder_id = action.payload?.id;
     });
 
-    // ✅ Edit user details (name + phone)
+    // EDIT USER DETAILS
     builder
       .addCase(editUserDetails.pending, (state) => {
         state.loading = true;

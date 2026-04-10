@@ -1,27 +1,14 @@
 // redux/slices/importSlice.js
-
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy"
-
-// Async thunk to handle CSV/bulk import
 export const importUsers = createAsyncThunk(
   "import/importUsers",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        // "https://ne-games.com/leaderBoard/api/user/import",
-        "https://ne-games.com/leaderBoard/api/user/importminileague",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            "APPKEY": APPKEY,
-          },
-        }
-      );
-      return response.data;
+      const data = await postFormData(API_ENDPOINTS.IMPORT_MINILEAGUE, formData);
+      return data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || "Import failed. Please try again."

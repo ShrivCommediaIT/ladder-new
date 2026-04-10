@@ -1,24 +1,26 @@
+// redux/slices/playersSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-// Replace with .env variable in production
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest, postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 // 🔄 Fetch Leaderboard
 export const fetchLeaderboard = createAsyncThunk(
   "players/fetchLeaderboard",
   async ({ ladder_id }, thunkAPI) => {
     try {
-      const res = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/leaderboard?ladder_id=${ladder_id}`
-      );
-      return { ladder_id, data: res.data.data, image_path: res.data.image_path, gradebarDetails: res.data.gradebarDetails || [],ladderDetails: res.data.ladderDetails || null };
+      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, { ladder_id });
+      return {
+        ladder_id,
+        data: data.data,
+        image_path: data.image_path,
+        gradebarDetails: data.gradebarDetails || [],
+        ladderDetails: data.ladderDetails || null,
+      };
     } catch (err) {
       return thunkAPI.rejectWithValue("Failed to fetch leaderboard.");
     }
   }
 );
-// console.log("Full API response:", res.data);
 
 // 📤 Upload CSV
 export const uploadCSV = createAsyncThunk(
@@ -29,18 +31,9 @@ export const uploadCSV = createAsyncThunk(
       formData.append("file", file);
       formData.append("ladder_id", ladder_id);
 
-      const res = await fetch("https://ne-games.com/leaderBoard/api/user/import", {
-        method: "POST",
-        headers: { APPKEY },
-        body: formData,
-      });
+      const data = await postFormData(API_ENDPOINTS.IMPORT, formData);
+      if (!data) throw new Error("Upload failed");
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Upload failed");
-      }
-
-      // Refetch after successful upload
       await dispatch(fetchLeaderboard({ ladder_id }));
       return true;
     } catch (error) {
@@ -54,19 +47,10 @@ export const changePlayerStatus = createAsyncThunk(
   "players/changePlayerStatus",
   async ({ user_id, player_status }, { rejectWithValue }) => {
     try {
-      const res = await fetch(
-        `https://ne-games.com/leaderBoard/api/user/changePlayerStatus?user_id=${user_id}&player_status=${player_status}`,
-        {
-          method: "GET",
-          headers: { APPKEY },
-        }
-      );
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to update status");
-      }
-
+      await getRequest(API_ENDPOINTS.CHANGE_PLAYER_STATUS, {
+        user_id,
+        player_status,
+      });
       return { user_id, player_status };
     } catch (err) {
       return rejectWithValue(err.message || "Unknown error");
@@ -75,7 +59,7 @@ export const changePlayerStatus = createAsyncThunk(
 );
 
 const initialState = {
-  playersByLadder: {}, // 🔄 Ladder-wise player data
+  playersByLadder: {},
   image_path: "",
   loading: false,
   error: null,
@@ -100,12 +84,10 @@ const playersSlice = createSlice({
       const { ladder_id, user_id, image } = action.payload;
       const playerList = state.playersByLadder[ladder_id];
       if (!playerList) return;
-
       const playerIndex = playerList.findIndex((p) => p.id === user_id);
       if (playerIndex !== -1) {
         state.playersByLadder[ladder_id][playerIndex].image = image;
       }
-
       if (state.selectedPlayer?.id === user_id) {
         state.selectedPlayer.image = image;
       }
@@ -113,28 +95,21 @@ const playersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // 🟡 Fetch Leaderboard
       .addCase(fetchLeaderboard.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchLeaderboard.fulfilled, (state, action) => {
-        const { ladder_id, data, image_path } = action.payload;
-        const { name,  id: ladderId, logo } = action.payload.ladderDetails || {};
-        const gradebarDetails = action.payload.gradebarDetails || [];
-
+        const { ladder_id, data, image_path, gradebarDetails } = action.payload;
         state.loading = false;
         state.playersByLadder[ladder_id] = data;
         state.image_path = image_path;
         state.gradebarDetails = gradebarDetails;
-        
       })
       .addCase(fetchLeaderboard.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 📤 CSV Upload
       .addCase(uploadCSV.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -146,12 +121,12 @@ const playersSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 🔄 Change Player Status
       .addCase(changePlayerStatus.fulfilled, (state, action) => {
         const { user_id, player_status } = action.payload;
         for (const ladder_id in state.playersByLadder) {
-          const player = state.playersByLadder[ladder_id].find((p) => p.id === user_id);
+          const player = state.playersByLadder[ladder_id].find(
+            (p) => p.id === user_id
+          );
           if (player) {
             player.player_status = player_status;
             break;
@@ -161,19 +136,6 @@ const playersSlice = createSlice({
   },
 });
 
-export const { setSelectedPlayer, clearPlayersState, updatePlayerImage } = playersSlice.actions;
+export const { setSelectedPlayer, clearPlayersState, updatePlayerImage } =
+  playersSlice.actions;
 export default playersSlice.reducer;
-
-
-
-
-
-
-
-
-
-
-
-
-
-

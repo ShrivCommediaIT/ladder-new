@@ -1,26 +1,17 @@
-
-
-// =============== 22
-
 // redux/slices/playerStatusSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-// Change player status
 export const changePlayerStatus = createAsyncThunk(
   "playerStatus/change",
   async ({ user_id, player_status }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/changePlayerStatus`,
-        {
-          params: { user_id, player_status },
-          headers: { APPKEY },
-        }
-      );
-      return response.data; // full data
+      const data = await getRequest(API_ENDPOINTS.CHANGE_PLAYER_STATUS, {
+        user_id,
+        player_status,
+      });
+      return data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to change player status"

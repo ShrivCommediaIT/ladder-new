@@ -1,33 +1,20 @@
-// ✅ FIXED SLICE - Transform API data for UI
+// redux/slices/BasicLeaderboardSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { getRequest, postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-
-// sort by
 export const fetchSkillLeaderboard = createAsyncThunk(
   "skillLeaderboard/fetchSkillLeaderboard",
-  async (
-    { ladder_id, type = "skill", sortbyskillnumber = 0 },
-    { rejectWithValue }
-  ) => {
+  async ({ ladder_id, type = "skill", sortbyskillnumber = 0 }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        "https://ne-games.com/leaderBoard/api/user/leaderboard",
-        {
-          headers: { APPKEY },
-          params: {
-            ladder_id,
-            type,
-            sortbyskillnumber,
-          },
-        }
-      );
+      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, {
+        ladder_id,
+        type,
+        sortbyskillnumber,
+      });
 
-      const rawPlayers = response.data?.data || [];
-
-      const transformedPlayers = rawPlayers.map(player => ({
+      const rawPlayers = data?.data || [];
+      const transformedPlayers = rawPlayers.map((player) => ({
         ...player,
         name: player.name,
         total_point: player.total_point || 0,
@@ -37,8 +24,8 @@ export const fetchSkillLeaderboard = createAsyncThunk(
 
       return {
         data: transformedPlayers,
-        gradebars: response.data.gradebarDetails || [],
-        ladderDetails: response.data.ladderDetails || {},
+        gradebars: data.gradebarDetails || [],
+        ladderDetails: data.ladderDetails || {},
       };
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -46,28 +33,15 @@ export const fetchSkillLeaderboard = createAsyncThunk(
   }
 );
 
-
-// importSkillLeaderboard remains same
 export const importSkillLeaderboard = createAsyncThunk(
   "skillLeaderboard/importSkillLeaderboard",
-  async (
-    { file, ladder_id },
-    { rejectWithValue }
-  ) => {
+  async ({ file, ladder_id }, { rejectWithValue }) => {
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("ladder_id", ladder_id);
-
-      const response = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/importskill",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data", APPKEY },
-        }
-      );
-
-      return response.data;
+      const data = await postFormData(API_ENDPOINTS.IMPORT_SKILL, formData);
+      return data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -87,9 +61,7 @@ const skillLeaderboardSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSkillLeaderboard.pending, (state) => {
-        state.loading = true;
-      })
+      .addCase(fetchSkillLeaderboard.pending, (state) => { state.loading = true; })
       .addCase(fetchSkillLeaderboard.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload.data;
@@ -100,12 +72,8 @@ const skillLeaderboardSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(importSkillLeaderboard.pending, (state) => {
-        state.importLoading = true;
-      })
-      .addCase(importSkillLeaderboard.fulfilled, (state) => {
-        state.importLoading = false;
-      })
+      .addCase(importSkillLeaderboard.pending, (state) => { state.importLoading = true; })
+      .addCase(importSkillLeaderboard.fulfilled, (state) => { state.importLoading = false; })
       .addCase(importSkillLeaderboard.rejected, (state, action) => {
         state.importLoading = false;
         state.error = action.payload;
