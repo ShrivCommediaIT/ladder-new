@@ -28,10 +28,10 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
 }));
 
 export default function BasicLeaderboardSetUpSkill({
-  onClose = () => {},
-  onSkillsUpdated = () => {},
+  onClose = () => { },
+  onSkillsUpdated = () => { },
 }) {
-  
+
   const [rows, setRows] = useState(initialRows);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -73,12 +73,12 @@ export default function BasicLeaderboardSetUpSkill({
             );
             return found
               ? {
-                  ...row,
-                  description: String(found.skill_description || ""),
-                  target: String(found.target || ""),
-                  unit: String(found.unit || ""),
-                  mode: found.skill_sign === "-" ? "minus" : "plus",
-                }
+                ...row,
+                description: String(found.skill_description || ""),
+                target: String(found.target || ""),
+                unit: String(found.unit || ""),
+                mode: found.skill_sign === "-" ? "minus" : "plus",
+              }
               : row;
           }),
         );
@@ -159,7 +159,7 @@ export default function BasicLeaderboardSetUpSkill({
       console.error("Skill update failed:", error);
       alert(
         error.response?.data?.message ||
-          "Failed to save skills. Please try again.",
+        "Failed to save skills. Please try again.",
       );
     } finally {
       setSaving(false);
@@ -283,105 +283,107 @@ export default function BasicLeaderboardSetUpSkill({
           {/* FIXED: Single line header with proper alignment */}
           <div className="sm:px-2 px-8 py-1  border-b border-white/10">
             <div className="flex items-end gap-2 text-white text-xs font-medium ">
-             {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : null}
+              {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : null}
               <div className="w-[120px]">Target</div>
-              <div className="w-[200px]">{(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ?"Skill Name":"Activity"}</div>
-             {( type !== "negative" && ladderType !== "negative" ) && <div className="w-[120px] translate">Units Of Measurement</div>}
+              <div className="w-[200px]">{(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? "Skill Name" : "Activity"}</div>
+              {(type !== "negative" && ladderType !== "negative") && <div className="w-[120px] translate">Units Of Measurement</div>}
             </div>
           </div>
 
           <div className="max-h-[25vh] overflow-y-auto py-2 space-y-1.5">
             {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ?
-             rows.map((row) => (
-              <div key={row.id} className="flex items-start ">
-                {/* Skill No. + +/- */}
-                <div className="flex flex-col w-20 pt-1">
-                  <div className="bg-white text-black font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
-                    {row.id}
+              rows.map((row) => (
+                <div key={row.id} className="flex items-start ">
+                  {/* Skill No. + +/- */}
+                  <div className="flex flex-col w-20 pt-1">
+                    <div className="bg-white text-black font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
+                      {row.id}
+                    </div>
+                    <RadioGroup
+                      value={row.mode}
+                      // onValueChange={(val) => updateRow(row.id, { mode: val })}
+                      onValueChange={(val) => {
+                        let newTarget = row.target;
+
+                        if (newTarget !== "" && !isNaN(newTarget)) {
+                          const num = Math.abs(Number(newTarget));
+                          newTarget = val === "minus" ? -num : num;
+                        }
+
+                        updateRow(row.id, { mode: val, target: newTarget });
+                      }}
+                      className="flex gap-1 justify-center"
+                    >
+                      <Label
+                        className={`px-2 py-1 cursor-pointer rounded text-xs leading-4 ${row.mode === "plus"
+                            ? "bg-green-400 text-black font-bold"
+                            : "bg-[#101c29] text-white"
+                          }`}
+                      >
+                        <RadioGroupItem value="plus" className="hidden" />+
+                      </Label>
+                      <Label
+                        className={`px-2 py-1 cursor-pointer rounded text-xs leading-4 ${row.mode === "minus"
+                            ? "bg-red-400 text-black font-bold"
+                            : "bg-[#101c29] text-white"
+                          }`}
+                      >
+                        <RadioGroupItem value="minus" className="hidden" />−
+                      </Label>
+                    </RadioGroup>
                   </div>
-                  <RadioGroup
-                    value={row.mode}
-                    // onValueChange={(val) => updateRow(row.id, { mode: val })}
-                    onValueChange={(val) => {
-                      let newTarget = row.target;
 
-                      if (newTarget !== "" && !isNaN(newTarget)) {
-                        const num = Math.abs(Number(newTarget));
-                        newTarget = val === "minus" ? -num : num;
+                  <div className="flex gap-2 w-[250px] items-start flex-1">
+                    <Textarea
+                      rows={1}
+                      placeholder="Target"
+                      value={row.target !== "" ? row.target : ""}  // ✅ raw string, no Math.abs/Number
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        // ✅ max 2 digits after decimal
+                        if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
+                          updateRow(row.id, { target: val });
+                        }
+                      }}
+                      className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
+                    />
+
+                    <Textarea
+                      rows={1}
+                      placeholder={`Skill ${row.id} description`}
+                      value={String(row.description || "")}
+                      onChange={(e) =>
+                        updateRow(row.id, { description: e.target.value })
                       }
+                      className="bg-white text-black text-xs w-[300px] rounded-md border border-slate-400 p-2 resize-none leading-tight"
+                    />
 
-                      updateRow(row.id, { mode: val, target: newTarget });
-                    }}
-                    className="flex gap-1 justify-center"
-                  >
-                    <Label
-                      className={`px-2 py-1 cursor-pointer rounded text-xs leading-4 ${
-                        row.mode === "plus"
-                          ? "bg-green-400 text-black font-bold"
-                          : "bg-[#101c29] text-white"
-                      }`}
-                    >
-                      <RadioGroupItem value="plus" className="hidden" />+
-                    </Label>
-                    <Label
-                      className={`px-2 py-1 cursor-pointer rounded text-xs leading-4 ${
-                        row.mode === "minus"
-                          ? "bg-red-400 text-black font-bold"
-                          : "bg-[#101c29] text-white"
-                      }`}
-                    >
-                      <RadioGroupItem value="minus" className="hidden" />−
-                    </Label>
-                  </RadioGroup>
+                    <Textarea
+                      rows={1}
+                      placeholder="Unit"
+                      value={row.unit}
+                      onChange={(e) =>
+                        updateRow(row.id, { unit: e.target.value })
+                      }
+                      className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
+                    />
+                  </div>
                 </div>
-
-                <div className="flex gap-2 w-[250px] items-start flex-1">
-                  <Textarea
-                    rows={1}
-                    placeholder="Target"
-                    value={
-                      row.target !== "" ? Math.abs(Number(row.target)) : ""
-                    }
-                    onChange={(e) =>
-                      updateRow(row.id, { target: e.target.value })
-                    }
-                    className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
-                  />
-
-                  <Textarea
-                    rows={1}
-                    placeholder={`Skill ${row.id} description`}
-                    value={String(row.description || "")}
-                    onChange={(e) =>
-                      updateRow(row.id, { description: e.target.value })
-                    }
-                    className="bg-white text-black text-xs w-[300px] rounded-md border border-slate-400 p-2 resize-none leading-tight"
-                  />
-
-                  <Textarea
-                    rows={1}
-                    placeholder="Unit"
-                    value={row.unit}
-                    onChange={(e) =>
-                      updateRow(row.id, { unit: e.target.value })
-                    }
-                    className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
-                  />
-                </div>
-              </div>
-            )):
-           <div className="flex items-start p-3">
+              )) :
+              <div className="flex items-start p-3">
                 {/* Skill No. + +/- */}
                 <div className="flex gap-2 w-[250px] items-start flex-1">
                   <Textarea
                     rows={1}
                     placeholder="Target"
-                    value={
-                      rows[0].target !== "" ? Math.abs(Number(rows[0].target)) : ""
-                    }
-                    onChange={(e) =>
-                      updateRow(1, { target: e.target.value })
-                    }
+                    value={rows[0].target !== "" ? rows[0].target : ""}  // ✅ raw string
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      // ✅ max 2 digits after decimal
+                      if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
+                        updateRow(1, { target: val });
+                      }
+                    }}
                     className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
                   />
 
@@ -395,32 +397,34 @@ export default function BasicLeaderboardSetUpSkill({
                     className="bg-white text-black text-xs w-[300px] rounded-md border border-slate-400 p-2 resize-none leading-tight"
                   />
 
-                 { (type !== "negative" && ladderType !== "negative") && (
-                  <Textarea
-                    rows={1}
-                    placeholder="Unit"
-                    value={rows[0].unit}
-                    onChange={(e) =>
-                      updateRow(1, { unit: e.target.value })
-                    }
-                    className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
-                  />)}
+                  {(type !== "negative" && ladderType !== "negative") && (
+                    <Textarea
+                      rows={1}
+                      placeholder="Unit"
+                      value={rows[0].unit}
+                      onChange={(e) =>
+                        updateRow(1, { unit: e.target.value })
+                      }
+                      className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
+                    />)}
                 </div>
               </div>
             }
           </div>
 
-          <div className={`bg-[#14283a] flex justify-between items-center w-full px-8 py-3 border-t border-white/20`}>
-         
-             {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? 
-             <div className="flex items-center justify-end mx-4">
-              <BasicLeaderboardPrintSkillsSheet
-                skills={safeSkillsForPrint}
-                ladderId={ladderId}
-                className="hidden"
-              />
-            </div>:null}
-               <div className="flex justify-center gap-4">
+          <div className={`bg-[#14283a] flex ${type === "positive" ||
+                  type === "negative" ||
+                  ladderType === "positive" ||
+                  ladderType === "negative"?"justify-end" : "justify-between"}   items-center w-full px-8 py-3 border-t border-white/20`}>
+            {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ?
+              <div className="flex items-center justify-end mx-4">
+                <BasicLeaderboardPrintSkillsSheet
+                  skills={safeSkillsForPrint}
+                  ladderId={ladderId}
+                  className="hidden"
+                />
+              </div> : null}
+            <div className="flex justify-center gap-4">
               <Button
                 size="sm"
                 disabled={saving}

@@ -181,29 +181,18 @@ const DemoLadder = ({ userId }) => {
                           Test
                         </Button>
 
-
-
                         <Popover>
-
                           <PopoverTrigger asChild>
-
-                            <button className="grid place-items-center h-8 w-8 rounded-full bg-white/10 text-cyan-300 hover:scale-110 transition">
+                            <button className="grid place-items-center h-8 w-8 rounded-full bg-white/10 text-cyan-300 hover:scale-110 transition cursor-pointer">
                               <Info className="w-4 h-4" />
                             </button>
-
                           </PopoverTrigger>
-
-
-
                           <PopoverContent
                             side="right"
                             align="center"
                             className="max-w-xs sm:max-w-md border border-white/10 bg-[#0b1020]/95 text-white backdrop-blur-xl shadow-xl animate-in fade-in zoom-in"
                           >
-
-
                             {name.includes("minileague") ? (
-
                               <table className="text-xs sm:text-sm w-full text-left border-collapse">
 
                                 <tbody>
@@ -241,34 +230,20 @@ const DemoLadder = ({ userId }) => {
                                 </tbody>
 
                               </table>
-
                             ) : (
-
                               <p className="text-xs sm:text-sm leading-relaxed">
                                 {description}
                               </p>
-
                             )}
-
-
                           </PopoverContent>
-
                         </Popover>
-
                       </div>
-
                     </motion.div>
-
                   );
-
                 })}
-
               </div>
-
             )}
-
           </div>
-
         </div>
 
       </motion.div>

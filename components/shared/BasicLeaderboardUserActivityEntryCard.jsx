@@ -46,14 +46,18 @@ export default function BasicLeaderboardActivityEntryCard({
     ms: "",
   });
   const [zeroAction, setZeroAction] = useState(null);
-  const [isConfirmedZero, setIsConfirmedZero] = useState(false);
+  const [topScore, setTopScore] = useState(0);
+  const [openSuccessResult, setOpenSuccessResult] = useState(false);
+
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
   const ladderType = searchParams.get("ladder_type");
   const minRef = useRef(null);
   const secRef = useRef(null);
   const msRef = useRef(null);
-  // Update selected activity if initialActivity changes
+
+
+
   useEffect(() => {
     if (initialActivity) {
       setSelectedActivity(initialActivity);
@@ -97,6 +101,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
     fetchSkill();
   }, [selectedActivity, ladderId]);
+
 
   /* ---------------- INPUT HANDLERS ---------------- */
   // const handleDigit = (d) => {
@@ -311,21 +316,44 @@ export default function BasicLeaderboardActivityEntryCard({
     });
   };
 
+  // const handleEnter = useCallback(() => {
+  //   if (!skillActivityId || !playerId) return;
+
+  //   const num = Math.abs(Number(value) || 0);
+
+  //   // 🚨 ALWAYS intercept 0 and "-"
+  //   if (type !== "negative" && ladderType !== "negative") {
+
+  //     if (value === "-") {
+  //       setZeroAction("onlyReset");
+  //       setOpenZeroAlert(true);
+  //       return;
+  //     }
+
+  //     if (num === 0) {
+  //       setZeroAction("both");
+  //       setOpenZeroAlert(true);
+  //       return;
+  //     }
+  //   }
+
+
+  //   // ✅ Normal flow → direct API
+  //   submitScore(value, topScore);
+
+  // }, [skillActivityId, playerId, value, skillSign, topScore, timeParts]);
+
   const handleEnter = useCallback(() => {
     if (!skillActivityId || !playerId) return;
 
     const num = Math.abs(Number(value) || 0);
 
-    // 🚨 ALWAYS intercept 0 and "-"
     if (type !== "negative" && ladderType !== "negative") {
-      console.log("handleDigit==>", type,  ladderType !== "negative");
-      
       if (value === "-") {
         setZeroAction("onlyReset");
         setOpenZeroAlert(true);
         return;
       }
-
       if (num === 0) {
         setZeroAction("both");
         setOpenZeroAlert(true);
@@ -333,26 +361,30 @@ export default function BasicLeaderboardActivityEntryCard({
       }
     }
 
+    // ✅ snapshot timeParts RIGHT NOW and pass it in
+    submitScore(value, topScore, timeParts);
 
-    // ✅ Normal flow → direct API
-    submitScore(value);
+  }, [skillActivityId, playerId, value, skillSign, topScore, timeParts]); // timeParts in deps
 
-  }, [skillActivityId, playerId, value, skillSign]);
 
-  const submitScore = async (inputScore) => {
+  const submitScore = async (inputScore, bestScore, currentTimeParts) => {
     if (!skillActivityId || !playerId) return;
 
     let finalScore;
     let URl;
     let ladderTypeUpdate;
-
     if (type === "negative" || ladderType === "negative") {
       URl = "user/postResultNegativeSkillboard";
       ladderTypeUpdate = "negative";
 
+      // ✅ use the directly passed timeParts — always fresh
+      const latest = currentTimeParts;
+
       finalScore =
         "00:" +
-        `${timeParts.min.padStart(2, "0")}:${timeParts.sec.padStart(2, "0")}.${timeParts.ms.padStart(3, "0")}`;
+        `${latest.min.padStart(2, "0")}:${latest.sec.padStart(2, "0")}.${latest.ms.padStart(3, "0")}`;
+
+
     } else {
       URl = "user/postResultSkillboard";
       ladderTypeUpdate =
@@ -377,6 +409,10 @@ export default function BasicLeaderboardActivityEntryCard({
         score: finalScore,
         witness_by: witnessBy.trim(),
       };
+
+      if (bestScore && ladderType === "skill") {
+        payload.best_result = bestScore;
+      }
 
       const res = await axios.post(
         `https://ne-games.com/leaderBoard/api/${URl}`,
@@ -403,9 +439,7 @@ export default function BasicLeaderboardActivityEntryCard({
       setOpenSuccess(true);
     } catch (err) {
       console.error("Error Detail:", err.response?.data || err);
-      alert(
-        "Failed to save: " + (err.response?.data?.message || "Unknown error")
-      );
+      alert("Failed to save: " + (err.response?.data?.message || "Unknown error"));
     } finally {
       setSaving(false);
     }
@@ -413,6 +447,11 @@ export default function BasicLeaderboardActivityEntryCard({
 
   const handleSuccessClose = useCallback(() => {
     setOpenSuccess(false);
+    if (onClose) onClose();
+  }, [onClose]);
+
+  const handleSuccessCloseResult = useCallback(() => {
+    setOpenSuccessResult(false);
     if (onClose) onClose();
   }, [onClose]);
 
@@ -432,6 +471,32 @@ export default function BasicLeaderboardActivityEntryCard({
     } else if (type === "reset") {
       setValue("-");
       submitScore("-");
+    }
+  };
+
+  const getBestScore = async () => {
+    if (ladderType === "negative" || type === "negative") {
+      submitScore(value, topScore, timeParts);
+      return;
+    }
+
+    if (value == 0 || value == "-" || ladderType === "positive") {
+      handleEnter();
+      return;
+    }
+
+    const bestScore = await axios.get(
+      `https://ne-games.com/leaderBoard/api/user/getTopScore?user_id=${String(playerId)}&skill_activity_id=${String(skillActivityId)}&score=${String(value)}`,
+      {
+        headers: {
+          APPKEY: APPKEY,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    if (bestScore.status == 200) {
+      setTopScore(bestScore.data.data[0].top_score);
+      setOpenSuccessResult(true);
     }
   };
 
@@ -497,8 +562,8 @@ export default function BasicLeaderboardActivityEntryCard({
 
         <div
           className={`flex items-center gap-2 w-full ${type === "negative" || ladderType === "negative"
-              ? "justify-center bg-slate-800"
-              : "justify-start"
+            ? "justify-center bg-slate-800"
+            : "justify-start"
             }`}
         >
           {type !== "negative" && ladderType !== "negative" && (
@@ -582,8 +647,8 @@ export default function BasicLeaderboardActivityEntryCard({
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleClear}
               className={`h-9 bg-red-500 text-black rounded transition-all ${type === "positive" || ladderType === "positive"
-                  ? "col-span-8"
-                  : "col-span-12"
+                ? "col-span-8"
+                : "col-span-12"
                 }`}
             >
               clear
@@ -642,7 +707,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
         <Button
           disabled={saving}
-          onClick={handleEnter}
+          onClick={getBestScore}
           className="w-full mt-3 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-lg"
         >
           {saving ? "Saving..." : "Enter"}
@@ -672,6 +737,60 @@ export default function BasicLeaderboardActivityEntryCard({
               className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold"
             >
               OK
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
+        <DialogContent className="max-w-md p-0 overflow-hidden">
+                  
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b">
+            <h2 className="text-lg font-semibold text-emerald-600">
+              Enter Result
+            </h2>
+          </div>
+
+          {/* Body */}
+          <div className="px-5 py-4 space-y-4">
+
+            {/* Scores Row */}
+            <div className="flex items-center justify-between text-lg font-bold">
+              <div className="flex items-center gap-2">
+                <span>Today’s Result</span>
+                <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
+                  {value}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span>Your Best Result</span>
+                <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
+                  {topScore || 0}
+                </span>
+              </div>
+            </div>
+
+            {/* Note */}
+            <p className="text-md text-gray-500 italic">
+              Note: If today's result is also your best result, fill in both boxes
+            </p>
+
+            {/* Witness */}
+            <div>
+              <label className="text-md font-medium">Witness: <span className="ml-3 font-bold"> {witnessBy || "—"} </span></label>
+            </div>
+
+            {/* Button */}
+            <Button
+              onClick={async () => {
+                await handleEnter();
+                handleSuccessCloseResult();
+              }}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-md"
+            >
+              Confirm
             </Button>
           </div>
         </DialogContent>
