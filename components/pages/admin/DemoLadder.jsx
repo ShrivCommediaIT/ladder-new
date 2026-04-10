@@ -130,21 +130,7 @@ const DemoLadder = ({ userId }) => {
               <div className="space-y-3">
 
                 {demoLadders?.map((ladder, index) => {
-
-                  const name = ladder.name.toLowerCase();
-
-                  let description = "";
-
-                  if (name.includes("win")) description = ladderDescriptions.win;
-                  else if (name.includes("best") && name.includes("3"))
-                    description = ladderDescriptions.best3;
-                  else if (name.includes("best") && name.includes("5"))
-                    description = ladderDescriptions.best5;
-                  else if (name.includes("skill"))
-                    description = ladderDescriptions.skill;
-
                   return (
-
                     <motion.div
                       key={ladder.id}
                       initial={{ opacity: 0, y: 10 }}
@@ -192,49 +178,11 @@ const DemoLadder = ({ userId }) => {
                             align="center"
                             className="max-w-xs sm:max-w-md border border-white/10 bg-[#0b1020]/95 text-white backdrop-blur-xl shadow-xl animate-in fade-in zoom-in"
                           >
-                            {name.includes("minileague") ? (
-                              <table className="text-xs sm:text-sm w-full text-left border-collapse">
-
-                                <tbody>
-
-                                  <tr>
-                                    <td className="pr-4 py-1">3-0 Win</td>
-                                    <td className="py-1 font-semibold">8 Pts</td>
-                                  </tr>
-
-                                  <tr>
-                                    <td className="pr-4 py-1">3-1 Win</td>
-                                    <td className="py-1 font-semibold">7 Pts</td>
-                                  </tr>
-
-                                  <tr>
-                                    <td className="pr-4 py-1">3-2 Win</td>
-                                    <td className="py-1 font-semibold">6 Pts</td>
-                                  </tr>
-
-                                  <tr>
-                                    <td className="pr-4 py-1">3-2 Loss</td>
-                                    <td className="py-1 font-semibold">4 Pts</td>
-                                  </tr>
-
-                                  <tr>
-                                    <td className="pr-4 py-1">3-1 Loss</td>
-                                    <td className="py-1 font-semibold">3 Pts</td>
-                                  </tr>
-
-                                  <tr>
-                                    <td className="pr-4 py-1">3-0 Loss</td>
-                                    <td className="py-1 font-semibold">2 Pts</td>
-                                  </tr>
-
-                                </tbody>
-
-                              </table>
-                            ) : (
+                         
                               <p className="text-xs sm:text-sm leading-relaxed">
-                                {description}
+                                {ladder.info}
                               </p>
-                            )}
+                        
                           </PopoverContent>
                         </Popover>
                       </div>
