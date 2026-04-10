@@ -1,29 +1,17 @@
-
-
+// redux/slices/gradebarSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { getRequest, postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-// 🔑 API Token (AppKey)
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-// ----------------- FETCH GRADEBARS -----------------
+// Fetch Gradebars
 export const fetchGradebars = createAsyncThunk(
   "gradebar/fetchGradebars",
   async (ladder_id, { rejectWithValue }) => {
     try {
-      const res = await fetch(
-        `https://ne-games.com/leaderBoard/api/user/leaderboard?ladder_id=${ladder_id}`,
-        {
-          headers: {
-            appkey: APPKEY,
-          },
-        }
-      );
-
-      const data = await res.json();
+      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, { ladder_id });
       if (data.status !== 200) {
         return rejectWithValue(data.message || "Failed to fetch gradebars");
       }
-
       return {
         gradebarDetails: data.gradebarDetails || [],
         gradebar: data.gradebar || {},
@@ -36,53 +24,35 @@ export const fetchGradebars = createAsyncThunk(
   }
 );
 
-
-// ----------------- UPDATE GRADEBAR DETAILS -----------------
+// Update Gradebar Details
 export const updategradeBar = createAsyncThunk(
   "gradebar/updategradeBar",
   async ({ gradebar_id, gradebar_details }, { rejectWithValue }) => {
     try {
       if (!gradebar_id) throw new Error("gradebar_id is required!");
 
-      const res = await fetch(
-        `https://ne-games.com/leaderBoard/api/user/updategradeBar`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            appkey: APPKEY,
-          },
-          body: JSON.stringify({
-            gradebar_id,
-            gradebar_details: gradebar_details.map((g) => ({
-              gradebar_details_id: g.id, // 👈 API ko ye chahiye
-              gradebar_name: g.gradebar_name || "",
-              player_id: g.player_id || null, // 👈 agar players bhi hai toh unka id pass karo
-            })),
-          }),
-        }
-      );
-
-      const data = await res.json();
+      const data = await postRequest(API_ENDPOINTS.UPDATE_GRADEBAR, {
+        gradebar_id,
+        gradebar_details: gradebar_details.map((g) => ({
+          gradebar_details_id: g.id,
+          gradebar_name: g.gradebar_name || "",
+          player_id: g.player_id || null,
+        })),
+      });
 
       if (data.status !== 200) {
         return rejectWithValue(
           data.error_message || data.message || "Failed to update gradebar"
         );
       }
-
-      return {
-        gradebar_details,
-        message: data.success_message ,
-      };
+      return { gradebar_details, message: data.success_message };
     } catch (err) {
       return rejectWithValue(err.message);
     }
   }
 );
 
-
-// ----------------- RESET GRADEBAR -----------------
+// Reset Gradebar
 export const resetGradebar = createAsyncThunk(
   "gradebar/resetGradebar",
   async ({ gradebar_id, ladder_id, preset, gradebar_name }, { rejectWithValue }) => {
@@ -90,28 +60,16 @@ export const resetGradebar = createAsyncThunk(
       if (!gradebar_id) throw new Error("gradebar_id is required!");
       if (!ladder_id) throw new Error("ladder_id is required!");
 
-      const res = await fetch(
-        `https://ne-games.com/leaderBoard/api/user/resetgradeBar`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            appkey: APPKEY,
-          },
-          body: JSON.stringify({
-            gradebar_id,
-            ladder_id,
-            preset,
-            gradebar_name,
-          }),
-        }
-      );
+      const data = await postRequest(API_ENDPOINTS.RESET_GRADEBAR, {
+        gradebar_id,
+        ladder_id,
+        preset,
+        gradebar_name,
+      });
 
-      const data = await res.json();
       if (data.status !== 200) {
         return rejectWithValue(data.message || "Failed to reset gradebar");
       }
-
       return {
         gradebar: data.data.gradebar,
         gradebarDetails: data.data.gradebar_details,
@@ -123,12 +81,11 @@ export const resetGradebar = createAsyncThunk(
   }
 );
 
-// ----------------- SLICE -----------------
 const gradebarSlice = createSlice({
   name: "gradebar",
   initialState: {
     gradebarDetails: [],
-    ladderDetails: {}, // ✅ ADD
+    ladderDetails: {},
     gradebar: {},
     preset: 10,
     loading: false,
@@ -142,13 +99,11 @@ const gradebarSlice = createSlice({
       state.gradebarDetails = updatedGrades;
     },
     updatePrimaryGradebarName: (state, action) => {
-    state.primaryGradebarName = action.payload; // ✅ नया reducer
-  },
-
+      state.primaryGradebarName = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
-      // fetch
       .addCase(fetchGradebars.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -164,8 +119,6 @@ const gradebarSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // update
       .addCase(updategradeBar.pending, (state) => {
         state.updating = true;
         state.error = null;
@@ -178,8 +131,6 @@ const gradebarSlice = createSlice({
         state.updating = false;
         state.error = action.payload;
       })
-
-      // reset
       .addCase(resetGradebar.pending, (state) => {
         state.updating = true;
         state.error = null;
@@ -197,9 +148,6 @@ const gradebarSlice = createSlice({
   },
 });
 
-// export const { updateLocalGradebarName } = gradebarSlice.actions;
-export const {
-  updateLocalGradebarName,
-  updatePrimaryGradebarName, // ✅ अब available
-} = gradebarSlice.actions;
+export const { updateLocalGradebarName, updatePrimaryGradebarName } =
+  gradebarSlice.actions;
 export default gradebarSlice.reducer;

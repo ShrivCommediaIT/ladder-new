@@ -1,5 +1,7 @@
+// redux/slices/challengeSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const initialState = {
   loading: false,
@@ -7,28 +9,19 @@ const initialState = {
   error: null,
 };
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy"
-
-// Thunk for challenge API
 const challengeToPlayer = createAsyncThunk(
   "challenge/send",
-  async (
-    { user_id, challenge_to_rank },
-    { rejectWithValue }
-  ) => {
+  async ({ user_id, challenge_to_rank }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/challenge_to`,
-        
-        {
-           headers: { APPKEY:APPKEY },  
-          params: { user_id, challenge_to_rank },
-          
-        }
-      );
-      return response.data;
+      const data = await getRequest(API_ENDPOINTS.CHALLENGE_TO, {
+        user_id,
+        challenge_to_rank,
+      });
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Challenge failed");
+      return rejectWithValue(
+        error.response?.data?.message || "Challenge failed"
+      );
     }
   }
 );
@@ -49,10 +42,10 @@ const challengeSlice = createSlice({
         state.success = false;
         state.error = null;
       })
-      .addCase(challengeToPlayer.fulfilled, (state,action) => {
+      .addCase(challengeToPlayer.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.data = action.payload
+        state.data = action.payload;
       })
       .addCase(challengeToPlayer.rejected, (state, action) => {
         state.loading = false;
@@ -62,5 +55,5 @@ const challengeSlice = createSlice({
 });
 
 export const { resetChallengeStatus } = challengeSlice.actions;
-export {challengeToPlayer}
+export { challengeToPlayer };
 export default challengeSlice.reducer;

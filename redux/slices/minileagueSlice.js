@@ -1,30 +1,22 @@
+// redux/slices/minileagueSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-// =============================== ladder type for minileague
+import { getRequest, postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 export const fetchMiniLeague = createAsyncThunk(
   "minileague/fetchMiniLeague",
   async ({ ladder_id, type = "minileague" }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/leaderboard?ladder_id=${ladder_id}&type=${type}`,
-        { headers: { APPKEY } },
-      );
-
-      const rawSections = response.data?.data || [];
-
+      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, { ladder_id, type });
       return {
-        data: rawSections, // ✅ section-wise players
-        gradebars: response.data.gradebarDetails || [], // ✅ gradebars
-        ladderDetails: response.data.ladderDetails || {}, // ✅ VERY IMPORTANT (TYPE YAHI SE AAYEGA)
+        data: data?.data || [],
+        gradebars: data.gradebarDetails || [],
+        ladderDetails: data.ladderDetails || {},
       };
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
-  },
+  }
 );
 
 export const importMiniLeague = createAsyncThunk(
@@ -34,20 +26,12 @@ export const importMiniLeague = createAsyncThunk(
       const formData = new FormData();
       formData.append("file", file);
       formData.append("ladder_id", ladder_id);
-
-      const response = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/importminileague",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data", APPKEY },
-        },
-      );
-
-      return response.data;
+      const data = await postFormData(API_ENDPOINTS.IMPORT_MINILEAGUE, formData);
+      return data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
-  },
+  }
 );
 
 const miniLeagueSlice = createSlice({
@@ -55,7 +39,7 @@ const miniLeagueSlice = createSlice({
   initialState: {
     loading: false,
     importLoading: false,
-    data: [], // section-wise data
+    data: [],
     gradebars: [],
     ladderDetails: null,
     error: null,
@@ -63,28 +47,19 @@ const miniLeagueSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchMiniLeague.pending, (state) => {
-        state.loading = true;
-      })
+      .addCase(fetchMiniLeague.pending, (state) => { state.loading = true; })
       .addCase(fetchMiniLeague.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload.data;
         state.gradebars = action.payload.gradebars;
-
-        // ✅ yahi se ab ladderType milega
         state.ladderDetails = action.payload.ladderDetails;
       })
-
       .addCase(fetchMiniLeague.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(importMiniLeague.pending, (state) => {
-        state.importLoading = true;
-      })
-      .addCase(importMiniLeague.fulfilled, (state) => {
-        state.importLoading = false;
-      })
+      .addCase(importMiniLeague.pending, (state) => { state.importLoading = true; })
+      .addCase(importMiniLeague.fulfilled, (state) => { state.importLoading = false; })
       .addCase(importMiniLeague.rejected, (state, action) => {
         state.importLoading = false;
         state.error = action.payload;

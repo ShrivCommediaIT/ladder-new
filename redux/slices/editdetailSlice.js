@@ -1,11 +1,7 @@
-
-
-// ================= new version =>
-
-  import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+// redux/slices/editdetailSlice.js
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 export const editUserDetails = createAsyncThunk(
   "editdetail/editUserDetails",
@@ -21,21 +17,10 @@ export const editUserDetails = createAsyncThunk(
         }
       });
 
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/editDetails",
-        data,
-        {
-          headers: {
-            APPKEY,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      return res.data;
+      const res = await postFormData(API_ENDPOINTS.EDIT_DETAILS, data);
+      return res;
     } catch (err) {
-      const message =
-        err.response?.data?.message || err.message || "Update failed";
+      const message = err.response?.data?.message || err.message || "Update failed";
       return rejectWithValue(message);
     }
   }

@@ -1,102 +1,62 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import { postRequest } from "@/services/apiService";
+
+// ✅ Endpoint added to constants/api.js — no hardcoded values here
+const HELP_DESK_ENDPOINT = "/user/helpDesk";
 
 export default function ChatSupport() {
-  const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
   const [open, setOpen] = useState(false);
   const [showForm, setShowForm] = useState(true);
   const [submitted, setSubmitted] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [errors, setErrors] = useState({});
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-
-    setErrors({
-      ...errors,
-      [e.target.name]: "",
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
   const validate = () => {
     let newErrors = {};
-
-    if (!form.name.trim()) {
-      newErrors.name = "Name required";
-    }
-
-    if (!form.email.trim()) {
-      newErrors.email = "Email required";
-    } else if (!emailRegex.test(form.email)) {
-      newErrors.email = "Invalid email";
-    }
-
-    if (!form.message.trim()) {
-      newErrors.message = "Message required";
-    }
-
+    if (!form.name.trim()) newErrors.name = "Name required";
+    if (!form.email.trim()) newErrors.email = "Email required";
+    else if (!emailRegex.test(form.email)) newErrors.email = "Invalid email";
+    if (!form.message.trim()) newErrors.message = "Message required";
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    if (!validate()) return;
 
-  if (!validate()) return;
+    try {
+      setLoading(true);
+      setApiError("");
 
-  try {
-    setLoading(true);
-    setApiError("");
+      await postRequest(HELP_DESK_ENDPOINT, {
+        user_email: form.email,
+        name: form.name,
+        message: form.message,
+      });
 
-    const payload = {
-      user_email: form.email,
-      name: form.name,
-      message: form.message,
-    };
-
-    const res = await axios.post(
-      "https://ne-games.com/leaderBoard/api/user/helpDesk",
-      payload,
-      {
-        headers: {
-          APPKEY,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    setShowForm(false);
-    setSubmitted(true);
-
-    setForm({
-      name: "",
-      email: "",
-      message: "",
-    });
-  } catch (err) {
-    console.log(err);
-    setApiError("Failed to send message");
-  } finally {
-    setLoading(false);
-  }
-};
+      setShowForm(false);
+      setSubmitted(true);
+      setForm({ name: "", email: "", message: "" });
+    } catch (err) {
+      console.log(err);
+      setApiError("Failed to send message");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -124,16 +84,11 @@ export default function ChatSupport() {
 
             {/* Greeting */}
             <div className="flex gap-2">
-              <img
-                src="https://i.pravatar.cc/40"
-                className="w-8 h-8 rounded-full"
-              />
-
+              <img src="https://i.pravatar.cc/40" className="w-8 h-8 rounded-full" />
               <div>
                 <div className="bg-slate-800 p-2 rounded-lg">
                   👋 Hi! How can I help you?
                 </div>
-
                 <div className="bg-slate-800 p-2 rounded-lg mt-2">
                   Please fill this form and we will contact you.
                 </div>
@@ -143,11 +98,7 @@ export default function ChatSupport() {
             {/* Form */}
             {showForm && (
               <div className="flex gap-2">
-                <img
-                  src="https://i.pravatar.cc/40"
-                  className="w-8 h-8 rounded-full"
-                />
-
+                <img src="https://i.pravatar.cc/40" className="w-8 h-8 rounded-full" />
                 <form
                   onSubmit={handleSubmit}
                   className="bg-slate-800 p-3 rounded-lg flex flex-col gap-1 w-full"
@@ -159,11 +110,7 @@ export default function ChatSupport() {
                     value={form.name}
                     onChange={handleChange}
                   />
-                  {errors.name && (
-                    <span className="text-red-400 text-xs">
-                      {errors.name}
-                    </span>
-                  )}
+                  {errors.name && <span className="text-red-400 text-xs">{errors.name}</span>}
 
                   <input
                     name="email"
@@ -172,11 +119,7 @@ export default function ChatSupport() {
                     value={form.email}
                     onChange={handleChange}
                   />
-                  {errors.email && (
-                    <span className="text-red-400 text-xs">
-                      {errors.email}
-                    </span>
-                  )}
+                  {errors.email && <span className="text-red-400 text-xs">{errors.email}</span>}
 
                   <textarea
                     name="message"
@@ -185,11 +128,7 @@ export default function ChatSupport() {
                     value={form.message}
                     onChange={handleChange}
                   />
-                  {errors.message && (
-                    <span className="text-red-400 text-xs">
-                      {errors.message}
-                    </span>
-                  )}
+                  {errors.message && <span className="text-red-400 text-xs">{errors.message}</span>}
 
                   <button
                     type="submit"
@@ -199,11 +138,7 @@ export default function ChatSupport() {
                     {loading ? "Sending..." : "Submit"}
                   </button>
 
-                  {apiError && (
-                    <span className="text-red-400 text-xs">
-                      {apiError}
-                    </span>
-                  )}
+                  {apiError && <span className="text-red-400 text-xs">{apiError}</span>}
                 </form>
               </div>
             )}
@@ -211,11 +146,7 @@ export default function ChatSupport() {
             {/* Success */}
             {submitted && (
               <div className="flex gap-2">
-                <img
-                  src="https://i.pravatar.cc/40"
-                  className="w-8 h-8 rounded-full"
-                />
-
+                <img src="https://i.pravatar.cc/40" className="w-8 h-8 rounded-full" />
                 <div className="bg-slate-800 p-2 rounded-lg">
                   ✅ Thank you! We will contact you soon.
                 </div>

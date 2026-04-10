@@ -1,60 +1,47 @@
+// redux/slices/loginClub.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
+import { setUser } from "./userSlice"; // ✅ fixed: was missing import
 
 export const loginClub = createAsyncThunk(
   "auth/loginClub",
   async ({ club_id, pin }, { rejectWithValue, dispatch }) => {
     try {
-      const payload = JSON.stringify({
+      const data = await postRequest(API_ENDPOINTS.APP_USER_LOGIN, {
         login_id: club_id,
         password: pin,
         user_type: "admin",
       });
 
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/app/user/login",
-        payload,
-        {
-          headers: {
-            APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      console.log("response api : ", res.data)
-
-      if (res.data?.status === false) {
-        return rejectWithValue(res.data?.message || "Login failed");
+      if (data?.status === false) {
+        return rejectWithValue(data?.message || "Login failed");
       }
 
-      //  GLOBAL USER SET
-      dispatch(setUser(res.data.data));
+      // Sync into main user slice
+      dispatch(setUser(data.data));
 
-      // optional: localStorage
-      localStorage.setItem("userData", JSON.stringify(res.data.data));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("userData", JSON.stringify(data.data));
+      }
 
-      return res.data.data; 
+      return data.data;
     } catch (err) {
       return rejectWithValue(
-        err?.response?.data?.message || err.data.error_message
+        err?.response?.data?.message || err.message || "Login failed"
       );
     }
   }
 );
 
-
-
-// ---------------------- SLICE ----------------------
 const loginSlice = createSlice({
-  name: "user",
+  name: "clubAuth",  // ✅ renamed from "user" to avoid conflict with userSlice
   initialState: {
     loading: false,
     success: false,
     user: null,
     error: null,
   },
-
   reducers: {
     resetLoginState: (state) => {
       state.loading = false;
@@ -67,7 +54,6 @@ const loginSlice = createSlice({
       state.success = false;
     },
   },
-
   extraReducers: (builder) => {
     builder
       .addCase(loginClub.pending, (state) => {

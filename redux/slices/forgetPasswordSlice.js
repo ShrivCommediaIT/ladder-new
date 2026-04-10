@@ -1,24 +1,14 @@
-
+// redux/slices/forgetPasswordSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-// API endpoint
-const API_URL = "https://ne-games.com/leaderBoard/api/user/forgot/password";
-const APP_KEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-// Async thunk → Reset link bhejne ke liye
 export const forgotPassword = createAsyncThunk(
   "forgotPassword/request",
   async (email, { rejectWithValue }) => {
     try {
-      const response = await axios.get(API_URL, {
-        params: { email },
-        headers: {
-          APPKEY: APP_KEY,
-        },
-      });
-      return response.data;
+      const data = await getRequest(API_ENDPOINTS.FORGOT_PASSWORD, { email });
+      return data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||

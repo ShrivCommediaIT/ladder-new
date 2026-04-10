@@ -1,24 +1,16 @@
+// redux/slices/resetLeaderboardSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-// import { headers } from "next/headers";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-// ✅ Async thunk to reset leaderboard
 export const resetLeaderboard = createAsyncThunk(
   "resetLeaderboard/reset",
   async (ladderId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/Resetleaderboard?ladder_id=${ladderId}`,
-        {
-          headers: {
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          },
-        }
-      );
-      return response.data;
+      const data = await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, {
+        ladder_id: ladderId,
+      });
+      return data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to reset leaderboard"

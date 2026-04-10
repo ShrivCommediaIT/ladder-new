@@ -1,8 +1,6 @@
-
-
 // store.js
 import { configureStore } from "@reduxjs/toolkit";
-import storageSession from "redux-persist/lib/storage/session"; // 👈 sessionStorage
+import storageSession from "redux-persist/lib/storage/session";
 import { persistReducer, persistStore } from "redux-persist";
 import { combineReducers } from "redux";
 
@@ -18,35 +16,32 @@ import profileImageReducer from "./slices/profileImageSlice";
 import profileReducer from "./slices/profileSlice";
 import playerStatusReducer from "./slices/playerStatusSlice";
 import importUsersReducer from "./slices/importSlice";
-
 import fetchLaddersReducer from "./slices/fetchLadderSlice";
-import fetchLadderIdReducer from './slices/playersSlice'
-import  resetLeaderboardReducer from "./slices/resetLeaderboardSlice";
-import gradebarReducer from "./slices/gradebarSlice"
-import playerResultReducer from "./slices/PlayerResultSlice"
-
-import forgotPasswordReducer from "./slices/forgetPasswordSlice"
-import resetPasswordReducer from "./slices/resetPasswordSlice"
-import changePasswordReducer from "./slices/changePassword"
+import fetchLadderIdReducer from "./slices/playersSlice";
+import resetLeaderboardReducer from "./slices/resetLeaderboardSlice";
+import gradebarReducer from "./slices/gradebarSlice";
+import playerResultReducer from "./slices/PlayerResultSlice";
+import forgotPasswordReducer from "./slices/forgetPasswordSlice";
+import resetPasswordReducer from "./slices/resetPasswordSlice";
+import changePasswordReducer from "./slices/changePassword";
 import miniLeagueReducer from "./slices/minileagueSlice";
-import moveToMiniLeagueReducer  from "./slices/minileagueMovingSlice";
+import moveToMiniLeagueReducer from "./slices/minileagueMovingSlice";
 import basicLeaderboardReducer from "./slices/BasicLeaderboardSlice";
 import positiveLeaderBoardReducer from "./slices/positiveLeaderBoardSlice";
 import negativeLeaderBoardReducer from "./slices/negativeLeaderBoardSlice";
-
 import rosterReducer from "./slices/rosterSlice";
 import rosterLeaderboardReducer from "./slices/rosterLeaderboardSlice";
-
-import clubReducer from "./slices/clubSlice"; 
-import authClubReducer from "./slices/loginClub";
-import { positive } from "zod";
+import clubReducer from "./slices/clubSlice";
+import clubAuthReducer from "./slices/loginClub";          // ✅ renamed from authClubReducer to avoid confusion
 import progressFlowReducer from "./slices/progressFlowSlice";
+import subscriptionReducer from "./slices/subscriptionSlice"; // ✅ was missing from store
 
 const persistConfig = {
   key: "root",
-  storage: storageSession, // 👈 ab sessionStorage
+  storage: storageSession,
   whitelist: [
     "user",
+    "clubAuth",       // ✅ updated key
     "player",
     "playerMove",
     "ladder",
@@ -54,6 +49,7 @@ const persistConfig = {
     "editdetail",
     "userByRank",
     "profileImage",
+    "profile",
     "players",
     "playerStatus",
     "import",
@@ -70,42 +66,43 @@ const persistConfig = {
     "club",
     "roster",
     "rosterLeaderboard",
-    "progressFlow"
+    "progressFlow",
+    "subscription",   // ✅ added
   ],
 };
 
 const rootReducer = combineReducers({
-  user: userReducer,
-  player: playersReducer,
-  playerMove: playerMoveReducer,
-  ladder: ladderReducer,
-  activity: activityReducer,
-  challenge: challengeReducer,
-  editdetail: editPlayerReducer,
-  userByRank: fetchUserByRankReducer,
-  profileImage: profileImageReducer,
-  profile: profileImageReducer,
-  playerStatus: playerStatusReducer,
-  importUsers: importUsersReducer,
-  createLadder: ladderReducer,
-  fetchLadder: fetchLaddersReducer,
-  fetchLadderId: fetchLadderIdReducer,
-  resetLeaderboard: resetLeaderboardReducer,
-  gradebar: gradebarReducer,
-  playerResult: playerResultReducer,
-  forgotPassword: forgotPasswordReducer,
-  resetPassword:resetPasswordReducer,
-  changePassword:changePasswordReducer,
-  minileague: miniLeagueReducer,
+  user:                   userReducer,          // ✅ standard user auth (register/login)
+  clubAuth:               clubAuthReducer,       // ✅ club admin login (was duplicate 'user')
+  player:                 playersReducer,
+  playerMove:             playerMoveReducer,
+  ladder:                 ladderReducer,
+  activity:               activityReducer,
+  challenge:              challengeReducer,
+  editdetail:             editPlayerReducer,
+  userByRank:             fetchUserByRankReducer,
+  profileImage:           profileImageReducer,
+  profile:                profileReducer,
+  playerStatus:           playerStatusReducer,
+  importUsers:            importUsersReducer,
+  fetchLadder:            fetchLaddersReducer,
+  fetchLadderId:          fetchLadderIdReducer,
+  resetLeaderboard:       resetLeaderboardReducer,
+  gradebar:               gradebarReducer,
+  playerResult:           playerResultReducer,
+  forgotPassword:         forgotPasswordReducer,
+  resetPassword:          resetPasswordReducer,
+  changePassword:         changePasswordReducer,
+  minileague:             miniLeagueReducer,
   minileaguePlayerMoving: moveToMiniLeagueReducer,
-  skillLeaderboard: basicLeaderboardReducer,
-  positiveLeaderBoard: positiveLeaderBoardReducer,
-  negativeLeaderBoard: negativeLeaderBoardReducer,
-  club: clubReducer,
-  user: authClubReducer,
-  roster: rosterReducer,
-  rosterLeaderboard: rosterLeaderboardReducer,
-  progressFlow:progressFlowReducer,
+  skillLeaderboard:       basicLeaderboardReducer,
+  positiveLeaderBoard:    positiveLeaderBoardReducer,
+  negativeLeaderBoard:    negativeLeaderBoardReducer,
+  club:                   clubReducer,
+  roster:                 rosterReducer,
+  rosterLeaderboard:      rosterLeaderboardReducer,
+  progressFlow:           progressFlowReducer,
+  subscription:           subscriptionReducer,  // ✅ added
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

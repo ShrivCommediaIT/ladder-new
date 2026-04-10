@@ -1,49 +1,34 @@
+// redux/slices/progressFlowSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { getRequest, postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-// GET
-// progressFlowSlice.js
+// GET progress flow
 export const fetchProgressFlow = createAsyncThunk(
   "progressFlow/fetchProgressFlow",
   async ({ user_id, user_type }, thunkAPI) => {
     try {
-      const res = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/getProgressFlow?user_id=${user_id}&user_type=${user_type}`,
-        { headers: { "APPKEY": APPKEY } }
-      );
-      // unwrap nested data if exists
-      return res.data?.data ?? res.data;
+      const data = await getRequest(API_ENDPOINTS.GET_PROGRESS_FLOW, {
+        user_id,
+        user_type,
+      });
+      return data?.data ?? data;
     } catch (err) {
       return thunkAPI.rejectWithValue("Failed to fetch progress flow.");
     }
   }
 );
 
-// POST
+// POST update progress flow
 export const updateProgressFlow = createAsyncThunk(
   "progressFlow/updateProgressFlow",
   async ({ user_id, user_type, step }, { rejectWithValue }) => {
     try {
-      const res = await fetch(
-        "https://ne-games.com/leaderBoard/api/user/updateProgressFlow",
-        {
-          method: "POST",
-          headers: {
-            "APPKEY": APPKEY,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ user_id, user_type, step }),
-        }
-      );
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to update progress flow");
-      }
-
-      const data = await res.json();
+      const data = await postRequest(API_ENDPOINTS.UPDATE_PROGRESS_FLOW, {
+        user_id,
+        user_type,
+        step,
+      });
       return data;
     } catch (err) {
       return rejectWithValue(err.message || "Unknown error");
@@ -73,7 +58,6 @@ const progressFlowSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // 🔄 GET Progress Flow
       .addCase(fetchProgressFlow.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -86,8 +70,6 @@ const progressFlowSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
-      // 📤 POST Update Progress Flow
       .addCase(updateProgressFlow.pending, (state) => {
         state.updateLoading = true;
         state.updateError = null;

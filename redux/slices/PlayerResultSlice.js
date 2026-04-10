@@ -1,23 +1,17 @@
-// src/redux/slices/playerResultSlice.js
+// redux/slices/PlayerResultSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-const API_URL = "https://ne-games.com/leaderBoard/api/user/result/show";
-const APPKEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-// 🔹 AsyncThunk for fetching player result
 export const fetchPlayerResult = createAsyncThunk(
   "playerResult/fetchPlayerResult",
   async ({ user_id, ladder_id }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(API_URL, {
-        params: { user_id, ladder_id },
-        headers: {
-          APPKEY: APPKEY,
-        },
+      const data = await getRequest(API_ENDPOINTS.RESULT_SHOW, {
+        user_id,
+        ladder_id,
       });
-      return response.data.data; // only "data" object return kar rahe hain
+      return data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch player result"
