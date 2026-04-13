@@ -341,7 +341,7 @@ const handleCreateRoster = async () => {
             {/* LADDER TYPES */}
             <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-5">
 
-              <DemoLadder />
+              <DemoLadder userId={admin?.id} />
 
             </div>
 
