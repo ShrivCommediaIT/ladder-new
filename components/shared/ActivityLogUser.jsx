@@ -12,10 +12,8 @@ import {
 import digitalTwin from "@/public/digital-twin.gif";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import axios from "axios";
-
-const APPKEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const ActivityLogUser = ({ ladderId }) => {
   const [activities, setActivities] = useState([]);
@@ -36,30 +34,28 @@ const ActivityLogUser = ({ ladderId }) => {
     try {
       if (!silent) setLoading(true);
 
-      const response = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/activity?ladder_id=${ladderId}&page=${page}&limit=${ACTIVITIES_PER_PAGE}`,
-        { headers: { APPKEY } }
-      );
+      const response = await getRequest(API_ENDPOINTS.ACTIVITY, {
+        ladder_id: ladderId,
+        page,
+        limit: ACTIVITIES_PER_PAGE,
+      });
 
       const data =
-        response?.data?.data ||
-        response?.data?.activities ||
-        response?.data?.result ||
+        response?.data ||
+        response?.activities ||
+        response?.result ||
         [];
 
       const newActivities = Array.isArray(data) ? data : [];
 
-      /* Prevent flashing */
       setActivities((prev) => {
-        if (JSON.stringify(prev) === JSON.stringify(newActivities)) {
-          return prev;
-        }
+        if (JSON.stringify(prev) === JSON.stringify(newActivities)) return prev;
         return newActivities;
       });
 
       const totalCount =
-        response?.data?.total_count ||
-        response?.data?.meta?.total ||
+        response?.total_count ||
+        response?.meta?.total ||
         newActivities.length;
 
       setTotalPages(

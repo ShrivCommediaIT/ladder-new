@@ -5,7 +5,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, UserCircle2, Pencil } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
-import axios from "axios";
+import { postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 // import Logo from "@/public/logo.jpg";
 
 import {
@@ -19,8 +20,7 @@ import {
 import { clubIdPage } from "@/helper/RouteName";
 
 const SubAdminDetails = () => {
-  const APPKEY =
-    "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 
   const router = useRouter();
 
@@ -63,22 +63,10 @@ const SubAdminDetails = () => {
     setUploading(true);
 
     try {
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/app/user/updateSubadminimage",
-        formData,
-        {
-          headers: {
-            APPKEY: APPKEY,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await postFormData("/app/user/updateSubadminimage", formData);
 
-      if (res.data.status == 200 || res.data.status === "success") {
-        let imageUrl =
-          res.data?.image ||
-          res.data?.data?.image ||
-          res.data?.path;
+      if (res.status == 200 || res.status === "success") {
+        let imageUrl = res?.image || res?.data?.image || res?.path;
 
         if (imageUrl) {
           // ensure full url
@@ -106,7 +94,7 @@ const SubAdminDetails = () => {
 
         alert("Profile image updated ");
       } else {
-        alert(res.data.message || "Upload failed");
+      alert(res?.message || "Upload failed");
       }
     } catch (err) {
       console.error(err);

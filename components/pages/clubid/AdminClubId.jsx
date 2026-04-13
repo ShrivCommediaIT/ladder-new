@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import { getRequest, postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -94,21 +95,12 @@ export default function AdminClubId() {
     try {
       setLoading(true);
 
-      const res = await axios.get(
-        "https://ne-games.com/leaderBoard/api/app/user/delete",
-        {
-          params: { id: adminToDelete.id },
-          headers: {
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          },
-        },
-      );
+      const res = await getRequest("/app/user/delete", { id: adminToDelete.id });
 
-      if (res.data?.status === 200 || res.data?.status === true) {
+      if (res?.status === 200 || res?.status === true) {
          await fetchSubAdmins();
       } else {
-        alert(res.data?.message || "Delete failed");
+        alert(res?.message || "Delete failed");
       }
     } catch (err) {
       console.error(err);
@@ -142,19 +134,11 @@ const fetchSubAdmins = async () => {
   setErrorMessage("");
 
   try {
-    const res = await axios.get(
-      "https://ne-games.com/leaderBoard/api/app/user/subadmin",
-      {
-        params: { user_id: userId },
-        headers: {
-          APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-        },
-      }
-    );
+    const res = await getRequest("/app/user/subadmin", { user_id: userId });
 
-    if (res.data?.status === 200) {
-      const admin = res.data.admin;
-      const subAdmins = res.data.data || [];
+    if (res?.status === 200) {
+      const admin = res.admin;
+      const subAdmins = res.data || [];
 
       setClubIdFixed(admin.login_id);
       form.setValue("clubId", admin.login_id);
@@ -226,30 +210,21 @@ useEffect(() => {
         sport_name: values.sportsName,
       };
 
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/app/user/create",
-        payload,
-        {
-          headers: {
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          },
-        },
-      );
+      const res = await postRequest("/app/user/create", payload);
 
 
    // Login PIN Exist popup
 if (
-  res.data?.status === 400 &&
-  res.data?.error_message === "Login pin Exist!"
+  res?.status === 400 &&
+  res?.error_message === "Login pin Exist!"
 ) {
   setLoginPinExistAlert(true);
   return;
 }
 
 
-      if (res.data?.status === false) {
-        setErrorMessage(res.data?.message || "Section-admin creation failed");
+      if (res?.status === false) {
+        setErrorMessage(res?.message || "Section-admin creation failed");
       } else {
        
         await fetchSubAdmins();
@@ -297,18 +272,9 @@ if (
         password: Number(selectedAdmin.pin),
       };
 
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/app/user/update",
-        payload,
-        {
-          headers: {
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          },
-        },
-      );
+      const res = await postRequest("/app/user/update", payload);
 
-      if (res.data?.status === 200 || res.data?.status === true) {
+      if (res?.status === 200 || res?.status === true) {
         //  update UI after success
         setData((prev) =>
           prev.map((i) =>
@@ -318,7 +284,7 @@ if (
 
         setIsDrawerOpen(false);
       } else {
-        alert(res.data?.message || "Update failed");
+        alert(res?.message || "Update failed");
       }
     } catch (err) {
       console.error("Update error:", err);

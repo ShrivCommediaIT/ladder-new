@@ -50,7 +50,6 @@ const ladderType = searchParams.get("type");
   // FIXED: Real-time refresh + auto-close after upload success
   useEffect(() => {
     if (success) {
-      // toast.success("Profile image updated successfully! ⏳ Refreshing...");
       
       // REAL-TIME REFRESH - 800ms delay for smooth UX
       const timer = setTimeout(() => {

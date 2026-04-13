@@ -417,16 +417,10 @@ const handleCreateRoster = async () => {
                 href="mailto:support@sportssolutionspro.com"
                 className="mt-1 inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors text-sm sm:text-base font-semibold"
               >
-                {/* <Envelope className="w-4 h-4 mr-2" /> */}
                 support@sportssolutionspro.com
               </a>
             </div>
 
-            {/* Right Section (Optional, you can add links or copyright) */}
-            {/* <div className="text-sm sm:text-base text-gray-400 text-center sm:text-right">
-            &copy; {new Date().getFullYear()} Sports Solutions Pro. All rights
-            reserved.
-          </div> */}
           </CardContent>
         </Card>
       </footer>

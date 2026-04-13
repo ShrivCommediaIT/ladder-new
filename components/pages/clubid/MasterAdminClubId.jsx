@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import { getRequest, postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { X, CheckCircle2, PencilLine } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -61,16 +62,10 @@ export default function AccessCodeParts() {
       setUserId(id);
 
       try {
-        const res = await axios.get(
-          "https://ne-games.com/leaderBoard/api/app/user/subadmin",
-          {
-            params: { user_id: id },
-            headers: { APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy" },
-          },
-        );
+        const res = await getRequest("/app/user/subadmin", { user_id: id });
 
-        if (res.data?.status === 200 && res.data?.admin) {
-          const admin = res.data.admin;
+        if (res?.status === 200 && res?.admin) {
+          const admin = res.admin;
           const data = {
             clubId: admin.login_id,
             clubPin: String(admin.password),
@@ -99,26 +94,17 @@ const handleSubmit = async (values) => {
       user_type: "admin",
     };
 
-    const res = await axios.post(
-      "https://ne-games.com/leaderBoard/api/app/user/create",
-      payload,
-      {
-        headers: {
-          APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const res = await postRequest("/app/user/create", payload);
 
     // Club ID already exist case
-    if (res.data?.status === 400) {
+    if (res?.status === 400) {
       alert("Club ID already exists");
       return;
     }
 
     // Other errors
-    if (res.data?.status === false) {
-      setErrorMessage(res.data?.message || "Action failed");
+    if (res?.status === false) {
+      setErrorMessage(res?.message || "Action failed");
       return;
     }
 
@@ -154,15 +140,10 @@ const handleSubmit = async (values) => {
         user_type: "admin",
       };
 
-      const res = await axios.post("https://ne-games.com/leaderBoard/api/app/user/update", payload, {
-        headers: {
-          APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await postRequest("/app/user/update", payload);
 
-      if (res.data?.status === false) {
-        setErrorMessage(res.data?.message || "Update failed");
+      if (res?.status === false) {
+        setErrorMessage(res?.message || "Update failed");
       } else {
         setSavedData({ clubId: values.part1, clubPin: values.part2 });
         setIsDrawerOpen(false);

@@ -44,7 +44,8 @@ const stripePromise = loadStripe(
 
 // -------------------------------------
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { postRequest, getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 // ADD THIS IMPORT
 
 function CheckoutForm({
@@ -88,34 +89,18 @@ function CheckoutForm({
         setDialogOpen(true);
 
         try {
-          const res = await fetch(
-            "https://ne-games.com/leaderBoard/api/user/buySubscription",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                APPKEY,
-              },
-              body: JSON.stringify({
-                user_id: userId,
-                no_of_users: noOfUsers ,
-                subscription_type: subscriptionType,
-                amount: amount,
-                transaction_id: paymentIntent.id,
-                transaction_status: paymentIntent.status,
-                discount_code: response?.discount_code || null,
-                ladder_id: ladderId,
-              }),
-            }
-          );
+          const result = await postRequest("/user/buySubscription", {
+            user_id: userId,
+            no_of_users: noOfUsers ,
+            subscription_type: subscriptionType,
+            amount: amount,
+            transaction_id: paymentIntent.id,
+            transaction_status: paymentIntent.status,
+            discount_code: response?.discount_code || null,
+            ladder_id: ladderId,
+          });
 
-          const result = await res.json();
-
-          const getRes = await fetch(
-            `https://ne-games.com/leaderBoard/api/user/getsubsciptionDetails?user_id=${userId}`,
-            { headers: { APPKEY } }
-          );
-          const getData = await getRes.json();
+          const getData = await getRequest("/user/getsubsciptionDetails", { user_id: userId });
 
           if (getData?.data) {
             const sub = getData.data;
@@ -238,15 +223,7 @@ export default function SubscriptionPlan({ ladderId }) {
 
   useEffect(() => {
     async function createMonthlyIntent() {
-      const res = await fetch(
-        "https://ne-games.com/leaderBoard/api/payment/intent",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", APPKEY },
-          body: JSON.stringify({ amount: Math.round(monthlyCost * 100) }),
-        }
-      );
-      const data = await res.json();
+      const data = await postRequest("/payment/intent", { amount: Math.round(monthlyCost * 100) });
       if (data.paymentIntent) setMonthlyClientSecret(data.paymentIntent);
     }
     createMonthlyIntent();
@@ -254,15 +231,7 @@ export default function SubscriptionPlan({ ladderId }) {
 
   useEffect(() => {
     async function createYearlyIntent() {
-      const res = await fetch(
-        "https://ne-games.com/leaderBoard/api/payment/intent",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", APPKEY },
-          body: JSON.stringify({ amount: Math.round(yearlyCost * 100) }),
-        }
-      );
-      const data = await res.json();
+      const data = await postRequest("/payment/intent", { amount: Math.round(yearlyCost * 100) });
       if (data.paymentIntent) setYearlyClientSecret(data.paymentIntent);
     }
     createYearlyIntent();
@@ -276,15 +245,7 @@ export default function SubscriptionPlan({ ladderId }) {
   const handleCheckMonthlyCoupon = async () => {
     setCheckingMonthlyCoupon(true);
     try {
-      const res = await fetch(
-        `https://ne-games.com/leaderBoard/api/apply/discountCode?discount_code=${monthlyCoupon}&amount=${monthlyCost}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json", APPKEY },
-        }
-      );
-
-      const data = await res.json();
+      const data = await getRequest("/apply/discountCode", { discount_code: monthlyCoupon, amount: monthlyCost });
 
       if (data.status === 200) {
         setMonthlyCouponValid(true);
@@ -313,15 +274,7 @@ export default function SubscriptionPlan({ ladderId }) {
   const handleCheckYearlyCoupon = async () => {
     setCheckingYearlyCoupon(true);
     try {
-      const res = await fetch(
-        `https://ne-games.com/leaderBoard/api/apply/discountCode?discount_code=${yearlyCoupon}&amount=${yearlyCost}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json", APPKEY },
-        }
-      );
-
-      const data = await res.json();
+      const data = await getRequest("/apply/discountCode", { discount_code: yearlyCoupon, amount: yearlyCost });
 
       if (data.status === 200) {
         setYearlyCouponValid(true);

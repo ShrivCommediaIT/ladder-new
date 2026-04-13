@@ -248,23 +248,7 @@ console.log("handleEnter==>", user_id, ladder_id, currentId, selectedNumber, sel
         Match Result
       </h2>
 
-      {/* Beat / Lost */}
-      {/* <div className="flex justify-center gap-6 mb-2">
-        {["beat", "lost"].map((type) => (
-          <div
-            key={type}
-            onClick={() => setResultType(type)}
-            className={`px-5 py-1 rounded-full cursor-pointer transition ${
-              resultType === type
-                ? "bg-green-500 text-black font-semibold"
-                : "bg-gray-700 hover:bg-gray-600"
-            }`}
-          >
-            {type === "beat" ? "Beat" : "Lost"}
-          </div>
-        ))}
-      </div> */}
-
+     
       <div className="flex justify-center gap-6 mb-2">
         <div
           onClick={() => setResultType("beat")}

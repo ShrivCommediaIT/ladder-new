@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
@@ -61,7 +62,7 @@ const getRankBySkillNumber = (ranks, skillNumber) => {
 
 const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
   const playerImageUrl = player?.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
+    ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
   return (
@@ -98,29 +99,6 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
 
         {player.skills?.length > 0 ? (
           <>
-            {/* <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
-              {player.skills.map((skill, i) => (
-                <div
-                  key={i}
-                  onClick={() =>
-                    isEditable && onSkillClick(player.id, skill.skill_number)
-                  }
-                  className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded transition-all ${
-                    isEditable
-                      ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
-                      : "cursor-not-allowed bg-white opacity-40"
-                  }`}
-                  title={
-                    isEditable
-                      ? `Edit Skill ${skill.skill_number}: ${skill.skill_description}`
-                      : "Only own skills can be edited"
-                  }
-                >
-                  {skill.skill_number}
-                </div>
-              ))}
-            </div> */}
-
             <div className="flex gap-[3px] overflow-y-visible pb-1 mb-1">
               {player.skills.map((skill, i) => {
                 const isNegative = skill.skill_sign === "-";

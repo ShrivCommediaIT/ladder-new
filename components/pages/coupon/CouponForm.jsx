@@ -53,7 +53,7 @@ const countries = [
   "Other",
 ];
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest, postRequest } from "@/services/apiService";
 
 // ✅ Validation schema
 const formSchema = z.object({
@@ -134,15 +134,7 @@ export default function CouponForm() {
 
     setCheckingCoupon(true);
     try {
-      const res = await fetch(
-        `https://ne-games.com/leaderBoard/api/check/discount?discount_code=${coupon}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json", APPKEY },
-        }
-      );
-
-      const data = await res.json();
+      const data = await getRequest("/check/discount", { discount_code: coupon });
 
       if (
         data?.status === 400 &&
@@ -182,17 +174,9 @@ export default function CouponForm() {
         bic_code: values.swiftBic || "",
       };
 
-      const res = await fetch(
-        "https://ne-games.com/leaderBoard/api/affiliate/create",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", APPKEY },
-          body: JSON.stringify(payload),
-        }
-      );
-      const data = await res.json();
+      const data = await postRequest("/affiliate/create", payload);
 
-      if (!res.ok) throw new Error(data?.message || "Failed to submit form");
+      if (data?.status === false) throw new Error(data?.message || "Failed to submit form");
 
       setShowSuccess(true); // ✅ show alert
       setIsCouponValid(false);

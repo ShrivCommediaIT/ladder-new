@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { FaPhoneVolume } from "react-icons/fa";
 import { MdContentCopy } from "react-icons/md"; // ✅ copy icon import
 import { useSearchParams } from "next/navigation";
 
-const APPKEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 
 const ContactAdmin = () => {
     const searchParams = useSearchParams();
@@ -22,15 +22,8 @@ const ContactAdmin = () => {
 
     const fetchAdmin = async () => {
       try {
-        const res = await axios.get(
-          `https://ne-games.com/leaderBoard/api/user/leaderboard?ladder_id=${ladderId}`,
-          {
-            headers: {
-              APPKEY,
-            },
-          }
-        );
-        setAdminDetails(res.data.ladderDetails);
+        const res = await getRequest(API_ENDPOINTS.LEADERBOARD, { ladder_id: ladderId });
+        setAdminDetails(res.ladderDetails);
       } catch (err) {
         console.error("Error fetching admin details:", err);
       } finally {

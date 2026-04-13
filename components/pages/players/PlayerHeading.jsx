@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import Image from "next/image";
 import React, { useRef, useState, useEffect } from "react";
@@ -6,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
+import { postFormData, postWithParams } from "@/services/apiService";
 
 const PlayerHeading = ({ demoLadderName }) => {
   const dispatch = useDispatch();
@@ -58,7 +60,7 @@ const PlayerHeading = ({ demoLadderName }) => {
     logo && logo !== "null"
       ? logo.startsWith("http")
         ? logo
-        : `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${logo}`
+        : `${IMAGE_BASE_URL}/${logo}`
       : "/game.png";
 
   // --------------------------
@@ -79,19 +81,9 @@ const PlayerHeading = ({ demoLadderName }) => {
     formData.append("ladder_id", ladderId);
 
     try {
-      const response = await fetch(
-        "https://ne-games.com/leaderBoard/api/user/updateladderlogo",
-        {
-          method: "POST",
-          headers: {
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          },
-          body: formData,
-        }
-      );
+      const response = await postFormData("/user/updateladderlogo", formData);
 
-      if (response.ok) window.location.reload();
+      if (response?.status === 200 || response?.status === true) window.location.reload();
     } catch (err) {
       console.error("Logo upload error:", err);
     }
@@ -108,20 +100,12 @@ const PlayerHeading = ({ demoLadderName }) => {
     if (!ladderId || !editedName.trim()) return;
 
     try {
-      const response = await fetch(
-        `https://ne-games.com/leaderBoard/api/user/updateladdername?ladder_id=${ladderId}&name=${encodeURIComponent(
-          editedName.trim()
-        )}`,
-        {
-          method: "POST",
-          headers: {
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          },
-        }
-      );
+      const response = await postWithParams("/user/updateladdername", {
+        ladder_id: ladderId,
+        name: editedName.trim()
+      });
 
-      if (response.ok) {
+      if (response?.status === 200 || response?.status === true) {
         setIsEditingName(false);
         window.location.reload();
       }

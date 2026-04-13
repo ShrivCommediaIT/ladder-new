@@ -160,11 +160,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { X, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const BasicLeaderboardShort = ({
   ladderId,
@@ -181,11 +180,8 @@ const BasicLeaderboardShort = ({
 
     try {
       setLoading(true);
-      const res = await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/getskillsetup?ladder_id=${ladderId}`,
-        { headers: { APPKEY } }
-      );
-      const skills = res.data?.data || [];
+      const res = await getRequest(API_ENDPOINTS.GET_SKILL_SETUP, { ladder_id: ladderId });
+      const skills = res?.data || [];
       setAllSkills(skills);
 
       if (skills.length > 0) {

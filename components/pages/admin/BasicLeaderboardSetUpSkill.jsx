@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -17,8 +16,8 @@ import {
 } from "@/components/ui/dialog";
 import BasicLeaderboardPrintSkillsSheet from "./BasicLeaderboardPrintSkillsSheet";
 import { Printer, CheckCircle, TriangleAlert } from "lucide-react";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest, postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 const initialRows = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   description: "",
@@ -59,12 +58,9 @@ export default function BasicLeaderboardSetUpSkill({
     const fetchSkillSetup = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(
-          `https://ne-games.com/leaderBoard/api/user/getskillsetup?ladder_id=${ladderId}`,
-          { headers: { APPKEY } },
-        );
+        const res = await getRequest(API_ENDPOINTS.GET_SKILL_SETUP, { ladder_id: ladderId });
 
-        const apiSkills = res.data?.data || [];
+        const apiSkills = res?.data || [];
 
         setRows((prevRows) =>
           prevRows.map((row) => {
@@ -145,11 +141,7 @@ export default function BasicLeaderboardSetUpSkill({
 
       setSaving(true);
 
-      await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/skillSetup",
-        { ladder_id: Number(ladderId), skills },
-        { headers: { APPKEY, "Content-Type": "application/json" } },
-      );
+      await postRequest(API_ENDPOINTS.SKILL_SETUP, { ladder_id: Number(ladderId), skills });
 
       setOpenSuccess(true);
       if (onSkillsUpdated) {

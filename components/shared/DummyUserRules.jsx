@@ -6,7 +6,8 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import axios from "axios";
+import { getRequest, postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { useSelector } from "react-redux";
 import {
   AlertDialog,
@@ -17,8 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-const APPKEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 
 const DummyUserRules = ({ ladderId }) => {
   const [isEditingIndex, setIsEditingIndex] = useState(null);
@@ -36,12 +36,9 @@ const DummyUserRules = ({ ladderId }) => {
     const fetchRules = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
-          `https://ne-games.com/leaderBoard/api/user/getRulesSuggestion?ladder_id=${ladderId}`,
-          { headers: { APPKEY } }
-        );
-        if (res.data.status === 200 && Array.isArray(res.data.data)) {
-          setRules(res.data.data);
+        const res = await getRequest(API_ENDPOINTS.GET_RULES_SUGGESTION, { ladder_id: ladderId });
+        if (res.status === 200 && Array.isArray(res.data)) {
+          setRules(res.data);
           setOpenRuleIds([]); // keep all rules closed by default
         }
       } catch (error) {

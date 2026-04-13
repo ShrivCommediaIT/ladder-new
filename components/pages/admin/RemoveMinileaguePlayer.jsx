@@ -6,7 +6,8 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
-import axios from "axios";
+import { postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -37,7 +38,6 @@ const RemoveMinileaguePlayer = ({ onClose }) => {
   const searchParams = useSearchParams();
   const ladder_id = searchParams.get("ladder_id");
   const miniLeagueSections = useSelector((state) => state.minileague.data) || [];
-  const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
   useEffect(() => {
     if (ladder_id) dispatch(fetchMiniLeague({ ladder_id }));
@@ -61,10 +61,9 @@ const RemoveMinileaguePlayer = ({ onClose }) => {
         removalReason: "Removed via admin panel",
       };
 
-      await axios.post(
-        `https://ne-games.com/leaderBoard/api/user/removeUserminileague`,
-        payload,
-        { params: { ladder_id }, headers: { APPKEY } }
+      await postRequest(
+        `${API_ENDPOINTS.REMOVE_USER_MINILEAGUE}?ladder_id=${ladder_id}`,
+        payload
       );
 
       dispatch(fetchMiniLeague({ ladder_id }));

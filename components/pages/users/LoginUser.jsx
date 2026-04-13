@@ -13,8 +13,9 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import axios from "axios";
 import EyeLogo from "@/public/eyeLogin.png";
+import { postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function LoginUser({ ladderId, ladderType }) {
@@ -56,25 +57,15 @@ export default function LoginUser({ ladderId, ladderType }) {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/login",
-        {
-          user_id: username,
-          password,
-          user_type: "user",
-          ladder_id: finalLadderId,
-          ladder_type: finalLadderType,
-        },
-        {
-          headers: {
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await postRequest(API_ENDPOINTS.LOGIN, {
+        user_id: username,
+        password,
+        user_type: "user",
+        ladder_id: finalLadderId,
+        ladder_type: finalLadderType,
+      });
 
-      const userData = res?.data?.data;
+      const userData = res?.data;
 
       if (!userData?.id) {
         toast.error("Invalid credentials.");

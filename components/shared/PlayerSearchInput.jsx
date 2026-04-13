@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import { CardContent } from "@/components/ui/card";
 import Image from "next/image";
@@ -142,7 +143,7 @@ const PlayerInfo = () => {
                     const isAllowed = isSubscribed || index < 10;
 
                     const playerImageUrl = player.image
-                      ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}?t=${Date.now()}`
+                      ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}`
                       : Logo;
 
                     return (

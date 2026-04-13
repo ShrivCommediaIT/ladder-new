@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import axios from "axios";
+import { getRequest, postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { updateLadderToken } from "@/helper/helperApi";
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 
 const activityNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
 
@@ -72,18 +73,12 @@ export default function BasicLeaderboardActivityEntryCard({
     const fetchSkill = async () => {
       try {
         setLoadingSkill(true);
-        const res = await axios.get(
-          "https://ne-games.com/leaderBoard/api/user/getskillBynumber",
-          {
-            params: {
-              ladder_id: ladderId,
-              skill_number: selectedActivity,
-            },
-            headers: { APPKEY },
-          },
-        );
+        const res = await getRequest("/user/getskillBynumber", {
+          ladder_id: ladderId,
+          skill_number: selectedActivity,
+        });
 
-        const data = res.data?.data || {};
+        const data = res?.data || {};
         setSkillDesc(data.skill_description || "");
         setSkillTarget(data.target || "No target"); // SET TARGET
         setSkillSign(data.skill_sign === "-" ? "-" : "+");
@@ -414,18 +409,9 @@ export default function BasicLeaderboardActivityEntryCard({
         payload.best_result = bestScore;
       }
 
-      const res = await axios.post(
-        `https://ne-games.com/leaderBoard/api/${URl}`,
-        payload,
-        {
-          headers: {
-            APPKEY: APPKEY,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await postRequest(`/${URl}`, payload);
 
-      if (res.status === 200) {
+      if (res?.status === 200 || res?.status === "success") {
         toast.success("Result posted successfully!");
         updateLadderToken({
           user_id: playerName,
@@ -485,17 +471,14 @@ export default function BasicLeaderboardActivityEntryCard({
       return;
     }
 
-    const bestScore = await axios.get(
-      `https://ne-games.com/leaderBoard/api/user/getTopScore?user_id=${String(playerId)}&skill_activity_id=${String(skillActivityId)}&score=${String(value)}`,
-      {
-        headers: {
-          APPKEY: APPKEY,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
-    if (bestScore.status == 200) {
-      setTopScore(bestScore.data.data[0].top_score);
+    const bestScore = await getRequest("/user/getTopScore", {
+      user_id: String(playerId),
+      skill_activity_id: String(skillActivityId),
+      score: String(value),
+    });
+
+    if (bestScore?.status == 200) {
+      setTopScore(bestScore?.data?.[0]?.top_score || 0);
       setOpenSuccessResult(true);
     }
   };

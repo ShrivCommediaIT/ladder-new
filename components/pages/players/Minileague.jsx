@@ -1,7 +1,5 @@
-
-// ====================== with paid update purchase wala 04-12-25 ======================
-
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 import Image from "next/image";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,7 +32,7 @@ const PlayerCard = ({
   ladderType,
 }) => {
   const playerImageUrl = player.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}?t=${Date.now()}`
+    ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}`
     : Logo;
 
   return (

@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import axios from "axios";
+import { getRequest, postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, ChevronUp, Edit, Save, X } from "lucide-react";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
 const LadderRulesCard = ({ ladderIdProp }) => {
   const searchParams = useSearchParams();
@@ -30,14 +29,11 @@ const LadderRulesCard = ({ ladderIdProp }) => {
 
     const fetchRules = async () => {
       try {
-        const res = await axios.get(
-          `https://ne-games.com/leaderBoard/api/user/getRulesSuggestion?ladder_id=${ladderId}`,
-          { headers: { APPKEY } }
-        );
+        const res = await getRequest(API_ENDPOINTS.GET_RULES_SUGGESTION, { ladder_id: ladderId });
 
-        if (res.data.status === 200 && Array.isArray(res.data.data)) {
-          setRulesList(res.data.data);
-          setTempRulesList(res.data.data);
+        if (res.status === 200 && Array.isArray(res.data)) {
+          setRulesList(res.data);
+          setTempRulesList(res.data);
 
           // ❌ Earlier: open all by default
           // ✔️ Now: keep all CLOSED
@@ -58,15 +54,11 @@ const LadderRulesCard = ({ ladderIdProp }) => {
       const rule = tempRulesList.find((r) => r.id === ruleId);
       if (!rule) return;
 
-      await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/updateRulesDocument",
-        {
-          id: rule.id,
-          title: rule.title,
-          rules: rule.rules,
-        },
-        { headers: { APPKEY } }
-      );
+      await postRequest(API_ENDPOINTS.UPDATE_RULES_DOCUMENT, {
+        id: rule.id,
+        title: rule.title,
+        rules: rule.rules,
+      });
 
       setRulesList([...tempRulesList]);
       setIsEditing(null);

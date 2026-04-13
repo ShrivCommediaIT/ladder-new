@@ -1,9 +1,11 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import Image from "next/image";
 import React, { useRef, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import axios from "axios";
+import { getRequest, postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -14,8 +16,7 @@ import {
 
 // import game from "@/public/game.png";
 
-const APPKEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 
 const UserHeading = () => {
   const fileInputRef = useRef(null);
@@ -33,19 +34,13 @@ const UserHeading = () => {
 
     const fetchLadderDetails = async () => {
       try {
-        const res = await axios.get(
-          "https://ne-games.com/leaderBoard/api/user/leaderboard",
-          {
-            params: {
-              ladder_id: ladderId,
-              ...(ladderType ? { type: ladderType } : {}),
-            },
-            headers: { APPKEY },
-          }
-        );
+        const res = await getRequest(API_ENDPOINTS.LEADERBOARD, {
+          ladder_id: ladderId,
+          ...(ladderType ? { type: ladderType } : {}),
+        });
 
-        setApiLadderName(res?.data?.ladderDetails?.name || "Test Skill");
-        setLogo(res?.data?.ladderDetails?.logo || null);
+        setApiLadderName(res?.ladderDetails?.name || "Test Skill");
+        setLogo(res?.ladderDetails?.logo || null);
       } catch (err) {
         console.error("Ladder API error:", err);
       }
@@ -67,19 +62,10 @@ const UserHeading = () => {
       formData.append("file", file);
       formData.append("ladder_id", ladderId);
 
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/uploadLogo",
-        formData,
-        {
-          headers: {
-            APPKEY,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await postFormData(API_ENDPOINTS.UPDATE_LADDER_LOGO, formData);
 
-      if (res.data.status === 200) {
-        setLogo(res.data.logo); // update local state
+      if (res.status === 200) {
+        setLogo(res.logo);
         setAlertOpen(true);
       } else {
         console.error("Logo upload failed:", res.data.message);
@@ -94,7 +80,7 @@ const UserHeading = () => {
     logo && logo !== "null"
       ? logo.startsWith("http")
         ? logo
-        : `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${logo}`
+        : `${IMAGE_BASE_URL}/${logo}`
       : "/game.png";
 
   return (

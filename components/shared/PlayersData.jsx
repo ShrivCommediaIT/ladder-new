@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import PlayerCard from "./PlayerCard";
-import axios from 'axios'
+
 
 const players = [
   { name: "Maya", phone: "09812356765", rank: 1 },

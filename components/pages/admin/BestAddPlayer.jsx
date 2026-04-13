@@ -6,7 +6,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "next/navigation";
-import axios from "axios";
+import { postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
@@ -41,8 +42,6 @@ export default function BestAddPlayer({ onClose }) {
   const [welcomeMsg, setWelcomeMsg] = useState("");
   const [showDialog, setShowDialog] = useState(false);
 
-  const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -73,13 +72,9 @@ const handleSubmit = async () => {
   if (profileFile) formData.append("file", profileFile);
 
   try {
-    const response = await axios.post(
-      "https://ne-games.com/leaderBoard/api/user/addbyadmin",
-      formData,
-      { headers: { APPKEY } }
-    );
+    const response = await postFormData(API_ENDPOINTS.ADD_BY_ADMIN, formData);
 
-    if (response.data.status === 200) {
+    if (response.status === 200) {
 
       setWelcomeMsg(`Welcome ${name}! ${response.data.success_message}`);
       setShowDialog(true);

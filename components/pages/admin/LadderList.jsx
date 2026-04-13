@@ -252,7 +252,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { fetchLadders } from "@/redux/slices/fetchLadderSlice";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 import { motion } from "framer-motion";
 import {
@@ -314,17 +315,7 @@ const LadderList = ({ userId }) => {
 
   const handleDelete = async (ladderId) => {
     try {
-      await axios.get(
-        "https://ne-games.com/leaderBoard/api/user/Deleteleaderboard",
-        {
-          params: { ladder_id: ladderId },
-          headers: {
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      await getRequest(API_ENDPOINTS.DELETE_LEADERBOARD, { ladder_id: ladderId });
 
       if (admin?.user_type === "admin") {
         dispatch(fetchLadderByUserId({ userId: admin.id }));

@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import { postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 import {
   Form,
@@ -107,37 +108,21 @@ export default function LoginByClubForm() {
       user_type: values.userType,
     };
 
-    const config = {
-      headers: {
-        APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-        "Content-Type": "application/json",
-      },
-      timeout: 10000, // 10 sec timeout
-    };
-
     try {
       let res;
 
       // ✅ First try
       try {
-        res = await axios.post(
-          "https://ne-games.com/leaderBoard/api/app/user/login",
-          payload,
-          config,
-        );
+        res = await postRequest("/app/user/login", payload);
       } catch (e) {
         // ✅ Retry once automatically
-        res = await axios.post(
-          "https://ne-games.com/leaderBoard/api/app/user/login",
-          payload,
-          config,
-        );
+        res = await postRequest("/app/user/login", payload);
       }
 
       // ✅ Response check
-      if (res.data?.status !== 200 || !res.data) {
+      if (res?.status !== 200 || !res) {
         setDialogTitle("Login Failed");
-        setDialogMessage(res.data?.message || "Invalid Club ID or PIN");
+        setDialogMessage(res?.message || "Invalid Club ID or PIN");
         setOpen(true);
         return;
       }
@@ -148,11 +133,11 @@ export default function LoginByClubForm() {
 
       const user =
         values.userType === "sub_admin"
-          ? { ...res.data.subadmin, isLoggedIn: true }
-          : { ...res.data.data, isLoggedIn: true };
+          ? { ...res.subadmin, isLoggedIn: true }
+          : { ...res.data, isLoggedIn: true };
 
       localStorage.setItem(storageKey, JSON.stringify(user));
-      localStorage.setItem("adminDetails", JSON.stringify({ ...res.data.data,}));
+      localStorage.setItem("adminDetails", JSON.stringify({ ...res.data,}));
 
       const route = values.userType === "sub_admin" ? subAdminPage : adminPage;
 

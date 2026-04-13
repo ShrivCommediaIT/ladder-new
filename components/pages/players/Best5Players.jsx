@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 import Image from "next/image";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,8 +21,7 @@ import { io } from "socket.io-client";
 import Logo from "@/public/logo1.png";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import InvertRankButton from "../admin/InvertRankButton";
-
+import { postRequest } from "@/services/apiService";
 //  PlayerCard Component
 const PlayerCard = ({
   player,
@@ -32,7 +32,7 @@ const PlayerCard = ({
   refreshKey,
 }) => {
   const playerImageUrl = player.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${
+    ? `${IMAGE_BASE_URL}/${
         player.image
       }?t=${Date.now()}`
     : Logo;
@@ -124,8 +124,6 @@ const Best5Players = () => {
   const [groupSize, setGroupSize] = useState(6);
   const [refreshKey, setRefreshKey] = useState(0);
   const isRefreshingRef = useRef(false);
-
-  // const [isDescending, setIsDescending] = useState(false);
 
   // Edit section state
   const [editIndex, setEditIndex] = useState(null);
@@ -246,44 +244,20 @@ const Best5Players = () => {
 
     try {
       if (String(editGradebarId).startsWith("temp-")) {
-        const res = await fetch(
-          "https://ne-games.com/leaderBoard/api/user/creategradeBar",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              appkey:
-                "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-            },
-            body: JSON.stringify({
-              user_id: user?.id,
-              ladder_id: ladderId,
-              preset: groupSize,
-              gradebar_name: newName.trim(),
-            }),
-          },
-        );
-        const data = await res.json();
+        const data = await postRequest("/user/creategradeBar", {
+          user_id: user?.id,
+          ladder_id: ladderId,
+          preset: groupSize,
+          gradebar_name: newName.trim(),
+        });
         if (data?.status === 200)
           toast.success("Gradebar created successfully!");
         else toast.error(data?.message || "Failed to create gradebar");
       } else {
-        const res = await fetch(
-          "https://ne-games.com/leaderBoard/api/user/updateGradebarName",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              APPKEY:
-                "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-            },
-            body: JSON.stringify({
-              gradebar_details_id: editGradebarId,
-              name: newName.trim(),
-            }),
-          },
-        );
-        const data = await res.json();
+        const data = await postRequest("/user/updateGradebarName", {
+          gradebar_details_id: editGradebarId,
+          name: newName.trim(),
+        });
         if (data?.success) toast.success("Updated Successfully");
         else toast.error(data?.message || "Update failed");
       }
@@ -326,14 +300,6 @@ const Best5Players = () => {
           )}
         </div>
         <div className="flex gap-3">
-          {/* <Button
-            onClick={() => setIsDescending((prev) => !prev)}
-            variant="secondary"
-            className="flex items-center gap-2 cursor-pointer text-white bg-teal-800 hover:bg-teal-900 "
-          >
-            <ArrowUpDown size={16} />
-            {isDescending ? "Ranking Descending" : "Ranking Ascending"}
-          </Button> */}
         </div>
       </div>
 

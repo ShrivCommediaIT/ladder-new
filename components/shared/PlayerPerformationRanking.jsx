@@ -173,7 +173,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../ui/button";
 import {
@@ -186,8 +187,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const APPKEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 
 const PlayerPerformationRanking = ({ ladderId }) => {
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
@@ -200,11 +200,8 @@ const PlayerPerformationRanking = ({ ladderId }) => {
     const fetchRankList = async () => {
       if (!ladderId) return setRankLoading(false);
       try {
-        const res = await axios.get(
-          `https://ne-games.com/leaderBoard/api/user/rank/list?ladder_id=${ladderId}`,
-          { headers: { "Content-Type": "application/json", APPKEY } }
-        );
-        setRankList(res.data?.data || []);
+        const res = await getRequest(API_ENDPOINTS.RANK_LIST, { ladder_id: ladderId });
+        setRankList(res?.data || []);
       } catch (err) {
         setRankError(err.response?.data?.message || "Failed to fetch rank list");
       } finally {

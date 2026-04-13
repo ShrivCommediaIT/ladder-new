@@ -43,34 +43,6 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
   // ✅ Get user from localStorage
  
 
-  // useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     try {
-  //       // Pehle admin check karo
-  //       const storedAdmin = localStorage.getItem("userData");
-  //       if (storedAdmin) {
-  //         setUser(JSON.parse(storedAdmin));
-  //         return;
-  //       }
-
-  //       // Agar admin nahi hai, toh subAdmin check karo
-  //       const storedSubAdmin = localStorage.getItem("subAdmin");
-  //       if (storedSubAdmin) {
-  //         setUser(JSON.parse(storedSubAdmin));
-  //         return;
-  //       }
-
-  //       // Agar dono null ho, fallback null
-  //       setUser(null);
-  //     } catch (err) {
-  //       console.error("Invalid user data in localStorage", err);
-  //       setUser(null);
-  //     }
-  //   }
-  // }, []);
-
-
-
   useEffect(() => {
   if (typeof window !== "undefined") {
     try {

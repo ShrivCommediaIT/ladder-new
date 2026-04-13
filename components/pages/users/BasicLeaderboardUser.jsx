@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
@@ -14,7 +15,8 @@ import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUser
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
-import axios from "axios";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import BasicLeaderboardPrintSkillsSheet from "../admin/BasicLeaderboardPrintSkillsSheet";
 import BasicLeaderboardActivityEntryCard from "../players/BasicLeaderboardActivityEntryCard";
 
@@ -76,7 +78,7 @@ const getRankBySkillNumber = (ranks, skillNumber) => {
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
   const playerImageUrl = player?.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
+    ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
   return (
@@ -201,7 +203,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const { data = [], loading } = useSelector(
     (state) => state.skillLeaderboard || {},
   );
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 const initialRows = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   description: "",
@@ -253,12 +255,9 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
 
     const fetchSkillSetup = async () => {
       try {
-        const res = await axios.get(
-          `https://ne-games.com/leaderBoard/api/user/getskillsetup?ladder_id=${ladderId}`,
-          { headers: { APPKEY } },
-        );
+        const res = await getRequest(API_ENDPOINTS.GET_SKILL_SETUP, { ladder_id: ladderId });
 
-        const apiSkills = res.data?.data || [];
+        const apiSkills = res?.data || [];
 
         setRows((prevRows) =>
           prevRows.map((row) => {

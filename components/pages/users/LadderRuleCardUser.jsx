@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import axios from "axios";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
 const LadderRuleCardUser = ({ ladderIdProp }) => {
   const searchParams = useSearchParams();
@@ -21,13 +20,10 @@ const LadderRuleCardUser = ({ ladderIdProp }) => {
 
     const fetchRules = async () => {
       try {
-        const res = await axios.get(
-          `https://ne-games.com/leaderBoard/api/user/getRulesSuggestion?ladder_id=${ladderId}`,
-          { headers: { APPKEY } }
-        );
+        const res = await getRequest(API_ENDPOINTS.GET_RULES_SUGGESTION, { ladder_id: ladderId });
 
-        if (res.data.status === 200 && Array.isArray(res.data.data)) {
-          setRulesList(res.data.data);
+        if (res.status === 200 && Array.isArray(res.data)) {
+          setRulesList(res.data);
           setOpenRuleIds([]); // All closed by default
         }
       } catch (error) {

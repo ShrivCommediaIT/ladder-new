@@ -46,19 +46,12 @@ const ladderType = searchParams.get("ladder_type");
     (state) => state.userByRank
   );
 
-  // const user = useSelector((state) => state.user?.user || null);
-  // const ladderId = user?.ladder_id || null;
 
   useEffect(() => {
     const timer = setTimeout(() => setLocalLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  // useEffect(() => {
-  //   if (challengeNumber && ladderId) {
-  //     dispatch(fetchUserByRank({ rank: challengeNumber, ladder_id: ladderId }));
-  //   }
-  // }, [challengeNumber, ladderId, dispatch]);
 
 useEffect(() => {
   if (challengeNumber && ladderId) {

@@ -1,5 +1,4 @@
-// AddPlayerSkill.jsx - SUCCESS DIALOG + INSTANT REFRESH
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   Dialog, 
@@ -10,12 +9,9 @@ import {
   DialogFooter 
 } from "@/components/ui/dialog";
 import { CheckCircle, AlertCircle, Phone, User } from "lucide-react";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { postWithParams } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
-//  SUCCESS DIALOG
 const SuccessDialog = ({ playerName, ladderId, onCloseAll }) => (
   <Dialog open={true} onOpenChange={() => {}}>
     <DialogContent className="sm:max-w-md bg-gradient-to-br from-green-500/10 to-emerald-500/10 
@@ -75,60 +71,35 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
     setError("");
 
     try {
-      const response = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/adduserskillboard",
-        null,
-        {
-          params: {
-            ladder_id: ladderId,
-            name: formData.name.trim(),
-            phone: formData.phone.trim() || undefined,
-          },
-          headers: {
-            APPKEY: APPKEY,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await postWithParams(API_ENDPOINTS.ADD_USER_SKILLBOARD, {
+        ladder_id: ladderId,
+        name: formData.name.trim(),
+        phone: formData.phone.trim() || undefined,
+      });
 
-      if (response.data?.status === 200) {
-        // SUCCESS DIALOG SHOW
+      if (response?.status === 200) {
         setSuccessData({
           playerName: formData.name.trim(),
           ladderId,
         });
         setShowSuccess(true);
-        
-        // Reset form
         setFormData({ name: "", phone: "" });
-        
-        // Toast notification
-        // toast.success("Player added successfully! 🎉", {
-        //   position: "top-right",
-        //   autoClose: 3000,
-        // });
-        
-        // Callback for parent refresh
         onSuccessRefresh?.();
       } else {
-        throw new Error(response.data?.message || "Failed to add player");
+        throw new Error(response?.message || "Failed to add player");
       }
     } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
       setError(error.response?.data?.message || "Failed to add player. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // CLOSE ALL MODALS + REFRESH
   const handleSuccessClose = () => {
     setShowSuccess(false);
-    onClose?.(); // Close add player dialog
-    // Parent will handle leaderboard refresh
+    onClose?.();
   };
 
-  // Show error dialog
   if (showSuccess) {
     return <SuccessDialog {...successData} onCloseAll={handleSuccessClose} />;
   }

@@ -12,12 +12,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
+import { postFormData } from "@/services/apiService";
 
 const ResetGradebarDialog = ({ open, onClose, ladderId }) => {
   const dispatch = useDispatch();
   const [preset, setPreset] = useState(2); // default
   const [names, setNames] = useState(["Grade 1", "Grade 2"]); // default 2 grades
-  const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
   // add new gradebar input
   const addGrade = () => {
@@ -35,21 +35,11 @@ const ResetGradebarDialog = ({ open, onClose, ladderId }) => {
   const handleReset = async () => {
     try {
       const formData = new FormData();
-      formData.append("APPKEY", "NeGame@ApPKeY!#!");
       formData.append("ladder_id", ladderId);
       formData.append("preset", preset);
       formData.append("gradebar_name", JSON.stringify(names));
 
-      const res = await fetch(
-        `https://ne-games.com/leaderBoard/api/user/resetgradeBar`,
-        {
-          method: "POST",
-          body: formData,
-           headers: { APPKEY },
-        }
-      );
-
-      const data = await res.json();
+      const data = await postFormData("/user/resetgradeBar", formData);
       console.log("📥 Reset API Response:", data);
 
       if (data.status === 200) {

@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
-import axios from "axios";
+import { postWithParams } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -30,8 +31,6 @@ const RemoveBestPlayer = ({ ladderId, onClose, onSuccessRefresh }) => {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
 
-  const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
-
   const handleRemove = async () => {
     const rankNum = Number(rank);
     
@@ -44,16 +43,12 @@ const RemoveBestPlayer = ({ ladderId, onClose, onSuccessRefresh }) => {
 
     try {
       // ✅ API CALL
-      const response = await axios.post(
-        `https://ne-games.com/leaderBoard/api/user/removeUser`,
-        {},
-        {
-          params: { ladder_id: ladderId, rank: rankNum },
-          headers: { APPKEY },
-        }
-      );
+      const response = await postWithParams(API_ENDPOINTS.REMOVE_USER, {
+        ladder_id: ladderId,
+        rank: rankNum,
+      });
 
-      if (response.data?.status === 200) {
+      if (response?.status === 200) {
         // ✅ INSTANT CLOSE + REFRESH
         onClose?.(); // Close Remove dialog
         onSuccessRefresh?.(); // Refresh leaderboard
