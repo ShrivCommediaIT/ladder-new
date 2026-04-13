@@ -111,6 +111,7 @@ export default function LoginPage() {
           isLoggedIn: true,
         };
         localStorage.setItem("userData", JSON.stringify(userData));
+        localStorage.setItem("adminDetails", JSON.stringify(userData));
         toast.success(res?.success_message || "Login successful!");
         router.push(adminPage);
       }
