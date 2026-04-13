@@ -1,6 +1,5 @@
-
-
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import Image from "next/image";
 import React, { useEffect, useState, useRef, useCallback } from "react";
@@ -23,9 +22,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import axios from "axios";
 import Minileague from "./Minileague";
 import MinileagueSearch from "./MinileagueSearch";
+import { postWithParams } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 /* ================= Player Card ================= */
 const PlayerCard = ({
@@ -46,7 +46,7 @@ const PlayerCard = ({
   }
 
   const playerImageUrl = player?.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
+    ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
   const sectionStartRank =
@@ -199,22 +199,12 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
 
   const updateSectionName = async (currentName, updateName) => {
     try {
-      const res = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/minileagueupdateGradebarName",
-        null,
-        {
-          params: {
-            ladder_id: ladderId,
-            current_name: currentName,
-            update_name: updateName,
-          },
-          headers: {
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          },
-        }
-      );
-      if (res.data?.status) refreshLeaderboard();
+      const res = await postWithParams(API_ENDPOINTS.MINILEAGUE_UPDATE_GRADEBAR_NAME, {
+        ladder_id: ladderId,
+        current_name: currentName,
+        update_name: updateName,
+      });
+      if (res?.status) refreshLeaderboard();
     } catch (error) {
       console.error(error);
     }
@@ -247,55 +237,6 @@ const processedSections = invertRanking
 
   return list; // order same as API
 }, [processedSections, searchQuery]);
-
-
-// const finalSections = React.useMemo(() => {
-//   const q = searchQuery.trim().toLowerCase();
-
-//   // ✅ NO SEARCH → EXACT SAME OUTPUT
-//   if (!q) {
-//     return processedSections.map((sec) => ({
-//       label: sec?.section,
-//       players: sec?.users_record || [],
-//       blankCount: Math.max(
-//         0,
-//         sectionSize - (sec?.users_record?.length || 0)
-//       ),
-//     }));
-//   }
-
-//   // ✅ SEARCH MODE
-//   const sections = [];
-
-//   processedSections.forEach((sec) => {
-//     const allPlayers = sec?.users_record || [];
-
-//     // 🔥 startsWith match first
-//     const startsWith = allPlayers.filter((p) =>
-//       p?.name?.toLowerCase().startsWith(q)
-//     );
-
-//     // then contains match
-//     const contains = allPlayers.filter(
-//       (p) =>
-//         !p?.name?.toLowerCase().startsWith(q) &&
-//         p?.name?.toLowerCase().includes(q)
-//     );
-
-//     const players = [...startsWith, ...contains];
-
-//     // ✅ hide empty sections during search
-//     if (players.length > 0) {
-//       sections.push({
-//         label: sec?.section,
-//         players,
-//         blankCount: 0, // ✅ hide blanks during search
-//       });
-//     }
-//   });
-
-//   return sections;
-// }, [processedSections, searchQuery, sectionSize]);
 
 
 const finalSections = React.useMemo(() => {

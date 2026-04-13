@@ -8,9 +8,8 @@ import { FaLongArrowAltDown, FaLongArrowAltUp } from "react-icons/fa";
 import digitalTwin from "@/public/digital-twin.gif";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import axios from "axios";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const ActivityLogUser = ({ ladderId }) => {
   const [activities, setActivities] = useState([]);
@@ -21,11 +20,8 @@ const ActivityLogUser = ({ ladderId }) => {
     const fetchActivities = async () => {
       if (!ladderId) return setLoading(false);
       try {
-        const res = await axios.get(
-          `https://ne-games.com/leaderBoard/api/user/activity?ladder_id=${ladderId}`,
-          { headers: { "Content-Type": "application/json", APPKEY } }
-        );
-        setActivities(res.data?.data || []);
+        const res = await getRequest(API_ENDPOINTS.ACTIVITY, { ladder_id: ladderId });
+        setActivities(res?.data || []);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch activities");
       } finally {

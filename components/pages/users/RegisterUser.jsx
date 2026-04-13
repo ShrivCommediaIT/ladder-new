@@ -16,14 +16,15 @@ import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, ArrowRight, Eye, EyeOff, CalendarIcon } from "lucide-react";
-import axios from "axios";
+import { postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 
 const schema = z
   .object({
@@ -81,13 +82,9 @@ const onSubmit = async (values) => {
   try {
     setLoading(true);
 
-    const res = await axios.post(
-      "https://ne-games.com/leaderBoard/api/user/register",
-      payload,
-      { headers: { "Content-Type": "application/json", APPKEY } }
-    );
+    const res = await postRequest(API_ENDPOINTS.REGISTER, payload);
 
-    if (res.data?.status === 200) {
+    if (res?.status === 200) {
       toast.success("Account created!");
 
       const url = ladderId
@@ -96,7 +93,7 @@ const onSubmit = async (values) => {
 
       setTimeout(() => router.replace(url), 1200);
     } else {
-      toast.error(res.data?.message || "Registration failed");
+      toast.error(res?.message || "Registration failed");
     }
   } catch {
     toast.error("Server error");

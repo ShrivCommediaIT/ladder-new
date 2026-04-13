@@ -131,15 +131,6 @@ export const EditPlayer = ({
     }
   }, [activeTab]);
 
-  // const tabs = [
-  //   { value: "move", label: "Result" },
-  //   // { value: "status", label: "Status" },
-  //   { value: "edit", label: "Edit" },
-  //   { value: "load", label: "Upload" },
-  //   { value: "stats", label: "Stats" },
-  //   { value: "challenge", label: "Challenge" },
-  // ];
-
 
   const allTabs = [
     { value: "move", label: "Result" },

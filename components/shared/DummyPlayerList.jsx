@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +10,7 @@ import PlayerPerformationRanking from "./PlayerPerformationRanking";
 
 const PlayerCard = ({ player, rank, ladderType, preset }) => {
   const playerImageUrl = player.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${
+    ? `${IMAGE_BASE_URL}/${
         player.image
       }?t=${Date.now()}`
     : Logo;

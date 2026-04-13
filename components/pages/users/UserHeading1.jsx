@@ -20,19 +20,6 @@ const UserHeading1 = ({ ladderId }) => {
           <p className="text-lg font-semibold">★ ★ ★ Tap on your name to move, edit details or status and upload avatar ★ ★ ★</p>
           </div>
         </div>
-
-        {/* <div className="flex items-center space-x-4">
-          <Image src={logo} alt="avatar" width={48} height={48} className="rounded-full" />
-          <Link
-            href={`/register-user/${encodedLadderId}`}
-            className="p-2 underline text-blue-700"
-          >
-            Register
-          </Link>
-          <Link href="#" className="p-2 underline text-blue-700">
-            Login
-          </Link>
-        </div> */}
       </div>
     </div>
   );

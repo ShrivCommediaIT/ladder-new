@@ -209,8 +209,8 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
-import axios from "axios";
-
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 
 import {
@@ -224,9 +224,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { ArrowLeft, X, MoveUp } from "lucide-react";
-
-const APPKEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
 const Best5MovePlayerBox = ({ open, onClose = () => {} }) => {
 
@@ -284,21 +281,15 @@ const Best5MovePlayerBox = ({ open, onClose = () => {} }) => {
     try {
       setLoading(true);
 
-      const response = await axios.get(
-        "https://ne-games.com/leaderBoard/api/user/move_to",
-        {
-          params: {
-            user_id,
-            move_from_user_id: fromRank,
-            move_to_rank: toRank,
-            move_from_rank: fromRank,
-            ladder_id,
-          },
-          headers: { APPKEY },
-        }
-      );
+      const response = await getRequest(API_ENDPOINTS.MOVE_TO, {
+        user_id,
+        move_from_user_id: fromRank,
+        move_to_rank: toRank,
+        move_from_rank: fromRank,
+        ladder_id,
+      });
 
-      if (response.data.status === 200) {
+      if (response.status === 200) {
         toast.success("Player moved successfully");
 
         dispatch(fetchLeaderboard({ ladder_id }));

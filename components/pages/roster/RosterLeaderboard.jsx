@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import Image from "next/image";
 import React, { useEffect, useState, useRef, useCallback } from "react";
@@ -11,12 +12,13 @@ import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import Logo from "@/public/logo1.png";
 import LadderLinkPanel from "../players/LadderLinkPanel";
 import RedeemModal from "./RedeemModal";
+import { getRequest } from "@/services/apiService";
 
 // ✅ Player Card
 const PlayerCard = ({ player, rank, onRedeemClick }) => {
   
   const playerImageUrl = player.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
+    ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
   return (
@@ -209,16 +211,10 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
   try {
     const admin = JSON.parse(localStorage.getItem("adminDetails"));
 
-    const res = await fetch(
-      `https://ne-games.com/leaderBoard/api/user/tokenHistory?user_id=${player.name}&admin_id=${admin.id}`,
-      {
-        headers: {
-          APPKEY: "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-        },
-      }
-    );
-
-    const data = await res.json();
+    const data = await getRequest("/user/tokenHistory", {
+      user_id: player.name,
+      admin_id: admin.id
+    });
 
     if (data.status === true) {
       setHistoryData(data.data || []);

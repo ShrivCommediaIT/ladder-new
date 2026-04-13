@@ -2873,7 +2873,6 @@
 
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import io from "socket.io-client";
-import axios from "axios";
 
 const socket = io("https://sportssolutionspro.com:8443", {
   transports: ["websocket"],
@@ -2898,9 +2897,9 @@ const MessageBoard = ({ senderId: propSenderId, ladderId, onClose }) => {
 
   useEffect(() => {
     if (!senderId) return;
-    axios
-      .get(`https://sportssolutionspro.com:8443/player/${senderId}`)
-      .then((res) => setSenderName(res.data?.name || "Unknown"))
+    fetch(`https://sportssolutionspro.com:8443/player/${senderId}`)
+      .then((res) => res.json())
+      .then((data) => setSenderName(data?.name || "Unknown"))
       .catch(() => setSenderName("Unknown"));
   }, [senderId]);
 
@@ -2925,9 +2924,9 @@ const MessageBoard = ({ senderId: propSenderId, ladderId, onClose }) => {
 
   useEffect(() => {
     if (!ladderId) return;
-    axios
-      .get(`https://sportssolutionspro.com:8443/group-messages/${ladderId}`)
-      .then((res) => setMessages(normalize(res.data || [])))
+    fetch(`https://sportssolutionspro.com:8443/group-messages/${ladderId}`)
+      .then((res) => res.json())
+      .then((data) => setMessages(normalize(data || [])))
       .catch(() => {});
   }, [ladderId]);
 

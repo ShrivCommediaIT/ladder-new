@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import Image from "next/image";
 import React, { useEffect, useState, useRef, useCallback } from "react";
@@ -14,7 +15,7 @@ import LadderLinkPanel from "../players/LadderLinkPanel";
 // Player Card
 const PlayerCard = ({ player, rank }) => {
   const playerImageUrl = player.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
+    ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
   return (
@@ -134,11 +135,6 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
   return (
     <div className="space-y-5">
       <ToastContainer />
-
-      {/* Ladder Name */}
-      {/* <h1 className="text-3xl font-bold text-white">
-        {ladderDetails?.name || "Roster"}
-      </h1> */}
 
       <div>
         <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />

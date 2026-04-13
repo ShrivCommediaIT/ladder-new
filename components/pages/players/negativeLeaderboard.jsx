@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
@@ -11,13 +12,13 @@ import LadderLinkPanel from "./LadderLinkPanel";
 import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { Button } from "@/components/ui/button";
 import { X, Trophy, ListOrdered } from "lucide-react";
-import axios from "axios";
+
 import PlayerSearchInput from "./PlayerSearchInput";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
 import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
 import { fetchNegativeLeaderboard } from "@/redux/slices/negativeLeaderBoardSlice";
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({
@@ -27,7 +28,7 @@ const PlayerCard = ({
   onTargetAchieved,
 }) => {
   const playerImageUrl = player?.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
+    ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const scoreObj = scores?.find((s) => s.skill_number === skillNumber);

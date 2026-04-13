@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
@@ -21,9 +20,8 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import AddRemoveBox from "./AddRemoveBox"; // AddRemoveBox (handles add/remove/move logic)
+import AddRemoveBox from "./AddRemoveBox";
 import UploadPlayerLists from "../uploadCsv/UploadPlayerLists";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
@@ -33,8 +31,6 @@ import BasicLeaderboardSetUpSkill from "./BasicLeaderboardSetUpSkill";
 import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import BasicLeaderboardShort from "./BasicLeaderboardShort";
 import { paymentPage } from "@/helper/RouteName";
-
-// import { Funnel } from "lucide-react";
 import {
   Funnel,
   RotateCw,
@@ -44,12 +40,11 @@ import {
   Upload,
   CreditCard,
   Zap,
-} from "lucide-react"; // import lucide icons
+} from "lucide-react";
 import { fetchNegativeLeaderboard } from "@/redux/slices/negativeLeaderBoardSlice";
 import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
-// import InvertRankButton from "./InvertRankButton";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const AdminButton = () => {
   const router = useRouter();
@@ -67,20 +62,19 @@ const AdminButton = () => {
     (state) => state.minileague?.ladderDetails?.type,
   );
 
-    const demoLadder = useSelector(
+  const demoLadder = useSelector(
     (state) => state.player?.players?.[ladderId]?.ladderDetails.created_by,
   );
 
-
   const isDemoLadder = demoLadder?.toLowerCase() === "demo";
 
-    const ladderType = typeFromParams || playerLadderType || miniLeagueLadderType;
+  const ladderType = typeFromParams || playerLadderType || miniLeagueLadderType;
 
-    const isMiniLeague = ladderType === "minileague";
-    const isSkill = ladderType === "skill";
-    const isRoster = typeFromParams === "roster";
-    const isPositive = typeFromParams === "positive";
-    const isNegative = typeFromParams === "negative";
+  const isMiniLeague = ladderType === "minileague";
+  const isSkill = ladderType === "skill";
+  const isRoster = typeFromParams === "roster";
+  const isPositive = typeFromParams === "positive";
+  const isNegative = typeFromParams === "negative";
   const [openAddPlayerDialog, setOpenAddPlayerDialog] = useState(false);
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
   const [openSkillDialog, setOpenSkillDialog] = useState(false);
@@ -91,12 +85,9 @@ const AdminButton = () => {
   const [resetLoading, setResetLoading] = useState(false);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [confirmType, setConfirmType] = useState(""); // zero | update | reset | reset_skill
+  const [confirmType, setConfirmType] = useState("");
   const [isSorted, setIsSorted] = useState(false);
 
-  const [isDescending, setIsDescending] = useState(false);
-
-  // REFRESH FUNCTIONS
   const refreshLeaderboard = () => {
     if (ladderId) {
       if (isSkill) {
@@ -112,57 +103,41 @@ const AdminButton = () => {
     }
   };
 
-const refreshSkillLeaderboard = (skillNo = 0) => {
-  if (!ladderId) return;
+  const refreshSkillLeaderboard = (skillNo = 0) => {
+    if (!ladderId) return;
 
-  let laddartype;
-  let fetchSliceLeaderboard;
+    let laddartype;
+    let fetchSliceLeaderboard;
 
-  if (
-    typeFromParams === "positive" ||
-    ladderTypeFromParams === "positive"
-  ) {
-    laddartype = "positive";
-    fetchSliceLeaderboard = fetchPositiveLeaderboard;
-  } 
-  else if (
-    typeFromParams === "negative" ||
-    ladderTypeFromParams === "negative"
-  ) {
-    laddartype = "negative";
-    fetchSliceLeaderboard = fetchNegativeLeaderboard;
-  } 
-  else {
-    laddartype = "skill";
-    fetchSliceLeaderboard = fetchSkillLeaderboard;
-  }
+    if (typeFromParams === "positive" || ladderTypeFromParams === "positive") {
+      laddartype = "positive";
+      fetchSliceLeaderboard = fetchPositiveLeaderboard;
+    } else if (typeFromParams === "negative" || ladderTypeFromParams === "negative") {
+      laddartype = "negative";
+      fetchSliceLeaderboard = fetchNegativeLeaderboard;
+    } else {
+      laddartype = "skill";
+      fetchSliceLeaderboard = fetchSkillLeaderboard;
+    }
 
-  dispatch(
-    fetchSliceLeaderboard({
-      ladder_id: ladderId,
-      type: laddartype,
-      sortbyskillnumber: skillNo,
-    })
-  );
-};
+    dispatch(
+      fetchSliceLeaderboard({
+        ladder_id: ladderId,
+        type: laddartype,
+        sortbyskillnumber: skillNo,
+      })
+    );
+  };
 
   useEffect(() => {
     if (ladderId) dispatch(fetchGradebars(ladderId));
   }, [ladderId, dispatch]);
 
-  // ZERO SCORE
   const handleZeroScore = async () => {
     setZeroLoading(true);
     try {
-      const res = await axios.get(
-        "https://ne-games.com/leaderBoard/api/user/resetscore",
-        {
-          params: { ladder_id: ladderId },
-          headers: { APPKEY },
-        },
-      );
-
-      if (res?.data?.status === 200) {
+      const res = await getRequest(API_ENDPOINTS.RESET_SCORE, { ladder_id: ladderId });
+      if (res?.status === 200) {
         dispatch(clearActivityState());
         refreshLeaderboard();
         toast.success("All scores reset to ZERO!");
@@ -174,19 +149,11 @@ const refreshSkillLeaderboard = (skillNo = 0) => {
     }
   };
 
-  // UPDATE MINI LEAGUE
   const handleUpdate = async () => {
     setUpdateLoading(true);
     try {
-      const res = await axios.get(
-        "https://ne-games.com/leaderBoard/api/user/update/minileague",
-        {
-          params: { ladder_id: ladderId },
-          headers: { APPKEY },
-        },
-      );
-
-      if (res?.data?.status === 200) {
+      const res = await getRequest(API_ENDPOINTS.UPDATE_MINILEAGUE, { ladder_id: ladderId });
+      if (res?.status === 200) {
         toast.success("Mini League updated successfully!");
         refreshLeaderboard();
       }
@@ -197,17 +164,10 @@ const refreshSkillLeaderboard = (skillNo = 0) => {
     }
   };
 
-  // RESET REGULAR LADDER
   const handleReset = async () => {
     setResetLoading(true);
     try {
-      await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/Resetleaderboard?ladder_id=${ladderId}`,
-        {
-          headers: { APPKEY },
-        },
-      );
-
+      await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
       setConfirmOpen(false);
       setOpenUploadDialog(true);
       toast.success("Leaderboard reset successfully!");
@@ -219,17 +179,10 @@ const refreshSkillLeaderboard = (skillNo = 0) => {
     }
   };
 
-  // RESET SKILL LADDER
   const handleResetSkill = async () => {
     setResetLoading(true);
     try {
-      await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/resetSkillboard?ladder_id=${ladderId}`,
-        {
-          headers: { APPKEY },
-        },
-      );
-
+      await getRequest(API_ENDPOINTS.RESET_SKILLBOARD, { ladder_id: ladderId });
       setConfirmOpen(false);
       setOpenSkillDialog(true);
       toast.success("Skill Leaderboard reset successfully!");
@@ -257,7 +210,6 @@ const refreshSkillLeaderboard = (skillNo = 0) => {
     refreshSkillLeaderboard(0);
   };
 
-  // Upgrade
   const handleUpgrade = () => router.push(paymentPage);
 
   return (
@@ -291,7 +243,7 @@ const refreshSkillLeaderboard = (skillNo = 0) => {
         )}
 
         {/* SKILL LADDER RESET */}
-        {(isSkill  || isPositive || isNegative) && (
+        {(isSkill || isPositive || isNegative) && (
           <Button
             onClick={() => {
               setConfirmType("reset_skill");
@@ -304,63 +256,57 @@ const refreshSkillLeaderboard = (skillNo = 0) => {
           </Button>
         )}
 
- 
+        {!isMiniLeague && !isSkill && !isRoster && !isPositive && !isNegative && (
+          <Button
+            onClick={() => {
+              if (isDemoLadder) {
+                toast.warning("Disabled for Demo Purposes");
+                return;
+              }
+              setConfirmType("reset");
+              setConfirmOpen(true);
+            }}
+            disabled={resetLoading}
+            className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
+          >
+            <RefreshCw size={20} />
+            {resetLoading ? "RESETTING..." : "RESET"}
+          </Button>
+        )}
 
-{!isMiniLeague && !isSkill && !isRoster && !isPositive && !isNegative &&  (
-  <Button
-    onClick={() => {
-      if (isDemoLadder) {
-        toast.warning("Disabled for Demo Purposes");
-        return;
-      }
-      setConfirmType("reset");
-      setConfirmOpen(true);
-    }}
-    disabled={resetLoading}
-    className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
-  >
-    <RefreshCw size={20} />
-    {resetLoading ? "RESETTING..." : "RESET"}
-  </Button>
-)}
-     
-    {!isRoster && (
-  <Dialog
-    open={openAddPlayerDialog}
-    onOpenChange={setOpenAddPlayerDialog}
-  >
-    <DialogTrigger asChild>
-      <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
-        <PlusCircle size={20} />
-        ADD/REMOVE/MOVE
-      </Button>
-    </DialogTrigger>
+        {!isRoster && (
+          <Dialog
+            open={openAddPlayerDialog}
+            onOpenChange={setOpenAddPlayerDialog}
+          >
+            <DialogTrigger asChild>
+              <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
+                <PlusCircle size={20} />
+                ADD/REMOVE/MOVE
+              </Button>
+            </DialogTrigger>
 
-    <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle className="sr-only">
-          Manage Players
-        </DialogTitle>
-      </DialogHeader>
+            <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="sr-only">
+                  Manage Players
+                </DialogTitle>
+              </DialogHeader>
 
-      {/* Skill ladder → add/remove only
-          Others → add/remove/move */}
-
-      <AddRemoveBox
-        ladderId={ladderId}
-        onSuccessRefresh={
-          isSkill
-            ? refreshSkillLeaderboard
-            : refreshLeaderboard
-        }
-      />
-    </DialogContent>
-
-  </Dialog>
-)}
+              <AddRemoveBox
+                ladderId={ladderId}
+                onSuccessRefresh={
+                  isSkill
+                    ? refreshSkillLeaderboard
+                    : refreshLeaderboard
+                }
+              />
+            </DialogContent>
+          </Dialog>
+        )}
 
         {/* SKILL SPECIFIC BUTTONS */}
-        {(isSkill  || isPositive || isNegative) && (
+        {(isSkill || isPositive || isNegative) && (
           <>
             {!isSorted ? (
               <Button
@@ -379,13 +325,6 @@ const refreshSkillLeaderboard = (skillNo = 0) => {
             )}
           </>
         )}
-
-        {/* <div className="">
-             <InvertRankButton
-            isDescending={isDescending}
-            onToggle={() => setIsDescending((prev) => !prev)}
-          />
-        </div> */}
 
         {/* SINGLE DIALOG */}
         <Dialog
@@ -412,7 +351,7 @@ const refreshSkillLeaderboard = (skillNo = 0) => {
         {/* SET UP SKILL */}
         <Dialog open={openSkillDialog} onOpenChange={setOpenSkillDialog}>
           <DialogTrigger asChild>
-            {(isSkill  || isPositive || isNegative) && (
+            {(isSkill || isPositive || isNegative) && (
               <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
                 <Zap size={20} /> SETUP
               </Button>
@@ -426,42 +365,24 @@ const refreshSkillLeaderboard = (skillNo = 0) => {
           </DialogContent>
         </Dialog>
 
-        {/* PURCHASE LADDER */}
-        {/* <Button
-          onClick={handleUpgrade}
-          className="bg-[#6766CC] bg-[length:200%_100%] animate-gradient-x 
-  border border-gray-400 text-white font-bold uppercase 
-  rounded-xl py-8 px-24 w-full shadow-lg 
-  flex flex-col items-center justify-center gap-1 
-  text-xs text-center leading-snug"
-        >
-          <CreditCard size={20} />
-
-          <span>PURCHASE</span>
-
-          <span className="text-[8px] normal-case font-semibold text-white/80">
-            Ignore if Club has a Licence
-          </span>
-        </Button> */}
-
         {!isRoster && (
-  <Button
-    onClick={handleUpgrade}
-    className="bg-[#6766CC] bg-[length:200%_100%] animate-gradient-x 
-    border border-gray-400 text-white font-bold uppercase 
-    rounded-xl py-8 px-24 w-full shadow-lg 
-    flex flex-col items-center justify-center gap-1 
-    text-xs text-center leading-snug"
-  >
-    <CreditCard size={20} />
+          <Button
+            onClick={handleUpgrade}
+            className="bg-[#6766CC] bg-[length:200%_100%] animate-gradient-x 
+            border border-gray-400 text-white font-bold uppercase 
+            rounded-xl py-8 px-24 w-full shadow-lg 
+            flex flex-col items-center justify-center gap-1 
+            text-xs text-center leading-snug"
+          >
+            <CreditCard size={20} />
 
-    <span>PURCHASE</span>
+            <span>PURCHASE</span>
 
-    <span className="text-[8px] normal-case font-semibold text-white/80">
-      Ignore if Club has a Licence
-    </span>
-  </Button>
-)}
+            <span className="text-[8px] normal-case font-semibold text-white/80">
+              Ignore if Club has a Licence
+            </span>
+          </Button>
+        )}
       </div>
 
       {/* CONFIRM DIALOG */}

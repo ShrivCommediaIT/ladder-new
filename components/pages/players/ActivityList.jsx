@@ -10,9 +10,8 @@ import { fetchUserActivity } from "@/redux/slices/activitySlice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import axios from "axios";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const ActivityLog = () => {
   const dispatch = useDispatch();
@@ -54,10 +53,7 @@ useEffect(() => {
     if (!activityId) return;
     setDeletingId(activityId);
     try {
-      await axios.get(
-        `https://ne-games.com/leaderBoard/api/user/activityDelete?id=${activityId}`,
-        { headers: { APPKEY } },
-      );
+      await getRequest(API_ENDPOINTS.ACTIVITY_DELETE, { id: activityId });
       // Refresh log after successful delete
       dispatch(fetchUserActivity({ ladder_id: Number(ladder_id) }));
     } catch (err) {

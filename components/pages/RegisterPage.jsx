@@ -6,7 +6,8 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import { postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -90,17 +91,7 @@ export default function RegisterPage() {
 
     try {
       setLoading(true);
-      await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/register",
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            APPKEY:
-              "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy",
-          },
-        },
-      );
+      await postRequest(API_ENDPOINTS.REGISTER, payload);
 
       toast.success("Account created successfully!");
       setTimeout(() => router.push(loginPage), 1500);

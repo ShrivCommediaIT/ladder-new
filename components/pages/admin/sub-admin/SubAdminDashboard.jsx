@@ -330,9 +330,6 @@ export default function SubAdminDashboard() {
 
                     <span className="text-[#F0ACFF] font-medium">Section:</span>
 
-                    {/* <span className="font-semibold text-white/80 capitalize break-words">
-                      {subAdmin?.sport_name || "N/A"}
-                    </span> */}
                     <p
                       className="
                       relative overflow-hidden
@@ -449,7 +446,6 @@ export default function SubAdminDashboard() {
                 href="mailto:support@sportssolutionspro.com"
                 className="mt-1 inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors text-sm sm:text-base font-semibold"
               >
-                {/* <Envelope className="w-4 h-4 mr-2" /> */}
                 support@sportssolutionspro.com
               </a>
             </div>

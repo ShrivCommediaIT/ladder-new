@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import Image from "next/image";
 
@@ -6,7 +7,7 @@ export default function PlayerCard({ name, phone, rank, image }) {
   // ✅ Safe image URL
   const imageUrl =
     image && !image.startsWith("http") && !image.startsWith("/")
-      ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${image}`
+      ? `${IMAGE_BASE_URL}/${image}`
       : image || "/logo.jpg"; // fallback
 
   return (

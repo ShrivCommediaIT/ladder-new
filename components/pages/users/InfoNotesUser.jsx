@@ -1,29 +1,3 @@
-// "use client";
-
-// import React from "react";
-
-// const InfoNotesUser = () => {
-//   return (
-//     <div className="w-full flex justify-center">
-//       <div className="bg-white dark:bg-gray-900 border border-black rounded-md px-4 py-2 shadow-sm">
-//         <p className="text-sm font-medium text-black dark:text-white">
-//           <span className="font-bold">Note:</span>{" "}
-//           Number of players in each  
-//         </p>
-//         <p>
-//             section can be changed by admin
-//         </p>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default InfoNotesUser;
-
-
-
-
-
 
 
 

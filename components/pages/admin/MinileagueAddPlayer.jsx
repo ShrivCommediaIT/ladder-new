@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
+import { postFormData } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { useSearchParams } from "next/navigation";
@@ -39,8 +40,6 @@ export default function MinileagueAddPlayer({ onClose }) {
   const [welcomeMsg, setWelcomeMsg] = useState("");
   const [showDialog, setShowDialog] = useState(false);
 
-  const APPKEY =
-    "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
 
   useEffect(() => {
     if (ladder_id) {
@@ -79,13 +78,9 @@ export default function MinileagueAddPlayer({ onClose }) {
     if (profileFile) formData.append("file", profileFile);
 
     try {
-      const response = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/minileagueaddbyadmin",
-        formData,
-        { headers: { APPKEY } }
-      );
+      const response = await postFormData(API_ENDPOINTS.MINILEAGUE_ADD_BY_ADMIN, formData);
 
-      if (response.data.status === 200) {
+      if (response.status === 200) {
         setWelcomeMsg(`Welcome ${name}! ${response.data.success_message}`);
         setShowDialog(true);
 
@@ -143,13 +138,7 @@ export default function MinileagueAddPlayer({ onClose }) {
               <h2 className="text-lg font-semibold text-center tracking-tight">
                 Add Player
               </h2>
-              {/* <p className="text-xs text-slate-400">
-                Fill in the details to place player in ladder.
-              </p> */}
             </div>
-            {/* <span className="rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] px-2 py-1 font-medium border border-emerald-500/30">
-              Admin
-            </span> */}
           </div>
 
           {/* Profile Upload */}

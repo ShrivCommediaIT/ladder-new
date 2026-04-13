@@ -11,9 +11,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import axios from "axios";
-
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { postRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const AdminEditPhone = () => {
   const [phone, setPhone] = useState("");
@@ -66,40 +65,27 @@ const handleEdit = async () => {
   setLoading(true);
 
   try {
-    let url = "";
     let payload = {};
 
-    // ✅ role based switch
     if (user.user_type === "admin") {
-      url = "https://ne-games.com/leaderBoard/api/user/editDetails";
-
       payload = {
         id: user.id,
         user_id: user.user_id,
-        name: name,
-        phone: phone,
+        name,
+        phone,
         role: user.user_type,
       };
+    } else {
+      payload = { id: user.id, name, phone };
     }
 
-    if (user.user_type === "sub_admin") {
-      url = "https://ne-games.com/leaderBoard/api/app/user/updateSubadminProfile";
+    const endpoint = user.user_type === "admin"
+      ? API_ENDPOINTS.EDIT_DETAILS
+      : "/app/user/updateSubadminProfile";
 
-      payload = {
-        id: user.id,
-        name: name,
-        phone: phone,
-      };
-    }
+    const res = await postRequest(endpoint, payload);
 
-    const res = await axios.post(url, payload, {
-      headers: {
-        APPKEY: APPKEY,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (res.data.status == 200 || res.data.status === "success") {
+    if (res.status == 200 || res.status === "success") {
       // update localStorage
       const updated = { ...user, name, phone };
 

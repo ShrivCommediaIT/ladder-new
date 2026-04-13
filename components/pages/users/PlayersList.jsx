@@ -1,7 +1,5 @@
-
-// ============================== 16-12-2025 wihout score boxes ====================
-
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 import Image from "next/image";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -179,7 +177,7 @@ export default function PlayersList() {
           <div className="space-y-3">
             {grade.players.map((player, pidx) => {
               const playerImageUrl = player.image
-                ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}?t=${cacheBuster}`
+                ? `${IMAGE_BASE_URL}/${player.image}?t=${cacheBuster}`
                 : "/logo.jpg";
 
               const isCurrentUser =

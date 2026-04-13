@@ -530,33 +530,6 @@ const MovePlayerMinileague = ({
             )}
           </div>
 
-          {/* <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
-            {numberButtons.map((num) => (
-              <motion.button
-                key={num}
-                onClick={() => handleNumberClick(num)}
-                style={{ touchAction: "manipulation" }}
-                whileTap={{ scale: 0.95 }}
-                className="
-                  h-8
-                  w-full
-                  bg-gray-700
-                  text-gray-100
-                  hover:bg-violet-600
-                  transition-all
-                  text-xl
-                  font-bold
-                  rounded-xl
-                  shadow-lg
-                  border
-                  border-gray-600
-                "
-              >
-                {num}
-              </motion.button>
-            ))}
-          </div> */}
-
           <div className="w-full md:w-1/2 max-w-xs grid grid-cols-3 gap-3">
             {numberButtons.map((num) => {
               if (num === 0) {

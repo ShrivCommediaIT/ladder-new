@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import Image from "next/image";
 import React, { useEffect, useState, useRef, useCallback } from "react";
@@ -43,7 +44,7 @@ const PlayerCard = ({
   const cacheBust = React.useMemo(() => Date.now(), [player?.image]);
 
   const playerImageUrl = player?.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}?t=${cacheBust}`
+    ? `${IMAGE_BASE_URL}/${player.image}?t=${cacheBust}`
     : Logo;
 
   const sectionStartRank =

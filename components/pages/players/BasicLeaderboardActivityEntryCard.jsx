@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
-import { Card } from "@/components/ui/card";
+import { getRequest, postUrlEncoded } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { updateLadderToken } from "@/helper/helperApi";
 
 
-const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { Card } from "@/components/ui/card";
 const activityNumbers = Array.from({ length: 12 }, (_, i) => i + 1);
 
 export default function BasicLeaderboardActivityEntryCard({
@@ -54,15 +54,12 @@ export default function BasicLeaderboardActivityEntryCard({
     const fetchSkill = async () => {
       try {
         setLoadingSkill(true);
-        const res = await axios.get(
-          "https://ne-games.com/leaderBoard/api/user/getskillBynumber",
-          {
-            params: { ladder_id: ladderId, skill_number: selectedActivity },
-            headers: { APPKEY },
-          }
-        );
+        const res = await getRequest(API_ENDPOINTS.GET_SKILL_BY_NUMBER, {
+          ladder_id: ladderId,
+          skill_number: selectedActivity,
+        });
 
-        const data = res.data?.data || {};
+        const data = res?.data || {};
         setSkillDesc(data.skill_description || "");
         setSkillTarget(data.target || "No target");
         setSkillSign(data.skill_sign === "-" ? "-" : "+");
@@ -107,18 +104,9 @@ export default function BasicLeaderboardActivityEntryCard({
         params.append("best_result", bestScore);
       }
 
-      const skillsPost = await axios.post(
-        "https://ne-games.com/leaderBoard/api/user/postResultSkillboard",
-        params,
-        {
-          headers: {
-            APPKEY: APPKEY,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
+      const skillsPost = await postUrlEncoded(API_ENDPOINTS.POST_RESULT_SKILLBOARD, params);
 
-      if (skillsPost.status == 200) {
+      if (skillsPost.status === 200) {
         setOpenSuccess(true);
 
         toast.success("Result posted successfully! ");
@@ -189,17 +177,13 @@ export default function BasicLeaderboardActivityEntryCard({
       handleEnter() 
       return
     } 
-    const bestScore = await axios.get(
-      `https://ne-games.com/leaderBoard/api/user/getTopScore?user_id=${String(playerId)}&skill_activity_id=${String(skillActivityId)}&score=${String(value)}`,
-      {
-        headers: {
-          APPKEY: APPKEY,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
-    if (bestScore.status == 200) {
-      setTopScore(bestScore.data.data[0].top_score)
+    const bestScore = await getRequest(API_ENDPOINTS.GET_TOP_SCORE, {
+      user_id: String(playerId),
+      skill_activity_id: String(skillActivityId),
+      score: String(value),
+    });
+    if (bestScore.status === 200) {
+      setTopScore(bestScore.data[0].top_score)
       setOpenSuccessResult(true)
     }
   }

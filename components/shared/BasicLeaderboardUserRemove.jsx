@@ -176,7 +176,8 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button"; // ✅ SHADCN BUTTON
-import axios from "axios";
+import { postWithParams } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 import { toast } from "react-toastify";
 import { X, User } from "lucide-react";
 import {
@@ -204,7 +205,7 @@ const BasicLeaderboardUserRemove = ({ ladderId, myRank, onClose, onSuccessRefres
 const [showConfirm, setShowConfirm] = useState(false);
 
 
-  const APPKEY = "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+
 
    const handleSelfRemove = async () => {
     if (!ladderId) {
@@ -216,16 +217,12 @@ const [showConfirm, setShowConfirm] = useState(false);
 
     try {
       // ✅ API CALL - Remove current logged-in user only
-      const response = await axios.post(
-        `https://ne-games.com/leaderBoard/api/user/removeUser`,
-        {},
-        {
-          params: { ladder_id: ladderId, rank: myRank }, // ✅ "self" for current user
-          headers: { APPKEY },
-        }
-      );
+      const response = await postWithParams(API_ENDPOINTS.REMOVE_USER, {
+        ladder_id: ladderId,
+        rank: myRank,
+      });
 
-      if (response.data?.status === 200) {
+      if (response?.status === 200) {
         onClose(); // Close dialog
         onSuccessRefresh(); // Refresh leaderboard
         
@@ -234,7 +231,7 @@ const [showConfirm, setShowConfirm] = useState(false);
           autoClose: 3000,
         });
       } else {
-        throw new Error(response.data?.message || "Failed to remove");
+        throw new Error(response?.message || "Failed to remove");
       }
     } catch (error) {
       console.error("❌ Remove Error:", error.response?.data || error);

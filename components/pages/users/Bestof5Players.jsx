@@ -1,5 +1,5 @@
-
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -162,7 +162,7 @@ export default function Bestof5Players() {
               const canEdit = isAdmin || isCurrentUser;
 
               const playerImageUrl = player.image
-                ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
+                ? `${IMAGE_BASE_URL}/${player.image}`
                 : "/logo.jpg";
 
               return (

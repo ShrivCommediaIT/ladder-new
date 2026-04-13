@@ -79,11 +79,9 @@
 import React, { useEffect, useState } from "react";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { toast } from "react-toastify";
-
-const APPKEY =
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const LadderLinkPanel = ({ ladderId, ladderType }) => {
   const [copied, setCopied] = useState(false);
@@ -93,20 +91,12 @@ const LadderLinkPanel = ({ ladderId, ladderType }) => {
   // 🔹 API Function
   const fetchLadderDetails = async () => {
     try {
-      const res = await axios.get(
-        "https://ne-games.com/leaderBoard/api/user/leaderboard",
-        {
-          params: {
-            ladder_id: ladderId,
-            type: ladderType,
-          },
-          headers: {
-            APPKEY,
-          },
-        }
-      );
+      const res = await getRequest(API_ENDPOINTS.LEADERBOARD, {
+        ladder_id: ladderId,
+        type: ladderType,
+      });
 
-      const createdBy = res?.data?.ladderDetails?.created_by;
+      const createdBy = res?.ladderDetails?.created_by;
 
       if (createdBy === "demo") {
         setIsDemo(true);

@@ -1,4 +1,5 @@
 "use client";
+import { IMAGE_BASE_URL } from "@/constants/api";
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
@@ -69,7 +70,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
   const playerImageUrl = player?.image
-    ? `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${player.image}`
+    ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
     console.log("PlayerCard" , player, isEditable, player.id, player.skills[0].skill_number);
 

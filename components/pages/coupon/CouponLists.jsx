@@ -1,7 +1,7 @@
 // "use client";
 
 // import React, { useEffect, useState } from "react";
-// import axios from "axios";
+//
 // import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import { Separator } from "@/components/ui/separator";
 // import { Badge } from "@/components/ui/badge";
@@ -19,10 +19,11 @@
 //       try {
 //         setLoading(true);
 //         // 👇 You can replace this with your real endpoint later
-//         const response = await axios.get("https://jsonplaceholder.typicode.com/users");
+//         const response = await fetch("https://jsonplaceholder.typicode.com/users");
+//         const data = await response.json();
 
 //         // 🧠 Map the fake API data to coupon-like structure
-//         const fakeCoupons = response.data.slice(0, 8).map((user, index) => ({
+//         const fakeCoupons = data.slice(0, 8).map((user, index) => ({
 //           discount_code: `CODE${index + 10}`,
 //           discount_percentage: Math.floor(Math.random() * 30) + 5,
 //           email: user.email,
@@ -203,7 +204,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+
 import {
   Card,
   CardContent,
@@ -233,11 +234,12 @@ const CouponLists = () => {
     const fetchCoupons = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
+        const response = await fetch(
           "https://jsonplaceholder.typicode.com/users"
         );
+        const data = await response.json();
 
-        const fakeCoupons = response.data.slice(0, 8).map((user, index) => ({
+        const fakeCoupons = data.slice(0, 8).map((user, index) => ({
           discount_code: `CODE${index + 10}`,
           discount_percentage: Math.floor(Math.random() * 30) + 5,
           email: user.email,
