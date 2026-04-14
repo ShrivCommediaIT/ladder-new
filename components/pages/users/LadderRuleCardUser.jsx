@@ -66,17 +66,19 @@ const LadderRuleCardUser = ({ ladderIdProp }) => {
               <span>{rule.title || "Ladder Rules"}</span>
               <ChevronDown
                 size={24}
-                className={`text-amber-400 transform transition-transform ${
-                  isOpen ? "rotate-180" : ""
-                }`}
+                className={`text-amber-400 transform transition-transform ${isOpen ? "rotate-180" : ""
+                  }`}
               />
             </div>
 
             {isOpen && (
               <div className="pt-2">
-                <p className="mt-2 bg-gray-900/70 p-6 text-gray-200 rounded-xl text-base sm:text-lg max-h-[380px] overflow-y-auto border border-gray-800">
-                  {rule.rules || "No rules available."}
-                </p>
+                <div
+                  className="mt-2 bg-gray-900/70 p-6 text-gray-200 rounded-xl text-base sm:text-lg max-h-[380px] overflow-y-auto border border-gray-800 prose prose-invert max-w-none space-y-3 leading-relaxed"
+                  dangerouslySetInnerHTML={{
+                    __html: rule.rules || "No rules available.",
+                  }}
+                />
               </div>
             )}
           </div>

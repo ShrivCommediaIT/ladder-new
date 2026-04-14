@@ -10,6 +10,7 @@ import { getRequest, postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, ChevronUp, Edit, Save, X } from "lucide-react";
+import EditDiscountToken from "@/helper/editDiscountToken";
 
 const LadderRulesCard = ({ ladderIdProp }) => {
   const searchParams = useSearchParams();
@@ -99,23 +100,11 @@ const LadderRulesCard = ({ ladderIdProp }) => {
           <div key={rule.id} className="space-y-3 pb-6 rounded-xl transition-all duration-300">
             {isCurrentEditing ? (
               <>
-                <Input
-                  className="text-xl sm:text-2xl font-bold text-amber-400 w-full bg-gray-800 border-amber-400/50 p-4 rounded-xl shadow-lg"
-                  value={tempRulesList[idx].title}
-                  onChange={(e) => {
+                <EditDiscountToken 
+                  tempRulesList={tempRulesList[idx].rules} 
+                  onChange={(newHtml) => {
                     const newList = [...tempRulesList];
-                    newList[idx].title = e.target.value;
-                    setTempRulesList(newList);
-                  }}
-                />
-
-                <Textarea
-                  className="w-full bg-gray-800 border-gray-700 p-4 text-gray-200 rounded-xl text-base sm:text-lg max-h-[380px] overflow-y-auto"
-                  rows={6}
-                  value={tempRulesList[idx].rules}
-                  onChange={(e) => {
-                    const newList = [...tempRulesList];
-                    newList[idx].rules = e.target.value;
+                    newList[idx].rules = newHtml;
                     setTempRulesList(newList);
                   }}
                 />
