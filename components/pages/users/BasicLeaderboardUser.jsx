@@ -19,6 +19,7 @@ import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import BasicLeaderboardPrintSkillsSheet from "../admin/BasicLeaderboardPrintSkillsSheet";
 import BasicLeaderboardActivityEntryCard from "../players/BasicLeaderboardActivityEntryCard";
+import PlayerEditInfoModel from "@/helper/playerEditInfoModel";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -82,7 +83,7 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
     : Logo;
 
   return (
-      <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
+      <Card onClick={() => {onSkillClick(player.id, player.skills[0].skill_number)}} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10">
@@ -242,7 +243,8 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
   const [showRemove, setShowRemove] = useState(false);
   
   const [currentUserId, setCurrentUserId] = useState(null);
-
+ const [dialogMessage, setDialogMessage] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const currentUser = data.find((p) => p.id == currentUserId);
   const myRank = currentUser?.rank;
 
@@ -345,7 +347,11 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
 
   const handleSkillClick = useCallback(
     (playerId, skillNumber) => {
-      if (playerId != currentUserId) return;
+      if (playerId != currentUserId){
+        setDialogMessage("You can only edit your own profile");
+        setIsDialogOpen(true);
+      return
+      }
 
       const player = data.find((p) => p.id === playerId);
       if (!player) return;
@@ -481,6 +487,12 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
           />
         </DialogContent>
       </Dialog>
+
+        <PlayerEditInfoModel
+        isDialogOpen={isDialogOpen}
+        dialogMessage={dialogMessage}
+        setIsDialogOpen={setIsDialogOpen}
+      />
 
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardUserEdit

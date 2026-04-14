@@ -37,6 +37,7 @@ export default function BasicLeaderboardActivityEntryCard({
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openSuccessResult, setOpenSuccessResult] = useState(false);
   const [topScore, setTopScore] = useState(0);
+  const [todaysScore, setTodaysScore] = useState(0);
   const [skillTarget, setSkillTarget] = useState("");
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
   const [zeroAction, setZeroAction] = useState(null);
@@ -94,6 +95,9 @@ export default function BasicLeaderboardActivityEntryCard({
       const witnessValue =
         witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
 
+        console.log("witnessValue==>5",witnessValue);
+        
+
       const params = new URLSearchParams();
       params.append("user_id", String(playerId));
       params.append("skill_activity_id", String(skillActivityId));
@@ -128,7 +132,7 @@ export default function BasicLeaderboardActivityEntryCard({
     }
   };
 
-  const handleEnter = useCallback(async () => {
+  const handleEnter = async () => {
     if (!skillActivityId || !playerId) return;
 
     const num = Math.abs(Number(value) || 0);
@@ -147,8 +151,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
     const finalScore = skillSign === "-" ? -num : num;
     submitScore(finalScore, topScore);
-
-  }, [skillActivityId, playerId, value, skillSign, topScore]);
+  };
 
   const handleZeroConfirm = (type) => {
     setOpenZeroAlert(false);
@@ -173,40 +176,95 @@ export default function BasicLeaderboardActivityEntryCard({
   }, [onClose]);
 
   const getBestScore = async () => {
-    if (value == 0 || value == "-"){
-      handleEnter() 
-      return
-    } 
-    const bestScore = await getRequest(API_ENDPOINTS.GET_TOP_SCORE, {
-      user_id: String(playerId),
-      skill_activity_id: String(skillActivityId),
-      score: String(value),
-    });
-    if (bestScore.status === 200) {
-      setTopScore(bestScore.data[0].top_score)
-      setOpenSuccessResult(true)
+    if (value == 0 || value == "-") {
+      handleEnter();
+      return;
     }
-  }
+
+    try {
+      const bestScore = await getRequest(API_ENDPOINTS.GET_TOP_SCORE, {
+        user_id: String(playerId),
+        skill_activity_id: String(skillActivityId),
+        score: String(value),
+      });
+
+      if (bestScore.status === 200) {
+        setTopScore(bestScore?.data?.[0]?.top_score || 0);
+        setOpenSuccessResult(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (!playerId || !skillActivityId) return;
+
+    const fetchTopScore = async () => {
+      try {
+        const bestScore = await getRequest(API_ENDPOINTS.GET_TOP_SCORE, {
+          user_id: String(playerId),
+          skill_activity_id: String(skillActivityId),
+          score: "0",
+        });
+        
+        if (bestScore.status === 200) {
+          setTopScore(bestScore?.data?.[0]?.top_score || 0);
+          setTodaysScore(bestScore?.data?.[0]?.current_score || value);
+        }
+      } catch (err) {
+        console.error("Failed to load initial top score:", err);
+      }
+    };
+
+    fetchTopScore();
+  }, [playerId, skillActivityId]);
 
   return (
     <>
       <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
-        <div className="mb-2">
-          <p className="text-[11px] uppercase tracking-wide text-sky-300">
-            Skill Selected Number : {selectedActivity}
-          </p>
-          {loadingSkill ? (
-            <p className="text-xs text-slate-400">Loading skill...</p>
-          ) : (
-            <>
-              <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words leading-relaxed">
-                Skill Name : {skillDesc || "No skill description"}
-              </p>
-              <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium leading-relaxed">
-                Target : {skillTarget ? Math.abs(Number(skillTarget)) : "No target"}
-              </p>
-            </>
-          )}
+        <div className="mb-2 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 bg-slate-800 p-2 rounded-lg">
+          <div className="flex flex-col gap-1">
+            <p className="text-[11px] uppercase tracking-wide text-sky-300">
+              Skill Selected Number : {selectedActivity}
+            </p>
+            {loadingSkill ? (
+              <p className="text-xs text-slate-400">Loading skill...</p>
+            ) : (
+              <>
+                <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words leading-relaxed">
+                  Skill Name : {skillDesc || "No skill description"}
+                </p>
+                <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium leading-relaxed">
+                  Target : {skillTarget ? Math.abs(Number(skillTarget)) : "No target"}
+                </p>
+              </>
+            )}
+          </div>
+          
+          <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
+            <div className="flex-1 sm:flex-none flex flex-col items-center">
+              <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
+                Today's Result
+              </label>
+              <input
+                className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex-1 sm:flex-none flex flex-col items-center">
+              <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
+                Best Result
+              </label>
+              <input
+                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 cursor-not-allowed outline-none"
+                value={topScore && topScore}
+                readOnly
+              />
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-1.5 mb-2">

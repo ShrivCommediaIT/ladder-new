@@ -5,13 +5,9 @@ import { API_ENDPOINTS } from "@/constants/api";
 
 export const fetchSkillLeaderboard = createAsyncThunk(
   "skillLeaderboard/fetchSkillLeaderboard",
-  async ({ ladder_id, type = "skill", sortbyskillnumber = 0 }, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, {
-        ladder_id,
-        type,
-        sortbyskillnumber,
-      });
+      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, payload);
 
       const rawPlayers = data?.data || [];
       const transformedPlayers = rawPlayers.map((player) => ({

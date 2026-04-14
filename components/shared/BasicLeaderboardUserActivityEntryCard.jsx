@@ -97,57 +97,28 @@ export default function BasicLeaderboardActivityEntryCard({
     fetchSkill();
   }, [selectedActivity, ladderId]);
 
+  useEffect(() => {
+    if (!playerId || !skillActivityId) return;
 
-  /* ---------------- INPUT HANDLERS ---------------- */
-  // const handleDigit = (d) => {
+    const fetchTopScore = async () => {
+      try {
+        const bestScore = await getRequest("/user/getTopScore", {
+          user_id: String(playerId),
+          skill_activity_id: String(skillActivityId),
+          score: "0",
+        });
+        
+        if (bestScore?.status === 200 || bestScore?.status === "success") {
+          setTopScore(bestScore?.data?.[0]?.top_score || 0);
+        }
+      } catch (err) {
+        console.error("Failed to load initial top score:", err);
+      }
+    };
 
-  //   if (type === "negative" || ladderType === "negative") {
-  //     if (document.activeElement === minRef.current) {
-  //       setTimeParts((p) => {
-  //         let v = (p.min + d).slice(-2);
-  //         if (Number(v) > 59) return p;
+    fetchTopScore();
+  }, [playerId, skillActivityId]);
 
-  //         if (v.length === 2) secRef.current?.focus();
-
-  //         return { ...p, min: v };
-  //       });
-
-  //       return;
-  //     }
-
-  //     if (document.activeElement === secRef.current) {
-  //       setTimeParts((p) => {
-  //         let v = (p.sec + d).slice(-2);
-  //         if (Number(v) > 59) return p;
-
-  //         if (v.length === 2) msRef.current?.focus();
-
-  //         return { ...p, sec: v };
-  //       });
-
-  //       return;
-  //     }
-
-  //     if (document.activeElement === msRef.current) {
-  //       setTimeParts((p) => {
-  //         let v = (p.ms + d).slice(-3);
-  //         return { ...p, ms: v };
-  //       });
-
-  //       return;
-  //     }
-
-  //     minRef.current?.focus();
-  //     return;
-  //   }
-
-  //   setValue((prev) => {
-  //       if (d === "." && !prev) return prev;
-  //       if (d === "." && prev.includes(".")) return prev;
-  //       if (prev === "0" && d !== ".") return d;
-  //       return prev + d;
-  //   })
-  // };
   const handleDigit = (d) => {
 
     // ✅ NEGATIVE (TIMER MODE)
@@ -311,33 +282,6 @@ export default function BasicLeaderboardActivityEntryCard({
     });
   };
 
-  // const handleEnter = useCallback(() => {
-  //   if (!skillActivityId || !playerId) return;
-
-  //   const num = Math.abs(Number(value) || 0);
-
-  //   // 🚨 ALWAYS intercept 0 and "-"
-  //   if (type !== "negative" && ladderType !== "negative") {
-
-  //     if (value === "-") {
-  //       setZeroAction("onlyReset");
-  //       setOpenZeroAlert(true);
-  //       return;
-  //     }
-
-  //     if (num === 0) {
-  //       setZeroAction("both");
-  //       setOpenZeroAlert(true);
-  //       return;
-  //     }
-  //   }
-
-
-  //   // ✅ Normal flow → direct API
-  //   submitScore(value, topScore);
-
-  // }, [skillActivityId, playerId, value, skillSign, topScore, timeParts]);
-
   const handleEnter = useCallback(() => {
     if (!skillActivityId || !playerId) return;
 
@@ -487,33 +431,65 @@ export default function BasicLeaderboardActivityEntryCard({
     <>
       <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
         {/* HEADER - FIXED */}
-        <div className="mb-2">
-          {type != "positive" &&
-            type != "negative" &&
-            ladderType != "positive" &&
-            ladderType != "negative" && (
-              <p className="text-[11px] uppercase tracking-wide text-sky-300">
-                Skill Selected Number : {selectedActivity}
+        <div className="mb-2 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 bg-slate-800 p-2 rounded-lg">
+          <div className="flex flex-col gap-1">
+            {type != "positive" &&
+              type != "negative" &&
+              ladderType != "positive" &&
+              ladderType != "negative" && (
+                <p className="text-[11px] uppercase tracking-wide text-sky-300">
+                  Skill Selected Number : {selectedActivity}
+                </p>
+              )}
+
+            {/* SKILL NAME */}
+            {loadingSkill ? (
+              <p className="text-xs text-slate-400">Loading skill...</p>
+            ) : (
+              <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
+                Skill Name : {skillDesc || "No skill description"}
               </p>
             )}
 
-          {/* SKILL NAME */}
-          {loadingSkill ? (
-            <p className="text-xs text-slate-400">Loading skill...</p>
-          ) : (
-            <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-              Skill Name : {skillDesc || "No skill description"}
-            </p>
-          )}
-
-          {/* SKILL TARGET */}
-          {loadingSkill ? (
-            <p className="text-xs text-slate-400">Loading target...</p>
-          ) : (
-            <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
-              Target : {skillTarget ? Math.abs(skillTarget) : "No target"}
-            </p>
-          )}
+            {/* SKILL TARGET */}
+            {loadingSkill ? (
+              <p className="text-xs text-slate-400">Loading target...</p>
+            ) : (
+              <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
+                Target : {skillTarget ? Math.abs(skillTarget) : "No target"}
+              </p>
+            )}
+          </div>
+          
+          <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
+            <div className="flex-1 sm:flex-none flex flex-col items-center">
+              <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
+                Today's Result
+              </label>
+              {(type === "negative" || ladderType === "negative") ? (
+                <div className="flex mt-1 items-center bg-white rounded px-2 h-8 border border-white">
+                  <span className="text-xs text-black font-bold whitespace-nowrap">TIMER</span>
+                </div>
+              ) : (
+                <input
+                  className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
+                  value={value}
+                  onChange={(e) => handleInputChange(e)}
+                />
+              )}
+            </div>
+            
+            <div className="flex-1 sm:flex-none flex flex-col items-center">
+              <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
+                Best Result
+              </label>
+              <input
+                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 cursor-not-allowed outline-none"
+                value={topScore && topScore}
+                readOnly
+              />
+            </div>
+          </div>
         </div>
 
         {/* ACTIVITY BUTTONS */}
@@ -550,12 +526,19 @@ export default function BasicLeaderboardActivityEntryCard({
             }`}
         >
           {type !== "negative" && ladderType !== "negative" && (
-            <Input
-              placeholder="Enter score"
-              value={value}
-              onChange={handleInputChange}
-              className={`text-center text-lg font-semibold`}
-            />
+            <div className="flex items-center gap-2 mb-2 w-full">
+              <Input
+                value={value}
+                readOnly
+                className="text-center text-lg text-black font-semibold bg-slate-200"
+              />
+              <Input
+                placeholder="Witness by (optional)"
+                value={witnessBy}
+                onChange={(e) => setWitnessBy(e.target.value)}
+                className="text-start text-sm text-black font-semibold bg-slate-200"
+              />
+            </div>
           )}
 
           {(type === "negative" || ladderType === "negative") && (
@@ -727,7 +710,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
       <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
         <DialogContent className="max-w-md p-0 overflow-hidden">
-                  
+
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b">
             <h2 className="text-lg font-semibold text-emerald-600">
