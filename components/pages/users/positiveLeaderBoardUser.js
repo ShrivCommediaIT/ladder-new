@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
 import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
+import PlayerEditInfoModel from "@/helper/playerEditInfoModel";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -63,6 +64,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     displayScore,
     target,
     isTargetAchieved,
+    witnessBy: scoreObj?.witness_by || null,
   };
 };
 
@@ -72,7 +74,6 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
-    console.log("PlayerCard" , player, isEditable, player.id, player.skills[0].skill_number);
 
     
   return (
@@ -102,8 +103,16 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
               </div>
                 <div  className="flex  justify-between mr-1">
                   <div className="flex flex-col items-center mr-1">
-                    <span className="bg-white flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border">
-                      {player &&  player?.scores[0]?.input_score || 0}
+                    <span className={` flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border ${ 
+                      player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).isTargetAchieved 
+                      ? "bg-green-500" 
+                      : "bg-white" 
+                    } ${
+                      player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).witnessBy 
+                      ? "underline decoration-black decoration-[3px] bg-green-400" 
+                      : "" 
+                    }`}>
+                      {player?.skills?.length > 0 ? getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).displayScore : 0}
                     </span>
                   </div>
                     {player && player?.skills?.length > 0 ?null : (
@@ -153,6 +162,8 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [isRefreshing, setIsRefreshing] = useState(false); // FIXED: UNCOMMENTED
   const [showRemove, setShowRemove] = useState(false);
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
+  const [dialogMessage, setDialogMessage] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const [currentUserId, setCurrentUserId] = useState(null);
 
@@ -211,27 +222,27 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
     refreshLeaderboard(0);
   }, [refreshLeaderboard]);
 
+const handleSkillClick = useCallback(
+    (playerId, skillNumber) => {
+      if (playerId != currentUserId){
+        setDialogMessage("You can only edit your own profile");
+        setIsDialogOpen(true);
+      return
+      }
 
-  const handleSkillClick = useCallback(
-  
-      (playerId, skillNumber) => {
-  
-  
-        const player = data.find((p) => p.id === playerId);
-        if (!player) return;
-  
-        const skillObj = player.skills.find(
-          (s) => s.skill_number === skillNumber,
-        );
-        
-        if (!skillObj) return;
-        setSelectedPlayerId(playerId);
-        setSelectedSkillNumber(skillNumber);
-        setSelectedSkillActivityId(skillObj.id);
-        setOpenEdit(true);
-      },
-      [data],
-    );
+      const player = data.find((p) => p.id === playerId);
+      if (!player) return;
+      const skillObj = player.skills.find(
+        (s) => s.skill_number === skillNumber,
+      );
+      if (!skillObj) return;
+      setSelectedPlayerId(playerId);
+      setSelectedSkillNumber(skillNumber);
+      setSelectedSkillActivityId(skillObj.id);
+      setOpenEdit(true);
+    },
+    [data, currentUserId],
+  );
     
 
   const handleEditClose = useCallback(() => {
@@ -348,6 +359,12 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
           />
         </DialogContent>
       </Dialog>
+
+      <PlayerEditInfoModel
+        isDialogOpen={isDialogOpen}
+        dialogMessage={dialogMessage}
+        setIsDialogOpen={setIsDialogOpen}
+      />  
 
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardUserEdit

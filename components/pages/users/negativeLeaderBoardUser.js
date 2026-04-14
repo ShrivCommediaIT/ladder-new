@@ -15,56 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
 import { fetchNegativeLeaderboard } from "@/redux/slices/negativeLeaderBoardSlice";
-
-/* ---------------- HELPER FUNCTIONS ---------------- */
-
-const getScoreBySkillNumber = (scores, skills, skillNumber) => {
-  const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
-  const skillObj = skills?.find((s) => s.skill_number === skillNumber);
-
-  const score = scoreObj ? Number(scoreObj.score) : 0;
-
-  const inputScore =
-    scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
-      ? Number(scoreObj.input_score)
-      : null;
-
-  // display priority = input_score first
-  const displayScore =
-    inputScore !== null && !isNaN(inputScore) ? inputScore : score;
-
-  const target =
-    skillObj?.target !== null && skillObj?.target !== undefined
-      ? Number(skillObj.target)
-      : null;
-
-  const mode = skillObj?.skill_sign || "+";
-
-  let isTargetAchieved = false;
-
-  if (
-    target !== null &&
-    target !== 0 &&
-    score !== 0 &&
-    !isNaN(target) &&
-    !isNaN(score)
-  ) {
-    if (mode === "+") {
-      isTargetAchieved = score >= target;
-    } else {
-      // SAME as working component
-      isTargetAchieved = score >= Math.abs(target);
-    }
-  }
-
-  return {
-    score,
-    displayScore,
-    target,
-    isTargetAchieved,
-  };
-};
-
+import PlayerEditInfoModel from "@/helper/playerEditInfoModel";
 
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
@@ -168,7 +119,8 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
 
   const [currentUserId, setCurrentUserId] = useState(null);
-
+  const [dialogMessage, setDialogMessage] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const currentUser = data.find((p) => p.id == currentUserId);
   const myRank = currentUser?.rank;
 
@@ -226,17 +178,18 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   const handleSkillClick = useCallback(
     (playerId, skillNumber) => {
-        
-      if (playerId != currentUserId) return;
+      if (playerId != currentUserId){
+        setDialogMessage("You can only edit your own profile");
+        setIsDialogOpen(true);
+      return
+      }
 
       const player = data.find((p) => p.id === playerId);
-      
       if (!player) return;
       const skillObj = player.skills.find(
         (s) => s.skill_number === skillNumber,
       );
       if (!skillObj) return;
-
       setSelectedPlayerId(playerId);
       setSelectedSkillNumber(skillNumber);
       setSelectedSkillActivityId(skillObj.id);
@@ -359,6 +312,12 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
           />
         </DialogContent>
       </Dialog>
+
+        <PlayerEditInfoModel
+        isDialogOpen={isDialogOpen}
+        dialogMessage={dialogMessage}
+        setIsDialogOpen={setIsDialogOpen}
+      />
 
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardUserEdit

@@ -175,7 +175,7 @@ const PlayerCard = ({
                       scoreData.isTargetAchieved
                         ? "bg-green-400 text-black shadow-md font-semibold"
                         : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
-                    } ${scoreData.witnessBy ? "underline decoration-blue decoration-[3px]" : ""}`}
+                    } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
                     title={`Score: ${scoreData.score} | Target: ${
                       scoreData.target || "N/A"
                     }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}

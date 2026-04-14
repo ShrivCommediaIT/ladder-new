@@ -72,6 +72,7 @@ const PlayerCard = ({
       target,
       isTargetAchieved,
       input_score: inputScore,
+      witnessBy: scoreObj?.witness_by || null,
     };
   };
 
@@ -122,8 +123,16 @@ const PlayerCard = ({
       </div>
         <div  className="flex  justify-between mr-1">
           <div className="flex flex-col items-center mr-1">
-            <span className="bg-white flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border">
-              {player &&  player?.scores[0]?.input_score || 0}
+            <span className={` flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border ${ 
+              player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).isTargetAchieved 
+              ? "bg-green-500" 
+              : "bg-white" 
+            } ${
+              player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).witnessBy 
+              ? "underline decoration-black decoration-[3px] bg-green-400" 
+              : "" 
+            }`}>
+              {player?.skills?.length > 0 ? getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).displayScore : 0}
             </span>
           </div>
             {player && player?.skills?.length > 0 ?null : (
