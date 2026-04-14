@@ -103,7 +103,7 @@ const CreatePanel = ({
             <p className="font-semibold text-white mb-1">
               CSV Instructions
             </p>
-            <p>(1) Names in Column A</p>
+            <p>(1) Names in Column A Or</p>
             <p>(2) Name + Phone Number</p>
           </div>
 

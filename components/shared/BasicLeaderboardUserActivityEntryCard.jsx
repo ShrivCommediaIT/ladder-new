@@ -41,11 +41,7 @@ export default function BasicLeaderboardActivityEntryCard({
   const [openSuccess, setOpenSuccess] = useState(false);
   const [skillTarget, setSkillTarget] = useState("");
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
-  const [timeParts, setTimeParts] = useState({
-    min: "",
-    sec: "",
-    ms: "",
-  });
+  const [timeDigits, setTimeDigits] = useState("");
   const [zeroAction, setZeroAction] = useState(null);
   const [topScore, setTopScore] = useState(0);
   const [openSuccessResult, setOpenSuccessResult] = useState(false);
@@ -53,9 +49,6 @@ export default function BasicLeaderboardActivityEntryCard({
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
   const ladderType = searchParams.get("ladder_type");
-  const minRef = useRef(null);
-  const secRef = useRef(null);
-  const msRef = useRef(null);
 
 
 
@@ -123,43 +116,13 @@ export default function BasicLeaderboardActivityEntryCard({
 
     // ✅ NEGATIVE (TIMER MODE)
     if (type === "negative" || ladderType === "negative") {
-
       // 🚨 Ignore non-digit inputs
       if (!/^\d$/.test(d)) return;
 
-      if (document.activeElement === minRef.current) {
-        setTimeParts((p) => {
-          let v = (p.min + d).slice(-2);
-          if (Number(v) > 59) return p;
-
-          if (v.length === 2) secRef.current?.focus();
-
-          return { ...p, min: v };
-        });
-        return;
-      }
-
-      if (document.activeElement === secRef.current) {
-        setTimeParts((p) => {
-          let v = (p.sec + d).slice(-2);
-          if (Number(v) > 59) return p;
-
-          if (v.length === 2) msRef.current?.focus();
-
-          return { ...p, sec: v };
-        });
-        return;
-      }
-
-      if (document.activeElement === msRef.current) {
-        setTimeParts((p) => {
-          let v = (p.ms + d).slice(-3);
-          return { ...p, ms: v };
-        });
-        return;
-      }
-
-      minRef.current?.focus();
+      setTimeDigits((prev) => {
+        if (prev.length >= 6) return prev;
+        return prev + d;
+      });
       return;
     }
 
@@ -178,53 +141,10 @@ export default function BasicLeaderboardActivityEntryCard({
       return prev + d;
     });
   };
+  
   const handleBackspace = () => {
     if (type === "negative" || ladderType === "negative") {
-      const active = document.activeElement;
-
-      // MIN
-      if (active === minRef.current) {
-        setTimeParts((p) => ({
-          ...p,
-          min: p.min.slice(0, -1),
-        }));
-        return;
-      }
-
-      // SEC
-      if (active === secRef.current) {
-        setTimeParts((p) => {
-          if (!p.sec) {
-            minRef.current?.focus();
-            return p;
-          }
-
-          return {
-            ...p,
-            sec: p.sec.slice(0, -1),
-          };
-        });
-
-        return;
-      }
-
-      // MS
-      if (active === msRef.current) {
-        setTimeParts((p) => {
-          if (!p.ms) {
-            secRef.current?.focus();
-            return p;
-          }
-
-          return {
-            ...p,
-            ms: p.ms.slice(0, -1),
-          };
-        });
-
-        return;
-      }
-
+      setTimeDigits((p) => p.slice(0, -1));
       return;
     }
 
@@ -239,14 +159,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
   const handleClear = () => {
     if (type === "negative" || ladderType === "negative") {
-      setTimeParts({
-        min: "",
-        sec: "",
-        ms: "",
-      });
-
-      minRef.current?.focus();
-
+      setTimeDigits("");
       return;
     }
 
@@ -260,26 +173,19 @@ export default function BasicLeaderboardActivityEntryCard({
     }
   };
 
-  const handleTimeChange = (type, value) => {
-    if (!/^\d*$/.test(value)) return;
+  const handleTimeChange = (e) => {
+    let digits = e.target.value.replace(/\D/g, "");
+    digits = digits.replace(/^0+/, "");
+    if (digits.length > 6) digits = digits.slice(-6);
+    setTimeDigits(digits);
+  };
 
-    setTimeParts((prev) => {
-      const newVal = { ...prev, [type]: value };
-
-      if (type === "min") {
-        if (value.length === 2) {
-          secRef.current?.focus();
-        }
-      }
-
-      if (type === "sec") {
-        if (value.length === 2) {
-          msRef.current?.focus();
-        }
-      }
-
-      return newVal;
-    });
+  const getFormattedTime = (digits) => {
+    const padded = (digits || "").padStart(6, "0");
+    const m = padded.slice(0, 2);
+    const s = padded.slice(2, 4);
+    const ms = padded.slice(4, 6);
+    return `${m}:${s}.${ms}`;
   };
 
   const handleEnter = useCallback(() => {
@@ -300,13 +206,13 @@ export default function BasicLeaderboardActivityEntryCard({
       }
     }
 
-    // ✅ snapshot timeParts RIGHT NOW and pass it in
-    submitScore(value, topScore, timeParts);
+    // ✅ snapshot timeDigits RIGHT NOW and pass it in
+    submitScore(value, topScore, timeDigits);
 
-  }, [skillActivityId, playerId, value, skillSign, topScore, timeParts]); // timeParts in deps
+  }, [skillActivityId, playerId, value, skillSign, topScore, timeDigits]); // timeDigits in deps
 
 
-  const submitScore = async (inputScore, bestScore, currentTimeParts) => {
+  const submitScore = async (inputScore, bestScore, currentTimeDigits) => {
     if (!skillActivityId || !playerId) return;
 
     let finalScore;
@@ -316,12 +222,13 @@ export default function BasicLeaderboardActivityEntryCard({
       URl = "user/postResultNegativeSkillboard";
       ladderTypeUpdate = "negative";
 
-      // ✅ use the directly passed timeParts — always fresh
-      const latest = currentTimeParts;
+      // ✅ use the directly passed timeDigits — always fresh
+      const padded = (currentTimeDigits || "").padStart(6, "0");
+      const m = padded.slice(0, 2);
+      const s = padded.slice(2, 4);
+      const ms = padded.slice(4, 6);
 
-      finalScore =
-        "00:" +
-        `${latest.min.padStart(2, "0")}:${latest.sec.padStart(2, "0")}.${latest.ms.padStart(3, "0")}`;
+      finalScore = `00:${m}:${s}.${ms}0`;
 
 
     } else {
@@ -385,12 +292,8 @@ export default function BasicLeaderboardActivityEntryCard({
     if (onClose) onClose();
   }, [onClose]);
 
-  const formatTime = (timeParts) => {
-    const min = (timeParts.min || "").padStart(2, "0");
-    const sec = (timeParts.sec || "").padStart(2, "0");
-    const ms = (timeParts.ms || "").padStart(3, "0");
-
-    return `${min}:${sec}.${ms}`;
+  const formatTime = (timeDigits) => {
+    return getFormattedTime(timeDigits);
   };
 
   const handleZeroConfirm = (type) => {
@@ -406,7 +309,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
   const getBestScore = async () => {
     if (ladderType === "negative" || type === "negative") {
-      submitScore(value, topScore, timeParts);
+      submitScore(value, topScore, timeDigits);
       return;
     }
 
@@ -467,9 +370,11 @@ export default function BasicLeaderboardActivityEntryCard({
                 Today's Result
               </label>
               {(type === "negative" || ladderType === "negative") ? (
-                <div className="flex mt-1 items-center bg-white rounded px-2 h-8 border border-white">
-                  <span className="text-xs text-black font-bold whitespace-nowrap">TIMER</span>
-                </div>
+                <input
+                  className="w-full sm:w-20 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
+                  value={getFormattedTime(timeDigits)}
+                  onChange={handleTimeChange}
+                />
               ) : (
                 <input
                   className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
@@ -542,41 +447,18 @@ export default function BasicLeaderboardActivityEntryCard({
           )}
 
           {(type === "negative" || ladderType === "negative") && (
-            <div className="flex items-center justify-center gap-2 text-lg">
+            <div className="flex items-center gap-2  w-full">
               <Input
-                ref={minRef}
-                value={timeParts.min}
-                maxLength={2}
-                placeholder="00"
-                onChange={(e) => handleTimeChange("min", e.target.value)}
-                className="w-12 h-10 text-center text-sm text-white font-semibold 
-                bg-slate-800 border-0 outline-none ring-0
-                focus:ring-0 focus:outline-none
-                focus-visible:ring-0 focus-visible:outline-none"
+                value={getFormattedTime(timeDigits)}
+                readOnly
+                className="text-center text-2xl text-black font-semibold bg-slate-200"
+                placeholder="00:00.00"
               />
-              :
               <Input
-                ref={secRef}
-                value={timeParts.sec}
-                maxLength={2}
-                placeholder="00"
-                onChange={(e) => handleTimeChange("sec", e.target.value)}
-                className="w-12 h-10 text-center text-sm text-white font-semibold 
-                bg-slate-800 border-0 outline-none ring-0
-                focus:ring-0 focus:outline-none
-                focus-visible:ring-0 focus-visible:outline-none"
-              />
-              :
-              <Input
-                ref={msRef}
-                value={timeParts.ms}
-                maxLength={3}
-                placeholder="000"
-                onChange={(e) => handleTimeChange("ms", e.target.value)}
-                className="w-14 h-10 text-center text-sm text-white font-semibold 
-                bg-slate-800 border-0 outline-none ring-0
-                focus:ring-0 focus:outline-none
-                focus-visible:ring-0 focus-visible:outline-none"
+                placeholder="Witness by (optional)"
+                value={witnessBy}
+                onChange={(e) => setWitnessBy(e.target.value)}
+                className="text-start text-sm text-black font-semibold bg-slate-200"
               />
             </div>
           )}
@@ -691,7 +573,7 @@ export default function BasicLeaderboardActivityEntryCard({
               Activity #{selectedActivity} updated with score{" "}
               <b>
                 {type === "negative" || ladderType === "negative"
-                  ? formatTime(timeParts)
+                  ? formatTime(timeDigits)
                   : value == "-" ? "Reset" : Math.abs(value)}
               </b>
             </DialogDescription>
