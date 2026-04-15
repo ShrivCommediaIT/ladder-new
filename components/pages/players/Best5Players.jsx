@@ -130,7 +130,9 @@ const Best5Players = () => {
   const [newName, setNewName] = useState("");
   const [editGradebarId, setEditGradebarId] = useState(null);
 
-  const playerList = players?.[ladderId]?.data || [];
+  // Ensure ladderId is a Number to match Redux state keys
+  const numericLadderId = Number(ladderId);
+  const playerList = players?.[numericLadderId]?.data || [];
 
   const isDescending = useSelector((state) => state.player.invertRanking);
 
@@ -165,31 +167,21 @@ const Best5Players = () => {
   );
 
   // 🎯 CONDITIONAL SORT
-  let sortedPlayers = [];
+  let sortedPlayers = uniquePlayers;
 
   if (cleanedSearch) {
     // ⭐ SEARCH MODE = startsWith first → then alphabetical
     sortedPlayers = [...uniquePlayers].sort((a, b) => {
       const aNameClean = (a.name || "").toLowerCase().replace(/\s+/g, "");
-
       const bNameClean = (b.name || "").toLowerCase().replace(/\s+/g, "");
 
       const aStarts = aNameClean.startsWith(cleanedSearch);
       const bStarts = bNameClean.startsWith(cleanedSearch);
 
-      // startsWith वालों को top pe lao
       if (aStarts && !bStarts) return -1;
       if (!aStarts && bStarts) return 1;
 
-      // fir alphabetical
       return aNameClean.localeCompare(bNameClean);
-    });
-  } else {
-    // 🏆 NORMAL MODE = rank sort
-    sortedPlayers = [...uniquePlayers].sort((a, b) => {
-      const rA = Number(a.rank || 0);
-      const rB = Number(b.rank || 0);
-      return isDescending ? rB - rA : rA - rB;
     });
   }
 

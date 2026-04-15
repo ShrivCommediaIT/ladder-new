@@ -33,7 +33,8 @@ export default function PlayerStatsBoxUser({ userId, ladderId }) {
   const { data, loading, error } = useSelector(
     (state) => state.playerResult
   );
-  const cardRef = useRef<HTMLDivElement | null>(null);
+  const searchParams = useSearchParams();
+  const cardRef = useRef(null);
 
 
   // ✅ Safely extract values
@@ -131,44 +132,102 @@ export default function PlayerStatsBoxUser({ userId, ladderId }) {
                 </DialogTitle>
                 <DialogDescription className="text-gray-100 text-xs sm:text-sm lg:text-base leading-relaxed space-y-3 sm:space-y-4 mt-3 sm:mt-4">
                   {/* Points System */}
-                  <div className="space-y-2 sm:space-y-1">
-                    <p className="flex items-center text-sm sm:text-base font-semibold">
-                      <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
-                        🏆
-                      </span>
-                      <span>8 Points for a 3-0 win</span>
-                    </p>
-                    <p className="flex items-center text-sm sm:text-base font-semibold">
-                      <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-400 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
-                        🏆
-                      </span>
-                      <span>7 Points for a 3-1 win</span>
-                    </p>
-                    <p className="flex items-center text-sm sm:text-base font-semibold">
-                      <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-300 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
-                        🏆
-                      </span>
-                      <span>6 Points for a 3-2 win</span>
-                    </p>
-                    <p className="flex items-center text-sm sm:text-base font-semibold">
-                      <span className="w-6 h-6 sm:w-7 sm:h-7 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
-                        ❌
-                      </span>
-                      <span>4 Points for a 3-2 loss</span>
-                    </p>
-                    <p className="flex items-center text-sm sm:text-base font-semibold">
-                      <span className="w-6 h-6 sm:w-7 sm:h-7 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
-                        ❌
-                      </span>
-                      <span>3 Points for a 3-1 loss</span>
-                    </p>
-                    <p className="flex items-center text-sm sm:text-base font-semibold">
-                      <span className="w-6 h-6 sm:w-7 sm:h-7 bg-red-600 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
-                        ❌
-                      </span>
-                      <span>2 Points for a 3-0 loss</span>
-                    </p>
-                  </div>
+                  
+                  {(() => {
+                    const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
+
+                    if (ladderType === "winlose") {
+                      return (
+                        <div className="space-y-2 sm:space-y-1">
+                          <p className="flex items-center text-sm sm:text-base font-semibold">
+                            <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                              🏆
+                            </span>
+                            <span>4 Points for a win</span>
+                          </p>
+                          <p className="flex items-center text-sm sm:text-base font-semibold">
+                            <span className="w-6 h-6 sm:w-7 sm:h-7 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                              ❌
+                            </span>
+                            <span>2 Points for a loss</span>
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    if (ladderType === "best3" || ladderType === "bestof3") {
+                      return (
+                        <div className="space-y-2 sm:space-y-1">
+                          <p className="flex items-center text-sm sm:text-base font-semibold">
+                            <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                              🏆
+                            </span>
+                            <span>5 Points for a 2-0 win</span>
+                          </p>
+                          <p className="flex items-center text-sm sm:text-base font-semibold">
+                            <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-400 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                              🏆
+                            </span>
+                            <span>4 Points for a 2-1 win</span>
+                          </p>
+                          <p className="flex items-center text-sm sm:text-base font-semibold">
+                            <span className="w-6 h-6 sm:w-7 sm:h-7 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                              ❌
+                            </span>
+                            <span>2 Points for a 2-1 loss</span>
+                          </p>
+                          <p className="flex items-center text-sm sm:text-base font-semibold">
+                            <span className="w-6 h-6 sm:w-7 sm:h-7 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                              ❌
+                            </span>
+                            <span>1 Points for a 2-0 loss</span>
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    // Default: Best of 5 points
+                    return (
+                      <div className="space-y-2 sm:space-y-1">
+                        <p className="flex items-center text-sm sm:text-base font-semibold">
+                          <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                            🏆
+                          </span>
+                          <span>8 Points for a 3-0 win</span>
+                        </p>
+                        <p className="flex items-center text-sm sm:text-base font-semibold">
+                          <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-400 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                            🏆
+                          </span>
+                          <span>7 Points for a 3-1 win</span>
+                        </p>
+                        <p className="flex items-center text-sm sm:text-base font-semibold">
+                          <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-300 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                            🏆
+                          </span>
+                          <span>6 Points for a 3-2 win</span>
+                        </p>  
+                        <p className="flex items-center text-sm sm:text-base font-semibold">
+                          <span className="w-6 h-6 sm:w-7 sm:h-7 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                            ❌
+                          </span>
+                          <span>4 Points for a 3-2 loss</span>
+                        </p>
+                        <p className="flex items-center text-sm sm:text-base font-semibold">
+                          <span className="w-6 h-6 sm:w-7 sm:h-7 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                            ❌
+                          </span>
+                          <span>3 Points for a 3-1 loss</span>
+                        </p>
+                        <p className="flex items-center text-sm sm:text-base font-semibold">
+                          <span className="w-6 h-6 sm:w-7 sm:h-7 bg-red-600 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
+                            ❌
+                          </span>
+                          <span>2 Points for a 3-0 loss</span>
+                        </p>
+                      </div>
+                    );
+                  })()}
             
                   {/* Calculation Box */}
                   <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 backdrop-blur-sm border border-blue-500/50 px-3 py-3 sm:px-4 sm:py-4 rounded-xl sm:rounded-md mt-4 sm:mt-6">

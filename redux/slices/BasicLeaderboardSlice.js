@@ -9,17 +9,9 @@ export const fetchSkillLeaderboard = createAsyncThunk(
     try {
       const data = await getRequest(API_ENDPOINTS.LEADERBOARD, payload);
 
-      const rawPlayers = data?.data || [];
-      const transformedPlayers = rawPlayers.map((player) => ({
-        ...player,
-        name: player.name,
-        total_point: player.total_point || 0,
-        id: player.id,
-        rank: player.rank,
-      }));
-
       return {
-        data: transformedPlayers,
+        ...data,
+        data: data?.data || [],
         gradebars: data.gradebarDetails || [],
         ladderDetails: data.ladderDetails || {},
       };

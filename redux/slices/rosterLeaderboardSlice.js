@@ -5,13 +5,17 @@ import { API_ENDPOINTS } from "@/constants/api";
 
 export const fetchRosterLeaderboard = createAsyncThunk(
   "rosterLeaderboard/fetchRosterLeaderboard",
-  async ({ ladder_id }, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
       const data = await getRequest(API_ENDPOINTS.LEADERBOARD, {
-        ladder_id,
         type: "roster",
+        ...payload
       });
-      return data;
+      return {
+        ...data,
+        data: data?.data || [],
+        ladderDetails: data?.ladderDetails || null,
+      };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }

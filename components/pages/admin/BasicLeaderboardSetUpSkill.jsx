@@ -26,6 +26,64 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
   unit: "",
 }));
 
+const TargetTimerInput = ({ value, onChange }) => {
+  const extract = (val) => {
+    if (val === "" || val === null || val === undefined) return { m: "00", s: "00", ms: "00" };
+    const num = Math.abs(Number(val));
+    if (isNaN(num)) return { m: "00", s: "00", ms: "00" };
+
+    const totalSeconds = Math.floor(num);
+    const mPart = Math.floor(totalSeconds / 60);
+    const sPart = totalSeconds % 60;
+    
+    const parts = String(num).split(".");
+    let msPart = "00";
+    if (parts.length > 1) {
+      msPart = parts[1].padEnd(2, "0").substring(0, 2);
+    }
+    
+    return {
+      m: String(mPart).padStart(2, "0"),
+      s: String(sPart).padStart(2, "0"),
+      ms: msPart,
+    };
+  };
+
+  const { m, s, ms } = extract(value);
+  const [activeField, setActiveField] = useState("min");
+
+  const emitChange = (newM, newS, newMs) => {
+    const mins = parseInt(newM || "0", 10);
+    const secs = parseInt(newS || "0", 10);
+    const msecs = parseInt(newMs || "0", 10);
+    const totalSecsStr = (mins * 60 + secs) + "." + String(msecs).padStart(2, "0");
+    onChange(totalSecsStr);
+  };
+
+  const handleChange = (field, event) => {
+    let val = event.target.value.replace(/\D/g, "");
+    if (val.length > 2) val = val.slice(-2);
+    let nm = m, ns = s, nms = ms;
+    if (field === 'm') { nm = val; setActiveField("min"); }
+    if (field === 's') { ns = val; setActiveField("sec"); }
+    if (field === 'ms') { nms = val; setActiveField("ms"); }
+    emitChange(nm, ns, nms);
+  };
+
+  const handleBlur = () => {
+    emitChange(m, s, ms);
+  };
+  return (
+    <div className="flex items-center justify-center gap-[2px] bg-white text-black font-semibold text-md border border-slate-400 rounded-md w-[80px] sm:w-[100px] h-15 px-1 outline-none focus-within:ring-2 focus-within:ring-sky-500">
+      <input className={`w-5 sm:w-6 text-center outline-none bg-transparent p-0 ${activeField === "min" ? "text-sky-600" : ""}`} value={m} onChange={(e) => handleChange("m", e)} onFocus={() => setActiveField("min")} onBlur={handleBlur} placeholder="00" />
+      <span className="pb-[2px]">:</span>
+      <input className={`w-5 sm:w-6 text-center outline-none bg-transparent p-0 ${activeField === "sec" ? "text-sky-600" : ""}`} value={s} onChange={(e) => handleChange("s", e)} onFocus={() => setActiveField("sec")} onBlur={handleBlur} placeholder="00" />
+      <span className="pb-[2px]">.</span>
+      <input className={`w-5 sm:w-6 text-center outline-none bg-transparent p-0 ${activeField === "ms" ? "text-sky-600" : ""}`} value={ms} onChange={(e) => handleChange("ms", e)} onFocus={() => setActiveField("ms")} onBlur={handleBlur} placeholder="00" />
+    </div>
+  );
+};
+
 export default function BasicLeaderboardSetUpSkill({
   onClose = () => { },
   onSkillsUpdated = () => { },
@@ -129,7 +187,7 @@ export default function BasicLeaderboardSetUpSkill({
             skill_number: row.id,
             skill_description: String(row.description || "").trim(),
             skill_sign: rows.mode,
-            target: targetNum,
+            target: targetNum !== null && !isNaN(targetNum) ? targetNum : targetStr,
             unit: String(row.unit || "").trim(),
           };
         });
@@ -320,25 +378,32 @@ export default function BasicLeaderboardSetUpSkill({
                             : "bg-[#101c29] text-white"
                           }`}
                       >
-                        <RadioGroupItem value="minus" className="hidden" />−
+                        {/* <RadioGroupItem value="minus" className="hidden" />− */}
                       </Label>
                     </RadioGroup>
                   </div>
 
                   <div className="flex gap-2 w-[250px] items-start flex-1">
-                    <Textarea
-                      rows={1}
-                      placeholder="Target"
-                      value={row.target !== "" ? row.target : ""}  // ✅ raw string, no Math.abs/Number
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        // ✅ max 2 digits after decimal
-                        if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
-                          updateRow(row.id, { target: val });
-                        }
-                      }}
-                      className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
-                    />
+                    {(type === "negative" || ladderType === "negative") ? (
+                      <TargetTimerInput 
+                        value={row.target} 
+                        onChange={(val) => updateRow(row.id, { target: val })} 
+                      />
+                    ) : (
+                      <Textarea
+                        rows={1}
+                        placeholder="Target"
+                        value={row.target !== "" ? row.target : ""}  // ✅ raw string, no Math.abs/Number
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          // ✅ max 2 digits after decimal
+                          if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
+                            updateRow(row.id, { target: val });
+                          }
+                        }}
+                        className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
+                      />
+                    )}
 
                     <Textarea
                       rows={1}
@@ -365,19 +430,26 @@ export default function BasicLeaderboardSetUpSkill({
               <div className="flex items-start p-3">
                 {/* Skill No. + +/- */}
                 <div className="flex gap-2 w-[250px] items-start flex-1">
-                  <Textarea
-                    rows={1}
-                    placeholder="Target"
-                    value={rows[0].target !== "" ? rows[0].target : ""}  // ✅ raw string
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      // ✅ max 2 digits after decimal
-                      if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
-                        updateRow(1, { target: val });
-                      }
-                    }}
-                    className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
-                  />
+                  {(type === "negative" || ladderType === "negative") ? (
+                    <TargetTimerInput 
+                      value={rows[0].target} 
+                      onChange={(val) => updateRow(1, { target: val })} 
+                    />
+                  ) : (
+                    <Textarea
+                      rows={1}
+                      placeholder="Target"
+                      value={rows[0].target !== "" ? rows[0].target : ""}  // ✅ raw string
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        // ✅ max 2 digits after decimal
+                        if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
+                          updateRow(1, { target: val });
+                        }
+                      }}
+                      className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
+                    />
+                  )}
 
                   <Textarea
                     rows={1}

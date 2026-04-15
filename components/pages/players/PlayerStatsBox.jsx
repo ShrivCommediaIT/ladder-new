@@ -131,7 +131,7 @@ export default function PlayerStatsUser({ userId }) {
             <DialogContent className="max-w-md sm:max-w-2xl mx-auto backdrop-blur-md bg-gradient-to-br from-gray-900 via-blue-950 to-gray-800 text-white border border-blue-100 shadow-2xl rounded-2xl p-4 sm:p-6 lg:p-8 overflow-hidden">
   <DialogHeader>
     <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-center text-blue-200 pb-3 sm:pb-4 border-b border-blue-800/50">
-      Performance Rank Explained
+      Performance Rank Explained 11
     </DialogTitle>
     <DialogDescription className="text-gray-100 text-xs sm:text-sm lg:text-base leading-relaxed space-y-3 sm:space-y-4 mt-3 sm:mt-4">
       {/* Points System */}

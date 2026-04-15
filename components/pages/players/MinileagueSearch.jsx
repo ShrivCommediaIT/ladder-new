@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import Minileague from "./Minileague";
+import { InvertRanckings } from "@/helper/InvertRanckings";
 
 const MinileagueSearch = ({
   value,
@@ -43,7 +44,8 @@ const MinileagueSearch = ({
   }, [value]);
 
   return (
-    <div className="relative w-full rounded-2xl border border-white/10 bg-zinc-900/70 backdrop-blur-xl shadow-lg focus-within:border-indigo-500/60 focus-within:shadow-indigo-500/20 transition-all duration-300">
+    <div className="flex gap-3">
+    <div className="relative w-full border border-white/10 bg-zinc-900/70 backdrop-blur-xl shadow-lg focus-within:border-indigo-500/60 focus-within:shadow-indigo-500/20 transition-all duration-300 p-2 bg-gradient-to-r from-gray-900 to-cyan-900 rounded-md">
       <Input
         ref={inputRef}
         type="text"
@@ -91,6 +93,8 @@ const MinileagueSearch = ({
           <X className="w-4 h-4" />
         </button>
       )}
+    </div>
+    <InvertRanckings />
     </div>
   );
 };

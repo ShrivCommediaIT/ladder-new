@@ -5,27 +5,19 @@ import { API_ENDPOINTS } from "@/constants/api";
 
 export const fetchPositiveLeaderboard = createAsyncThunk(
   "positiveLeaderboard/fetchPositiveLeaderboard",
-  async ({ ladder_id, type = "positive", sortbyskillnumber = 0 }, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, {
-        ladder_id,
-        type,
-        sortbyskillnumber,
+      const res = await getRequest(API_ENDPOINTS.LEADERBOARD, {
+        type: "positive",
+        sortbyskillnumber: 0,
+        ...payload
       });
 
-      const rawPlayers = data?.data || [];
-      const transformedPlayers = rawPlayers.map((player) => ({
-        ...player,
-        name: player.name,
-        total_point: player.total_point || 0,
-        id: player.id,
-        rank: player.rank,
-      }));
-
       return {
-        data: transformedPlayers,
-        gradebars: data.gradebarDetails || [],
-        ladderDetails: data.ladderDetails || {},
+        ...res,
+        data: res?.data || [],
+        gradebars: res.gradebarDetails || [],
+        ladderDetails: res.ladderDetails || {},
       };
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

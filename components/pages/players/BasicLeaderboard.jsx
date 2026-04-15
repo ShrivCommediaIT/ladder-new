@@ -314,11 +314,8 @@ const filteredPlayers = React.useMemo(() => {
 }, [data, searchQuery]);
 
 
-  const invertRanking = useSelector((state) => state.player.invertRanking);
-
-  const processedPlayers = invertRanking
-    ? [...filteredPlayers].reverse()
-    : filteredPlayers;
+  // Server now handles ordering via orderBy parameter in the API call
+  const processedPlayers = filteredPlayers;
 
   return (
     <>
