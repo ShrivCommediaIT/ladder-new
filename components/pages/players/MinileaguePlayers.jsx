@@ -212,13 +212,8 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
 
 
 
-  const invertRanking = useSelector(
-  (state) => state.player.invertRanking
-);
-
-const processedSections = invertRanking
-  ? [...sectionedPlayers].reverse()
-  : sectionedPlayers;
+// Trust server-side ordering from API
+const processedSections = sectionedPlayers;
 
 
   const searchPlayers = React.useMemo(() => {

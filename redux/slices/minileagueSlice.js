@@ -5,10 +5,14 @@ import { API_ENDPOINTS } from "@/constants/api";
 
 export const fetchMiniLeague = createAsyncThunk(
   "minileague/fetchMiniLeague",
-  async ({ ladder_id, type = "minileague" }, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, { ladder_id, type });
+      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, { 
+        type: "minileague",
+        ...payload
+      });
       return {
+        ...data,
         data: data?.data || [],
         gradebars: data.gradebarDetails || [],
         ladderDetails: data.ladderDetails || {},

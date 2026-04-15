@@ -139,7 +139,6 @@ const MoveNumberInput = ({
 
 
     if (!user_id || !ladder_id || !currentId) return;
-console.log("handleEnter==>", user_id, ladder_id, currentId, selectedNumber, selectedNumber);
 
     if (!selectedNumber || isNaN(selectedNumber)) return;
 

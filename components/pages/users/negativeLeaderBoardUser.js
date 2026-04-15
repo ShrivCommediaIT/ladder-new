@@ -25,15 +25,33 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
 
   const toTotalSeconds = (score) => {
     if (!score) return 0;
+    const strScore = String(score);
+    
+    if (!strScore.includes(":")) {
+      return Number(strScore) || 0;
+    }
 
-    const [hh, mm, secMs] = score.split(":");
-    const [ss, ms = "0"] = secMs.split(".");
+    const parts = strScore.split(":");
+    let hh = 0, mm = 0, secMsStr = "0";
+
+    if (parts.length === 3) {
+      hh = Number(parts[0]);
+      mm = Number(parts[1]);
+      secMsStr = parts[2];
+    } else if (parts.length === 2) {
+      mm = Number(parts[0]);
+      secMsStr = parts[1];
+    } else {
+      secMsStr = parts[0];
+    }
+
+    const [ss, ms = "0"] = secMsStr.split(".");
 
     const total =
-      Number(hh) * 3600 +
-      Number(mm) * 60 +
+      hh * 3600 +
+      mm * 60 +
       Number(ss) +
-      Number(ms) / 100;
+      Number(ms.padEnd(2, "0").substring(0, 2)) / 100;
 
     return total;
   };
@@ -66,7 +84,18 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
               </div>
                 <div  className="flex  justify-between mr-1">
                   <div className="flex flex-col items-center mr-1">
-                    <span className="bg-white flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border">
+                    <span className={` flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border ${
+                      player?.skills?.length > 0 &&
+                      Number(player.skills[0].target) > 0 &&
+                      toTotalSeconds(player?.scores?.[0]?.negative_ladder_score || "0") > 0 &&
+                      Number(player.skills[0].target) >= toTotalSeconds(player?.scores?.[0]?.negative_ladder_score || "0")
+                        ? "bg-green-500"
+                        : "bg-white"
+                    } ${
+                      player?.skills?.length > 0 && player?.scores?.[0]?.witness_by
+                        ? "underline decoration-black decoration-[3px] bg-green-400"
+                        : ""
+                    }`}>
                       {toTotalSeconds(player && player?.scores[0]?.negative_ladder_score) || 0}
                     </span>
                   </div>

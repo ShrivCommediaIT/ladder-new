@@ -187,7 +187,7 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
   }
 
   // fallback → rank sort
-  return Number(a.rank || 0) - Number(b.rank || 0);
+  return 0;
 });
 
   // ✅ group by gradebar preset (roster section)

@@ -41,14 +41,22 @@ export const uploadLadderLogo = createAsyncThunk(
 // 📋 Fetch Leaderboard
 export const fetchLeaderboard = createAsyncThunk(
   "players/fetchLeaderboard",
-  async ({ ladder_id, type = "bestof5" }, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const data = await getRequest(API_ENDPOINTS.LEADERBOARD, {
-        ladder_id,
-        type,
+      const res = await getRequest(API_ENDPOINTS.LEADERBOARD, {
+        type: "bestof5",
+        ...payload
       });
-      if (!data) throw new Error("Failed to fetch leaderboard");
-      return { ladder_id, ...data };
+      if (!res) throw new Error("Failed to fetch leaderboard");
+
+      // Resilient Payload: Spread original response + provide explicit keys
+      return { 
+        ...res,
+        ladder_id: Number(payload.ladder_id || res.ladder_id),
+        data: res?.data || [],
+        image_path: res?.image_path || "",
+        ladderDetails: res?.ladderDetails || {},
+      };
     } catch (error) {
       return rejectWithValue(error.message || "Unknown error");
     }
