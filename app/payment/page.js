@@ -13,8 +13,8 @@ const PaymentPageRouter = () => {
   const ladderId = useSelector((state) => state.user?.user?.ladder_id);
 
   return (
-    <div>
-        <main className='bg-gradient-to-br from-purple-300 via-pink-200 to-indigo-400 '>
+    <div className='bg-gradient-to-b from-[#080a1f] via-[#071748] to-[#0000de] min-h-screen'>
+        <main className=''>
          <PaymentHeading />
          <SubscriptionPlan ladderId={ladderId} />
         </main>
