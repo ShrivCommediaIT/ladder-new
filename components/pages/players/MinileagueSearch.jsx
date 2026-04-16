@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import Minileague from "./Minileague";
 import { InvertRanckings } from "@/helper/InvertRanckings";
+import { useSearchParams } from "next/navigation";
 
 const MinileagueSearch = ({
   value,
@@ -15,6 +16,7 @@ const MinileagueSearch = ({
 }) => {
   const inputRef = useRef(null);
   const [displayValue, setDisplayValue] = useState("");
+  const [isSubAdminDetails, setIsSubAdminDetails] = useState(null);
 
   // Clean search value (IGNORE ALL SPACES for backend)
   const cleanSearchValue = useCallback((inputValue) => {
@@ -22,7 +24,15 @@ const MinileagueSearch = ({
     return inputValue.replace(/\s+/g, "").toLowerCase();
   }, []);
 
-  
+  const searchParams = useSearchParams();
+  const ladderType = searchParams.get("ladder_type"); 
+
+    useEffect(() => {
+      const subAdminDetails = JSON.parse(localStorage.getItem("subAdmin"))
+      if(subAdminDetails?.role === "admin"){
+        setIsSubAdminDetails(true)
+      } 
+    }, [])
 
   const handleChange = useCallback(
     (e) => {
@@ -94,7 +104,7 @@ const MinileagueSearch = ({
         </button>
       )}
     </div>
-    <InvertRanckings />
+    {(ladderType == null && isSubAdminDetails == null) ? <InvertRanckings /> : null}
     </div>
   );
 };
