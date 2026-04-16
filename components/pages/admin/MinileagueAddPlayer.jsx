@@ -80,11 +80,19 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
     try {
       const response = await postFormData(API_ENDPOINTS.MINILEAGUE_ADD_BY_ADMIN, formData);
 
-      if (response.status === 200) {
-        setWelcomeMsg(`Welcome ${name}! ${response.data.success_message}`);
-        setShowDialog(true);
+        if (response.status === 200) {
+          setWelcomeMsg(`Welcome ${name}! ${response.data.success_message}`);
+          setShowDialog(true);
 
-        setLoading(true);
+          // Reset fields
+          setName("");
+          setPhone("");
+          setRank("");
+          setSelectedSection("");
+          setProfileImage(null);
+          setProfileFile(null);
+
+          setLoading(true);
         await dispatch(fetchMiniLeague({ ladder_id }));
         onSuccessRefresh?.(); // ✅ Refresh callback
         setLoading(false);

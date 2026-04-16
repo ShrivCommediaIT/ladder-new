@@ -89,6 +89,7 @@ const AdminButton = () => {
   const [confirmType, setConfirmType] = useState("");
   const [isSorted, setIsSorted] = useState(false);
   const [currentSkillNo, setCurrentSkillNo] = useState(0);
+  const [appliedDob, setAppliedDob] = useState("");
 
   const refreshLeaderboard = () => {
     if (ladderId) {
@@ -129,8 +130,10 @@ const AdminButton = () => {
       sortbyskillnumber: skillNo,
     };
 
-    if (customDob) {
-      payload.dob = customDob;
+    const finalDob = customDob !== undefined ? customDob : appliedDob;
+
+    if (finalDob) {
+      payload.dob = finalDob;
     }
 
     dispatch(fetchSliceLeaderboard(payload));
@@ -215,10 +218,12 @@ const AdminButton = () => {
   const handleClearAll = () => {
     setIsSorted(false);
     setCurrentSkillNo(0);
+    setAppliedDob("");
     refreshSkillLeaderboard(0, "");
   };
 
   const handleAgeSearch = (dob) => {
+    setAppliedDob(dob);
     refreshSkillLeaderboard(currentSkillNo, dob);
     setIsSorted(true);
   };

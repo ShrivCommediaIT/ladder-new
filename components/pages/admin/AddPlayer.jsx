@@ -32,7 +32,7 @@ const AddPlayer = ({ ladderId, onClose, onSuccessRefresh }) => { // ✅ Both pro
     );
   }
 
-  if (ladderType === "skill") {
+  if (["skill", "positive", "negative", "roster"].includes(ladderType)) {
     return (
       <AddPlayerSkill
         ladderId={ladderId}

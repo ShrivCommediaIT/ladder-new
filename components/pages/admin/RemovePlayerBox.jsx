@@ -37,7 +37,7 @@ const RemovePlayerBox = ({ onClose, onSuccessRefresh }) => {
   }
 
   // Best5 / Winlose / Best3 / Skill
-  if (["best5", "winlose", "best3", "skill", "roster"].includes(ladderType)) {
+  if (["best5", "winlose", "best3", "skill", "roster", "positive", "negative"].includes(ladderType)) {
     return (
       <RemoveBestPlayer
         ladderId={ladderId}
