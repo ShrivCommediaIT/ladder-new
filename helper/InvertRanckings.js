@@ -98,7 +98,7 @@ export const InvertRanckings = () => {
         onClick={handleInvertRanckings} 
         className='border border-white/10 bg-zinc-900/70 backdrop-blur-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 p-2 bg-gradient-to-r from-gray-900 to-cyan-900 rounded-md cursor-pointer flex items-center justify-center'
         title={`Sort ${order === 'asc' ? 'Descending' : 'Ascending'}`}
-    >
+    >   <span className="text-white text-sm">Invert Rank</span>
         <ArrowDownUp className={`text-white transition-transform duration-300 ${order === "desc" ? "rotate-180" : ""}`} />
     </div>
   );

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
@@ -21,15 +20,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import AddRemoveBox from "./AddRemoveBox";
-import UploadPlayerLists from "../uploadCsv/UploadPlayerLists";
+import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
+import UploadPlayerLists from "@/components/pages/uploadCsv/UploadPlayerLists";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { clearActivityState } from "@/redux/slices/activitySlice";
-import BasicLeaderboardSetUpSkill from "./BasicLeaderboardSetUpSkill";
+import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
 import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
-import BasicLeaderboardShort from "./BasicLeaderboardShort";
+import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
 import { paymentPage } from "@/helper/RouteName";
 import {
   Funnel,
@@ -37,7 +36,6 @@ import {
   RefreshCw,
   XCircle,
   PlusCircle,
-  Upload,
   CreditCard,
   Zap,
 } from "lucide-react";
@@ -45,6 +43,7 @@ import { fetchNegativeLeaderboard } from "@/redux/slices/negativeLeaderBoardSlic
 import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
 import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import AgeFilter from "./AgeFilter";
 
 const AdminButton = () => {
   const router = useRouter();
@@ -75,11 +74,11 @@ const AdminButton = () => {
   const isRoster = typeFromParams === "roster";
   const isPositive = typeFromParams === "positive";
   const isNegative = typeFromParams === "negative";
+
   const [openAddPlayerDialog, setOpenAddPlayerDialog] = useState(false);
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
   const [openSkillDialog, setOpenSkillDialog] = useState(false);
   const [openSkillShortDialog, setOpenSkillShortDialog] = useState(false);
-  const [openAgeFilterDialog, setOpenAgeFilterDialog] = useState(false);
 
   const [zeroLoading, setZeroLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
@@ -89,76 +88,6 @@ const AdminButton = () => {
   const [confirmType, setConfirmType] = useState("");
   const [isSorted, setIsSorted] = useState(false);
   const [currentSkillNo, setCurrentSkillNo] = useState(0);
-
-  const [dobInput, setDobInput] = useState("");
-  const [appliedDob, setAppliedDob] = useState("");
-  const [calculatedAge, setCalculatedAge] = useState("");
-
-  const calculateAge = (dobString) => {
-    const parts = dobString.split("/");
-    if (parts.length === 3 && parts[2].length === 4) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
-      const dobDate = new Date(year, month, day);
-      if (!isNaN(dobDate.getTime())) {
-        const today = new Date();
-        let age = today.getFullYear() - dobDate.getFullYear();
-        const m = today.getMonth() - dobDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
-          age--;
-        }
-        if (age >= 0) {
-          setCalculatedAge(age);
-          return;
-        }
-      }
-    }
-    setCalculatedAge("");
-  };
-
-  const handleDobChange = (e) => {
-    let value = e.target.value.replace(/\D/g, "");
-    if (value.length > 8) value = value.slice(0, 8);
-    let formatted = value;
-    if (value.length > 2) {
-      formatted = value.slice(0, 2) + "/" + value.slice(2);
-    }
-    if (value.length > 4) {
-      formatted = formatted.slice(0, 5) + "/" + value.slice(4);
-    }
-    setDobInput(formatted);
-    calculateAge(formatted);
-  };
-
-  const handleAgeChange = (e) => {
-    const value = e.target.value.replace(/\D/g, "");
-    setCalculatedAge(value);
-    
-    if (value && value !== "0") {
-      const age = parseInt(value, 10);
-      const today = new Date();
-      const prevYear = today.getFullYear() - age;
-      const dd = String(today.getDate()).padStart(2, '0');
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      setDobInput(`${dd}/${mm}/${prevYear}`);
-    } else if (value === "") {
-      setDobInput("");
-    }
-  };
-
-  const applyAgeFilter = () => {
-    if (dobInput.length === 10) {
-      setAppliedDob(dobInput);
-      refreshSkillLeaderboard(currentSkillNo, dobInput);
-      setOpenAgeFilterDialog(false);
-      setIsSorted(true);
-      toast.success("Searching by Age!");
-    } else {
-      toast.error("Please enter a valid date (DD/MM/YYYY)");
-    }
-  };
-
 
   const refreshLeaderboard = () => {
     if (ladderId) {
@@ -192,16 +121,14 @@ const AdminButton = () => {
       fetchSliceLeaderboard = fetchSkillLeaderboard;
     }
 
-    const finalDob = customDob !== undefined ? customDob : appliedDob;
-
     const payload = {
       ladder_id: ladderId,
       type: laddartype,
       sortbyskillnumber: skillNo,
     };
 
-    if (finalDob) {
-      payload.dob = finalDob;
+    if (customDob) {
+      payload.dob = customDob;
     }
 
     dispatch(fetchSliceLeaderboard(payload));
@@ -286,10 +213,12 @@ const AdminButton = () => {
   const handleClearAll = () => {
     setIsSorted(false);
     setCurrentSkillNo(0);
-    setAppliedDob("");
-    setDobInput("");
-    setCalculatedAge("");
     refreshSkillLeaderboard(0, "");
+  };
+
+  const handleAgeSearch = (dob) => {
+    refreshSkillLeaderboard(currentSkillNo, dob);
+    setIsSorted(true);
   };
 
   const handleUpgrade = () => router.push(paymentPage);
@@ -409,64 +338,11 @@ const AdminButton = () => {
         )}
 
         {/* AGE FILTER BUTTON */}
-        {isSkill && (
-          <Dialog open={openAgeFilterDialog} onOpenChange={(open) => {
-            setOpenAgeFilterDialog(open);
-            if (!open) {
-              setDobInput("");
-              setCalculatedAge("");
-            }
-          }}>
-            <DialogTrigger asChild>
-              <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
-                Age Filter
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-[#163344] text-white border border-[#2dd4bf] rounded-xl max-w-sm flex flex-col items-center p-6">
-              <DialogTitle className="text-2xl font-bold uppercase tracking-wider text-center w-full mt-2">AGE FILTER</DialogTitle>
-              <div className="w-full flex justify-center mt-2 mb-6">
-                <span className="h-1 w-20 bg-[#2dd4bf] rounded-full"></span>
-              </div>
-              <div className="flex flex-col items-center w-full gap-4 relative">
-                <p className="text-xl font-semibold">Born Before</p>
-                <div className="flex justify-center w-full">
-                  <input
-                    type="text"
-                    value={dobInput}
-                    onChange={handleDobChange}
-                    placeholder="DD/MM/YYYY"
-                    className="bg-[#242424] border border-gray-400 outline-none text-left p-1 text-2xl w-46 py-1 tracking-widest text-white transition-colors"
-                  />
-                </div>
-                <div className="text-white text-lg mt-2 flex items-center justify-center gap-2">
-                  <span className="font-semibold">that's under</span>
-                  <div className="flex items-center">
-                    <span className="text-white w-4 border-b-2 border-white mr-[1px]"></span>
-                    <input
-                      type="text"
-                      value={calculatedAge}
-                      onChange={handleAgeChange}
-                      className="bg-[#242424] border border-gray-400 outline-none text-center text-xl w-16 py-1 text-white transition-colors"
-                    />
-                    <span className="text-white w-4 border-b-2 border-white ml-[1px]"></span>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 w-full mt-10">
-                <Button onClick={() => {
-                  setOpenAgeFilterDialog(false);
-                  setDobInput("");
-                  setCalculatedAge("");
-                }} className="bg-[#fbcfe8] text-[#9d174d] hover:bg-[#f9a8d4] font-bold rounded-xl h-12 text-lg">
-                  Cancel
-                </Button>
-                <Button onClick={applyAgeFilter} className="bg-[#2dd4bf] text-[#115e59] hover:bg-[#14b8a6] font-bold rounded-xl h-12 text-lg">
-                  Search
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
+        { isSkill && 
+        <div  className="h-16 w-full">
+        <AgeFilter onSearch={handleAgeSearch} user={false} />
+        </div>
+        }
 
         {/* SINGLE DIALOG */}
         <Dialog

@@ -13,7 +13,7 @@ import UserDetails from "@/components/shared/UserDetails";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import LadderRulesCard from "./LadderRulesCard";
-import AdminButton from "../admin/AdminButton";
+import AdminButton from "@/components/shared/AdminButton";
 import Info from "@/components/shared/Info";
 import AdminEditPhone from "@/components/shared/AdminEditPhone";
 import { useSearchParams, useRouter } from "next/navigation";
