@@ -10,7 +10,7 @@ import { getRequest, postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, ChevronUp, Edit, Save, X } from "lucide-react";
-import EditDiscountToken from "@/helper/editDiscountToken";
+import EditDiscountToken from "@/components/shared/editDiscountToken";
 
 const LadderRulesCard = ({ ladderIdProp }) => {
   const searchParams = useSearchParams();

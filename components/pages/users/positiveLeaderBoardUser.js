@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
 import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
-import PlayerEditInfoModel from "@/helper/playerEditInfoModel";
+import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -75,53 +75,51 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
-    
+
   return (
-        <Card onClick={() => {onSkillClick(player.id, player.skills[0].skill_number)}} className="w-full rounded-2xl     shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
-              <div    className="flex-1 min-w-0 curcer-pointer">
-                {/* Header */}
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10">
-                    <Image
-                      src={playerImageUrl}
-                      alt={player?.name}
-                      width={80}
-                      height={80}
-                      className="object-cover rounded"
-                      unoptimized
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <p className="text-white font-semibold truncate">{player.name}</p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-9 h-9 rounded-full bg-[#01ffff] border-2 border-white flex items-center justify-center font-bold text-black">
-                      {overallRank}
-                    </div>
-                  </div>
-                </div>
-              </div>
-                <div  className="flex  justify-between mr-1">
-                  <div className="flex flex-col items-center mr-1">
-                    <span className={` flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border ${ 
-                      player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).isTargetAchieved 
-                      ? "bg-green-500" 
-                      : "bg-white" 
-                    } ${
-                      player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).witnessBy 
-                      ? "underline decoration-black decoration-[3px] bg-green-400" 
-                      : "" 
-                    }`}>
-                      {player?.skills?.length > 0 ? getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).displayScore : 0}
-                    </span>
-                  </div>
-                    {player && player?.skills?.length > 0 ?null : (
-                    <div className="h-7 p-3 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
-                        No skills data
-                    </div>
-                    )}  
-                </div>
-        </Card>
+    <Card onClick={() => { onSkillClick(player.id, player.skills[0].skill_number) }} className="w-full rounded-2xl     shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
+      <div className="flex-1 min-w-0 curcer-pointer">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10">
+            <Image
+              src={playerImageUrl}
+              alt={player?.name}
+              width={80}
+              height={80}
+              className="object-cover rounded"
+              unoptimized
+            />
+          </div>
+          <div className="flex-1 min-w-0 space-y-1">
+            <p className="text-white font-semibold truncate">{player.name}</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-9 h-9 rounded-full bg-[#01ffff] border-2 border-white flex items-center justify-center font-bold text-black">
+              {overallRank}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex  justify-between mr-1">
+        <div className="flex flex-col items-center mr-1">
+          <span className={` flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border ${player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).isTargetAchieved
+              ? "bg-green-500"
+              : "bg-white"
+            } ${player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).witnessBy
+              ? "underline decoration-black decoration-[3px] bg-green-400"
+              : ""
+            }`}>
+            {player?.skills?.length > 0 ? getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).displayScore : 0}
+          </span>
+        </div>
+        {player && player?.skills?.length > 0 ? null : (
+          <div className="h-7 p-3 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
+            No skills data
+          </div>
+        )}
+      </div>
+    </Card>
   );
 };
 
@@ -131,8 +129,8 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
   const { data = [], loading } = useSelector(
-      (state) => state.positiveLeaderBoard || {},
-    );
+    (state) => state.positiveLeaderBoard || {},
+  );
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -222,12 +220,12 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
     refreshLeaderboard(0);
   }, [refreshLeaderboard]);
 
-const handleSkillClick = useCallback(
+  const handleSkillClick = useCallback(
     (playerId, skillNumber) => {
-      if (playerId != currentUserId){
+      if (playerId != currentUserId) {
         setDialogMessage("You can only edit your own profile");
         setIsDialogOpen(true);
-      return
+        return
       }
 
       const player = data.find((p) => p.id === playerId);
@@ -243,7 +241,7 @@ const handleSkillClick = useCallback(
     },
     [data, currentUserId],
   );
-    
+
 
   const handleEditClose = useCallback(() => {
     setOpenEdit(false);
@@ -364,7 +362,7 @@ const handleSkillClick = useCallback(
         isDialogOpen={isDialogOpen}
         dialogMessage={dialogMessage}
         setIsDialogOpen={setIsDialogOpen}
-      />  
+      />
 
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardUserEdit

@@ -5,7 +5,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
-import { InvertRanckings } from "@/helper/InvertRanckings";
+import { InvertRanckings } from "@/components/shared/InvertRanckings";
 import { useSearchParams } from "next/navigation";
 
 const PlayerSearchInput = ({
@@ -15,19 +15,19 @@ const PlayerSearchInput = ({
 }) => {
   const inputRef = useRef(null);
   const [displayValue, setDisplayValue] = useState("");
-    const [isSubAdminDetails, setIsSubAdminDetails] = useState(null);
+  const [isSubAdminDetails, setIsSubAdminDetails] = useState(null);
   const searchParams = useSearchParams();
-  const ladderType = searchParams.get("ladder_type"); 
+  const ladderType = searchParams.get("ladder_type");
   // Clean search value (IGNORE ALL SPACES for backend)
   const cleanSearchValue = useCallback((inputValue) => {
     if (!inputValue) return "";
     return inputValue.replace(/\s+/g, "").toLowerCase();
   }, []);
 
-    useEffect(() => {
-      const subAdminDetails = JSON.parse(localStorage.getItem("subAdmin"))
-      setIsSubAdminDetails(subAdminDetails)
-    }, [])
+  useEffect(() => {
+    const subAdminDetails = JSON.parse(localStorage.getItem("subAdmin"))
+    setIsSubAdminDetails(subAdminDetails)
+  }, [])
 
   const handleChange = useCallback(
     (e) => {
@@ -48,9 +48,9 @@ const PlayerSearchInput = ({
     if (!value) setDisplayValue("");
   }, [value]);
 
-  
 
-  
+
+
 
   return (
     <div className="flex gap-3">
@@ -103,7 +103,7 @@ const PlayerSearchInput = ({
           </button>
         )}
       </div>
-           {(ladderType == null && isSubAdminDetails == null) ? <InvertRanckings /> : null}
+      {(ladderType == null && isSubAdminDetails == null) ? <InvertRanckings /> : null}
     </div>
   );
 };

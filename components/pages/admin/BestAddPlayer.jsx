@@ -26,7 +26,7 @@ import {
 
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 
-export default function BestAddPlayer({ onClose }) {
+export default function BestAddPlayer({ onClose, onSuccessRefresh }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladder_id = searchParams.get("ladder_id");
@@ -76,7 +76,7 @@ const handleSubmit = async () => {
 
     if (response.status === 200) {
 
-      setWelcomeMsg(`Welcome ${name}! ${response.data.success_message}`);
+      setWelcomeMsg(`Welcome ${name}!`);
       setShowDialog(true);
 
       setLoading(true);
@@ -87,6 +87,7 @@ const handleSubmit = async () => {
       // ⭐ Instant activity refresh (NEW FIX)
       await dispatch(fetchUserActivity({ ladder_id: Number(ladder_id) }));
 
+      onSuccessRefresh?.(); // ✅ Refresh callback
       setLoading(false);
 
     } else {

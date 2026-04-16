@@ -19,7 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-export default function MinileagueAddPlayer({ onClose }) {
+export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladder_id = searchParams.get("ladder_id");
@@ -86,6 +86,7 @@ export default function MinileagueAddPlayer({ onClose }) {
 
         setLoading(true);
         await dispatch(fetchMiniLeague({ ladder_id }));
+        onSuccessRefresh?.(); // ✅ Refresh callback
         setLoading(false);
       } else {
         setWelcomeMsg("Player already exist !");

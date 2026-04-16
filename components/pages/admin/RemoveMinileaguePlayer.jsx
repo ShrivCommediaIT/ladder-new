@@ -27,7 +27,7 @@ const fadeIn = {
   visible: { opacity: 1, y: 0 },
 };
 
-const RemoveMinileaguePlayer = ({ onClose }) => {
+const RemoveMinileaguePlayer = ({ onClose, onSuccessRefresh }) => {
   const [rank, setRank] = useState(0);
   const [selectedSection, setSelectedSection] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +68,7 @@ const RemoveMinileaguePlayer = ({ onClose }) => {
 
       dispatch(fetchMiniLeague({ ladder_id }));
       dispatch(fetchUserActivity({ ladder_id }));
+      onSuccessRefresh?.(); // ✅ Refresh callback
 
       setAlertInfo({ open: true, title: "Success", description: `Player removed successfully!`, type: "success" });
     } catch (err) {

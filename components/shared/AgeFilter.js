@@ -68,7 +68,7 @@ const AgeFilter = ({ onSearch, user }) => {
 
   const applyAgeFilter = () => {
     if (dobInput.length === 10) {
-      onSearch(dobInput);
+      onSearch(calculatedAge);
       setOpen(false);
       toast.success("Searching by Age!");
     } else {

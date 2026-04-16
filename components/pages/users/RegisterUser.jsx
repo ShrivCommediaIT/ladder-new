@@ -45,6 +45,17 @@ export default function RegisterUser({ ladderId, ladderType }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const getAge = (birthDate) => {
+    if (!birthDate) return "";
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 0 ? age : "";
+  };
+
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -59,25 +70,26 @@ export default function RegisterUser({ ladderId, ladderType }) {
   const { errors } = formState;
 
   /* ✅ SUBMIT */
-const onSubmit = async (values) => {
-  if (ladderType === "skill" && !values.dob) {
-    toast.error("Please select date of birth");
-    return;
-  }
+  const onSubmit = async (values) => {
+    if (!values.dob) {
+      toast.error("Please select date of birth");
+      return;
+    }
 
-  const payload = {
-    user_id: values.name,
-    password: values.password,
-    name: values.name,
-    user_type: "user",
-    ladder_id: ladderId,
-    ladder_type: ladderType,
-  };
+    const age = getAge(values.dob);
+    const dobString = format(values.dob, "dd/MM/yyyy");
 
-  // ✅ Add age only for skill ladder
-  if (ladderType === "skill") {
-    payload.age = format(values.dob, "dd/MM/yyyy");
-  }
+    const payload = {
+      user_id: values.name,
+      password: values.password,
+      name: values.name,
+      user_type: "user",
+      ladder_id: ladderId,
+      ladder_type: ladderType,
+      age: age,
+      dob: dobString
+    };
+
 
   try {
     setLoading(true);
@@ -130,7 +142,6 @@ const onSubmit = async (values) => {
             </div>
 
             {/* DOB PICKER */}
-          {ladderType === "skill" && (
   <div>
     <Label className="text-teal-400 mb-1">
       Date of Birth:(Only for age related solutions)
@@ -168,7 +179,6 @@ const onSubmit = async (values) => {
 
     <p className="text-red-400 text-xs">{errors.dob?.message}</p>
   </div>
-)}
 
             {/* PIN */}
             <div>
