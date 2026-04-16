@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { store, persistor } from "@/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import AppInit from '@/components/AppInit';
-import SupportChatBot from '@/helper/SupportChatBot';
+import SupportChatBot from '@/components/shared/SupportChatBot';
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from 'react';
 

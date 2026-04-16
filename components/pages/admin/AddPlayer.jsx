@@ -23,24 +23,32 @@ const AddPlayer = ({ ladderId, onClose, onSuccessRefresh }) => { // ✅ Both pro
 
   /* ========== RENDER WITH CALLBACKS ========== */
   if (ladderType === "minileague") {
-    return <MinileagueAddPlayer ladderId={ladderId} onClose={onClose} />;
-  }
-
-  if (ladderType === "skill") {
     return (
-      <AddPlayerSkill 
+      <MinileagueAddPlayer
         ladderId={ladderId}
-        onClose={onClose} // ✅ Parent onClose forward
-        onSuccessRefresh={onSuccessRefresh} // ✅ Refresh callback
+        onClose={onClose}
+        onSuccessRefresh={onSuccessRefresh} // ✅ Added
       />
     );
   }
 
-  if (ladderType === "best5") {
-    return <BestAddPlayer ladderId={ladderId} onClose={onClose} />;
+  if (ladderType === "skill") {
+    return (
+      <AddPlayerSkill
+        ladderId={ladderId}
+        onClose={onClose}
+        onSuccessRefresh={onSuccessRefresh}
+      />
+    );
   }
 
-  return <BestAddPlayer ladderId={ladderId} onClose={onClose} />;
+  return (
+    <BestAddPlayer
+      ladderId={ladderId}
+      onClose={onClose}
+      onSuccessRefresh={onSuccessRefresh} // ✅ Added
+    />
+  );
 };
 
 export default AddPlayer;

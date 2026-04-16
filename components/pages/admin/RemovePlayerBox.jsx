@@ -27,11 +27,17 @@ const RemovePlayerBox = ({ onClose, onSuccessRefresh }) => {
 
   // Minileague
   if (ladderType === "minileague") {
-    return <RemoveMinileaguePlayer ladderId={ladderId} />;
+    return (
+      <RemoveMinileaguePlayer
+        ladderId={ladderId}
+        onSuccessRefresh={onSuccessRefresh} // ✅ Added
+        onClose={onClose} // Also passing onClose for consistency
+      />
+    );
   }
 
   // Best5 / Winlose / Best3 / Skill
-  if (["best5", "winlose", "best3", "skill"].includes(ladderType)) {
+  if (["best5", "winlose", "best3", "skill", "roster"].includes(ladderType)) {
     return (
       <RemoveBestPlayer
         ladderId={ladderId}

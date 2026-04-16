@@ -26,6 +26,7 @@ import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { clearActivityState } from "@/redux/slices/activitySlice";
+import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
 import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
@@ -94,11 +95,12 @@ const AdminButton = () => {
       if (isSkill) {
         dispatch(fetchSkillLeaderboard({ ladder_id: ladderId, type: "skill" }));
       } else {
-        dispatch(fetchLeaderboard({ ladder_id: ladderId }));
+        dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderType }));
         if (isMiniLeague) {
-          dispatch(
-            fetchMiniLeague({ ladder_id: ladderId, type: "minileague" }),
-          );
+          dispatch(fetchMiniLeague({ ladder_id: ladderId, type: "minileague" }));
+        }
+        if (isRoster) {
+          dispatch(fetchRosterLeaderboard({ ladder_id: ladderId }));
         }
       }
     }
@@ -285,7 +287,6 @@ const AdminButton = () => {
           </Button>
         )}
 
-        {!isRoster && (
           <Dialog
             open={openAddPlayerDialog}
             onOpenChange={setOpenAddPlayerDialog}
@@ -314,7 +315,6 @@ const AdminButton = () => {
               />
             </DialogContent>
           </Dialog>
-        )}
 
         {/* SKILL SPECIFIC BUTTONS */}
         {(isSkill || isPositive || isNegative) && (
