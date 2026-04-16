@@ -79,6 +79,13 @@ const handleSubmit = async () => {
       setWelcomeMsg(`Welcome ${name}!`);
       setShowDialog(true);
 
+      // Reset fields
+      setName("");
+      setPhone("");
+      setRank("");
+      setProfileImage(null);
+      setProfileFile(null);
+
       setLoading(true);
 
       // Leaderboard refresh

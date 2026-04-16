@@ -458,7 +458,6 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
                 className="hidden"
               />
               <div className="h-10 w-full">
-
                 <AgeFilter onSearch={handleAgeSearch} user={true} />
               </div>
             </div>
