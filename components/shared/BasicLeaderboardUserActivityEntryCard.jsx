@@ -58,7 +58,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
-  const ladderType = searchParams.get("ladder_type");
+  const ladderType = searchParams.get("ladder_type"); 
 
 
 
@@ -327,7 +327,7 @@ export default function BasicLeaderboardActivityEntryCard({
         witness_by: witnessBy.trim(),
       };
 
-      if (bestScore && ladderType === "skill") {
+      if (bestScore) {
         payload.best_result = bestScore;
       }
 
@@ -368,10 +368,10 @@ export default function BasicLeaderboardActivityEntryCard({
     setOpenZeroAlert(false);
 
     if (type === "ok") {
-      submitScore(0);
+      submitScore(0, topScore);
     } else if (type === "reset") {
       setValue("-");
-      submitScore("-");
+      submitScore("-", topScore);
     }
   };
 
@@ -432,7 +432,7 @@ export default function BasicLeaderboardActivityEntryCard({
             )}
           </div>
           
-          <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
+          {(ladderType !== "negative" && type !== "negative") && <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
             <div className="flex-1 sm:flex-none flex flex-col items-center">
               <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
                 Today's Result
@@ -483,12 +483,12 @@ export default function BasicLeaderboardActivityEntryCard({
                 Best Result
               </label>
               <input
-                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 cursor-not-allowed outline-none"
+                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
                 value={topScore && topScore}
-                readOnly
+                onChange={(e) => setTopScore(e.target.value)}
               />
             </div>
-          </div>
+          </div>}
         </div>
 
         {/* ACTIVITY BUTTONS */}

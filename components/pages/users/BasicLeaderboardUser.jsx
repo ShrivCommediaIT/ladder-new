@@ -20,6 +20,7 @@ import { API_ENDPOINTS } from "@/constants/api";
 import BasicLeaderboardPrintSkillsSheet from "../admin/BasicLeaderboardPrintSkillsSheet";
 import BasicLeaderboardActivityEntryCard from "../players/BasicLeaderboardActivityEntryCard";
 import PlayerEditInfoModel from "@/helper/playerEditInfoModel";
+import AgeFilter from "@/components/shared/AgeFilter";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -201,6 +202,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
+  const laddartype =  searchParams.get("ladder_type");
   const { data = [], loading } = useSelector(
     (state) => state.skillLeaderboard || {},
   );
@@ -239,7 +241,8 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
   const [openSort, setOpenSort] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false); // FIXED: UNCOMMENTED
+  const [appliedDob, setAppliedDob] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [showRemove, setShowRemove] = useState(false);
   
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -295,22 +298,34 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = 0) => {
+    (skillNo = 0, dob) => {
       if (!ladderId || isRefreshing) return;
 
       setIsRefreshing(true);
-      dispatch(
-        fetchSkillLeaderboard({
-          ladder_id: ladderId,
-          type: "skill",
-          sortbyskillnumber: skillNo,
-        }),
-      ).finally(() => {
-        setIsRefreshing(false); // FIXED: was setIsRefreshing(true)
+      const finalDob = dob !== undefined ? dob : appliedDob;
+
+      const payload = {
+        ladder_id: ladderId,
+        type: "skill",
+        sortbyskillnumber: skillNo,
+      };
+
+      if (finalDob) {
+        payload.dob = finalDob;
+      }
+
+      dispatch(fetchSkillLeaderboard(payload)).finally(() => {
+        setIsRefreshing(false);
       });
     },
-    [dispatch, ladderId, isRefreshing],
+    [dispatch, ladderId, isRefreshing, appliedDob],
   );
+
+  const handleAgeSearch = (dob) => {
+    setAppliedDob(dob);
+    refreshLeaderboard(selectedSkillFilter, dob);
+    setIsSorted(true);
+  };
 
   // MANUAL REFRESH HANDLERS (only when explicitly called)
   const handleSelfRemove = useCallback(() => {
@@ -330,6 +345,7 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
     (skillNo) => {
       setOpenSort(false);
       setIsSorted(true);
+      setSelectedSkillFilter(skillNo);
       refreshLeaderboard(skillNo);
     },
     [refreshLeaderboard],
@@ -342,7 +358,8 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
   const handleClearAll = useCallback(() => {
     setIsSorted(false);
     setSelectedSkillFilter(0);
-    refreshLeaderboard(0);
+    setAppliedDob("");
+    refreshLeaderboard(0, "");
   }, [refreshLeaderboard]);
 
   const handleSkillClick = useCallback(
@@ -405,7 +422,7 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0">
+            <div className="flex flex-wrap justify-between w-full sm:flex-nowrap gap-2 mt-3 sm:mt-0">
               {!isSorted ? (
                 <Button
                   onClick={handleSortBySkill}
@@ -443,6 +460,10 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
                 ladderId={ladderId}
                 className="hidden"
               />
+              <div className="h-10 w-full">
+
+                <AgeFilter onSearch={handleAgeSearch} user={true} />
+              </div>
             </div>
           </div>
 
@@ -463,6 +484,8 @@ const initialRows = Array.from({ length: 12 }, (_, i) => ({
           </div>
         </div>
       </main>
+
+      
 
       <Dialog open={openSort} onOpenChange={setOpenSort}>
         <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">

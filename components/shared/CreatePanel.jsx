@@ -81,15 +81,15 @@ const CreatePanel = ({
                 MiniLeagues
               </option>
               <option className="bg-black" value="skill">
-                Skills Leaderboard
+                Skills/Performance Challenge Board
               </option>
 
               {/* ❌ ROSTER HIDDEN */}
               <option className="bg-black" value="positive">
-                Positive LeaderBoard
+                 LeaderBoard
               </option>
               <option className="bg-black" value="negative">
-                Negative LeaderBoard
+                LeaderBoard (Times)
               </option>
             </select>
           </div>

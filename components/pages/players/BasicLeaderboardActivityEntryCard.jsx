@@ -95,8 +95,6 @@ export default function BasicLeaderboardActivityEntryCard({
       const witnessValue =
         witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
 
-        console.log("witnessValue==>5",witnessValue);
-        
 
       const params = new URLSearchParams();
       params.append("user_id", String(playerId));
@@ -150,17 +148,17 @@ export default function BasicLeaderboardActivityEntryCard({
     }
 
     const finalScore = skillSign === "-" ? -num : num;
-    submitScore(finalScore, topScore);
+    await submitScore(finalScore, topScore);
   };
 
   const handleZeroConfirm = (type) => {
     setOpenZeroAlert(false);
 
     if (type === "ok") {
-      submitScore(0);
+      submitScore(0, topScore);
     } else if (type === "reset") {
       setValue("-")
-      submitScore("-");
+      submitScore("-", topScore);
     }
   };
 
@@ -180,21 +178,7 @@ export default function BasicLeaderboardActivityEntryCard({
       handleEnter();
       return;
     }
-
-    try {
-      const bestScore = await getRequest(API_ENDPOINTS.GET_TOP_SCORE, {
-        user_id: String(playerId),
-        skill_activity_id: String(skillActivityId),
-        score: String(value),
-      });
-
-      if (bestScore.status === 200) {
-        setTopScore(bestScore?.data?.[0]?.top_score || 0);
-        setOpenSuccessResult(true);
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    setOpenSuccessResult(true);
   };
 
   useEffect(() => {
@@ -256,12 +240,12 @@ export default function BasicLeaderboardActivityEntryCard({
             
             <div className="flex-1 sm:flex-none flex flex-col items-center">
               <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
-                Best Result
+                Best Result 
               </label>
               <input
-                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 cursor-not-allowed outline-none"
+                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none"
                 value={topScore && topScore}
-                readOnly
+                onChange={(e) => setTopScore(e.target.value)}
               />
             </div>
           </div>
