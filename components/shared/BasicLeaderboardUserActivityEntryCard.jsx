@@ -279,8 +279,7 @@ export default function BasicLeaderboardActivityEntryCard({
     }
 
     // ✅ snapshot time input RIGHT NOW and pass it in
-    await submitScore(value, topScore, { m: minStr, s: secStr, ms: msStr });
-
+    return await submitScore(value, topScore, { m: minStr, s: secStr, ms: msStr });
   }
 
 
@@ -318,6 +317,8 @@ export default function BasicLeaderboardActivityEntryCard({
     }
 
     try {
+      const adminDetails = JSON.parse(localStorage.getItem("adminDetails"));
+
       setSaving(true);
 
       const payload = {
@@ -325,6 +326,8 @@ export default function BasicLeaderboardActivityEntryCard({
         skill_activity_id: skillActivityId,
         score: finalScore,
         witness_by: witnessBy.trim(),
+        admin_id: adminDetails.id,
+        ladder_id: ladderId,
       };
 
       if (bestScore) {
@@ -340,20 +343,28 @@ export default function BasicLeaderboardActivityEntryCard({
           ladder_id: ladderId,
           ladder_type: ladderTypeUpdate,
         });
+       
+        setOpenSuccess(true);
+        return true;
       } else {
-        toast.error("Failed to post result. Please try again.");
+        toast.error(res.error_message);
+        return false;
       }
-
-      setOpenSuccess(true);
     } catch (err) {
       console.error("Error Detail:", err.response?.data || err);
       alert("Failed to save: " + (err.response?.data?.message || "Unknown error"));
+      return false;
     } finally {
       setSaving(false);
     }
   };
 
   const handleSuccessClose = useCallback(() => {
+    setValue("0");
+    setWitnessBy("");
+    setMinStr("00");
+    setSecStr("00");
+    setMsStr("00");
     setOpenSuccess(false);
     if (onClose) onClose();
   }, [onClose]);
@@ -741,8 +752,10 @@ export default function BasicLeaderboardActivityEntryCard({
             {/* Button */}
             <Button
               onClick={async () => {
-                handleSuccessCloseResult();
-                await handleEnter();
+                const success = await handleEnter();
+                if (success) {
+                  handleSuccessCloseResult();
+                }
               }}
               className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-md"
             >

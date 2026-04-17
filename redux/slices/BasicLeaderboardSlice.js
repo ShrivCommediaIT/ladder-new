@@ -44,9 +44,14 @@ const skillLeaderboardSlice = createSlice({
     data: [],
     gradebars: [],
     ladderDetails: null,
+    appliedAge: 0,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    setAppliedAge: (state, action) => {
+      state.appliedAge = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSkillLeaderboard.pending, (state) => { state.loading = true; })
@@ -69,4 +74,5 @@ const skillLeaderboardSlice = createSlice({
   },
 });
 
+export const { setAppliedAge } = skillLeaderboardSlice.actions;
 export default skillLeaderboardSlice.reducer;

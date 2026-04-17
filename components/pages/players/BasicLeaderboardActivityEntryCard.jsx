@@ -90,41 +90,43 @@ export default function BasicLeaderboardActivityEntryCard({
   const submitScore = async (finalScore, bestScore) => {
 
     try {
+      const adminDetails = JSON.parse(localStorage.getItem("adminDetails"));
+
       setSaving(true);
-
       const witnessValue =
-        witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
-
-
+      witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
       const params = new URLSearchParams();
       params.append("user_id", String(playerId));
       params.append("skill_activity_id", String(skillActivityId));
       params.append("score", String(finalScore));
       params.append("witness_by", witnessValue);
+      params.append("admin_id", adminDetails.id);
+      params.append("ladder_id", ladderId);
+
       
       if (bestScore) {
         params.append("best_result", bestScore);
       }
-
       const skillsPost = await postUrlEncoded(API_ENDPOINTS.POST_RESULT_SKILLBOARD, params);
-
       if (skillsPost.status === 200) {
         setOpenSuccess(true);
-
         toast.success("Result posted successfully! ");
         updateLadderToken({
           user_id: playerName,
           ladder_id: ladderId,
           ladder_type: "skill",
         })
+        
+        setOpenSuccess(true);
+        return true;
       } else {
-        toast.error("Failed to post result. Please try again.");
+        toast.error(skillsPost.error_message);
+        return false;
       }
-
-
     } catch (err) {
       console.error("Error Detail:", err.response?.data || err);
       alert("Failed to save: " + (err.response?.data?.message || "Error"));
+      return false;
     } finally {
       setSaving(false);
     }
@@ -148,7 +150,7 @@ export default function BasicLeaderboardActivityEntryCard({
     }
 
     const finalScore = skillSign === "-" ? -num : num;
-    await submitScore(finalScore, topScore);
+    return await submitScore(finalScore, topScore);
   };
 
   const handleZeroConfirm = (type) => {
@@ -164,14 +166,15 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
   const handleSuccessClose = useCallback(() => {
+    setValue("0");
+    setWitnessBy("");
     setOpenSuccess(false);
     if (onClose) onClose();
   }, [onClose]);
 
   const handleSuccessCloseResult = useCallback(() => {
     setOpenSuccessResult(false);
-    if (onClose) onClose();
-  }, [onClose]);
+  }, []);
 
   const getBestScore = async () => {
     if (value == 0 || value == "-") {
@@ -395,8 +398,10 @@ export default function BasicLeaderboardActivityEntryCard({
             {/* Button */}
             <Button
               onClick={async () => {
-                await handleEnter();
-                handleSuccessCloseResult();
+                const success = await handleEnter();
+                if (success) {
+                  handleSuccessCloseResult();
+                }
               }}
               className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-md"
             >
