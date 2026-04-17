@@ -73,7 +73,7 @@ export default function LoginUser({ ladderId, ladderType }) {
         return;
       }
 
-      localStorage.setItem(
+      sessionStorage.setItem(
         "user",
         JSON.stringify({
           ...userData,

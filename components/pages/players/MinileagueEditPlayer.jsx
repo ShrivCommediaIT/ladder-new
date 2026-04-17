@@ -40,7 +40,7 @@ export const MinileagueEditPlayer = ({
 
 const userData =
   typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem("userData") || localStorage.getItem("subAdmin") || "{}")
+    ? JSON.parse(sessionStorage.getItem("userData") || sessionStorage.getItem("subAdmin") || "{}")
     : {};
 
 let userId = null;

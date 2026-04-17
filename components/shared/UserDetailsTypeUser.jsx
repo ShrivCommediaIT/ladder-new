@@ -25,7 +25,7 @@ const UserDetailsTypeUser = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("user");
+      const storedUser = sessionStorage.getItem("user");
       if (storedUser) {
         try {
           setUser(JSON.parse(storedUser));
@@ -44,7 +44,7 @@ const UserDetailsTypeUser = () => {
   /* ---------------- LOGOUT ---------------- */
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
     localStorage.removeItem("persist:root");
     sessionStorage.clear();
 

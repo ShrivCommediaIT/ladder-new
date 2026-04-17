@@ -69,13 +69,13 @@ export default function LoginByClubForm() {
   const { setValue } = form;
 
   useEffect(() => {
-    const saved = localStorage.getItem("userData");
+    const saved = sessionStorage.getItem("userData");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (parsed?.login_id && parsed?.password) setUserData(parsed);
       } catch {
-        localStorage.removeItem("userData");
+        sessionStorage.removeItem("userData");
       }
     }
   }, []);
@@ -136,8 +136,8 @@ export default function LoginByClubForm() {
           ? { ...res.subadmin, isLoggedIn: true }
           : { ...res.data, isLoggedIn: true };
 
-      localStorage.setItem(storageKey, JSON.stringify(user));
-      localStorage.setItem("adminDetails", JSON.stringify({ ...res.data,}));
+      sessionStorage.setItem(storageKey, JSON.stringify(user));
+      sessionStorage.setItem("adminDetails", JSON.stringify({ ...res.data,}));
 
       const route = values.userType === "sub_admin" ? subAdminPage : adminPage;
 

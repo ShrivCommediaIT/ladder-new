@@ -25,7 +25,7 @@ const MinileagueMovePlayerBox = ({ onCancel }) => {
   
     useEffect(() => {
       if (typeof window !== "undefined") {
-        const raw = localStorage.getItem("userData");
+        const raw = sessionStorage.getItem("userData");
         if (raw) {
           try {
             const parsed = JSON.parse(raw);

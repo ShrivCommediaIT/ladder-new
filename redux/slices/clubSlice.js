@@ -40,7 +40,7 @@ const clubSlice = createSlice({
       state.success = false;
       state.data = null;
       state.error = null;
-      localStorage.removeItem("createdClub");
+      sessionStorage.removeItem("createdClub");
     },
   },
   extraReducers: (builder) => {
@@ -55,7 +55,7 @@ const clubSlice = createSlice({
         state.success = true;
         state.data = action.payload;
         if (action.payload?.data) {
-          localStorage.setItem("createdClub", JSON.stringify(action.payload.data));
+          sessionStorage.setItem("createdClub", JSON.stringify(action.payload.data));
         }
       })
       .addCase(createClub.rejected, (state, action) => {

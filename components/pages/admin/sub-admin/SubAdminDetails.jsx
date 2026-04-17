@@ -30,7 +30,7 @@ const SubAdminDetails = () => {
 
   //  Load user from storage
   useEffect(() => {
-    const stored = localStorage.getItem("subAdmin");
+    const stored = sessionStorage.getItem("subAdmin");
     if (stored) {
       try {
         setUser(JSON.parse(stored));
@@ -76,7 +76,7 @@ const SubAdminDetails = () => {
           }
 
           const existing = JSON.parse(
-            localStorage.getItem("subAdmin") || "{}"
+            sessionStorage.getItem("subAdmin") || "{}"
           );
 
           const updatedUser = {
@@ -84,7 +84,7 @@ const SubAdminDetails = () => {
             image: imageUrl,
           };
 
-          localStorage.setItem(
+          sessionStorage.setItem(
             "subAdmin",
             JSON.stringify(updatedUser)
           );
@@ -126,10 +126,10 @@ const getImageSrc = () => {
 
   //  Logout
   const handleLogout = () => {
-    localStorage.removeItem("admin");
-    localStorage.removeItem("subAdmin");
-    localStorage.removeItem("userData");
-    localStorage.removeItem("persist:root");
+    sessionStorage.removeItem("admin");
+    sessionStorage.removeItem("subAdmin");
+    sessionStorage.removeItem("userData");
+    sessionStorage.removeItem("persist:root");
     sessionStorage.clear();
     router.push(clubIdPage);
   };

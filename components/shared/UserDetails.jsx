@@ -40,14 +40,14 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
 
 
 
-  // ✅ Get user from localStorage
+  // ✅ Get user from sessionStorage
  
 
   useEffect(() => {
   if (typeof window !== "undefined") {
     try {
-      const storedAdmin = localStorage.getItem("userData");
-      const storedSubAdmin = localStorage.getItem("subAdmin");
+      const storedAdmin = sessionStorage.getItem("userData");
+      const storedSubAdmin = sessionStorage.getItem("subAdmin");
 
       const admin = storedAdmin ? JSON.parse(storedAdmin) : null;
       const subAdmin = storedSubAdmin ? JSON.parse(storedSubAdmin) : null;
@@ -65,7 +65,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
 
       setUser(null);
     } catch (err) {
-      console.error("Invalid user data in localStorage", err);
+      console.error("Invalid user data in sessionStorage", err);
       setUser(null);
     }
   }
@@ -81,8 +81,8 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
 
   const handleLogout = () => {
     // Clear storage
-    localStorage.removeItem("userData");
-    localStorage.removeItem("subAdmin");
+    sessionStorage.removeItem("userData");
+    sessionStorage.removeItem("subAdmin");
     localStorage.removeItem("persist:root");
     sessionStorage.clear();
     dispatch(resetUserState());

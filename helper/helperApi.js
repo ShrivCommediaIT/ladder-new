@@ -6,10 +6,10 @@ import { API_ENDPOINTS } from "@/constants/api";
 
 /**
  * Update ladder token for an admin.
- * Reads admin_id from localStorage.
+ * Reads admin_id from sessionStorage.
  */
 export const updateLadderToken = async (payload) => {
-  const adminDetails = JSON.parse(localStorage.getItem("adminDetails"));
+  const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
 
   const formData = new FormData();
   formData.append("admin_id", adminDetails.id);

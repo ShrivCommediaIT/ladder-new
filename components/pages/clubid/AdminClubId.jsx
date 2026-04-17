@@ -126,7 +126,7 @@ export default function AdminClubId() {
 
   /* --------- FETCH SUB ADMINS --------- */
 const fetchSubAdmins = async () => {
-  const storedUser = localStorage.getItem("userData");
+  const storedUser = sessionStorage.getItem("userData");
   const userId = storedUser ? JSON.parse(storedUser)?.id : null;
   if (!userId) return;
 
@@ -184,7 +184,7 @@ useEffect(() => {
 
   /* --------- SUBMIT NEW SUB ADMIN --------- */
   const handleSubmit = async (values) => {
-    const storedUser = localStorage.getItem("userData");
+    const storedUser = sessionStorage.getItem("userData");
     const userId = storedUser ? JSON.parse(storedUser)?.id : null;
     if (!userId) return alert("User not logged in");
 

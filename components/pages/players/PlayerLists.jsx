@@ -84,11 +84,11 @@ export const PlayerLists = () => {
   const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
-    const hasSeenInfo = localStorage.getItem("adminInfoShown");
+    const hasSeenInfo = sessionStorage.getItem("adminInfoShown");
 
     if (!hasSeenInfo) {
       setShowInfo(true);
-      localStorage.setItem("adminInfoShown", "true");
+      sessionStorage.setItem("adminInfoShown", "true");
     }
   }, []);
 

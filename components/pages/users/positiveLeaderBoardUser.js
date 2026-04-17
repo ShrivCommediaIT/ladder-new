@@ -134,7 +134,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("user");
+      const storedUser = sessionStorage.getItem("user");
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
@@ -142,7 +142,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
             setCurrentUserId(Number(parsedUser.id));
           }
         } catch (err) {
-          console.error("Failed to parse user from localStorage", err);
+          console.error("Failed to parse user from sessionStorage", err);
         }
       }
     }

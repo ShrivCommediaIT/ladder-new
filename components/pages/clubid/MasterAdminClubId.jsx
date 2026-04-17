@@ -56,7 +56,7 @@ export default function AccessCodeParts() {
 
   useEffect(() => {
     const fetchSavedClub = async () => {
-      const storedUser = localStorage.getItem("userData");
+      const storedUser = sessionStorage.getItem("userData");
       const id = storedUser ? JSON.parse(storedUser)?.id : null;
       if (!id) return;
       setUserId(id);

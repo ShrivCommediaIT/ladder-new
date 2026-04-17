@@ -25,7 +25,7 @@ const PlayerSearchInput = ({
   }, []);
 
   useEffect(() => {
-    const subAdminDetails = JSON.parse(localStorage.getItem("subAdmin"))
+    const subAdminDetails = JSON.parse(sessionStorage.getItem("subAdmin"))
     setIsSubAdminDetails(subAdminDetails)
   }, [])
 

@@ -50,7 +50,7 @@ export const EditPlayer = ({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+      const storedUser = JSON.parse(sessionStorage.getItem("user") || "null");
       setLocalUser(storedUser);
     }
   }, []);
