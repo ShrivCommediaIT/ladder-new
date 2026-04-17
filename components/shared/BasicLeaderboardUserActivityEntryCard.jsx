@@ -278,9 +278,15 @@ export default function BasicLeaderboardActivityEntryCard({
       }
     }
 
-    // ✅ snapshot time input RIGHT NOW and pass it in
-    return await submitScore(value, topScore, { m: minStr, s: secStr, ms: msStr });
-  }
+    // ✅ If topScore is 0, send the current value (or current time string) as the best result
+    const currentVal = (type === "negative" || ladderType === "negative") 
+        ? `00:${minStr.padStart(2, "0")}:${secStr.padStart(2, "0")}.${msStr.padStart(2, "0")}0`
+        : value;
+    
+    const bestResultToSubmit = (topScore === 0 || topScore === "0") ? currentVal : topScore;
+
+    return await submitScore(value, bestResultToSubmit, { m: minStr, s: secStr, ms: msStr });
+}
 
 
 
@@ -330,7 +336,7 @@ export default function BasicLeaderboardActivityEntryCard({
         ladder_id: ladderId,
       };
 
-      if (bestScore) {
+      if (bestScore !== undefined && bestScore !== null) {
         payload.best_result = bestScore;
       }
 
@@ -380,10 +386,12 @@ export default function BasicLeaderboardActivityEntryCard({
     setOpenZeroAlert(false);
 
     if (type === "ok") {
-      submitScore(0, topScore);
+      const bestResultToSubmit = (topScore === 0 || topScore === "0") ? 0 : topScore;
+      submitScore(0, bestResultToSubmit);
     } else if (type === "reset") {
       setValue("-");
-      submitScore("-", topScore);
+      const bestResultToSubmit = (topScore === 0 || topScore === "0") ? "-" : topScore;
+      submitScore("-", bestResultToSubmit);
     }
   };
 
@@ -496,7 +504,9 @@ export default function BasicLeaderboardActivityEntryCard({
               </label>
               <input
                 className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
-                value={topScore && topScore}
+                value={(topScore === 0 || topScore === "0") 
+                  ? ((type === "negative" || ladderType === "negative") ? formatTimeInfo() : value) 
+                  : topScore}
                 onChange={(e) => setTopScore(e.target.value)}
               />
             </div>
@@ -735,7 +745,9 @@ export default function BasicLeaderboardActivityEntryCard({
               <div className="flex items-center gap-2">
                 <span>Your Best Result</span>
                 <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
-                  {topScore || 0}
+                  {(topScore === 0 || topScore === "0") 
+                    ? ((type === "negative" || ladderType === "negative") ? formatTimeInfo() : value) 
+                    : topScore}
                 </span>
               </div>
             </div>
