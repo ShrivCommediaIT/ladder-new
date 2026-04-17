@@ -23,20 +23,20 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("userData") || localStorage.getItem("subAdmin"); 
+      const raw = sessionStorage.getItem("userData") || sessionStorage.getItem("subAdmin"); 
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
           setLocalUser(parsed);
         } catch (e) {
-          console.error("Invalid userData in localStorage");
+          console.error("Invalid userData in sessionStorage");
         }
       }
     }
   }, []);
 
 
-  // redux first, fallback localStorage
+  // redux first, fallback sessionStorage
   const user = reduxUser || localUser;
 
   // ladderId priority: prop → user.ladder_id

@@ -23,9 +23,9 @@ const AdminEditPhone = () => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
 
-  //  Load user from localStorage directly
+  //  Load user from sessionStorage directly
   useEffect(() => {
-    const stored = localStorage.getItem("userData") || localStorage.getItem("subAdmin");
+    const stored = sessionStorage.getItem("userData") || sessionStorage.getItem("subAdmin");
     if (!stored) return;
 
     try {
@@ -42,7 +42,7 @@ const AdminEditPhone = () => {
         setOpen(true);
       }
     } catch (e) {
-      console.log("localStorage parse error", e);
+      console.log("sessionStorage parse error", e);
     }
   }, []);
 
@@ -86,13 +86,13 @@ const handleEdit = async () => {
     const res = await postRequest(endpoint, payload);
 
     if (res.status == 200 || res.status === "success") {
-      // update localStorage
+      // update sessionStorage
       const updated = { ...user, name, phone };
 
-      if (localStorage.getItem("subAdmin")) {
-        localStorage.setItem("subAdmin", JSON.stringify(updated));
+      if (sessionStorage.getItem("subAdmin")) {
+        sessionStorage.setItem("subAdmin", JSON.stringify(updated));
       } else {
-        localStorage.setItem("userData", JSON.stringify(updated));
+        sessionStorage.setItem("userData", JSON.stringify(updated));
       }
 
       setDialogTitle("Success");

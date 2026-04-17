@@ -110,8 +110,8 @@ export default function LoginPage() {
           subscription: res.subscription || null,
           isLoggedIn: true,
         };
-        localStorage.setItem("userData", JSON.stringify(userData));
-        localStorage.setItem("adminDetails", JSON.stringify(userData));
+        sessionStorage.setItem("userData", JSON.stringify(userData));
+        sessionStorage.setItem("adminDetails", JSON.stringify(userData));
         toast.success(res?.success_message || "Login successful!");
         router.push(adminPage);
       }

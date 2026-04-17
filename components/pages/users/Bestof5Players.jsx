@@ -31,7 +31,7 @@ export default function Bestof5Players() {
   // ✅ user from localStorage
   const userData =
     typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("userData") || "{}")
+      ? JSON.parse(sessionStorage.getItem("userData") || "{}")
       : {};
 
   let effectiveUserId = null;

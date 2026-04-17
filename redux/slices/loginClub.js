@@ -22,7 +22,7 @@ export const loginClub = createAsyncThunk(
       dispatch(setUser(data.data));
 
       if (typeof window !== "undefined") {
-        localStorage.setItem("userData", JSON.stringify(data.data));
+        sessionStorage.setItem("userData", JSON.stringify(data.data));
       }
 
       return data.data;

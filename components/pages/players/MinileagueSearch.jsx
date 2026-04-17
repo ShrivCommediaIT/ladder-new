@@ -28,7 +28,7 @@ const MinileagueSearch = ({
   const ladderType = searchParams.get("ladder_type");
 
   useEffect(() => {
-    const subAdminDetails = JSON.parse(localStorage.getItem("subAdmin"))
+    const subAdminDetails = JSON.parse(sessionStorage.getItem("subAdmin"))
     if (subAdminDetails?.role === "admin") {
       setIsSubAdminDetails(true)
     }

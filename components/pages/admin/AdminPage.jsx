@@ -54,7 +54,7 @@ export default function AdminPage() {
 
 
   useEffect(() => {
-      const storedAdmin = localStorage.getItem("adminDetails");
+      const storedAdmin = sessionStorage.getItem("adminDetails");
       if (storedAdmin) {
         try {
           const parsed = JSON.parse(storedAdmin);

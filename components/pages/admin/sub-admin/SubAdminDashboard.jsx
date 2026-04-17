@@ -56,7 +56,7 @@ export default function SubAdminDashboard() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("userData");
+      const storedUser = sessionStorage.getItem("userData");
       if (storedUser) {
         try {
           setUser(JSON.parse(storedUser));
@@ -72,7 +72,7 @@ export default function SubAdminDashboard() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("userData");
+      const storedUser = sessionStorage.getItem("userData");
       if (storedUser) {
         try {
           const parsed = JSON.parse(storedUser);
@@ -137,7 +137,7 @@ export default function SubAdminDashboard() {
 
   const subAdmin =
     typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("subAdmin") || "null")
+      ? JSON.parse(sessionStorage.getItem("subAdmin") || "null")
       : null;
 
   const handleFileChange = async (e) => {

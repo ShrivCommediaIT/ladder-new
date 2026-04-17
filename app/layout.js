@@ -12,7 +12,7 @@ export default function RootLayout({ children }) {
   const [userType, setUserType] = useState("")
 
 useEffect(() => {
-  const parsed = JSON.parse(localStorage.getItem("userData") || "null");
+  const parsed = JSON.parse(sessionStorage.getItem("userData") || "null");
   const role = parsed?.user_type;
 
   if (role === "admin" || role === "sub_admin") {

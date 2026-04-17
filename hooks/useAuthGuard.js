@@ -9,8 +9,8 @@ export default function useAuthGuard(options = {}) {
   const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
-    const admin = JSON.parse(localStorage.getItem("userData") || "null");
-    const subAdmin = JSON.parse(localStorage.getItem("subAdmin") || "null");
+    const admin = JSON.parse(sessionStorage.getItem("userData") || "null");
+    const subAdmin = JSON.parse(sessionStorage.getItem("subAdmin") || "null");
 
     let isAllowed = false;
 

@@ -21,7 +21,9 @@ axiosInstance.interceptors.request.use(
 
     // Optional Bearer token (for future protected routes)
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
+      const admin = JSON.parse(sessionStorage.getItem("userData") || "null");
+      const subAdmin = JSON.parse(sessionStorage.getItem("subAdmin") || "null");
+      const token = admin?.token || subAdmin?.token;
       if (token) {
         config.headers["Authorization"] = `Bearer ${token}`;
       }

@@ -209,7 +209,7 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
   setLoadingHistory(true);
 
   try {
-    const admin = JSON.parse(localStorage.getItem("adminDetails"));
+    const admin = JSON.parse(sessionStorage.getItem("adminDetails"));
 
     const data = await getRequest("/user/tokenHistory", {
       user_id: player.name,

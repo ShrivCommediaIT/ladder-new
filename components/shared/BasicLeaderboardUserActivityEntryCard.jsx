@@ -317,7 +317,7 @@ export default function BasicLeaderboardActivityEntryCard({
     }
 
     try {
-      const adminDetails = JSON.parse(localStorage.getItem("adminDetails"));
+      const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
 
       setSaving(true);
 
@@ -342,6 +342,7 @@ export default function BasicLeaderboardActivityEntryCard({
           user_id: playerName,
           ladder_id: ladderId,
           ladder_type: ladderTypeUpdate,
+          user_name: playerName,
         });
        
         setOpenSuccess(true);

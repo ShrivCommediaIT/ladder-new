@@ -168,7 +168,7 @@ const userSlice = createSlice({
           action.payload.success_message || "Login successful!";
         state.error = null;
         if (typeof window !== "undefined" && userData) {
-          localStorage.setItem("userData", JSON.stringify(userData));
+          sessionStorage.setItem("userData", JSON.stringify(userData));
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -197,7 +197,7 @@ const userSlice = createSlice({
           state.user.name = action.meta.arg.name;
           state.user.phone = action.meta.arg.phone;
         }
-        localStorage.setItem("userData", JSON.stringify(state.user));
+        sessionStorage.setItem("userData", JSON.stringify(state.user));
       })
       .addCase(editUserDetails.rejected, (state, action) => {
         state.loading = false;

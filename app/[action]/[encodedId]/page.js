@@ -112,8 +112,8 @@ export default function DynamicPage() {
 
   // ✅ Auth + decode check
   useEffect(() => {
-    const admin = JSON.parse(localStorage.getItem("userData") || "null");
-    const subAdmin = JSON.parse(localStorage.getItem("subAdmin") || "null");
+    const admin = JSON.parse(sessionStorage.getItem("userData") || "null");
+    const subAdmin = JSON.parse(sessionStorage.getItem("subAdmin") || "null");
 
     const isLoggedIn =
       (admin && admin.isLoggedIn === true) ||

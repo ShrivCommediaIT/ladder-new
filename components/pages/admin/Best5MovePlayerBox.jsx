@@ -243,7 +243,7 @@ const Best5MovePlayerBox = ({ open, onClose = () => {} }) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("userData");
+      const raw = sessionStorage.getItem("userData");
       if (raw) {
         setLocalUser(JSON.parse(raw));
       }

@@ -153,7 +153,7 @@ const MinileaguePlayers = ({ ladderId }) => {
 
   const user =
     typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user") || "null")
+      ? JSON.parse(sessionStorage.getItem("user") || "null")
       : null;
 
   const [loadingPlayers, setLoadingPlayers] = useState(true);

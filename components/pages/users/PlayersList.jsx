@@ -33,7 +33,7 @@ export default function PlayersList() {
 
   const loggedInUser = useMemo(() => {
     if (typeof window === "undefined") return null;
-    return JSON.parse(localStorage.getItem("user") || "null");
+    return JSON.parse(sessionStorage.getItem("user") || "null");
   }, []);
 
   const loggedInUserId = Number(

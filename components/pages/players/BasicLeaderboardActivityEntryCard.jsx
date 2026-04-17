@@ -90,7 +90,7 @@ export default function BasicLeaderboardActivityEntryCard({
   const submitScore = async (finalScore, bestScore) => {
 
     try {
-      const adminDetails = JSON.parse(localStorage.getItem("adminDetails"));
+      const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
 
       setSaving(true);
       const witnessValue =
@@ -102,6 +102,8 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("witness_by", witnessValue);
       params.append("admin_id", adminDetails.id);
       params.append("ladder_id", ladderId);
+      params.append("user_name", playerName);
+
 
       
       if (bestScore) {

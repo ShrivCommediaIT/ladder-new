@@ -42,12 +42,12 @@ const LadderList = ({ userId }) => {
 
   const subAdmin =
     typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("subAdmin") || "null")
+      ? JSON.parse(sessionStorage.getItem("subAdmin") || "null")
       : null;
 
   const admin =
     typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("userData") || "null")
+      ? JSON.parse(sessionStorage.getItem("userData") || "null")
       : null;
 
   useEffect(() => {
