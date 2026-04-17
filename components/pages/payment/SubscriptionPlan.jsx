@@ -179,11 +179,22 @@ function CheckoutForm({
 
 /* Main Component */
 export default function SubscriptionPlan({ ladderId }) {
-  const [monthlyPlayers, setMonthlyPlayers] = useState(20);
-  const [yearlyPlayers, setYearlyPlayers] = useState(20);
+  // State for Monthly Plan
+  const [monthlyPlayers, setMonthlyPlayers] = useState(10);
+  const [monthlyCost, setMonthlyCost] = useState(10);
 
-  const [monthlyCost, setMonthlyCost] = useState(monthlyPlayers);
-  const [yearlyCost, setYearlyCost] = useState(yearlyPlayers);
+  // Constants for Yearly Tiers
+  const YEARLY_TIERS = [
+    { id: 1, label: "Tier 1 - 0 to 150 Members", cost: 1000, maxUsers: 150 },
+    { id: 2, label: "Tier 2 - 151 to 300 Members", cost: 2000, maxUsers: 300 },
+    { id: 3, label: "Tier 3 - 301 to 600 Members", cost: 3000, maxUsers: 600 },
+    { id: 4, label: "Tier 4 - 601 to 1000 Members", cost: 4000, maxUsers: 1000 },
+    { id: 5, label: "Tier 5 - 1001+ Members", cost: 5000, maxUsers: 5000 },
+  ];
+
+  // State for Yearly Plan
+  const [selectedTier, setSelectedTier] = useState(YEARLY_TIERS[0]);
+  const [yearlyCost, setYearlyCost] = useState(YEARLY_TIERS[0].cost);
 
   // ------------------- ADD THESE STATES -------------------
   const [monthlyCoupon, setMonthlyCoupon] = useState("");
@@ -202,18 +213,18 @@ export default function SubscriptionPlan({ ladderId }) {
   const [yearlyCouponResponse, setYearlyCouponResponse] = useState(null);
 
 
-  // Update cost whenever players change (but don't overwrite if coupon already applied)
+  // Update cost whenever players change
   useEffect(() => {
     if (!monthlyCouponValid) {
-      setMonthlyCost(monthlyPlayers * 1.33);
+      setMonthlyCost(monthlyPlayers * 1); // £1 per month per player
     }
   }, [monthlyPlayers, monthlyCouponValid]);
 
   useEffect(() => {
     if (!yearlyCouponValid) {
-      setYearlyCost(yearlyPlayers * 12);
+      setYearlyCost(selectedTier.cost);
     }
-  }, [yearlyPlayers, yearlyCouponValid]);
+  }, [selectedTier, yearlyCouponValid]);
 
   const [monthlyClientSecret, setMonthlyClientSecret] = useState(null);
   const [yearlyClientSecret, setYearlyClientSecret] = useState(null);
@@ -302,127 +313,91 @@ export default function SubscriptionPlan({ ladderId }) {
 
   return (
     <main
-      className="px-4 py-10 sm:px-8 md:px-12 lg:px-20 xl:px-32 max-w-6xl mx-auto min-h-screen overflow-hidden"
-      style={{
-        backgroundImage: "url('/bgHome.png')",
-        backgroundRepeat: "repeat",
-        backgroundSize: "200px",
-      }}
+      className="px-4 py-6 sm:px-8 md:px-12 lg:px-20 xl:px-32 max-w-7xl mx-auto min-h-screen"
     >
-      {/* ✅ Heading */}
-      <motion.section
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-6 relative text-center bg-yellow-100/90 border border-yellow-300 p-8 rounded-lg shadow-md "
-      >
-        <div className="absolute w-full flex items-center justify-center sm:justify-start sm:left-[40%] left-[2%] top-[-80]">
-          <Image
-            src={BgHome}
-            alt="bghome"
-            height={100}
-            width={100}
-            className="w-56 sm:w-56 md:w-56 lg:w-56"
-          />
-        </div>
-
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-wide text-gray-800 uppercase py-4">
-          Payment Plans & Size of Ladder
-        </h1>
-      </motion.section>
       {/* ✅ Subscription Cards */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-10"
-      >
-        {/* Monthly Plan */}
-        <motion.div className="bg-gradient-to-b from-yellow-700 to-yellow-100 p-6 rounded-lg shadow-lg border text-center space-y-2">
-          <h2 className="text-xl font-bold text-yellow-300">
-            Monthly Subscription
-          </h2>
-          <p className="text-lg font-semibold text-gray-300">
-            Ideal for short term ladders
-          </p>
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-4 max-w-5xl mx-auto">
+        
+        {/* Pay per Solution (Blue Card) */}
+        <div className="bg-gradient-to-b from-[#042793] to-[#00278a] p-3 rounded-none shadow-2xl border-[1px] border-black">
+          <div className="text-center pb-2">
+            <h2 className="text-3xl font-black text-white italic leading-tight">Pay per Solution</h2>
+            <p className="text-[10px] font-bold text-white italic opacity-100">£1 per month per player per solution</p>
+          </div>
 
-          <div className="bg-gradient-to-b from-yellow-300 to-yellow-100 border border-black border-dashed rounded-md space-y-4 px-8 py-8">
-            <p className="font-semibold">£1.33 per player per month</p>
-            <select
-              value={monthlyPlayers}
-              onChange={(e) => setMonthlyPlayers(Number(e.target.value))}
-              className="border border-gray-400 rounded p-2 w-full"
-            >
-              {[20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250].map((size) => (
-                <option key={size} value={size}>
-                  {size} Players
-                </option>
-              ))}
-            </select>
-            <p className="font-bold">
-              Total Cost <br /> £{monthlyCost.toFixed(2)} / month
-            </p>
-
-            {/* Monthly Coupon Input */}
-            <div className="flex flex-col md:flex-col sm:flex-row gap-2">
-              <input
-                type="text"
-                value={monthlyCoupon}
-                onChange={(e) => {
-                  setMonthlyCoupon(e.target.value);
-                  setMonthlyCouponValid(false);
-                }}
-                placeholder="Coupon Code"
-                className="flex-1 border-2 border-amber-50 rounded-sm px-2 text-base"
-              />
-              <Button
-                type="button"
-                onClick={handleCheckMonthlyCoupon}
-                disabled={!monthlyCoupon || checkingMonthlyCoupon}
-                className="px-6 py-2 rounded-sm bg-amber-500 hover:bg-amber-600 cursor-pointer w-full sm:w-auto"
+          {/* Inner Content Card (Nested Div) */}
+          <div className="bg-gradient-to-b from-[#00009d] to-[#0000cd] border border-black/40 p-4 flex flex-col items-center gap-4">
+            <div className="w-full bg-[#cbd5e1] rounded-sm relative shadow-inner">
+              <select
+                value={monthlyPlayers}
+                onChange={(e) => setMonthlyPlayers(Number(e.target.value))}
+                className="w-full bg-[#cbd5e1] px-4 py-2 text-2xl font-black text-gray-800 appearance-none cursor-pointer focus:outline-none"
               >
-                {checkingMonthlyCoupon ? "Checking..." : "Apply"}
-              </Button>
+                {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250].map((size) => (
+                  <option key={size} value={size}>
+                    {size} Players
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-800">
+                <span className="text-lg">↕</span>
+              </div>
+            </div>
+
+            <div className="text-center space-y-1 w-full">
+              <p className="text-white font-bold text-xs uppercase">Monthly Cost</p>
+              <div className="bg-[#cbd5e1] py-2 px-6 inline-block rounded-sm shadow-inner min-w-[100px]">
+                <span className="text-2xl font-black text-gray-800">£{monthlyCost}</span>
+              </div>
             </div>
 
             <Button
-              className="bg-green-500 hover:bg-green-600 cursor-pointer px-8 rounded-sm"
+              className="bg-[#2fb000] hover:bg-green-600 text-black font-black text-lg py-4 px-8 rounded-sm shadow-lg border-b-2 border-black/30 active:border-b-0 transition-all uppercase leading-none"
               onClick={() => handleOpenPayment("monthly")}
             >
               Pay Now
             </Button>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Yearly Plan */}
-        <motion.div className="bg-gradient-to-b from-green-500 to-green-100 p-6 rounded-lg shadow-lg border text-center space-y-2">
-          <h2 className="text-xl font-bold text-yellow-100">
-            Yearly Subscription
-          </h2>
-          <p className="text-lg font-semibold text-black">
-            Ideal for long term ladders
-          </p>
+        {/* Year Licences (Green Card) */}
+        <div className="bg-gradient-to-b from-[#119f33] to-[#84c533] p-3 rounded-none shadow-2xl border-[1px] border-black">
+          <div className="text-center pb-2">
+            <h2 className="text-3xl font-black text-white italic leading-tight">Year Licences</h2>
+            <p className="text-[10px] font-bold text-white italic opacity-100">Unlimited Access to All Solutions</p>
+          </div>
 
-          <div className="bg-gradient-to-b from-blue-200 to-yellow-100 border border-black border-dashed shadow-lg rounded-md space-y-2 px-8 py-8">
-            <p className="font-semibold">£12 per player per year</p>
-            <p className="italic text-sm">(25% discount on monthly charge)</p>
-            <select
-              value={yearlyPlayers}
-              onChange={(e) => setYearlyPlayers(Number(e.target.value))}
-              className="border border-gray-400 rounded p-2 w-full"
-            >
-              {[20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250].map((size) => (
-                <option key={size} value={size}>
-                  {size} Players
-                </option>
-              ))}
-            </select>
-            <p className="font-bold">
-              Total Cost <br /> £{yearlyCost.toFixed(2)} / year
-            </p>
+          {/* Inner Content Card (Nested Div) */}
+          <div className="bg-gradient-to-b from-[#0aa132] to-[#88f406] border border-black/40 p-4 flex flex-col items-center gap-4">
+            <div className="w-full text-center space-y-1">
+              <p className="text-white font-black text-sm uppercase">Select Your Tier</p>
+              <div className="w-full bg-[#cbd5e1] rounded-sm relative shadow-inner">
+                <select
+                  value={selectedTier.id}
+                  onChange={(e) => setSelectedTier(YEARLY_TIERS.find(t => t.id === Number(e.target.value)))}
+                  className="w-full bg-[#cbd5e1] px-4 py-2 text-md font-black text-gray-800 appearance-none cursor-pointer focus:outline-none"
+                >
+                  {YEARLY_TIERS.map((tier) => (
+                    <option key={tier.id} value={tier.id}>
+                      {tier.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-800">
+                  <span className="text-lg">↕</span>
+                </div>
+              </div>
+            </div>
 
-            {/* Yearly Coupon Input */}
-            <div className="flex flex-col md:flex-col sm:flex-row gap-2">
+            <div className="text-center space-y-1 w-full">
+              <p className="text-white font-bold text-[10px] italic">Yearly Cost including the App</p>
+              <div className="bg-[#cbd5e1] py-1 px-8 inline-block rounded-sm shadow-inner min-w-[120px]">
+                <span className="text-xl font-black text-gray-800">£{yearlyCost}</span>
+              </div>
+            </div>
+
+            {/* Coupon Inside Content */}
+            <div className="flex gap-1 w-full items-center">
               <input
                 type="text"
                 value={yearlyCoupon}
@@ -431,27 +406,28 @@ export default function SubscriptionPlan({ ladderId }) {
                   setYearlyCouponValid(false);
                 }}
                 placeholder="Coupon Code"
-                className="flex-1 border-2 border-amber-50 rounded-sm px-2 text-base"
+                className="flex-1 bg-[#cbd5e1] border-none p-2 rounded-sm text-xs font-bold text-gray-800 placeholder:text-gray-500"
               />
               <Button
                 type="button"
                 onClick={handleCheckYearlyCoupon}
                 disabled={!yearlyCoupon || checkingYearlyCoupon}
-                className="px-6 py-2 rounded-sm bg-amber-500 hover:bg-amber-600 cursor-pointer w-full sm:w-auto"
+                className="bg-[#2fb000] hover:bg-[#258d00] text-white font-bold py-2 px-3 text-xs rounded-sm"
               >
-                {checkingYearlyCoupon ? "Checking..." : "Apply"}
+                {checkingYearlyCoupon ? "..." : "Apply"}
               </Button>
             </div>
 
             <Button
-              className="bg-green-500 px-8 rounded-sm hover:bg-green-600 cursor-pointer"
+              className="bg-[#2fb000] hover:bg-[#258d00] text-black font-black text-lg py-4 px-8 rounded-sm shadow-xl border-b-2 border-black/30 active:border-b-0 transition-all uppercase leading-none"
               onClick={() => handleOpenPayment("yearly")}
             >
               Pay Now
             </Button>
           </div>
-        </motion.div>
-      </motion.section>
+        </div>
+
+      </section>
       {/* ✅ Stripe Dialog */}
       <Dialog open={openPaymentDialog} onOpenChange={setOpenPaymentDialog}>
         <DialogContent className="max-w-md">
@@ -459,172 +435,98 @@ export default function SubscriptionPlan({ ladderId }) {
             <DialogTitle>Complete Your Payment</DialogTitle>
           </DialogHeader>
 
-          {selectedPlan === "monthly" && monthlyClientSecret && (
-            <Elements
-              stripe={stripePromise}
-              options={{ clientSecret: monthlyClientSecret }}
-            >
-              <CheckoutForm
-                amount={Math.round(monthlyCost * 100)}
-                noOfUsers={monthlyPlayers}
-                subscriptionType="monthly"
-                response={monthlyCouponResponse} // ✅ pass here
-                ladderId={ladderId}
-                onClose={() => setOpenPaymentDialog(false)}
-              />
-            </Elements>
-          )}
+  {selectedPlan === "monthly" && monthlyClientSecret && (
+    <Elements
+      stripe={stripePromise}
+      options={{ clientSecret: monthlyClientSecret }}
+    >
+      <CheckoutForm
+        amount={Math.round(monthlyCost * 100)}
+        noOfUsers={monthlyPlayers}
+        subscriptionType="monthly"
+        response={monthlyCouponResponse}
+        ladderId={ladderId}
+        onClose={() => setOpenPaymentDialog(false)}
+      />
+    </Elements>
+  )}
 
-          {selectedPlan === "yearly" && yearlyClientSecret && (
-            <Elements
-              stripe={stripePromise}
-              options={{ clientSecret: yearlyClientSecret }}
-            >
-              <CheckoutForm
-                amount={Math.round(yearlyCost * 100)}
-                noOfUsers={yearlyPlayers}
-                subscriptionType="yearly"
-                response={yearlyCouponResponse}
-                ladderId={ladderId}
-                onClose={() => setOpenPaymentDialog(false)}
-              />
-            </Elements>
-          )}
-        </DialogContent>
-      </Dialog>
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="bg-yellow-100/90  py-8 px-6 sm:px-12 mt-4"
-        style={{
-          backgroundImage: "url('/bgHome.png')",
-          backgroundRepeat: "repeat",
-          backgroundSize: "200px",
-        }}
-      >
+  {selectedPlan === "yearly" && yearlyClientSecret && (
+    <Elements
+      stripe={stripePromise}
+      options={{ clientSecret: yearlyClientSecret }}
+    >
+      <CheckoutForm
+        amount={Math.round(yearlyCost * 100)}
+        noOfUsers={selectedTier.maxUsers}
+        subscriptionType="yearly"
+        response={yearlyCouponResponse}
+        ladderId={ladderId}
+        onClose={() => setOpenPaymentDialog(false)}
+      />
+    </Elements>
+  )}
+</DialogContent>
+</Dialog>
+      {/* ✅ Footer Section */}
+      <section className="bg-yellow-100/100 border border-black pt-10 pb-4 px-6 sm:px-12 mt-12 space-y-8 rounded-sm">
+          
+        <div className="text-center space-y-6">
+          <h2 className="text-md sm:text-lg font-black text-gray-800">
+            You will get a confirmation email immediately after payment. Thank You.
+          </h2>
 
-                
-          <div className="text-center pb-8">
-            <h1 className="text-xl font-semibold">You will get a confirmation email immediately after payment. Thank You.</h1>
-          </div>
+          <div className="space-y-4">
+            <h3 className="font-black text-3xl underline text-blue-600 tracking-tight">
+              <Link href="/pricing.pdf" target="_blank" rel="noopener noreferrer">
+                Our Guide to Pricing
+              </Link>
+            </h3>
+            
+            <h3 className="font-black text-3xl underline text-blue-600 tracking-tight pt-4">
+              Follow us on:
+            </h3>
 
-        <div className="text-center">
-          <h1 className="font-semibold text-2xl underline text-blue-600">
-            <a
-              href="/pricing.pdf" // apni PDF ka path yahaan dalna
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative text-blue-600 transition-all duration-300 
-     after:content-[''] after:absolute after:left-0 after:bottom-0 
-     after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-blue-500 after:to-purple-500  
-     hover:after:w-full after:transition-all after:duration-500"
-            >
-              Our Guide to Pricing
-            </a>
-          </h1>
-          <br />
-          <h1 className="font-semibold text-2xl underline text-blue-600">
-            Follow us on:
-          </h1>
-          <br />
-          <div className="flex items-center justify-center gap-8">
-            <Link
-              href="https://www.facebook.com/profile.php?id=61580051563946 "
-              target="_blank"
-              className="flex items-end justify-center"
-            >
-              <Image src={Facebook} height={50} width={50} alt="facebook1" />
-              <span className="font-semibold text-2xl text-blue-600">1</span>
-            </Link>
-            <Link
-              href=" https://www.facebook.com/profile.php?id=61561085668817"
-              target="_blank"
-              className="flex items-end justify-center"
-            >
-              <Image src={Facebook} height={50} width={50} alt="facebook2" />
-              <span className="font-semibold text-2xl text-blue-600">2</span>
-            </Link>
-
-             <Link
-              href="https://www.youtube.com/@sspro-squash"
-              target="_blank"
-              className="flex items-end justify-center"
-            >
-              <Image src={Youtube} height={50} width={50} alt="facebook2" />
-            </Link>
+            <div className="flex items-center justify-center gap-12 pt-2">
+              <Link href="https://www.facebook.com/profile.php?id=61580051563946" target="_blank" className="relative">
+                <Image src={Facebook} height={70} width={70} alt="facebook1" />
+                <span className="absolute -right-4 bottom-0 font-black text-3xl text-blue-600">1</span>
+              </Link>
+              <Link href="https://www.facebook.com/profile.php?id=61561085668817" target="_blank" className="relative">
+                <Image src={Facebook} height={70} width={70} alt="facebook2" />
+                <span className="absolute -right-4 bottom-0 font-black text-3xl text-blue-600">2</span>
+              </Link>
+              <Link href="https://www.youtube.com/@sspro-squash" target="_blank">
+                <Image src={Youtube} height={70} width={70} alt="youtube" />
+              </Link>
+            </div>
           </div>
         </div>
-      </motion.section>{" "}
-      <div className="w-full text-center space-y-4">
-        <div className="bg-white p-6 border border-black w-full shadow rounded-md">
-          <div className=" w-full gap-4">
-            {/* Address */}
-            <h1 className="font-semibold">
-              Sports Solutions Pro – a subsidiary of NE Games Ltd
-            </h1>
-            <h1>
-              NE Games Ltd (Company No. 12345678) Registered in England & Wales
-            </h1>
-            <h1>
-              Registered Office: Richmond House, Lawnswood Business Park,
-              Redvers Close, Leeds LS16 6QY{" "}
-            </h1>
-            <h1>
-              An ISO 9001 : 2015 Certified. Designed and Developed by Shriv
-              ComMedia Solutions Pvt. Ltd. - Software Development Company in
-              India. All Rights Reserved -{" "}
-              <Link
-                href="https://www.commediait.com/"
-                target="_blank"
-                className="relative text-blue-600 transition-all duration-300
-               after:content-[''] after:absolute after:left-0 after:bottom-0
-               after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-blue-500 after:to-purple-500
-               hover:after:w-full after:transition-all after:duration-500 "
-              >
+
+        {/* Company Info Box */}
+        <div className="max-w-4xl mx-auto bg-white border-2 border-black p-6 sm:p-10 shadow-lg">
+          <div className="text-center space-y-1 font-bold text-gray-800 text-xs sm:text-sm">
+            <p className="font-black text-base pb-1">Sports Solutions Pro – a subsidiary of NE Games Ltd</p>
+            <p>NE Games Ltd (Company No. 12345678) Registered in England & Wales</p>
+            <p>Registered Office: Richmond House, Lawnswood Business Park, Redvers Close, Leeds LS16 6QY</p>
+            <p className="pt-2">An ISO 9001 : 2015 Certified. Designed and Developed by Shriv ComMedia Solutions Pvt. Ltd.</p>
+            <div className="flex items-center justify-center gap-1 mt-1">
+              <span>Software Development Company in India. All Rights Reserved -</span>
+              <Link href="https://www.commediait.com/" target="_blank" className="text-blue-600 underline">
                 www.commediait.com
               </Link>
-            </h1>
+            </div>
           </div>
         </div>
-        {/* Policy Links */}
-        <p className="text-xs sm:text-sm md:text-md text-center text-gray-600 py-4 flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
-          <Link
-            href="https://ne-games.com/privacy_policy"
-            target="_blank"
-            className="relative text-blue-600 transition-all duration-300
-               after:content-[''] after:absolute after:left-0 after:bottom-0
-               after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-blue-500 after:to-purple-500
-               hover:after:w-full after:transition-all after:duration-500"
-          >
-            Data and Privacy Policy
-          </Link>
-          <span className="hidden sm:block">|</span>
-          <a
-            href="/refundPolicy.pdf" // apni PDF ka path yahaan dalna
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative text-blue-600 transition-all duration-300
-     after:content-[''] after:absolute after:left-0 after:bottom-0
-     after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-blue-500 after:to-purple-500
-     hover:after:w-full after:transition-all after:duration-500"
-          >
-            Refund Policy
-          </a>
 
-          <span className="hidden sm:block">|</span>
-          <Link
-            href="https://ne-games.com/terms_and_conditions"
-            target="_blank"
-            className="relative text-blue-600 transition-all duration-300
-               after:content-[''] after:absolute after:left-0 after:bottom-0
-               after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-blue-500 after:to-purple-500
-               hover:after:w-full after:transition-all after:duration-500"
-          >
-            Terms and Conditions
-          </Link>
-        </p>
-      </div>
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-6 text-xs sm:text-sm font-bold text-blue-600 pt-4 pb-4">
+          <Link href="https://ne-games.com/privacy_policy" target="_blank" className="underline">Data and Privacy Policy</Link>
+          <span className="hidden sm:block text-black">|</span>
+          <Link href="/refundPolicy.pdf" target="_blank" className="underline">Refund Policy</Link>
+          <span className="hidden sm:block text-black">|</span>
+          <Link href="https://ne-games.com/terms_and_conditions" target="_blank" className="underline">Terms and Conditions</Link>
+        </div>
+      </section>
       {/* Monthly Coupon Dialog */}
       <Dialog open={monthlyDialogOpen} onOpenChange={setMonthlyDialogOpen}>
         <DialogContent>
