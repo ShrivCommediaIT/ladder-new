@@ -105,4 +105,7 @@ export const API_ENDPOINTS = {
   APP_USER_GENERATE_CODES:  "/app/user/generateAccessCodes",
   APP_USER_GET_CODES:       "/app/user/getAccessCodes",
   APP_USER_COUPON_LIST:     "/app/user/couponList",
+
+  // ── Other ─────────────────────────────────────
+  INVERTER:               "/user/inverter",
 };

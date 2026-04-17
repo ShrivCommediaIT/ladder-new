@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
+import { getRequest } from '@/services/apiService';
+import { API_ENDPOINTS } from '@/constants/api';
 
 // Actions from different slices
 import { fetchNegativeLeaderboard } from '@/redux/slices/negativeLeaderBoardSlice';
@@ -45,51 +47,70 @@ export const InvertRanckings = () => {
     const searchParams = useSearchParams();
     const [order, setOrder] = useState("asc");
 
-    const handleInvertRanckings = () => {
+    const handleInvertRanckings = async () => {
         const newOrder = order === "asc" ? "desc" : "asc";
-        setOrder(newOrder);
+        const ladderId = searchParams.get('ladder_id');
 
-        // 1. Sync global Redux invert state
-        dispatch(toggleInvertRanking());
+        if (!ladderId) {
+            console.error("No ladder_id found in URL params");
+            return;
+        }
 
-        // 2. Prepare parameters 
-        const params = Object.fromEntries(searchParams.entries());
-        params.orderBy = newOrder;
+        try {
+            // 1. Call the server-side inverter API to persist the state
+            await getRequest(API_ENDPOINTS.INVERTER, {
+                ladder_id: ladderId,
+                order_by: 'desc' 
+            });
 
-        // Get and Normalize type from URL
-        const rawType = (params.ladder_type || params.type || "");
-        const canonicalType = normalizeType(rawType);
-        
-        // Update params with the canonical type for the API call
-        params.type = canonicalType;
+            // 2. Sync global UI order state
+            setOrder(newOrder);
 
-        console.log("Inverting Ranking (Normalized):", { original: rawType, canonical: canonicalType, orderBy: newOrder });
+            // 3. Sync global Redux invert state
+            dispatch(toggleInvertRanking());
 
-        // 3. Dispatch to the specific slice that the page component is actually listening to
-        switch (canonicalType) {
-            case "negative":
-                dispatch(fetchNegativeLeaderboard(params));
-                break;
-            case "positive":
-                dispatch(fetchPositiveLeaderboard(params));
-                break;
-            case "minileague":
-                dispatch(fetchMiniLeague(params));
-                break;
-            case "roster":
-                dispatch(fetchRosterLeaderboard(params));
-                break;
-            case "winlose":
-            case "best3":
-            case "best5":
-                // These pages (Best5Players) listen to state.player/leaderboardSlice 
-                dispatch(fetchLeaderboard(params));
-                break;
-            case "skill":
-            default:
-                // BasicLeaderboard listens to state.skillLeaderboard/BasicLeaderboardSlice
-                dispatch(fetchSkillLeaderboard(params));
-                break;
+            // 4. Prepare parameters for refreshing the data
+            const params = Object.fromEntries(searchParams.entries());
+            
+            // ✅ REMOVE orderBy from the fetch API call as requested
+            delete params.orderBy;
+            delete params.order_by;
+
+            // Get and Normalize type from URL
+            const rawType = (params.ladder_type || params.type || "");
+            const canonicalType = normalizeType(rawType);
+            
+            // Update params with the canonical type for the API call
+            params.type = canonicalType;
+
+            console.log("Inverting Ranking (Normalized):", { original: rawType, canonical: canonicalType, orderBy: newOrder });
+
+            // 5. Dispatch to the specific slice that the page component is actually listening to
+            switch (canonicalType) {
+                case "negative":
+                    dispatch(fetchNegativeLeaderboard(params));
+                    break;
+                case "positive":
+                    dispatch(fetchPositiveLeaderboard(params));
+                    break;
+                case "minileague":
+                    dispatch(fetchMiniLeague(params));
+                    break;
+                case "roster":
+                    dispatch(fetchRosterLeaderboard(params));
+                    break;
+                case "winlose":
+                case "best3":
+                case "best5":
+                    dispatch(fetchLeaderboard(params));
+                    break;
+                case "skill":
+                default:
+                    dispatch(fetchSkillLeaderboard(params));
+                    break;
+            }
+        } catch (error) {
+            console.error("Failed to invert ranking on server:", error);
         }
     };
     

@@ -13,7 +13,7 @@ const HELP_DESK_ENDPOINT = "/user/helpDesk";
 const KNOWLEDGE_BASE = [
   {
     keywords: ["what", "project", "ladder", "about", "this app"],
-    answer: "Ladder OS is a performance management platform. It allows clubs to track player rankings across different competition formats like Win/Lose, Skills, and Multi-league structures.",
+    answer: "SSP OS is a performance management platform. It allows clubs to track player rankings across different competition formats like Win/Lose, Skills, and Multi-league structures.",
   },
   {
     keywords: ["leaderboard", "ranking", "rank", "points", "standing"],
@@ -62,7 +62,7 @@ export default function SupportChatBot() {
     {
       id: 1,
       sender: "bot",
-      text: "👋 Hello! I'm the Ladder OS Assistant. Ask me anything about the project or type 'help' for support.",
+      text: "👋 Hello! I'm the SSP OS Assistant. Ask me anything about the project or type 'help' for support.",
       timestamp: new Date(),
     }
   ]);
@@ -169,7 +169,7 @@ export default function SupportChatBot() {
         });
         
         addMessage("All set! I've dispatched your message to our support team. They'll reach out to " + finalData.email + " soon.", "bot");
-        addMessage("Is there something else about the Ladder OS I can help you with?", "bot");
+        addMessage("Is there something else about the SSP OS I can help you with?", "bot");
         setStep("idle");
       } catch (err) {
         addMessage("I encountered an error while sending. Please try again in a moment.", "bot");
@@ -201,7 +201,7 @@ export default function SupportChatBot() {
         {
           id: 1,
           sender: "bot",
-          text: "👋 Hi! I'm the Ladder OS Assistant. How can I help you today?",
+          text: "👋 Hi! I'm the SSP OS Assistant. How can I help you today?",
           timestamp: new Date(),
         }
       ]);
@@ -235,7 +235,7 @@ export default function SupportChatBot() {
                     <Image src={Logo} alt="Support" width={36} height={36} className="object-contain" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white uppercase tracking-wider">Ladder OS AI</h3>
+                  <h3 className="text-base font-bold text-white uppercase tracking-wider">SSP OS AI</h3>
                   <div className="flex items-center gap-1.5 font-bold">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                     <p className="text-[10px] text-emerald-500/80 uppercase">Active Assistant</p>

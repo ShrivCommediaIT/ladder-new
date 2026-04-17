@@ -104,7 +104,7 @@ const MinileagueSearch = ({
           </button>
         )}
       </div>
-      {(ladderType == null && isSubAdminDetails == null) ? <InvertRanckings /> : null}
+      {/* {(ladderType == null && isSubAdminDetails == null) ? <InvertRanckings /> : null} */}
     </div>
   );
 };

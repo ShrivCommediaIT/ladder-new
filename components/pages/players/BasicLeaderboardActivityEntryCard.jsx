@@ -106,8 +106,8 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
       
-      if (bestScore) {
-        params.append("best_result", bestScore);
+      if (bestScore !== undefined && bestScore !== null) {
+        params.append("best_result", String(bestScore));
       }
       const skillsPost = await postUrlEncoded(API_ENDPOINTS.POST_RESULT_SKILLBOARD, params);
       if (skillsPost.status === 200) {
@@ -152,17 +152,23 @@ export default function BasicLeaderboardActivityEntryCard({
     }
 
     const finalScore = skillSign === "-" ? -num : num;
-    return await submitScore(finalScore, topScore);
+
+    // ✅ If topScore is 0, send the current value as the best result
+    const bestResultToSubmit = (topScore === 0 || topScore === "0") ? finalScore : topScore;
+
+    return await submitScore(finalScore, bestResultToSubmit);
   };
 
   const handleZeroConfirm = (type) => {
     setOpenZeroAlert(false);
 
     if (type === "ok") {
-      submitScore(0, topScore);
+      const bestResultToSubmit = (topScore === 0 || topScore === "0") ? 0 : topScore;
+      submitScore(0, bestResultToSubmit);
     } else if (type === "reset") {
       setValue("-")
-      submitScore("-", topScore);
+      const bestResultToSubmit = (topScore === 0 || topScore === "0") ? "-" : topScore;
+      submitScore("-", bestResultToSubmit);
     }
   };
 
@@ -249,7 +255,7 @@ export default function BasicLeaderboardActivityEntryCard({
               </label>
               <input
                 className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none"
-                value={topScore && topScore}
+                value={(topScore === 0 || topScore === "0") ? value : topScore}
                 onChange={(e) => setTopScore(e.target.value)}
               />
             </div>
@@ -382,7 +388,7 @@ export default function BasicLeaderboardActivityEntryCard({
               <div className="flex items-center gap-2">
                 <span>Your Best Result</span>
                 <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
-                  {topScore || 0}
+                   {(topScore === 0 || topScore === "0") ? value : topScore}
                 </span>
               </div>
             </div>
