@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
-import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
+import { fetchSkillLeaderboard, setAppliedAge } from "@/redux/slices/BasicLeaderboardSlice";
 import PlayerSearchInput from "../players/PlayerSearchInput";
 import BasicLeaderboardShort from "../admin/BasicLeaderboardShort";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
@@ -27,15 +27,14 @@ import AgeFilter from "@/components/shared/AgeFilter";
 const getScoreBySkillNumber = (scores, skills, skillNumber) => {
   const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
   const skillObj = skills?.find((s) => s.skill_number === skillNumber);
-
+  
+  const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
   const score = scoreObj ? Number(scoreObj.score) : 0;
-
   const inputScore =
     scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
       ? Number(scoreObj.input_score)
       : null;
 
-  // display priority = input_score first
   const displayScore =
     inputScore !== null && !isNaN(inputScore) ? inputScore : score;
 
@@ -64,10 +63,12 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
   }
 
   return {
+    witnessBy,
     score,
     displayScore,
     target,
     isTargetAchieved,
+    input_score: inputScore,
   };
 };
 
@@ -78,16 +79,24 @@ const getRankBySkillNumber = (ranks, skillNumber) => {
 };
 
 /* ---------------- PLAYER CARD ---------------- */
-const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
+const PlayerCard = ({
+  player,
+  overallRank,
+  appliedAge,
+  ageRank,
+  onSkillClick,
+  isEditable,
+}) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
   return (
-    <Card onClick={() => { onSkillClick(player.id, player.skills[0].skill_number) }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
+    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10">
+        {/* Header */}
+        <div className="flex items-center gap-2 sm:gap-3 mb-2">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
             <Image
               src={playerImageUrl}
               alt={player?.name}
@@ -97,21 +106,38 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
               unoptimized
             />
           </div>
-          <div className="flex-1 min-w-0 space-y-1">
+          <div className="flex-1 flex flex-col sm:flex-row sm:items-center min-w-0 gap-x-2">
             <p className="text-white font-semibold truncate">{player.name}</p>
-            {isEditable && <p className="text-xs text-emerald-400">{ }</p>}
+            {player.age && (
+              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+                {player.age}
+              </p>
+            )}
           </div>
-          <div className="flex flex-col items-center mr-1">
-            <span className="bg-yellow-200 text-black px-4 py-1 rounded-sm font-semibold border">
-              {Math.abs(player.total_point || 0)}
-            </span>
-            <p className="text-[10px] text-white mt-1">Total Pts</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-9 h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black">
-              {overallRank}
+          <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
+            <div className="flex flex-col items-center">
+              <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm shadow-sm leading-none h-7 sm:h-auto flex items-center">
+                {Math.abs(player.total_point || 0)}
+              </span>
+              <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
             </div>
-            <p className="text-[10px] text-white mt-1">Overall Rank</p>
+            
+            <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
+              {Boolean(appliedAge) && (
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                    {ageRank}
+                  </div>
+                  <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-1 whitespace-nowrap">Age Rank</p>
+                </div>
+              )}
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                  {overallRank}
+                </div>
+                <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -129,7 +155,7 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
                     }
                     className={`relative min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded transition-all ${isEditable
                         ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
-                        : "cursor-not-allowed bg-white opacity-40"
+                        : "cursor-not-allowed bg-white opacity-40 text-gray-500"
                       }`}
                     title={
                       isEditable
@@ -161,9 +187,9 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
                   <div
                     key={i}
                     className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 ${scoreData.isTargetAchieved
-                        ? "bg-green-400 hover:bg-green-400 text-black shadow-md border-green-300 ring-1 ring-green-400/50"
-                        : "bg-yellow-200 text-black border-[#2a5a58] hover:bg-yellow-300"
-                      }`}
+                        ? "bg-green-400 text-black shadow-md font-semibold"
+                        : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
+                      } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
                     title={`Score: ${scoreData.score || 0} | Target: ${scoreData.target || "N/A"
                       }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
                   >
@@ -238,7 +264,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [openSort, setOpenSort] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const [appliedDob, setAppliedDob] = useState("");
+  const { appliedAge, appliedDob } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showRemove, setShowRemove] = useState(false);
 
@@ -295,32 +321,31 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = 0, dob) => {
+    (skillNo = 0, age = appliedAge) => {
       if (!ladderId || isRefreshing) return;
 
       setIsRefreshing(true);
-      const finalDob = dob !== undefined ? dob : appliedDob;
-
       const payload = {
         ladder_id: ladderId,
         type: "skill",
         sortbyskillnumber: skillNo,
       };
 
-      if (finalDob) {
-        payload.dob = finalDob;
+      if (age > 0) {
+        payload.dob = age;
       }
 
       dispatch(fetchSkillLeaderboard(payload)).finally(() => {
         setIsRefreshing(false);
       });
     },
-    [dispatch, ladderId, isRefreshing, appliedDob],
+    [dispatch, ladderId, isRefreshing, appliedAge],
   );
 
-  const handleAgeSearch = (dob) => {
-    setAppliedDob(dob);
-    refreshLeaderboard(selectedSkillFilter, dob);
+  const handleAgeSearch = (age) => {
+    const ageNum = Number(age);
+    dispatch(setAppliedAge(ageNum));
+    refreshLeaderboard(selectedSkillFilter, ageNum);
     setIsSorted(true);
   };
 
@@ -355,8 +380,8 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const handleClearAll = useCallback(() => {
     setIsSorted(false);
     setSelectedSkillFilter(0);
-    setAppliedDob("");
-    refreshLeaderboard(0, "");
+    dispatch(setAppliedAge(0));
+    refreshLeaderboard(0, 0);
   }, [refreshLeaderboard]);
 
   const handleSkillClick = useCallback(
@@ -420,7 +445,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
 
             {/* Buttons */}
             <div className="flex flex-wrap justify-between w-full sm:flex-nowrap gap-2 mt-3 sm:mt-0">
-              {!isSorted ? (
+              {(!isSorted && appliedAge === 0) ? (
                 <Button
                   onClick={handleSortBySkill}
                   disabled={isRefreshing}
@@ -472,6 +497,8 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
                   key={player.id}
                   player={player}
                   overallRank={player.rank || index + 1}
+                  appliedAge={appliedAge}
+                  ageRank={index + 1}
                   onSkillClick={handleSkillClick}
                   isEditable={isEditablePlayer}
                 />

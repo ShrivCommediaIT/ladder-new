@@ -275,7 +275,7 @@ const filteredPlayers = React.useMemo(() => {
   return (
     <>
       
-      <main className="min-h-screen flex justify-center relative">
+      <main className="min-h-screen flex justify-start md:justify-center relative">
         <div className="w-full max-w-2xl px-2 space-y-4">
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           <LadderLinkPanel ladderId={ladderId} ladderType="positive" />

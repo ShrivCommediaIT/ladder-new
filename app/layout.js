@@ -23,8 +23,8 @@ useEffect(() => {
 }, []);
 
   return (
-    <html lang="en">
-       <body>
+    <html lang="en" suppressHydrationWarning>
+       <body suppressHydrationWarning>
          <Provider store={store}>
            <PersistGate loading={null} persistor={persistor}>
             <AppInit />

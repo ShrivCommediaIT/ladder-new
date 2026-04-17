@@ -28,7 +28,7 @@ import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { clearActivityState } from "@/redux/slices/activitySlice";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
-import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
+import { fetchSkillLeaderboard, setAppliedAge } from "@/redux/slices/BasicLeaderboardSlice";
 import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
 import { paymentPage } from "@/helper/RouteName";
 import {
@@ -89,7 +89,7 @@ const AdminButton = () => {
   const [confirmType, setConfirmType] = useState("");
   const [isSorted, setIsSorted] = useState(false);
   const [currentSkillNo, setCurrentSkillNo] = useState(0);
-  const [appliedDob, setAppliedDob] = useState("");
+  const { appliedAge, appliedDob } = useSelector((state) => state.skillLeaderboard || {});
 
   const refreshLeaderboard = () => {
     if (ladderId) {
@@ -107,7 +107,7 @@ const AdminButton = () => {
     }
   };
 
-  const refreshSkillLeaderboard = (skillNo = 0, customDob) => {
+  const refreshSkillLeaderboard = (skillNo = 0, ageOverride) => {
     if (!ladderId) return;
 
     let laddartype;
@@ -130,10 +130,10 @@ const AdminButton = () => {
       sortbyskillnumber: skillNo,
     };
 
-    const finalDob = customDob !== undefined ? customDob : appliedDob;
+    const finalAge = ageOverride !== undefined ? ageOverride : appliedAge;
 
-    if (finalDob) {
-      payload.dob = finalDob;
+    if (finalAge > 0) {
+      payload.dob = finalAge;
     }
 
     dispatch(fetchSliceLeaderboard(payload));
@@ -218,13 +218,14 @@ const AdminButton = () => {
   const handleClearAll = () => {
     setIsSorted(false);
     setCurrentSkillNo(0);
-    setAppliedDob("");
-    refreshSkillLeaderboard(0, "");
+    dispatch(setAppliedAge(0));
+    refreshSkillLeaderboard(0, 0);
   };
 
-  const handleAgeSearch = (dob) => {
-    setAppliedDob(dob);
-    refreshSkillLeaderboard(currentSkillNo, dob);
+  const handleAgeSearch = (age) => {
+    const ageNum = Number(age);
+    dispatch(setAppliedAge(ageNum));
+    refreshSkillLeaderboard(currentSkillNo, ageNum);
     setIsSorted(true);
   };
 
@@ -324,19 +325,19 @@ const AdminButton = () => {
         {/* SKILL SPECIFIC BUTTONS */}
         {(isSkill || isPositive || isNegative) && (
           <>
-            {!isSorted ? (
+            {(!isSorted && appliedAge === 0) ? (
               <Button
                 onClick={handleSortBySkill}
-                className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
+                className="bg-[#163344] border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
               >
                 <Funnel size={20} /> SORT
               </Button>
             ) : (
               <Button
                 onClick={handleClearAll}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl py-8 w-full shadow-lg flex items-center justify-center gap-2"
+                className="bg-red-600 hover:bg-red-700 border border-white/20 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight transition-all active:scale-95"
               >
-                <Funnel size={20} /> CLEAR ALL
+                <XCircle size={20} /> CLEAR ALL
               </Button>
             )}
           </>

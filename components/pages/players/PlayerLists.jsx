@@ -122,7 +122,7 @@ export const PlayerLists = () => {
       </div>
 
       {/* 🔹 Main Section */}
-      <div className="flex flex-col lg:flex-row gap-6 ">
+      <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-6">
         {/* 🔹 Left/Main Column */}
         <div className="flex-1 flex flex-col gap-4 min-w-0">
           <div className="flex flex-col gap-4 lg:hidden">
@@ -141,7 +141,7 @@ export const PlayerLists = () => {
         </div>
 
         {/* 🔹 Sidebar → visible only on lg+ screens */}
-        <div className="hidden lg:flex lg:w-[600px] flex-col gap-4 flex-shrink-0">
+        <div className="hidden lg:flex lg:w-[560px] flex-col gap-4 flex-shrink-0">
           <AdminEditPhone />
           <AdminButton />
           <LadderRulesCard />
