@@ -357,7 +357,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
           </div>
 
           {/* Player Cards */}
-          <div className="space-y-2 mt-2">
+          <div className="space-y-2 mt-2 w-full">
             {filteredPlayers.length === 0 ? (
               <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
             ) : (
