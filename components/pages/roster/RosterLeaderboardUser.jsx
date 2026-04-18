@@ -165,7 +165,10 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
       {error && <div className="text-red-400">{error}</div>}
 
       {/* Sections */}
-      {!loading &&
+      {!loading && sections.length === 0 ? (
+        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+      ) : (
+        !loading &&
         sections.map((section, idx) => (
           <div key={idx}>
             {/* <div className="bg-gradient-to-r from-[#0f3a4a] to-[#1e60aa] text-white font-bold px-4 py-2 rounded mb-3">

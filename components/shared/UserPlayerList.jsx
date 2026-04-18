@@ -126,6 +126,8 @@ const UserPlayerList = () => {
             <Skeleton key={i} className="h-24 w-full rounded-md" />
           ))}
         </CardContent>
+      ) : uniqueFilteredPlayers.length === 0 ? (
+        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
       ) : (
         <div className="space-y-8">
           {generateGrades(uniqueFilteredPlayers, gradebarDetails).map(

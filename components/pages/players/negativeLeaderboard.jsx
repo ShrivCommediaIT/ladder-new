@@ -16,7 +16,8 @@ import { X, Trophy, ListOrdered } from "lucide-react";
 import PlayerSearchInput from "./PlayerSearchInput";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
 import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
-import { fetchNegativeLeaderboard } from "@/redux/slices/negativeLeaderBoardSlice";
+import { fetchNegativeLeaderboard, setAppliedAge } from "@/redux/slices/negativeLeaderBoardSlice";
+import AgeFilter from "@/components/shared/AgeFilter";
 
 
 
@@ -24,6 +25,8 @@ import { fetchNegativeLeaderboard } from "@/redux/slices/negativeLeaderBoardSlic
 const PlayerCard = ({
   player,
   overallRank,
+  appliedAge,
+  ageRank,
   onSkillClick,
   onTargetAchieved,
 }) => {
@@ -161,9 +164,20 @@ const PlayerCard = ({
               {player?.phone || "N/A"}
             </div>
           </div>
-          <div className="flex flex-col items-center">
-            <div className="w-9 h-9 rounded-full bg-[#01ffff] border-2 border-white flex items-center justify-center font-bold text-black">
-              {overallRank}
+          <div className="flex shrink-0 items-center justify-end gap-2">
+            {Boolean(appliedAge) && (
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                  {ageRank}
+                </div>
+                <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-0.5 whitespace-nowrap">Age Rank</p>
+              </div>
+            )}
+            <div className="flex flex-col items-center">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                {overallRank}
+              </div>
+              <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-0.5 whitespace-nowrap">Overall Rank</p>
             </div>
           </div>
         </div>
@@ -200,7 +214,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading } = useSelector(
+  const { data = [], loading, appliedAge } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
 
@@ -225,19 +239,29 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, []);
 
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge) => {
       if (ladderId) {
-        dispatch(
-          fetchNegativeLeaderboard({
-            ladder_id: ladderId,
-            type: "negative",
-            sortbyskillnumber: skillNo,
-          }),
-        );
+        const payload = {
+          ladder_id: ladderId,
+          type: "negative",
+          sortbyskillnumber: skillNo,
+        };
+
+        if (age > 0) {
+          payload.dob = age;
+        }
+
+        dispatch(fetchNegativeLeaderboard(payload));
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge],
   );
+
+  const handleAgeSearch = (age) => {
+    const ageNum = Number(age);
+    dispatch(setAppliedAge(ageNum));
+    refreshLeaderboard(selectedPositiveFilter, ageNum);
+  };
 
   useEffect(() => {
     if (onPlayerAdded) {
@@ -247,9 +271,9 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
   useEffect(() => {
     if (ladderId) {
-      dispatch(fetchNegativeLeaderboard({ ladder_id: ladderId, type: "negative" }));
+      refreshLeaderboard();
     }
-  }, [dispatch, ladderId]);
+  }, [ladderId, refreshLeaderboard]);
 
 
   const handleSkillClick = useCallback(
@@ -304,27 +328,37 @@ const filteredPlayers = React.useMemo(() => {
 }, [data, searchQuery]);
 
 
-  const playerData = useSelector((state) => state.negativeLeaderBoard.data);
+  const playerData = data; // use data from selector
   return (
     <>
-      
       <main className="min-h-screen flex justify-start md:justify-center relative">
         <div className="w-full max-w-2xl px-2 space-y-4">
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+          
+          <div className="h-10 w-full">
+            <AgeFilter onSearch={handleAgeSearch} user={false} />
+          </div>
+
           <LadderLinkPanel ladderId={ladderId} ladderType="negative" />
           {loading && (
             <p className="text-white text-center hidden">Loading...</p>
           )}
           <div className="space-y-2 mt-2">
-            {playerData.map((player, index) => (
-              <PlayerCard
-                key={player.id}
-                player={player}
-                overallRank={player.rank || index + 1}
-                onSkillClick={handleSkillClick}
-                onTargetAchieved={handleTargetAchieved}
-              />
-            ))}
+            {playerData.length === 0 ? (
+              <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+            ) : (
+              playerData.map((player, index) => (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  overallRank={player.rank || index + 1}
+                  appliedAge={appliedAge}
+                  ageRank={index + 1}
+                  onSkillClick={handleSkillClick}
+                  onTargetAchieved={handleTargetAchieved}
+                />
+              ))
+            )}
           </div>
         </div>
       </main>

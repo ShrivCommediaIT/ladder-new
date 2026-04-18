@@ -48,9 +48,14 @@ const negativeLeaderboardSlice = createSlice({
     data: [],
     gradebars: [],
     ladderDetails: null,
+    appliedAge: 0,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    setAppliedAge: (state, action) => {
+      state.appliedAge = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchNegativeLeaderboard.pending, (state) => { state.loading = true; })
@@ -73,4 +78,5 @@ const negativeLeaderboardSlice = createSlice({
   },
 });
 
+export const { setAppliedAge } = negativeLeaderboardSlice.actions;
 export default negativeLeaderboardSlice.reducer;

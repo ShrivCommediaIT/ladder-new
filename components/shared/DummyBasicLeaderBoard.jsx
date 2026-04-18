@@ -257,7 +257,9 @@ const DummyBasicLeaderboard = ({ ladderId: propLadderId }) => {
           </div>
 
           <div className="space-y-2 mt-2">
-            {filteredPlayers.map((player, index) => {
+            {filteredPlayers.length === 0 ? (
+              <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+            ) : filteredPlayers.map((player, index) => {
               const isEditablePlayer = player.id == 1; // Dummy editable player
               return (
                 <PlayerCard

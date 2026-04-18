@@ -255,7 +255,10 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
       {error && <div className="text-red-400">{error}</div>}
 
       {/* Sections */}
-      {!loading &&
+      {!loading && sections.length === 0 ? (
+        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+      ) : (
+        !loading &&
         sections.map((section, idx) => (
           <div key={idx}>
             {section.players.map((player, i) => (
@@ -267,7 +270,7 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
               />
             ))}
           </div>
-        ))}
+        )))}
         <RedeemModal
           open={redeemOpen}
           onClose={() => setRedeemOpen(false)}

@@ -142,7 +142,7 @@ export default function DummyPlayerList({ ladderId }) {
       </div>
 
       {grades.length === 0 ? (
-        <p className="text-center text-gray-500">No players found</p>
+        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
       ) : (
         <div className="space-y-8 sm:px-4 md:px-4 ">
           {grades.map((grade, index) => (
