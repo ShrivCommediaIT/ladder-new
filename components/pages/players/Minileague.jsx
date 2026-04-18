@@ -58,8 +58,13 @@ const PlayerCard = ({
             {rank}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-white font-semibold truncate">
-              {player?.name || "N/A"}
+            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+              {player?.name || "N/A"}   
+              {player.age && (
+              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+                {player.age}
+              </p>
+            )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -169,19 +174,27 @@ const Minileague = () => {
     setRefreshKey((prev) => prev + 1);
 
     try {
+      const urlType = searchParams.get("type") || searchParams.get("ladder_type");
       await Promise.all([
         dispatch(fetchGradebars(ladderId)),
-        dispatch(fetchLeaderboard({ ladder_id: ladderId })),
+        dispatch(fetchLeaderboard({ ladder_id: ladderId, type: urlType })),
       ]);
     } finally {
       setLoadingPlayers(false);
       setTimeout(() => (isRefreshingRef.current = false), 1500);
     }
-  }, [ladderId, dispatch]);
+  }, [ladderId, dispatch, searchParams]);
 
   useEffect(() => {
-    if (ladderId) refreshLeaderboard();
-  }, [ladderId, refreshLeaderboard]);
+    if (!ladderId) return;
+    // ✅ Only fetch on mount if data is NOT already in Redux (avoids double-fetch when parent already loaded it)
+    const hasData = players?.[Number(ladderId)]?.data?.length > 0;
+    if (!hasData) {
+      refreshLeaderboard();
+    } else {
+      setLoadingPlayers(false);
+    }
+  }, [ladderId]); // intentionally only run on ladderId change
 
   const handlePurchase = () => router.push(paymentPage);
 
@@ -243,6 +256,7 @@ const Minileague = () => {
                           setSelectedPlayer({
                             ...playerData,
                             ladder_id: ladderId,
+                            type: searchParams.get("type") || searchParams.get("ladder_type"),
                           })
                         );
                         setIsOpen(true);

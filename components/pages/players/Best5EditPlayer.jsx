@@ -13,6 +13,7 @@ import { clearMoveResult } from "@/redux/slices/playerMovingSlice";
 import { toast } from "react-toastify";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { useSearchParams } from "next/navigation";
 import ChallengeNumberInput from "./ChallengeNumberInput";
 import MoveNumberInput from "./MoveNumberInput";
 import EditPlayerDetails from "./EditPlayerDetails";
@@ -28,6 +29,8 @@ export const Best5EditPlayer = ({
   setLoading = () => {},
 }) => {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const urlType = searchParams.get("type") || searchParams.get("ladder_type");
 
   const playerId = currentId ? Number(currentId) : null;
 
@@ -47,12 +50,8 @@ export const Best5EditPlayer = ({
   // ✅ CORRECT LADDER ID (REAL FIX)
   const ladder_id = selectedPlayer?.ladder_id;
 
-  // ✅ MODAL OPEN PAR LATEST DATA LOAD
-  useEffect(() => {
-    if (open && ladder_id) {
-      dispatch(fetchLeaderboard({ ladder_id }));
-    }
-  }, [dispatch, ladder_id, open]);
+  // ✅ No fetch on modal open — data is already in Redux from parent page.
+  // Post-action refresh is handled below after result/move.
 
   // ✅ 🔥 REAL-TIME UPDATE AFTER MOVE / RESULT
   useEffect(() => {
@@ -60,7 +59,7 @@ export const Best5EditPlayer = ({
       toast.success(result.success_message);
 
       if (ladder_id) {
-        dispatch(fetchLeaderboard({ ladder_id }));
+        dispatch(fetchLeaderboard({ ladder_id, type: urlType || ladderType }));
       }
 
       dispatch(clearMoveResult());

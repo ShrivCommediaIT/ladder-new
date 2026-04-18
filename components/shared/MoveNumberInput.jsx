@@ -44,7 +44,7 @@ const MoveNumberInput = ({
 
   // ladderId from URL
   const ladder_id = Number(searchParams.get("ladder_id"));
-  const ladderTypeFromUrl = searchParams.get("ladder_type");
+  const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
 
   // logged in user id
   const user_id = Number(userId);
@@ -93,14 +93,16 @@ const MoveNumberInput = ({
     return () => clearTimeout(timer);
   }, []);
 
+  // ✅ Live activity poll — refreshes leaderboard + activity every 5s for real-time display
   useEffect(() => {
     if (!ladder_id) return;
+    const effectiveType = ladderTypeFromUrl || ladderType;
     const interval = setInterval(() => {
-      dispatch(fetchLeaderboard({ ladder_id }));
+      dispatch(fetchLeaderboard({ ladder_id, type: effectiveType }));
       dispatch(fetchUserActivity({ ladder_id }));
     }, 5000);
     return () => clearInterval(interval);
-  }, [dispatch, ladder_id]);
+  }, [dispatch, ladder_id, ladderTypeFromUrl, ladderType]);
 
   /* -------------------- HANDLERS -------------------- */
   const handleNumberClick = (num) => {
@@ -212,8 +214,9 @@ const MoveNumberInput = ({
         }
       }
 
+      const effectiveType = ladderTypeFromUrl || ladderType;
       await Promise.all([
-        dispatch(fetchLeaderboard({ ladder_id })),
+        dispatch(fetchLeaderboard({ ladder_id, type: effectiveType })),
         dispatch(fetchUserActivity({ ladder_id })),
       ]);
 

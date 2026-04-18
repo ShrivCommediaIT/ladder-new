@@ -25,11 +25,18 @@ const PlayerCard = ({ player, rank }) => {
           {rank}
         </div>
 
-        <div>
-          <div className="text-white font-semibold">
-            {player?.name || "N/A"}
+        <div className="flex-1 min-w-0">
+          <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+            {player?.name || "N/A"}   
+            {player.age && (
+            <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+              {player.age}
+            </p>
+          )}
           </div>
-          <div className="text-gray-300 text-sm">{player?.phone || "N/A"}</div>
+          <div className="text-gray-300 text-sm truncate">
+            {player?.phone || "N/A"}
+          </div>
         </div>
       </div>
 

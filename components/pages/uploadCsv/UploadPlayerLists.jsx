@@ -7,9 +7,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchLeaderboard, uploadCSV } from "@/redux/slices/leaderboardSlice";
 import { UploadCloud } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
 
   /* ---------------- REDUX STATE ---------------- */
 
@@ -51,9 +54,9 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
 
   useEffect(() => {
     if (effectiveLadderId) {
-      dispatch(fetchLeaderboard({ ladder_id: effectiveLadderId }));
+      dispatch(fetchLeaderboard({ ladder_id: effectiveLadderId, type: ladderTypeFromUrl }));
     }
-  }, [dispatch, effectiveLadderId]);
+  }, [dispatch, effectiveLadderId, ladderTypeFromUrl]);
 
   /* ---------------- UPLOAD ---------------- */
 

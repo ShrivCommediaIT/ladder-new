@@ -69,7 +69,7 @@ export const PlayerLists = () => {
 
       // 2. Then fetch leaderboard
       setLoadingPlayers(true);
-      await dispatch(fetchLeaderboard({ ladder_id: ladderId }));
+      await dispatch(fetchLeaderboard({ ladder_id: ladderId, type: type || ladderType }));
       setLoadingPlayers(false);
 
       // 3. Finally fetch activity

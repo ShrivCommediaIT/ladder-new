@@ -38,6 +38,7 @@ const MoveNumberInput = ({
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladder_id = searchParams.get("ladder_id");
+  const urlType = searchParams.get("type") || searchParams.get("ladder_type");
 
   // States
   const [selectedNumber, setSelectedNumber] = useState("");
@@ -161,8 +162,9 @@ const MoveNumberInput = ({
       }
 
       // Refresh data
+      const effectiveType = urlType || ladderType;
       await Promise.all([
-        dispatch(fetchLeaderboard({ ladder_id })),
+        dispatch(fetchLeaderboard({ ladder_id, type: effectiveType })),
         dispatch(fetchUserActivity({ ladder_id })),
       ]);
 

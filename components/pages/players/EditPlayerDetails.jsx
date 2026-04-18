@@ -113,7 +113,8 @@ const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
         
         // ✅ REAL-TIME REFRESH - BOTH LEADERBOARD & MINILEAGUE
         if (ladder_id) {
-          dispatch(fetchLeaderboard({ ladder_id }));
+          const urlType = searchParams.get("type") || searchParams.get("ladder_type");
+          dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
           dispatch(fetchMiniLeague({ ladder_id, ladderType: "minileague" }));
         }
         

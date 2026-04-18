@@ -28,6 +28,7 @@ const PlayerInfo = () => {
   const ladderId = urlLadderId || user?.ladder_id;
 
   const { players, selectedPlayer } = useSelector((state) => state.player);
+  const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
   const gradebarDetails = useSelector(
     (state) => state.player?.gradebarDetails?.[ladderId] || []
   );
@@ -47,11 +48,11 @@ const PlayerInfo = () => {
   useEffect(() => {
     if (ladderId && !players?.[ladderId]) {
       setLoadingPlayers(true);
-      dispatch(fetchLeaderboard({ ladder_id: ladderId })).finally(() =>
+      dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl })).finally(() =>
         setLoadingPlayers(false)
       );
     }
-  }, [dispatch, ladderId, players]);
+  }, [dispatch, ladderId, players, ladderTypeFromUrl]);
 
   useEffect(() => {
     if (user?.id) {
@@ -169,6 +170,7 @@ const PlayerInfo = () => {
                               setSelectedPlayer({
                                 ...player,
                                 ladder_id: ladderId,
+                                type: ladderTypeFromUrl,
                               })
                             );
                             setIsOpen(true);
@@ -234,7 +236,7 @@ const PlayerInfo = () => {
               dispatch(fetchUserProfile(user?.id));
             }
             if (ladderId) {
-              dispatch(fetchLeaderboard({ ladder_id: ladderId }));
+              dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl }));
             }
           }}
           currentId={selectedPlayer?.id}
