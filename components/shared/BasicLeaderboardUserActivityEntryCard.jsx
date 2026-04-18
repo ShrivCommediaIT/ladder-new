@@ -153,6 +153,12 @@ export default function BasicLeaderboardActivityEntryCard({
       if (d === "." && prev.includes(".")) return prev;
       if (prev === "0" && d !== ".") return d;
 
+      // Allow only 2 decimal places
+      if (prev.includes(".") && d !== "-") {
+        const parts = prev.split(".");
+        if (parts[1].length >= 2) return prev;
+      }
+
       // 🔥 Optional: handle "-" properly (only at start)
       if (d === "-") {
         if (!prev) return "-";
@@ -221,7 +227,7 @@ export default function BasicLeaderboardActivityEntryCard({
   const handleInputChange = (e) => {
     const val = e.target.value;
 
-    if (/^\d*\.?\d*$/.test(val)) {
+    if (/^-?\d*\.?\d{0,2}$/.test(val)) {
       setValue(val);
     }
   };

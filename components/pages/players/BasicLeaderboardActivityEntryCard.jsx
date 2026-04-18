@@ -76,7 +76,15 @@ export default function BasicLeaderboardActivityEntryCard({
 
   /* ---------------- INPUT HANDLERS ---------------- */
   const handleDigit = (d) => {
-    setValue((prev) => (prev === "0" ? d : prev + d));
+    setValue((prev) => {
+      if (prev === "0") return d;
+      // Allow only 2 decimal places
+      if (prev.includes(".")) {
+        const parts = prev.split(".");
+        if (parts[1].length >= 2) return prev;
+      }
+      return prev + d;
+    });
   };
 
   const handleBackspace = () => {
@@ -242,11 +250,16 @@ export default function BasicLeaderboardActivityEntryCard({
               <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
                 Today's Result
               </label>
-              <input
-                className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-              />
+                <input
+                  className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
+                  value={value}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^\d*\.?\d{0,2}$/.test(val) || val === "-") {
+                      setValue(val);
+                    }
+                  }}
+                />
             </div>
             
             <div className="flex-1 sm:flex-none flex flex-col items-center">
