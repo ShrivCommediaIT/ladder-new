@@ -27,20 +27,8 @@ const RedeemModal = ({ open, onClose, player, history, loading }) => {
                                 <span className='text-cyan-400'>Discount</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>5 Tokens</span>
-                                <span>5%</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>10 Tokens</span>
-                                <span>10%</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>15 Tokens</span>
-                                <span>15%</span>
-                            </div>
-                            <div className="flex justify-between">
                                 <span>20 Tokens</span>
-                                <span>20% (maximum)</span>
+                                <span>20%</span>
                             </div>
                         </div>
                     </div>
