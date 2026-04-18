@@ -15,8 +15,9 @@ import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUser
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
-import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
+import { fetchPositiveLeaderboard, setAppliedAge } from "@/redux/slices/positiveLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
+import AgeFilter from "@/components/shared/AgeFilter";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -70,7 +71,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
 
 
 /* ---------------- PLAYER CARD ---------------- */
-const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
+const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, isEditable }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
@@ -104,9 +105,20 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
               {player?.phone || "N/A"}
             </div>
           </div>
-          <div className="flex flex-col items-center">
-            <div className="w-9 h-9 rounded-full bg-[#01ffff] border-2 border-white flex items-center justify-center font-bold text-black">
-              {overallRank}
+          <div className="flex shrink-0 items-center justify-end gap-2">
+            {Boolean(appliedAge) && (
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                  {ageRank}
+                </div>
+                <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-0.5 whitespace-nowrap">Age Rank</p>
+              </div>
+            )}
+            <div className="flex flex-col items-center">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                {overallRank}
+              </div>
+              <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-0.5 whitespace-nowrap">Overall Rank</p>
             </div>
           </div>
         </div>
@@ -138,7 +150,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading } = useSelector(
+  const { data = [], loading, appliedAge } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
 
@@ -181,21 +193,34 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
   // REFRESH KEY TO CONTROL RELOADS (STOPS INFINITE LOOP)
   const refreshKey = useRef(0);
 
-  // REFRESH FUNCTION FIRST
+   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge) => {
       if (ladderId) {
-        dispatch(
-          fetchPositiveLeaderboard({
-            ladder_id: ladderId,
-            type: "positive",
-            sortbyskillnumber: skillNo,
-          }),
-        );
+        const payload = {
+          ladder_id: ladderId,
+          type: "positive",
+          sortbyskillnumber: skillNo,
+        };
+
+        if (age > 0) {
+          payload.dob = age;
+        }
+
+        dispatch(fetchPositiveLeaderboard(payload)).finally(() => {
+          setIsRefreshing(false);
+        });
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge],
   );
+
+  const handleAgeSearch = (age) => {
+    const ageNum = Number(age);
+    dispatch(setAppliedAge(ageNum));
+    refreshLeaderboard(selectedPositiveFilter, ageNum);
+    setIsSorted(true);
+  };
 
   // MANUAL REFRESH HANDLERS (only when explicitly called)
   const handleSelfRemove = useCallback(() => {
@@ -227,8 +252,9 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
   const handleClearAll = useCallback(() => {
     setIsSorted(false);
     setSelectedSkillFilter(0);
-    refreshLeaderboard(0);
-  }, [refreshLeaderboard]);
+    dispatch(setAppliedAge(0));
+    refreshLeaderboard(0, 0);
+  }, [refreshLeaderboard, dispatch]);
 
   const handleSkillClick = useCallback(
     (playerId, skillNumber) => {
@@ -290,6 +316,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
               />
             </div>
 
+            <div className="flex-1 w-full min-w-0">
             {/* Buttons */}
             <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0">
               {!isSorted ? (
@@ -323,24 +350,34 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
                   Click here to leave this solution
                 </Button>
               )}
+               <div className="h-10 w-full">
+                <AgeFilter onSearch={handleAgeSearch} user={true} />
+              </div>
             </div>
           </div>
 
           {/* Player Cards */}
           <div className="space-y-2 mt-2">
-            {filteredPlayers.map((player, index) => {
-              const isEditablePlayer = player.id === currentUserId;
-              return (
-                <PlayerCard
+            {filteredPlayers.length === 0 ? (
+              <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+            ) : (
+              filteredPlayers.map((player, index) => {
+                const isEditablePlayer = player.id === currentUserId;
+                return (
+                  <PlayerCard
                   key={player.id}
                   player={player}
                   overallRank={player.rank || index + 1}
+                  appliedAge={appliedAge}
+                  ageRank={index + 1}
                   onSkillClick={handleSkillClick}
                   isEditable={isEditablePlayer}
                 />
-              );
-            })}
+                );
+              })
+            )}
           </div>
+        </div>
         </div>
       </main>
 

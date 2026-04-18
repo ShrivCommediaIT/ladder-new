@@ -299,6 +299,8 @@ const finalSections = React.useMemo(() => {
         Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-16 w-full" />
         ))
+      ) : finalSections.length === 0 ? (
+        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
       ) : (
         finalSections.map((section, idx) => (
           <div key={idx}>

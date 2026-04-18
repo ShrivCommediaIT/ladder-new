@@ -42,56 +42,60 @@ const LeaderBoard = () => {
 
       {/* 📋 Player Cards */}
       <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {(playersData || []).map((player, index) => {
-          const isActive = selectedPlayer?.id === player.id;
-          const isSelf = user?.id === player.id;
-          const isAdmin = user?.user_type === "admin";
-          const canEdit = isAdmin || isSelf;
+        {!loading && (playersData || []).length === 0 ? (
+          <div className="text-center py-10 text-gray-400 font-bold col-span-full">No players found</div>
+        ) : (
+          (playersData || []).map((player, index) => {
+            const isActive = selectedPlayer?.id === player.id;
+            const isSelf = user?.id === player.id;
+            const isAdmin = user?.user_type === "admin";
+            const canEdit = isAdmin || isSelf;
 
-          return (
-            <Dialog
-              key={player.id || index}
-              onOpenChange={(isOpen) => {
-                if (!isOpen) setSelectedPlayer(null);
-              }}
-            >
-              <DialogTrigger asChild>
-                <div
-                  onClick={() => {
-                    if (canEdit) {
-                      setSelectedPlayer(player);
-                    } else {
-                      toast.warning("You can only edit your own profile.");
-                    }
-                  }}
-                  className={`flex gap-4 rounded-md shadow-md py-3 px-4 items-center justify-start transition
-                    ${isActive ? "bg-yellow-300" : "bg-blue-100 hover:bg-blue-200"}
-                    ${!canEdit ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}
-                  `}
-                >
-                  <span className="font-semibold text-lg">{index + 1}</span>
-                  <Image
-                    src={Logo}
-                    className="rounded-full w-10 h-10"
-                    width={40}
-                    height={40}
-                    alt={`Player ${index + 1}`}
-                  />
-                  <p className="truncate">
-                    {player.name || player.username || "Unknown"}
-                  </p>
-                </div>
-              </DialogTrigger>
+            return (
+              <Dialog
+                key={player.id || index}
+                onOpenChange={(isOpen) => {
+                  if (!isOpen) setSelectedPlayer(null);
+                }}
+              >
+                <DialogTrigger asChild>
+                  <div
+                    onClick={() => {
+                      if (canEdit) {
+                        setSelectedPlayer(player);
+                      } else {
+                        toast.warning("You can only edit your own profile.");
+                      }
+                    }}
+                    className={`flex gap-4 rounded-md shadow-md py-3 px-4 items-center justify-start transition
+                      ${isActive ? "bg-yellow-300" : "bg-blue-100 hover:bg-blue-200"}
+                      ${!canEdit ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}
+                    `}
+                  >
+                    <span className="font-semibold text-lg">{index + 1}</span>
+                    <Image
+                      src={Logo}
+                      className="rounded-full w-10 h-10"
+                      width={40}
+                      height={40}
+                      alt={`Player ${index + 1}`}
+                    />
+                    <p className="truncate">
+                      {player.name || player.username || "Unknown"}
+                    </p>
+                  </div>
+                </DialogTrigger>
 
-              {/* ✏️ Only Show Modal if Editable */}
-              {canEdit && selectedPlayer?.id === player.id && (
-                <DialogContent onInteractOutside={(e) => e.preventDefault()}>
-                  <EditPlayer key={selectedPlayer.id} player={selectedPlayer} />
-                </DialogContent>
-              )}
-            </Dialog>
-          );
-        })}
+                {/* ✏️ Only Show Modal if Editable */}
+                {canEdit && selectedPlayer?.id === player.id && (
+                  <DialogContent onInteractOutside={(e) => e.preventDefault()}>
+                    <EditPlayer key={selectedPlayer.id} player={selectedPlayer} />
+                  </DialogContent>
+                )}
+              </Dialog>
+            );
+          })
+        )}
       </CardContent>
     </div>
   );

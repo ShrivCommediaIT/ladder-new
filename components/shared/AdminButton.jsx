@@ -28,7 +28,9 @@ import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { clearActivityState } from "@/redux/slices/activitySlice";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
-import { fetchSkillLeaderboard, setAppliedAge } from "@/redux/slices/BasicLeaderboardSlice";
+import { fetchSkillLeaderboard, setAppliedAge as setSkillAppliedAge } from "@/redux/slices/BasicLeaderboardSlice";
+import { setAppliedAge as setPositiveAppliedAge } from "@/redux/slices/positiveLeaderBoardSlice";
+import { setAppliedAge as setNegativeAppliedAge } from "@/redux/slices/negativeLeaderBoardSlice";
 import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
 import { paymentPage } from "@/helper/RouteName";
 import {
@@ -89,7 +91,11 @@ const AdminButton = () => {
   const [confirmType, setConfirmType] = useState("");
   const [isSorted, setIsSorted] = useState(false);
   const [currentSkillNo, setCurrentSkillNo] = useState(0);
-  const { appliedAge, appliedDob } = useSelector((state) => state.skillLeaderboard || {});
+  const skillAppliedAge = useSelector((state) => state.skillLeaderboard?.appliedAge || 0);
+  const positiveAppliedAge = useSelector((state) => state.positiveLeaderBoard?.appliedAge || 0);
+  const negativeAppliedAge = useSelector((state) => state.negativeLeaderBoard?.appliedAge || 0);
+
+  const appliedAge = isSkill ? skillAppliedAge : isPositive ? positiveAppliedAge : isNegative ? negativeAppliedAge : 0;
 
   const refreshLeaderboard = () => {
     if (ladderId) {
@@ -138,6 +144,8 @@ const AdminButton = () => {
 
     dispatch(fetchSliceLeaderboard(payload));
   };
+
+  const currentSetAppliedAge = isSkill ? setSkillAppliedAge : isPositive ? setPositiveAppliedAge : isNegative ? setNegativeAppliedAge : null;
 
   useEffect(() => {
     if (ladderId) dispatch(fetchGradebars(ladderId));
@@ -218,13 +226,13 @@ const AdminButton = () => {
   const handleClearAll = () => {
     setIsSorted(false);
     setCurrentSkillNo(0);
-    dispatch(setAppliedAge(0));
+    if (currentSetAppliedAge) dispatch(currentSetAppliedAge(0));
     refreshSkillLeaderboard(0, 0);
   };
 
   const handleAgeSearch = (age) => {
     const ageNum = Number(age);
-    dispatch(setAppliedAge(ageNum));
+    if (currentSetAppliedAge) dispatch(currentSetAppliedAge(ageNum));
     refreshSkillLeaderboard(currentSkillNo, ageNum);
     setIsSorted(true);
   };

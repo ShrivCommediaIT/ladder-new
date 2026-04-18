@@ -48,9 +48,14 @@ const positiveLeaderboardSlice = createSlice({
     data: [],
     gradebars: [],
     ladderDetails: null,
+    appliedAge: 0,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    setAppliedAge: (state, action) => {
+      state.appliedAge = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchPositiveLeaderboard.pending, (state) => { state.loading = true; })
@@ -73,4 +78,5 @@ const positiveLeaderboardSlice = createSlice({
   },
 });
 
+export const { setAppliedAge } = positiveLeaderboardSlice.actions;
 export default positiveLeaderboardSlice.reducer;

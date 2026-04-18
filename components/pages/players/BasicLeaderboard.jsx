@@ -361,17 +361,21 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
             <p className="text-white text-center text-xs opacity-70">Updating list...</p>
           )}
           <div className="space-y-2 mt-2">
-            {processedPlayers.map((player, index) => (
-              <PlayerCard
-                key={player.id}
-                player={player}
-                overallRank={player.rank || index + 1}
-                appliedAge={appliedAge}
-                ageRank={index + 1}
-                onSkillClick={handleSkillClick}
-                onTargetAchieved={handleTargetAchieved}
-              />
-            ))}
+            {processedPlayers.length === 0 ? (
+              <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+            ) : (
+              processedPlayers.map((player, index) => (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  overallRank={player.rank || index + 1}
+                  appliedAge={appliedAge}
+                  ageRank={index + 1}
+                  onSkillClick={handleSkillClick}
+                  onTargetAchieved={handleTargetAchieved}
+                />
+              ))
+            )}
           </div>
         </div>
       </main>

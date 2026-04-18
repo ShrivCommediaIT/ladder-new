@@ -346,6 +346,8 @@ console.log("player.age==>1", players);
             <Skeleton key={i} className="h-16 w-full rounded-md mb-1" />
           ))}
         </div>
+      ) : grades.length === 0 ? (
+        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
       ) : (
         <div>
           {grades.map((section, idx) => (

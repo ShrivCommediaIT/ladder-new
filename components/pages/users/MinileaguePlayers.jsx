@@ -251,7 +251,7 @@ const MinileaguePlayers = ({ ladderId }) => {
           <Skeleton key={i} className="h-16 w-full" />
         ))
       ) : finalSections.length === 0 ? (
-        <p className="text-gray-500 text-center mt-6">No players found</p>
+        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
       ) : (
         finalSections.map((section, idx) => (
           <div key={idx} className="mt-8">

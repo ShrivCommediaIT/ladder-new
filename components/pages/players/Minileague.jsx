@@ -224,6 +224,8 @@ const Minileague = () => {
             <Skeleton key={i} className="h-16 w-full mb-1" />
           ))}
         </>
+      ) : grades.length === 0 ? (
+        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
       ) : (
         <div>
           {grades.map((section, idx) => (
