@@ -40,15 +40,15 @@ const STEPS = [
 
 export default function OnboardingFlow() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const hasSeenOnboarding = localStorage.getItem("hasSeenOnboarding");
-  //   if (!hasSeenOnboarding) {
-  //     setIsVisible(true);
-  //   }
-  // }, []);
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem("hasSeenOnboarding");
+    if (!hasSeenOnboarding) {
+      setIsVisible(true);
+    }
+  }, []);
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
