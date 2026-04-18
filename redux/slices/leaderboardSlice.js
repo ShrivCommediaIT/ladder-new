@@ -38,13 +38,16 @@ export const uploadLadderLogo = createAsyncThunk(
   }
 );
 
+// 🔒 In-flight request deduplication — prevents multiple concurrent calls for the same data
+const pendingRequests = new Set();
+
 // 📋 Fetch Leaderboard
 export const fetchLeaderboard = createAsyncThunk(
   "players/fetchLeaderboard",
   async (payload, { rejectWithValue }) => {
+    const requestKey = `${payload.ladder_id}-${payload.type || "default"}`;
     try {
       const res = await getRequest(API_ENDPOINTS.LEADERBOARD, {
-        type: "bestof5",
         ...payload
       });
       if (!res) throw new Error("Failed to fetch leaderboard");
@@ -59,7 +62,18 @@ export const fetchLeaderboard = createAsyncThunk(
       };
     } catch (error) {
       return rejectWithValue(error.message || "Unknown error");
+    } finally {
+      pendingRequests.delete(requestKey);
     }
+  },
+  {
+    // 🚦 Skip if an identical request is already in-flight
+    condition: (payload) => {
+      const requestKey = `${payload.ladder_id}-${payload.type || "default"}`;
+      if (pendingRequests.has(requestKey)) return false; // abort — already pending
+      pendingRequests.add(requestKey);
+      return true;
+    },
   }
 );
 

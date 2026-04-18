@@ -16,6 +16,7 @@ import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSearchParams } from "next/navigation";
 
 const EditPlayerDetails = ({
   userId,
@@ -24,6 +25,8 @@ const EditPlayerDetails = ({
   onClose = () => {},
 }) => {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
 
 
   const { loading, successMessage, error } = useSelector(
@@ -89,7 +92,7 @@ const EditPlayerDetails = ({
         setShowSkeleton(false);
 
         if (ladderId) {
-          dispatch(fetchLeaderboard({ ladder_id: ladderId }));
+          dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl }));
           dispatch(
             fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" })
           );

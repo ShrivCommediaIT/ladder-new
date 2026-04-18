@@ -28,6 +28,7 @@ const Best5MovePlayerBox = ({ open, onClose = () => {} }) => {
   const searchParams = useSearchParams();
 
   const ladder_id = searchParams.get("ladder_id");
+  const urlType = searchParams.get("type") || searchParams.get("ladder_type");
 
   const [fromRank, setFromRank] = useState("");
   const [toRank, setToRank] = useState("");
@@ -87,7 +88,7 @@ const Best5MovePlayerBox = ({ open, onClose = () => {} }) => {
       if (response.status === 200) {
         toast.success("Player moved successfully");
 
-        dispatch(fetchLeaderboard({ ladder_id }));
+        dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
 
         setFromRank("");
         setToRank("");

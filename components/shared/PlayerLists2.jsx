@@ -28,6 +28,7 @@ const PlayerLists2 = () => {
   const ladderId = urlLadderId || user?.ladder_id;
 
   const { players, selectedPlayer } = useSelector((state) => state.player);
+  const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
   const gradebarDetails = useSelector(
     (state) => state.player?.gradebarDetails?.[ladderId] || []
   );
@@ -47,11 +48,11 @@ const PlayerLists2 = () => {
   useEffect(() => {
     if (ladderId && !players?.[ladderId]) {
       setLoadingPlayers(true);
-      dispatch(fetchLeaderboard({ ladder_id: ladderId })).finally(() =>
+      dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl })).finally(() =>
         setLoadingPlayers(false)
       );
     }
-  }, [dispatch, ladderId, players]);
+  }, [dispatch, ladderId, players, ladderTypeFromUrl]);
 
   useEffect(() => {
     if (user?.id) {
@@ -130,11 +131,6 @@ const PlayerLists2 = () => {
           {generateGrades(uniqueFilteredPlayers, gradebarDetails).map(
             (grade, gradeIndex) => (
               <div key={gradeIndex} className="space-y-2">
-                {/* <h2 className="text-md font-bold bg-orange-500 text-white px-4 py-1 rounded w-fit shadow-sm uppercase">
-                  {grade.label}
-                </h2>
-                {gradeIndex === 0 && <AvailableLabel />} */}
-
                 <div className="flex items-center gap-4">
                   <h2 className="text-md font-bold bg-orange-500 text-white px-4 py-1 rounded w-fit shadow-sm uppercase">
                     {grade.label}
@@ -178,6 +174,7 @@ const PlayerLists2 = () => {
                               setSelectedPlayer({
                                 ...player,
                                 ladder_id: ladderId,
+                                type: ladderTypeFromUrl,
                               })
                             );
                             setIsOpen(true);
@@ -243,7 +240,7 @@ const PlayerLists2 = () => {
               dispatch(fetchUserProfile(user?.id));
             }
             if (ladderId) {
-              dispatch(fetchLeaderboard({ ladder_id: ladderId }));
+              dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl }));
             }
           }}
           currentId={selectedPlayer?.id}

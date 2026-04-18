@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { useSearchParams } from "next/navigation";
 
 const BasicLeaderboardAgeUserEdit = ({
   userId,
@@ -30,6 +31,8 @@ const BasicLeaderboardAgeUserEdit = ({
   onClose = () => {},
 }) => {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
   const { loading, successMessage, error } = useSelector(
     (state) => state.editdetail,
   );
@@ -98,7 +101,7 @@ const BasicLeaderboardAgeUserEdit = ({
         setShowSkeleton(false);
 
         if (ladderId) {
-          dispatch(fetchLeaderboard({ ladder_id: ladderId }));
+          dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl }));
           dispatch(
             fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" }),
           );

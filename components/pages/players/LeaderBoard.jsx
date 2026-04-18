@@ -13,19 +13,22 @@ import "react-toastify/dist/ReactToastify.css";
 import Logo from "@/public/logo.jpg";
 import { EditPlayer } from "./EditPlayer";
 import { fetchLeaderboard, uploadCSV } from "@/redux/slices/leaderboardSlice";
+import { useSearchParams } from "next/navigation";
 
 const LeaderBoard = () => {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const urlType = searchParams.get("type") || searchParams.get("ladder_type");
+  const urlLadderId = searchParams.get("ladder_id");
   const { playersData, loading, error } = useSelector((state) => state);
   const user = useSelector((state) => state.user?.user);
-  const ladderId = user?.ladder_id;
+  const ladderId = urlLadderId || user?.ladder_id;
 
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [file, setFile] = useState(null);
 
-  useEffect(() => {
-    dispatch(fetchLeaderboard());
-  }, [dispatch]);
+  // ✅ No independent fetch here — parent (PlayerLists.jsx) already handles initial load.
+  // Data is read directly from Redux state via the 'players' selector in parent components.
 
 
   return (

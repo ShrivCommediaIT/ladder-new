@@ -42,6 +42,7 @@ const MinileagueMovePlayerBox = ({ onCancel }) => {
 
   const searchParams = useSearchParams();
   const ladder_id = searchParams.get("ladder_id");
+  const urlType = searchParams.get("type") || searchParams.get("ladder_type");
 
   /* ✅ SECTION OPTIONS */
   const sectionOptions = useMemo(() => {
@@ -83,7 +84,7 @@ const MinileagueMovePlayerBox = ({ onCancel }) => {
     if (moveToMiniLeague.fulfilled.match(resultAction)) {
       toast.success("Player moved successfully ");
 
-      dispatch(fetchLeaderboard({ ladder_id }));
+      dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
       dispatch(fetchMiniLeague({ ladder_id, type: "minileague" }));
 
       setFromRank("");

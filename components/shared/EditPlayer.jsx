@@ -47,6 +47,7 @@ export const EditPlayer = ({
 
   const searchParams = useSearchParams();
   const ladderType = searchParams.get("ladder_type");
+  const urlType = searchParams.get("type") || ladderType;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -77,12 +78,8 @@ export const EditPlayer = ({
   const [showEditSkeleton, setShowEditSkeleton] = useState(false);
 
   /* -------------------- FETCH PLAYERS -------------------- */
-
-  useEffect(() => {
-    if (open && ladder_id) {
-      dispatch(fetchLeaderboard({ ladder_id }));
-    }
-  }, [dispatch, ladder_id, open]);
+  // ✅ No fetch on open — data is already in Redux state from parent page load.
+  // Post-action refreshes (move, status change, image) are handled below.
 
   /* -------------------- HANDLE RESPONSES -------------------- */
 
@@ -117,7 +114,7 @@ export const EditPlayer = ({
     }
 
     if (didSomething && ladder_id) {
-      dispatch(fetchLeaderboard({ ladder_id }));
+      dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
     }
   }, [moving, status, image, dispatch, ladder_id]);
 

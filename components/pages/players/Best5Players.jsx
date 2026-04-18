@@ -39,12 +39,10 @@ const PlayerCard = ({
 
   const groupSize = 6;
   const sectionStartRank = Math.floor((rank - 1) / groupSize) * groupSize + 1;
-  const currentSectionRanks = Array.from(
-    { length: groupSize },
-    (_, i) => sectionStartRank + i,
-  );
+
 
   const preset = useSelector((state) => state.gradebar?.preset || 6);
+console.log("player.age",player);
 
   return (
     // new version
@@ -71,8 +69,13 @@ const PlayerCard = ({
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="text-white text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}
+            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+              {player?.name || "N/A"}   
+              {player.age && (
+              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+                {player.age}
+              </p>
+            )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -134,7 +137,7 @@ const Best5Players = () => {
   const numericLadderId = Number(ladderId);
   const playerList = players?.[numericLadderId]?.data || [];
 
-  const isDescending = useSelector((state) => state.player.invertRanking);
+console.log("player.age==>1", players);
 
   useEffect(() => {
     if (user?.id) dispatch(fetchUserProfile(user.id));
@@ -205,7 +208,9 @@ const Best5Players = () => {
   // const grades = generateGrades(uniquePlayers, localGradebars);
   const grades = generateGrades(sortedPlayers, localGradebars);
 
-  const refreshLeaderboard = useCallback(async () => {
+  const urlType = searchParams.get("type") || searchParams.get("ladder_type");
+
+  const refreshLeaderboard = useCallback(async (forceRefresh = false) => {
     if (!ladderId || isRefreshingRef.current) return;
     isRefreshingRef.current = true;
     setLoadingPlayers(true);
@@ -214,7 +219,10 @@ const Best5Players = () => {
     try {
       await Promise.all([
         dispatch(fetchGradebars(ladderId)),
-        dispatch(fetchLeaderboard({ ladder_id: ladderId })),
+        dispatch(fetchLeaderboard({ 
+          ladder_id: ladderId,
+          type: urlType || "bestof5" 
+        })),
       ]);
     } catch (error) {
       console.error("Refresh failed:", error);
@@ -222,11 +230,18 @@ const Best5Players = () => {
       setLoadingPlayers(false);
       setTimeout(() => (isRefreshingRef.current = false), 1500);
     }
-  }, [ladderId, dispatch]);
+  }, [ladderId, dispatch, urlType]);
 
   useEffect(() => {
-    if (ladderId) refreshLeaderboard();
-  }, [ladderId, refreshLeaderboard]);
+    if (!ladderId) return;
+    // ✅ Only fetch on mount if data is NOT already in Redux (avoids double-fetch when parent already loaded it)
+    const hasData = players?.[Number(ladderId)]?.data?.length > 0;
+    if (!hasData) {
+      refreshLeaderboard();
+    } else {
+      setLoadingPlayers(false);
+    }
+  }, [ladderId]); // intentionally only run on ladderId change, not on refreshLeaderboard identity change
 
   const handlePurchase = () => router.push(paymentPage);
 
@@ -370,36 +385,36 @@ const Best5Players = () => {
               </div>
 
               {/* Player cards */}
-              {section.players.map((player, pidx) => {
-                const canEdit =
-                  user?.user_type?.toLowerCase() === "admin" ||
-                  user?.id === player.user_id;
-                const globalIndex = idx * groupSize + pidx;
+                {section.players.map((player, pidx) => {
+                  const canEdit =
+                    user?.user_type?.toLowerCase() === "admin" ||
+                    user?.id === player.user_id;
+                  const globalIndex = idx * groupSize + pidx;
 
-                return (
-                  <PlayerCard
-                    key={`${player.id}-${player.total_point}-${player.rank}-${refreshKey}`}
-                    player={player}
-                    rank={player.rank || globalIndex + 1}
-                    canEdit={canEdit}
-                    ladderType={ladderType}
-                    refreshKey={refreshKey}
-                    onSelect={(action, playerData) => {
-                      if (action === "toastWarning")
-                        toast.warning("You may only tap on your name");
-                      else if (action === "select") {
-                        dispatch(
-                          setSelectedPlayer({
-                            ...playerData,
-                            ladder_id: ladderId,
-                          }),
-                        );
-                        setIsOpen(true);
-                      }
-                    }}
-                  />
-                );
-              })}
+                  return (
+                    <PlayerCard
+                      key={`${player.id}-${player.total_point}-${player.rank}-${refreshKey}`}
+                      player={player}
+                      rank={player.rank || globalIndex + 1}
+                      canEdit={canEdit}
+                      ladderType={ladderType}
+                      refreshKey={refreshKey}
+                      onSelect={(action, playerData) => {
+                        if (action === "toastWarning")
+                          toast.warning("You may only tap on your name");
+                        else if (action === "select") {
+                          dispatch(
+                            setSelectedPlayer({
+                              ...playerData,
+                              ladder_id: ladderId,
+                            }),
+                          );
+                          setIsOpen(true);
+                        }
+                      }}
+                    />
+                  );
+                })}
             </React.Fragment>
           ))}
         </div>

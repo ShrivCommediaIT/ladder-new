@@ -344,7 +344,7 @@ const AdminButton = () => {
         )}
 
         {/* AGE FILTER BUTTON */}
-        { isSkill && 
+        { (isSkill || isPositive || isNegative) && 
         <div  className="h-16 w-full">
         <AgeFilter onSearch={handleAgeSearch} user={false} />
         </div>

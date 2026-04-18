@@ -28,6 +28,7 @@ const UserPlayerList = () => {
   const ladderId = urlLadderId || user?.ladder_id;
 
   const { players, selectedPlayer } = useSelector((state) => state.player);
+  const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
   const gradebarDetails = useSelector(
     (state) => state.player?.gradebarDetails?.[ladderId] || []
   );
@@ -47,11 +48,11 @@ const UserPlayerList = () => {
   useEffect(() => {
     if (ladderId && !players?.[ladderId]) {
       setLoadingPlayers(true);
-      dispatch(fetchLeaderboard({ ladder_id: ladderId })).finally(() =>
+      dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl })).finally(() =>
         setLoadingPlayers(false)
       );
     }
-  }, [dispatch, ladderId, players]);
+  }, [dispatch, ladderId, players, ladderTypeFromUrl]);
 
   useEffect(() => {
     if (user?.id) {
@@ -167,6 +168,7 @@ const UserPlayerList = () => {
                               setSelectedPlayer({
                                 ...player,
                                 ladder_id: ladderId,
+                                type: ladderTypeFromUrl,
                               })
                             );
                             setIsOpen(true);
@@ -196,19 +198,18 @@ const UserPlayerList = () => {
                               height={48}
                               alt={`Player ${player.name}`}
                             />
-                            <div className="flex flex-col flex-1 min-w-0">
-                              <p
-                                className="text-sm font-semibold truncate text-gray-900"
-                                title={player.name}
-                              >
-                                {player.name}
-                              </p>
-                              <p
-                                className="text-xs text-gray-600 truncate"
-                                title={player.phone}
-                              >
-                                {player.phone}
-                              </p>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-gray-900 flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+                                {player?.name || "N/A"}   
+                                {player.age && (
+                                <p className="text-gray-700 border border-gray-700 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+                                  {player.age}
+                                </p>
+                              )}
+                              </div>
+                              <div className="text-gray-600 text-xs truncate">
+                                {player?.phone || "N/A"}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -232,7 +233,7 @@ const UserPlayerList = () => {
               dispatch(fetchUserProfile(user?.id));
             }
             if (ladderId) {
-              dispatch(fetchLeaderboard({ ladder_id: ladderId }));
+              dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl }));
             }
           }}
           currentId={selectedPlayer?.id}

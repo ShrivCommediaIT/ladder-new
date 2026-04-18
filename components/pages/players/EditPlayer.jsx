@@ -35,8 +35,10 @@ export const EditPlayer = ({
   const dispatch = useDispatch();
 
   const searchParams = useSearchParams()
+  const urlType = searchParams.get("type") || searchParams.get("ladder_type");
+  const urlLadderId = searchParams.get("ladder_id");
 
-  const ladder_id =
+  const ladder_id = urlLadderId || 
   searchParams.get("ladder_type")?.toLowerCase() || "minileague";
 
   const userData =
@@ -75,12 +77,8 @@ export const EditPlayer = ({
   // CORRECT LADDER ID (REAL FIX)
   // const ladder_id = selectedPlayer?.ladder_id;
 
-  // MODAL OPEN PAR LATEST DATA LOAD
-  useEffect(() => {
-    if (open && ladder_id) {
-      dispatch(fetchLeaderboard({ ladder_id }));
-    }
-  }, [dispatch, ladder_id, open]);
+  // ✅ No fetch on modal open — data is already in Redux from parent page.
+  // Refresh happens after result/move in the effect below.
 
   //  REAL-TIME UPDATE AFTER MOVE / RESULT
   useEffect(() => {
@@ -88,7 +86,7 @@ export const EditPlayer = ({
       toast.success(result.success_message);
 
       if (ladder_id) {
-        dispatch(fetchLeaderboard({ ladder_id })); // INSTANT REFRESH
+        dispatch(fetchLeaderboard({ ladder_id, type: urlType })); // INSTANT REFRESH
       }
 
       dispatch(clearMoveResult());

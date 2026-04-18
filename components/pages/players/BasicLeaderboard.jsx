@@ -119,13 +119,18 @@ const PlayerCard = ({
               unoptimized
             />
           </div>
-          <div className="flex-1 flex flex-col sm:flex-row sm:items-center  min-w-0 gap-x-2">
-            <p className="text-white font-semibold truncate">{player.name}</p>
-            {player.age && (
+          <div className="flex-1 min-w-0">
+            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+              {player?.name || "N/A"}   
+              {player.age && (
               <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
                 {player.age}
               </p>
             )}
+            </div>
+            <div className="text-[#d4e5e8] text-xs truncate">
+              {player?.phone || "N/A"}
+            </div>
           </div>
           <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
             <div className="flex flex-col items-center">

@@ -18,9 +18,12 @@ import { EditPlayer } from "@/components/shared/EditPlayer";
 import PlayerSearch from "./PlayerSearch";
 import { motion } from "framer-motion";
 import AvailableLabel from "@/components/shared/AvailableLabel";
+import { useSearchParams } from "next/navigation";
 
 export default function DemoPlayerList({ ladderId }) {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,10 +45,10 @@ export default function DemoPlayerList({ ladderId }) {
 
   useEffect(() => {
     if (ladderId) {
-      dispatch(fetchLeaderboard({ ladder_id: ladderId }));
+      dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl }));
       dispatch(fetchGradebars(ladderId));
     }
-  }, [dispatch, ladderId]);
+  }, [dispatch, ladderId, ladderTypeFromUrl]);
 
   const filteredPlayers = searchTerm
     ? players.filter((p) =>

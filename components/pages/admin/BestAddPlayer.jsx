@@ -30,6 +30,7 @@ export default function BestAddPlayer({ onClose, onSuccessRefresh }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladder_id = searchParams.get("ladder_id");
+  const urlType = searchParams.get("type") || searchParams.get("ladder_type");
 
   const [profileImage, setProfileImage] = useState(null);
   const [profileFile, setProfileFile] = useState(null);
@@ -89,7 +90,7 @@ const handleSubmit = async () => {
       setLoading(true);
 
       // Leaderboard refresh
-      await dispatch(fetchLeaderboard({ ladder_id }));
+      await dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
 
       // ⭐ Instant activity refresh (NEW FIX)
       await dispatch(fetchUserActivity({ ladder_id: Number(ladder_id) }));
