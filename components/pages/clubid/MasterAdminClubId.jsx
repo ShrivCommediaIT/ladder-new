@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -81,7 +82,7 @@ export default function AccessCodeParts() {
   }, [drawerForm]);
 
 const handleSubmit = async (values) => {
-  if (!userId) return alert("User not logged in");
+  if (!userId) return toast.error("User not logged in");
 
   setLoading(true);
   setErrorMessage("");
@@ -98,7 +99,7 @@ const handleSubmit = async (values) => {
 
     // Club ID already exist case
     if (res?.status === 400) {
-      alert("Club ID already exists");
+      toast.error("Club ID already exists");
       return;
     }
 
@@ -130,7 +131,7 @@ const handleSubmit = async (values) => {
   };
 
   const handleUpdate = async (values) => {
-    if (!userId) return alert("User not logged in");
+    if (!userId) return toast.error("User not logged in");
     setLoading(true);
     try {
       const payload = {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { toast } from "react-toastify";
 import gsap from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
 
@@ -157,7 +158,7 @@ export default function AnimatedHeroText() {
           e.target.style.transform = "scale(1)";
           e.target.style.boxShadow = "0 0 20px rgba(139, 92, 246, 0.4)";
         }}
-        onClick={() => alert("Let's build your ladder!")}
+        onClick={() => toast.info("Let's build your ladder!")}
       >
         Start Your Ladder
       </button>

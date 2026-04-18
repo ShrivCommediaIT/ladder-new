@@ -24,14 +24,23 @@ const AdminHideShowInfo = ({ isModel }) => {
       <div>
         <p className={`font-semibold ${headingText}`}>1. Create Your Club ID</p>
         <p>
-          From the Main Administrator drop-down menu, create your Club ID.
-          You can change this later if needed.
+          Using an Excel CSV file with member’s names and phone numbers (phone numbers optional but can help members communicate more easily) 
+          The roster not only lists your membership but also informs you and the members of their token totals and membership status.  You can add or remove members at any time.
         </p>
       </div>
 
       {/* Step 2 */}
+
       <div>
-        <p className={`font-semibold ${headingText}`}>2. Create a Sport Section</p>
+        <p className={`font-semibold ${headingText}`}>2. Create your Club Roster</p>
+        <p>
+          Add your first sport section and assign a Section PIN from the same
+          drop-down menu.
+        </p>
+      </div>
+      
+      <div>
+        <p className={`font-semibold ${headingText}`}>3. Create a Sport Section</p>
         <p>
           Add your first sport section and assign a Section PIN from the same
           drop-down menu.
@@ -40,7 +49,7 @@ const AdminHideShowInfo = ({ isModel }) => {
 
       {/* Step 3 */}
       <div>
-        <p className={`font-semibold ${headingText}`}>3. Log in as Section Admin</p>
+        <p className={`font-semibold ${headingText}`}>4. Log in as Section Admin</p>
         <p>Log out of the Main Dashboard and log back in using:</p>
         <ul className="list-disc ml-5 mt-1 space-y-1">
           <li>Your Club ID</li>
@@ -60,7 +69,7 @@ const AdminHideShowInfo = ({ isModel }) => {
       {isModel && (
         <div>
           <p className={`font-semibold ${headingText}`}>
-            4. Explore the Demo
+            5. Explore the Demo
           </p>
           <p>
             You can try out the demo environment to understand how the system works

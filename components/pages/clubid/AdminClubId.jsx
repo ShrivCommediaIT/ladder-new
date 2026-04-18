@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -88,7 +89,7 @@ export default function AdminClubId() {
 
   const handleConfirmDelete = async () => {
     if (!adminToDelete?.id) {
-      alert("Missing sub admin id");
+      toast.error("Missing sub admin id");
       return;
     }
 
@@ -100,11 +101,11 @@ export default function AdminClubId() {
       if (res?.status === 200 || res?.status === true) {
          await fetchSubAdmins();
       } else {
-        alert(res?.message || "Delete failed");
+        toast.error(res?.message || "Delete failed");
       }
     } catch (err) {
       console.error(err);
-      alert("Delete API error");
+      toast.error("Delete API error");
     } finally {
       setLoading(false);
       setDeleteDialogOpen(false);
@@ -186,7 +187,7 @@ useEffect(() => {
   const handleSubmit = async (values) => {
     const storedUser = sessionStorage.getItem("userData");
     const userId = storedUser ? JSON.parse(storedUser)?.id : null;
-    if (!userId) return alert("User not logged in");
+    if (!userId) return toast.error("User not logged in");
 
     setLoading(true);
     setErrorMessage("");
@@ -258,7 +259,7 @@ if (
 
   const handleSave = async () => {
     if (!selectedAdmin?.id) {
-      alert("Missing admin id");
+      toast.error("Missing admin id");
       return;
     }
 
@@ -284,11 +285,11 @@ if (
 
         setIsDrawerOpen(false);
       } else {
-        alert(res?.message || "Update failed");
+        toast.error(res?.message || "Update failed");
       }
     } catch (err) {
       console.error("Update error:", err);
-      alert("Update API error");
+      toast.error("Update API error");
     } finally {
       setLoading(false);
     }

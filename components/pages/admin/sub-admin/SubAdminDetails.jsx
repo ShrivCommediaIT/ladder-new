@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { LogOut, UserCircle2, Pencil } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
@@ -48,7 +49,7 @@ const SubAdminDetails = () => {
     if (!file) return;
 
     if (!user?.id) {
-      alert("User id missing");
+      toast.error("User id missing");
       return;
     }
 
@@ -92,13 +93,13 @@ const SubAdminDetails = () => {
           setUser(updatedUser);
         }
 
-        alert("Profile image updated ");
+        toast.success("Profile image updated ");
       } else {
-      alert(res?.message || "Upload failed");
+      toast.error(res?.message || "Upload failed");
       }
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Upload error");
+      toast.error(err.response?.data?.message || "Upload error");
     } finally {
       setUploading(false);
       setPreviewImage(null);

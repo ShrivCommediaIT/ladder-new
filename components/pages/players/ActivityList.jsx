@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
@@ -57,7 +58,7 @@ useEffect(() => {
       // Refresh log after successful delete
       dispatch(fetchUserActivity({ ladder_id: Number(ladder_id) }));
     } catch (err) {
-      alert(
+      toast.error(
         "Failed to delete activity: " +
           (err?.response?.data?.message || err.message),
       );

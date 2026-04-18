@@ -8,7 +8,7 @@ import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { setSelectedPlayer } from "@/redux/slices/leaderboardSlice";
 import { MinileagueEditPlayer } from "./MinileagueEditPlayer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchUserProfile } from "@/redux/slices/profileSlice";
 import { useSearchParams } from "next/navigation";
@@ -379,7 +379,7 @@ const finalSections = React.useMemo(() => {
               <Button onClick={() => setIsSectionModalOpen(false)}>Cancel</Button>
               <Button
                 onClick={async () => {
-                  if (!newSectionName.trim()) return alert("Enter name");
+                  if (!newSectionName.trim()) return toast.error("Enter name");
                   setUpdating(true);
                   await updateSectionName(currentSectionName, newSectionName);
                   setSectionSize(newSectionSize);

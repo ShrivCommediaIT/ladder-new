@@ -127,7 +127,7 @@ export default function BasicLeaderboardActivityEntryCard({
       }
     } catch (err) {
       console.error("Error Detail:", err.response?.data || err);
-      alert("Failed to save: " + (err.response?.data?.message || "Error"));
+      toast.error("Failed to save: " + (err.response?.data?.message || "Error"));
       return false;
     } finally {
       setSaving(false);
@@ -392,11 +392,6 @@ export default function BasicLeaderboardActivityEntryCard({
                 </span>
               </div>
             </div>
-
-            {/* Note */}
-            <p className="text-md text-gray-500 italic">
-              Note: If today's result is also your best result, fill in both boxes
-            </p>
 
             {/* Witness */}
             <div>

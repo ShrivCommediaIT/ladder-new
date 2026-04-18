@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -65,7 +66,7 @@ const LadderRulesCard = ({ ladderIdProp }) => {
       setIsEditing(null);
     } catch (error) {
       console.error("Error updating rules:", error);
-      alert("Failed to update rules. Please try again.");
+      toast.error("Failed to update rules. Please try again.");
     }
   };
 

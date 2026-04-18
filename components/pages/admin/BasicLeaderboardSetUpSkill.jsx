@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -153,7 +154,7 @@ export default function BasicLeaderboardSetUpSkill({
   const handleSetUpSkills = async () => {
     try {
       if (!ladderId) {
-        alert("Ladder ID missing");
+        toast.error("Ladder ID missing");
         return;
       }
 
@@ -193,7 +194,7 @@ export default function BasicLeaderboardSetUpSkill({
         });
 
       if (skills.length === 0) {
-        alert("Please add at least one skill");
+        toast.error("Please add at least one skill");
         return;
       }
 
@@ -207,7 +208,7 @@ export default function BasicLeaderboardSetUpSkill({
       }
     } catch (error) {
       console.error("Skill update failed:", error);
-      alert(
+      toast.error(
         error.response?.data?.message ||
         "Failed to save skills. Please try again.",
       );
@@ -239,90 +240,6 @@ export default function BasicLeaderboardSetUpSkill({
               ×
             </button>
           </div>
-
-          {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") && (<div className="max-h-[20vh] sm:max-h-[20vh] md:max-h-[20vh] overflow-y-auto">
-            <div className=" bg-gray-100 ">
-              <div className="text-gray-950 text-[11px] mb-2 text-justify sm:text-[14px] md:text-[14px] px-3 sm:px-4 md:px-6 leading-relaxed">
-                <div className="w-full flex items-center justify-center gap-3 py-2">
-                  <div className="flex-1 h-[3px] bg-red-600"></div>
-
-                  <p className="text-red-600 font-semibold whitespace-nowrap">
-                    VERY IMPORTANT
-                  </p>
-
-                  <div className="flex-1 h-[3px] bg-red-600"></div>
-                </div>
-
-                <p>
-                  NEGTIVE ACTIVITIES (the lower score the better) - it is
-                  IMPERATIVE that you set a target score because the uploaded
-                  scores are turned into points relative to a target score.
-                  Without a target, the rankings will be incorrect.
-                </p>
-              </div>
-            </div>
-
-            <div className="px-1">
-              <p className="text-[11px] sm:text-xs md:text-sm px-3 sm:px-4 md:px-6 text-gray-300 leading-relaxed">
-                Type in your skill test description - for example :
-                <span className="block mt-1">
-                  "How many times can you head the ball?" or "What is your best
-                  time for the 1000m?"
-                </span>
-              </p>
-
-              <p className="text-gray-300 text-[11px] sm:text-xs md:text-sm px-3 sm:px-4 md:px-6 mt-2 leading-relaxed">
-                Remember to select{" "}
-                <span className="text-green-300 font-medium">"Plus"</span> or{" "}
-                <span className="text-red-300 font-medium">"Minus"</span>
-                <br className="hidden sm:block" />
-                Select{" "}
-                <span className="text-green-300 font-medium">"Plus"</span>{" "}
-                <br />
-                if the bigger number = higher rank.
-                <br className="hidden sm:block" />
-                Select <span className="text-red-300 font-medium">
-                  "Minus"
-                </span>{" "}
-                <br />
-                if the smaller number = higher rank.
-              </p>
-            </div>
-
-            <div className="mt-2 bg-yellow-100 p-2 rounded">
-              <p className="text-gray-950 text-[11px] sm:text-xs md:text-sm px-3 sm:px-4 md:px-6 leading-relaxed">
-                <span className="text-teal-900 font-semibold">TARGET - </span>
-                Setting a target is optional. However, you can set up a target
-                for each activity as a{" "}
-                <span className="text-teal-900 font-semibold">
-                  GOAL
-                </span> for{" "}
-                <span className="text-teal-900 font-semibold">PASS</span> or
-                even have a{" "}
-                <span className="text-teal-900 font-semibold">
-                  TARGET RACE -{" "}
-                </span>{" "}
-                first to reach all targets! When a target is reached, the square
-                goes green - so girst to turn all their squares green!
-              </p>
-
-              <p className="text-gray-950 text-justify text-[11px] mt-1 sm:text-xs md:text-sm px-3 sm:px-4 md:px-6 leading-relaxed">
-                <span className="text-slate-900 font-semibold">
-                  IMPORTANT NOTE - for negatives skills where the lower the
-                  score the better.{" "}
-                </span>{" "}
-                <br />
-                You <span className="text-slate-900 font-semibold">
-                  MUST
-                </span>{" "}
-                select a target as negatives scores are turned into points to go
-                towards to the total scores for accurate ranking. The system
-                will not let you set a negative skill without first setting a
-                target. It is suggested that you choose a target close to a
-                “best performance” but achievable for that skill/performance.
-              </p>
-            </div>
-          </div>)}
 
           {loading && (
             <p className="text-center text-white text-sm py-3">
@@ -364,22 +281,6 @@ export default function BasicLeaderboardSetUpSkill({
                       }}
                       className="flex gap-1 justify-center"
                     >
-                      <Label
-                        className={`px-2 py-1 cursor-pointer rounded text-xs leading-4 ${row.mode === "plus"
-                            ? "bg-green-400 text-black font-bold"
-                            : "bg-[#101c29] text-white"
-                          }`}
-                      >
-                        <RadioGroupItem value="plus" className="hidden" />+
-                      </Label>
-                      <Label
-                        className={`px-2 py-1 cursor-pointer rounded text-xs leading-4 ${row.mode === "minus"
-                            ? "bg-red-400 text-black font-bold"
-                            : "bg-[#101c29] text-white"
-                          }`}
-                      >
-                        {/* <RadioGroupItem value="minus" className="hidden" />− */}
-                      </Label>
                     </RadioGroup>
                   </div>
 
