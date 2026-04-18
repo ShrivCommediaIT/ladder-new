@@ -160,6 +160,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { X, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getRequest } from "@/services/apiService";
@@ -201,7 +202,7 @@ const BasicLeaderboardShort = ({
 
   const handleSubmit = () => {
     if (!skillNumber) {
-      alert("Please select skill");
+      toast.error("Please select skill");
       return;
     }
     

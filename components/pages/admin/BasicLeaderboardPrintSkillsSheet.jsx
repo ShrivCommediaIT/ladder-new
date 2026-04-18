@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { toast } from "react-toastify";
 import { useRef } from "react";
 
 export default function BasicLeaderboardPrintSkillsSheet({
@@ -28,7 +29,7 @@ export default function BasicLeaderboardPrintSkillsSheet({
     const printWindow = window.open("", "_blank");
 
     if (!printWindow) {
-      alert("Popup blocked. Please allow popups to print.");
+      toast.error("Popup blocked. Please allow popups to print.");
       return;
     }
 

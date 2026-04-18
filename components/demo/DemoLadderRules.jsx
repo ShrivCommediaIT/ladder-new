@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -67,7 +68,7 @@ const LadderRulesCard = ({ ladderIdProp }) => {
       setIsEditing(null);
     } catch (error) {
       console.error("Error updating rules:", error);
-      alert("Failed to update rules. Please try again.");
+      toast.error("Failed to update rules. Please try again.");
     }
   };
 

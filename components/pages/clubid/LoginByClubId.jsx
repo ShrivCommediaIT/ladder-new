@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -96,7 +97,7 @@ export default function LoginByClubForm() {
     navigator.clipboard.writeText(
       `Login ID: ${userData.login_id}, Password: ${userData.password}`,
     );
-    alert("Credentials copied to clipboard!");
+    toast.success("Credentials copied to clipboard!");
   };
 
   const handleSubmit = async (values) => {

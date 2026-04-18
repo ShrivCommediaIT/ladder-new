@@ -3,6 +3,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -181,7 +182,7 @@ export default function CouponForm() {
       setShowSuccess(true); // ✅ show alert
       setIsCouponValid(false);
     } catch (err) {
-      alert(err.message || "Submission failed."); // fallback error
+      toast.error(err.message || "Submission failed."); // fallback error
     }
   }
 

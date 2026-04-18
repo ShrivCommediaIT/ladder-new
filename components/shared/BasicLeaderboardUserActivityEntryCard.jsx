@@ -334,11 +334,13 @@ export default function BasicLeaderboardActivityEntryCard({
         witness_by: witnessBy.trim(),
         admin_id: adminDetails.id,
         ladder_id: ladderId,
+        user_name: playerName,
       };
 
       if (bestScore !== undefined && bestScore !== null) {
         payload.best_result = bestScore;
       }
+
 
       const res = await postRequest(`/${URl}`, payload);
 
@@ -348,7 +350,6 @@ export default function BasicLeaderboardActivityEntryCard({
           user_id: playerName,
           ladder_id: ladderId,
           ladder_type: ladderTypeUpdate,
-          user_name: playerName,
         });
        
         setOpenSuccess(true);
@@ -359,7 +360,7 @@ export default function BasicLeaderboardActivityEntryCard({
       }
     } catch (err) {
       console.error("Error Detail:", err.response?.data || err);
-      alert("Failed to save: " + (err.response?.data?.message || "Unknown error"));
+      toast.error("Failed to save: " + (err.response?.data?.message || "Unknown error"));
       return false;
     } finally {
       setSaving(false);
@@ -751,12 +752,6 @@ export default function BasicLeaderboardActivityEntryCard({
                 </span>
               </div>
             </div>
-
-            {/* Note */}
-            <p className="text-md text-gray-500 italic">
-              Note: If today's result is also your best result, fill in both boxes
-            </p>
-
             {/* Witness */}
             <div>
               <label className="text-md font-medium">Witness: <span className="ml-3 font-bold"> {witnessBy || "—"} </span></label>
