@@ -218,7 +218,7 @@ export default function OnboardingFlow() {
               onClick={handleSkip}
               className="bg-[#39FF14] hover:bg-[#32e312] text-black px-3 sm:px-8 py-2 sm:py-3 rounded-md flex items-center gap-1 sm:gap-2 font-black uppercase text-[10px] sm:text-base border-2 border-transparent hover:border-white shadow-[0_0_20px_rgba(57,255,20,0.3)] transition-all active:scale-95"
             >
-              Skip <ChevronRight size={18} strokeWidth={4} />
+              Skip <ChevronRight size={20} strokeWidth={4} />
             </button>
           </div>
         </div>
