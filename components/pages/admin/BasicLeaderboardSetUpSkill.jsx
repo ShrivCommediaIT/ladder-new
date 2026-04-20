@@ -231,7 +231,7 @@ export default function BasicLeaderboardSetUpSkill({
         <Card className="w-full max-w-[350px] sm:max-w-[600px] sm:w-xl bg-[#0f2433] border border-slate-700 rounded-xl overflow-hidden shadow-xl">
           <div className="bg-[#14283a] text-white py-3 border-b border-white/20 relative">
             <h2 className="text-md font-semibold text-center">
-              {type === "skill" ? "Skills/Performance Set Up" : type === "negative" ? "LeaderBoard (Times) Set Up" : "LeaderBoard Set Up"}
+              {type === "skill" ? "Skills/Performance Set Up" : type === "negative" ? "Set Up" : "LeaderBoard Set Up"}
             </h2>
             <button
               onClick={onClose}
@@ -396,7 +396,7 @@ export default function BasicLeaderboardSetUpSkill({
                 onClick={handleSetUpSkills}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white w-full max-w-xs cursor-pointer"
               >
-                {saving ? "Saving..." : "Update Skills"}
+                {saving ? "Saving..." :  (type === "skill") ? "Update Skills" : "Update"}
               </Button>
             </div>
           </div>
