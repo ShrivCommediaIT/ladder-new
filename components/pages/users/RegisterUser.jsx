@@ -23,6 +23,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { calculateAge } from "@/lib/utils";
 
 
 
@@ -45,16 +46,6 @@ export default function RegisterUser({ ladderId, ladderType }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const getAge = (birthDate) => {
-    if (!birthDate) return "";
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age >= 0 ? age : "";
-  };
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -76,7 +67,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
       return;
     }
 
-    const age = getAge(values.dob);
+    const age = calculateAge(values.dob);
     const dobString = format(values.dob, "dd/MM/yyyy");
 
     const payload = {

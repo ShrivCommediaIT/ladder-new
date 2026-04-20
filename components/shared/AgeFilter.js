@@ -7,34 +7,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
+import { calculateAge } from "@/lib/utils";
 
 const AgeFilter = ({ onSearch, user }) => {
   const [open, setOpen] = useState(false);
   const [dobInput, setDobInput] = useState("");
   const [calculatedAge, setCalculatedAge] = useState("");
 
-  const calculateAge = (dobString) => {
-    const parts = dobString.split("/");
-    if (parts.length === 3 && parts[2].length === 4) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
-      const dobDate = new Date(year, month, day);
-      if (!isNaN(dobDate.getTime())) {
-        const today = new Date();
-        let age = today.getFullYear() - dobDate.getFullYear();
-        const m = today.getMonth() - dobDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
-          age--;
-        }
-        if (age >= 0) {
-          setCalculatedAge(age);
-          return;
-        }
-      }
-    }
-    setCalculatedAge("");
-  };
 
   const handleDobChange = (e) => {
     let value = e.target.value.replace(/\D/g, "");
@@ -47,7 +26,7 @@ const AgeFilter = ({ onSearch, user }) => {
       formatted = formatted.slice(0, 5) + "/" + value.slice(4);
     }
     setDobInput(formatted);
-    calculateAge(formatted);
+    setCalculatedAge(calculateAge(formatted));
   };
 
   const handleAgeChange = (e) => {

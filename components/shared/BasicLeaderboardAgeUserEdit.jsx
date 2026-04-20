@@ -23,6 +23,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { useSearchParams } from "next/navigation";
+import { calculateAge } from "@/lib/utils";
 
 const BasicLeaderboardAgeUserEdit = ({
   userId,
@@ -30,6 +31,7 @@ const BasicLeaderboardAgeUserEdit = ({
   selectedPlayer,
   onClose = () => {},
 }) => {
+
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
@@ -47,15 +49,40 @@ const BasicLeaderboardAgeUserEdit = ({
 
   const [showSkeleton, setShowSkeleton] = useState(false);
 
-  // Auto-fill strictly from selectedPlayer (id/user_id/name/phone)
+  // Auto-fill strictly from selectedPlayer (id/user_id/name/phone/dob)
   useEffect(() => {
     if (selectedPlayer) {
+      let initialDob = null;
+      if (selectedPlayer.dob) {
+        if (selectedPlayer.dob instanceof Date) {
+          initialDob = selectedPlayer.dob;
+        } else if (typeof selectedPlayer.dob === "string") {
+          if (selectedPlayer.dob.includes("-")) {
+            // Handle YYYY-MM-DD (e.g., 2010-04-07)
+            const parts = selectedPlayer.dob.split("-");
+            if (parts.length === 3) {
+              initialDob = new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+          } else if (selectedPlayer.dob.includes("/")) {
+            // Handle DD/MM/YYYY
+            const parts = selectedPlayer.dob.split("/");
+            if (parts.length === 3) {
+              initialDob = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+          }
+
+          if (!initialDob) {
+            initialDob = new Date(selectedPlayer.dob);
+          }
+        }
+      }
+
       setForm({
         id: (selectedPlayer.id ?? selectedPlayer.user_id)?.toString() || "",
         user_id:
           (selectedPlayer.user_id ?? selectedPlayer.id)?.toString() || "",
         name: selectedPlayer.name || "",
-        dob: selectedPlayer.dob ? new Date(selectedPlayer.dob) : null,
+        dob: initialDob && !isNaN(initialDob.getTime()) ? initialDob : null,
         phone: selectedPlayer.phone || "",
       });
     } else if (userId) {
@@ -87,6 +114,7 @@ const BasicLeaderboardAgeUserEdit = ({
       id: form.id,
       name: form.name,
       dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
+      age: calculateAge(form.dob),
       phone: form.phone,
     };
 
