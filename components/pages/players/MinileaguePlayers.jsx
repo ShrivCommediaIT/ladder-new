@@ -26,6 +26,7 @@ import Minileague from "./Minileague";
 import MinileagueSearch from "./MinileagueSearch";
 import { postWithParams } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 /* ================= Player Card ================= */
 const PlayerCard = ({
@@ -35,6 +36,7 @@ const PlayerCard = ({
   isBlank,
   onEdit,
   groupSize,
+  currentUser,
 }) => {
   if (isBlank) {
     return (
@@ -60,9 +62,14 @@ const PlayerCard = ({
   return (
     <div
       onClick={() => onEdit(player)}
-      className="flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow cursor-pointer hover:bg-[#143238] transition-all"
+      className=" hover:bg-[#143238] transition-allmb-3 rounded-lg shadow cursor-pointer mb-3"
       style={{ background: "#223848", border: "2px solid #4eb0a2" }}
     >
+      <div className="flex justify-between items-start mb-1 px-1 mt-1">
+        <PlayerStatusToggle player={player} user={currentUser} />
+      </div>
+
+      <div className="flex items-center justify-between px-2 py-2 ">
       <div className="flex-1 min-w-0">
         <div className="flex w-full items-center mb-2">
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#48aaa8] border-2 border-white text-lg font-bold text-white mr-2">
@@ -132,6 +139,7 @@ const PlayerCard = ({
           unoptimized
         />
       </div>
+        </div>
     </div>
   );
 };
@@ -335,6 +343,7 @@ const finalSections = React.useMemo(() => {
                   }
                   groupSize={sectionSize}
                   onEdit={handleEditPlayer}
+                  currentUser={user}
                 />
               );
             })}

@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getRequest, postFormData } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import { changePlayerStatus } from "./leaderboardSlice";
 
 export const fetchSkillLeaderboard = createAsyncThunk(
   "skillLeaderboard/fetchSkillLeaderboard",
@@ -70,6 +71,13 @@ const skillLeaderboardSlice = createSlice({
       .addCase(importSkillLeaderboard.rejected, (state, action) => {
         state.importLoading = false;
         state.error = action.payload;
+      })
+      .addCase(changePlayerStatus.fulfilled, (state, action) => {
+        const { user_id, player_status } = action.payload;
+        const player = state.data.find((p) => p.id === user_id);
+        if (player) {
+          player.player_status = player_status;
+        }
       });
   },
 });

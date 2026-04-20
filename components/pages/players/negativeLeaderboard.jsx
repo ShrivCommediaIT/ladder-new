@@ -18,6 +18,7 @@ import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUs
 import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
 import { fetchNegativeLeaderboard, setAppliedAge } from "@/redux/slices/negativeLeaderBoardSlice";
 import AgeFilter from "@/components/shared/AgeFilter";
+import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 
 
@@ -29,6 +30,7 @@ const PlayerCard = ({
   ageRank,
   onSkillClick,
   onTargetAchieved,
+  currentUser,
 }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
@@ -138,6 +140,10 @@ const PlayerCard = ({
     if (!skillNumber) return;
     onSkillClick(player.id, skillNumber);
   }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
+      <div className="flex justify-between items-start mb-1 px-1">
+        <PlayerStatusToggle player={player} user={currentUser} />
+      </div>
+     
       <div    className="flex-1 min-w-0 curcer-pointer">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">
@@ -217,6 +223,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const { data = [], loading, appliedAge } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
+  const currentUser = useSelector((state) => state.user?.user);
 
   // CELEBRATION STATE ONLY
   const [showCelebration, setShowCelebration] = useState(false);
@@ -356,6 +363,7 @@ const filteredPlayers = React.useMemo(() => {
                   ageRank={index + 1}
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}
+                  currentUser={currentUser}
                 />
               ))
             )}

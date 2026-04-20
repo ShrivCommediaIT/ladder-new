@@ -18,6 +18,7 @@ import { fetchUserProfile } from "@/redux/slices/profileSlice";
 import PlayerSearchInput from "./PlayerSearchInput";
 import { useSearchParams } from "next/navigation";
 import AvailableLabel from "@/components/shared/AvailableLabel";
+import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 const PlayerLists2 = () => {
   const dispatch = useDispatch();
@@ -205,12 +206,15 @@ const PlayerLists2 = () => {
                               alt={`Player ${player.name}`}
                             />
                             <div className="flex flex-col flex-1 min-w-0">
-                              <p
-                                className="text-sm font-semibold truncate text-gray-900"
-                                title={player.name}
-                              >
-                                {player.name}
-                              </p>
+                               <div className="flex justify-between items-center w-full">
+                                  <p
+                                    className="text-sm font-semibold truncate text-gray-900"
+                                    title={player.name}
+                                  >
+                                    {player.name}
+                                  </p>
+                                  <PlayerStatusToggle player={player} user={user} />
+                               </div>
                               <p
                                 className="text-xs text-gray-600 truncate"
                                 title={player.phone}

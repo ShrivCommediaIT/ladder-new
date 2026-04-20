@@ -22,6 +22,7 @@ import Logo from "@/public/logo1.png";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { postRequest } from "@/services/apiService";
+import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 //  PlayerCard Component
 const PlayerCard = ({
   player,
@@ -30,19 +31,12 @@ const PlayerCard = ({
   onSelect,
   ladderType,
   refreshKey,
+  currentUser,
 }) => {
   const playerImageUrl = player.image
-    ? `${IMAGE_BASE_URL}/${
-        player.image
-      }?t=${Date.now()}`
+    ? `${IMAGE_BASE_URL}/${player.image
+    }?t=${Date.now()}`
     : Logo;
-
-  const groupSize = 6;
-  const sectionStartRank = Math.floor((rank - 1) / groupSize) * groupSize + 1;
-
-
-  const preset = useSelector((state) => state.gradebar?.preset || 6);
-console.log("player.age",player);
 
   return (
     // new version
@@ -51,50 +45,57 @@ console.log("player.age",player);
         if (!canEdit) return onSelect("toastWarning");
         onSelect("select", player);
       }}
-      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans ${
-        canEdit
+      className={`mb-3 rounded-lg shadow transition-all font-sans ${canEdit
           ? "cursor-pointer hover:bg-[#143238]"
           : "opacity-0 cursor-not-allowed"
-      } sm:px-4 sm:py-3`}
+        } sm:px-4 sm:py-3`}
       style={{
         background: "#223848",
         border: "2px solid #4eb0a2",
       }}
     >
-      {/* LEFT CONTENT */}
-      <div className="flex-1">
-        <div className="flex w-full items-center mb-2">
-          <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#48aaa8] border-2 border-white text-lg sm:text-2xl font-bold text-white mr-2 shrink-0">
-            {rank}
-          </div>
+      <div className="flex justify-between items-start mb-1 px-1 mt-1">
+        <PlayerStatusToggle player={player} user={currentUser} />
+      </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}   
-              {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
-                {player.age}
-              </p>
-            )}
+      <div className="flex items-center justify-between px-2 py-2 ">
+
+        {/* LEFT CONTENT */}
+        <div className="flex-1">
+          <div className="flex w-full items-center mb-2">
+            <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#48aaa8] border-2 border-white text-lg sm:text-2xl font-bold text-white mr-2 shrink-0">
+              {rank}
             </div>
-            <div className="text-[#d4e5e8] text-xs truncate">
-              {player?.phone || "N/A"}
+
+            <div className="flex-1 min-w-0">
+              <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+                {player?.name || "N/A"}
+                {player.age && (
+                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+                    {player.age}
+                  </p>
+                )}
+              </div>
+              <div className="text-[#d4e5e8] text-xs truncate">
+                {player?.phone || "N/A"}
+              </div>
             </div>
           </div>
         </div>
+
+        {/* ✅ RIGHT ALIGNED AVATAR */}
+        <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center ml-3 shrink-0">
+          <Image
+            src={playerImageUrl}
+            alt={player.name}
+            width={96}
+            height={96}
+            className="object-cover w-full h-full rounded"
+            unoptimized
+          />
+        </div>
       </div>
 
-      {/* ✅ RIGHT ALIGNED AVATAR */}
-      <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center ml-3 shrink-0">
-        <Image
-          src={playerImageUrl}
-          alt={player.name}
-          width={96}
-          height={96}
-          className="object-cover w-full h-full rounded"
-          unoptimized
-        />
-      </div>
     </div>
   );
 };
@@ -137,7 +138,7 @@ const Best5Players = () => {
   const numericLadderId = Number(ladderId);
   const playerList = players?.[numericLadderId]?.data || [];
 
-console.log("player.age==>1", players);
+  console.log("player.age==>1", players);
 
   useEffect(() => {
     if (user?.id) dispatch(fetchUserProfile(user.id));
@@ -219,9 +220,9 @@ console.log("player.age==>1", players);
     try {
       await Promise.all([
         dispatch(fetchGradebars(ladderId)),
-        dispatch(fetchLeaderboard({ 
+        dispatch(fetchLeaderboard({
           ladder_id: ladderId,
-          type: urlType || "bestof5" 
+          type: urlType || "bestof5"
         })),
       ]);
     } catch (error) {
@@ -387,36 +388,37 @@ console.log("player.age==>1", players);
               </div>
 
               {/* Player cards */}
-                {section.players.map((player, pidx) => {
-                  const canEdit =
-                    user?.user_type?.toLowerCase() === "admin" ||
-                    user?.id === player.user_id;
-                  const globalIndex = idx * groupSize + pidx;
+              {section.players.map((player, pidx) => {
+                const canEdit =
+                  user?.user_type?.toLowerCase() === "admin" ||
+                  user?.id === player.user_id;
+                const globalIndex = idx * groupSize + pidx;
 
-                  return (
-                    <PlayerCard
-                      key={`${player.id}-${player.total_point}-${player.rank}-${refreshKey}`}
-                      player={player}
-                      rank={player.rank || globalIndex + 1}
-                      canEdit={canEdit}
-                      ladderType={ladderType}
-                      refreshKey={refreshKey}
-                      onSelect={(action, playerData) => {
-                        if (action === "toastWarning")
-                          toast.warning("You may only tap on your name");
-                        else if (action === "select") {
-                          dispatch(
-                            setSelectedPlayer({
-                              ...playerData,
-                              ladder_id: ladderId,
-                            }),
-                          );
-                          setIsOpen(true);
-                        }
-                      }}
-                    />
-                  );
-                })}
+                return (
+                  <PlayerCard
+                    key={`${player.id}-${player.total_point}-${player.rank}-${refreshKey}`}
+                    player={player}
+                    rank={player.rank || globalIndex + 1}
+                    canEdit={canEdit}
+                    ladderType={ladderType}
+                    refreshKey={refreshKey}
+                    onSelect={(action, playerData) => {
+                      if (action === "toastWarning")
+                        toast.warning("You may only tap on your name");
+                      else if (action === "select") {
+                        dispatch(
+                          setSelectedPlayer({
+                            ...playerData,
+                            ladder_id: ladderId,
+                          }),
+                        );
+                        setIsOpen(true);
+                      }
+                    }}
+                    currentUser={user}
+                  />
+                );
+              })}
             </React.Fragment>
           ))}
         </div>
