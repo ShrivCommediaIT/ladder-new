@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { X, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { X, ChevronRight, ChevronLeft } from "lucide-react";
 
 const STEPS = [
   {
@@ -55,6 +54,12 @@ export default function OnboardingFlow() {
       setCurrentStep(currentStep + 1);
     } else {
       finishOnboarding();
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
     }
   };
 
@@ -178,11 +183,23 @@ export default function OnboardingFlow() {
 
         {/* Bottom Navigation Control Bar */}
         <div className="flex-shrink-0 w-full bg-black/60 backdrop-blur-md py-4 px-4 sm:px-8 border-t border-white/10 flex items-center justify-between relative z-20">
-          {/* Desktop Spacer */}
-          <div className="hidden md:block w-40" />
+          {/* Back Button Container */}
+          <div className="w-20 sm:w-40 flex justify-start">
+            {currentStep > 0 && (
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-1 sm:gap-2 text-white hover:text-white transition-all group"
+              >
+                <ChevronLeft size={24} strokeWidth={3} className="group-hover:-translate-x-1 transition-transform" />
+                <span className="text-xs sm:text-sm font-bold uppercase tracking-widest whitespace-nowrap">
+                  Back
+                </span>
+              </button>
+            )}
+          </div>
 
           {/* Centered Next Button Container */}
-          <div className="flex-1 flex justify-center md:justify-center">
+          <div className="flex-1 flex justify-center">
             <button
               onClick={handleNext}
               className="flex items-center gap-2 sm:gap-4 text-white hover:text-[#39FF14] transition-all group"
@@ -196,12 +213,12 @@ export default function OnboardingFlow() {
           </div>
 
           {/* Skip Button Container */}
-          <div className="flex-shrink-0">
+          <div className="w-20 sm:w-40 flex justify-end">
             <button
               onClick={handleSkip}
-              className="bg-[#39FF14] hover:bg-[#32e312] text-black px-4 sm:px-8 py-2 sm:py-3 rounded-md flex items-center gap-2 font-black uppercase text-xs sm:text-base border-2 border-transparent hover:border-white shadow-[0_0_20px_rgba(57,255,20,0.3)] transition-all active:scale-95"
+              className="bg-[#39FF14] hover:bg-[#32e312] text-black px-3 sm:px-8 py-2 sm:py-3 rounded-md flex items-center gap-1 sm:gap-2 font-black uppercase text-[10px] sm:text-base border-2 border-transparent hover:border-white shadow-[0_0_20px_rgba(57,255,20,0.3)] transition-all active:scale-95"
             >
-                  Skip <ChevronRight size={20} strokeWidth={4} />
+              Skip <ChevronRight size={20} strokeWidth={4} />
             </button>
           </div>
         </div>
