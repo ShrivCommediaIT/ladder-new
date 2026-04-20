@@ -342,10 +342,6 @@ const filteredPlayers = React.useMemo(() => {
         <div className="w-full max-w-2xl px-2 space-y-4">
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           
-          <div className="h-10 w-full">
-            <AgeFilter onSearch={handleAgeSearch} user={false} />
-          </div>
-
           <LadderLinkPanel ladderId={ladderId} ladderType="negative" />
           {loading && (
             <p className="text-white text-center hidden">Loading...</p>
