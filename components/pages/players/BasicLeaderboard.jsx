@@ -15,6 +15,7 @@ import { X, Trophy, ListOrdered } from "lucide-react";
 import { getRequest } from "@/services/apiService";
 import PlayerSearchInput from "./PlayerSearchInput";
 import AgeFilter from "../../shared/AgeFilter";
+import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 
 
@@ -26,6 +27,7 @@ const PlayerCard = ({
   ageRank,
   onSkillClick,
   onTargetAchieved,
+  currentUser,
 }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
@@ -105,7 +107,10 @@ const PlayerCard = ({
   };
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
+    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
+      <div className="flex justify-between items-start mb-1 px-1">
+        <PlayerStatusToggle player={player} user={currentUser} />
+      </div>
       <div className="flex-1 min-w-0">
         {/* Header */}
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -121,12 +126,12 @@ const PlayerCard = ({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}   
+              {player?.name || "N/A"}
               {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
-                {player.age}
-              </p>
-            )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+                  {player.age}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -139,7 +144,7 @@ const PlayerCard = ({
               </span>
               <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
             </div>
-            
+
             <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
               {Boolean(appliedAge) && (
                 <div className="flex flex-col items-center">
@@ -197,8 +202,8 @@ const PlayerCard = ({
                   <div
                     key={i}
                     className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
-                        ? "bg-green-400 text-black shadow-md font-semibold"
-                        : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
+                      ? "bg-green-400 text-black shadow-md font-semibold"
+                      : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
                       } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
                     title={`Score: ${scoreData.score} | Target: ${scoreData.target || "N/A"
                       }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
@@ -239,6 +244,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const { data = [], loading } = useSelector(
     (state) => state.skillLeaderboard || {},
   );
+  const currentUser = useSelector((state) => state.user?.user);
 
   // CELEBRATION STATE ONLY
   const [showCelebration, setShowCelebration] = useState(false);
@@ -373,6 +379,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
                   ageRank={index + 1}
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}
+                  currentUser={currentUser}
                 />
               ))
             )}
