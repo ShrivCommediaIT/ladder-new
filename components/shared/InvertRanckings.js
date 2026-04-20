@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { getRequest } from '@/services/apiService';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -45,6 +45,7 @@ const normalizeType = (rawType) => {
 export const InvertRanckings = () => {
     const dispatch = useDispatch();
     const searchParams = useSearchParams();
+    const router = useRouter();
     const [order, setOrder] = useState("asc");
 
     const handleInvertRanckings = async () => {
@@ -63,6 +64,13 @@ export const InvertRanckings = () => {
                 order_by: 'desc' 
             });
 
+            // 2. Update URL with inverted param
+            const currentInverted = searchParams.get('inverted') === '1';
+            const nextInverted = currentInverted ? '0' : '1';
+            const queryParams = new URLSearchParams(searchParams.toString());
+            queryParams.set('inverted', nextInverted);
+            router.replace(`${window.location.pathname}?${queryParams.toString()}`);
+
             // 2. Sync global UI order state
             setOrder(newOrder);
 
@@ -73,8 +81,8 @@ export const InvertRanckings = () => {
             const params = Object.fromEntries(searchParams.entries());
             
             // ✅ REMOVE orderBy from the fetch API call as requested
-            delete params.orderBy;
             delete params.order_by;
+            delete params.inverted;
 
             // Get and Normalize type from URL
             const rawType = (params.ladder_type || params.type || "");
@@ -82,8 +90,6 @@ export const InvertRanckings = () => {
             
             // Update params with the canonical type for the API call
             params.type = canonicalType;
-
-            console.log("Inverting Ranking (Normalized):", { original: rawType, canonical: canonicalType, orderBy: newOrder });
 
             // 5. Dispatch to the specific slice that the page component is actually listening to
             switch (canonicalType) {
@@ -114,12 +120,18 @@ export const InvertRanckings = () => {
         }
     };
     
+    const isInverted = searchParams.get('inverted') === '1';
+
   return (
     <div 
         onClick={handleInvertRanckings} 
-        className='border border-white/10 bg-zinc-900/70 backdrop-blur-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 p-2 bg-gradient-to-r from-gray-900 to-cyan-900 rounded-md cursor-pointer flex items-center justify-center'
-        title={`Sort ${order === 'asc' ? 'Descending' : 'Ascending'}`}
-    >   <span className="text-white text-sm">Invert Rank</span>
+        className={`border backdrop-blur-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 p-2 rounded-md cursor-pointer flex items-center justify-center bg-gradient-to-r ${
+            isInverted 
+            ? 'border-green-500/50 from-green-900/80 to-emerald-900/80' 
+            : 'border-white/10 bg-zinc-900/70 from-gray-900 to-cyan-900'
+        }`}
+        title="Invert Rank"
+    >   <span className="text-white text-sm">{isInverted?"Inverted Rank": "Invert Rank"}</span>
         <ArrowDownUp className={`text-white transition-transform duration-300 ${order === "desc" ? "rotate-180" : ""}`} />
     </div>
   );
