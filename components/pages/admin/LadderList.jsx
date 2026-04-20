@@ -65,8 +65,8 @@ const LadderList = ({ userId }) => {
     }
   }, [userId, dispatch]);
 
-  const handleEditClick = (ladderId, ladderType) => {
-    router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}`);
+  const handleEditClick = (ladderId, ladderType, inverted) => {
+    router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}&inverted=${inverted}`);
   };
 
   const handleDelete = async (ladderId) => {
@@ -191,75 +191,75 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                     </div>
 
                    {/* Right */}
-<div className="flex items-center gap-2 justify-end sm:justify-start">
-  <Button
-    size="sm"
-    variant="ghost"
-    className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm
-      ${
-        isDemo
-          ? "text-cyan-300 border border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"
-          : "text-cyan-300 border border-cyan-300/30 hover:bg-cyan-300/10 hover:text-white"
-      }`}
-    onClick={() =>
-      handleEditClick(ladder.id, ladder.type)
-    }
-  >
-    Edit
-  </Button>
+                  <div className="flex items-center gap-2 justify-end sm:justify-start">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm
+                        ${
+                          isDemo
+                            ? "text-cyan-300 border border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"
+                            : "text-cyan-300 border border-cyan-300/30 hover:bg-cyan-300/10 hover:text-white"
+                        }`}
+                      onClick={() =>
+                        handleEditClick(ladder.id, ladder.type, ladder.inverted)
+                      }
+                    >
+                      Edit
+                    </Button>
 
-  <AlertDialog>
-    <AlertDialogTrigger asChild>
-      <Button
-        size="sm"
-        variant="ghost"
-        className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm cursor-pointer
-          ${
-            isDemo
-              ? "text-red-400 border border-red-500 hover:bg-red-300"
-              : "text-red-400 border border-red-400/30 hover:bg-red-400/50"
-          }`}
-        onClick={() => {
-          setDeleteLadderId(ladder.id);
-          setDeleteLadderName(ladder.name);
-        }}
-      >
-        Delete
-      </Button>
-    </AlertDialogTrigger>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm cursor-pointer
+                            ${
+                              isDemo
+                                ? "text-red-400 border border-red-500 hover:bg-red-300"
+                                : "text-red-400 border border-red-400/30 hover:bg-red-400/50"
+                            }`}
+                          onClick={() => {
+                            setDeleteLadderId(ladder.id);
+                            setDeleteLadderName(ladder.name);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
 
-    <AlertDialogContent className="w-[90%] max-w-md bg-[#0b1020] border border-white/10 text-white rounded-lg">
-      <AlertDialogHeader>
-        <AlertDialogTitle>
-          Delete{" "}
-          <span className="text-red-400 font-bold">
-            {deleteLadderName}
-          </span>
-          ?
-        </AlertDialogTitle>
-        <AlertDialogDescription>
-          This action cannot be undone.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel
-          className="text-black"
-          onClick={() => setDeleteLadderId(null)}
-        >
-          Cancel
-        </AlertDialogCancel>
-        <AlertDialogAction
-          onClick={() =>
-            handleDelete(deleteLadderId)
-          }
-          className="bg-red-600 hover:bg-red-700"
-        >
-          Delete
-        </AlertDialogAction>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
-</div>
+                      <AlertDialogContent className="w-[90%] max-w-md bg-[#0b1020] border border-white/10 text-white rounded-lg">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Delete{" "}
+                            <span className="text-red-400 font-bold">
+                              {deleteLadderName}
+                            </span>
+                            ?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel
+                            className="text-black"
+                            onClick={() => setDeleteLadderId(null)}
+                          >
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() =>
+                              handleDelete(deleteLadderId)
+                            }
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
 
                   </motion.div>
                 );
