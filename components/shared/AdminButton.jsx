@@ -398,7 +398,7 @@ const AdminButton = () => {
           </DialogContent>
         </Dialog>
 
-        {!isRoster && (
+        {/* {!isRoster && (
           <Button
             onClick={handleUpgrade}
             className="bg-[#6766CC] bg-[length:200%_100%] animate-gradient-x 
@@ -415,7 +415,7 @@ const AdminButton = () => {
               Ignore if Club has a Licence
             </span>
           </Button>
-        )}
+        )} */}
       </div>
 
       {/* CONFIRM DIALOG */}

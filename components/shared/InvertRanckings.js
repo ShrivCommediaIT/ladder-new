@@ -12,6 +12,14 @@ import { fetchLeaderboard, toggleInvertRanking } from '@/redux/slices/leaderboar
 import { fetchMiniLeague } from '@/redux/slices/minileagueSlice';
 import { fetchRosterLeaderboard } from '@/redux/slices/rosterLeaderboardSlice';
 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { ArrowDownUp } from 'lucide-react';
 
 /**
@@ -47,13 +55,19 @@ export const InvertRanckings = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [order, setOrder] = useState("asc");
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-    const handleInvertRanckings = async () => {
+    const handleInvertRanckings = () => {
+        setIsConfirmOpen(true);
+    };
+
+    const executeInversion = async () => {
         const newOrder = order === "asc" ? "desc" : "asc";
         const ladderId = searchParams.get('ladder_id');
 
         if (!ladderId) {
             console.error("No ladder_id found in URL params");
+            setIsConfirmOpen(false);
             return;
         }
 
@@ -117,12 +131,37 @@ export const InvertRanckings = () => {
             }
         } catch (error) {
             console.error("Failed to invert ranking on server:", error);
+        } finally {
+            setIsConfirmOpen(false);
         }
     };
     
     const isInverted = searchParams.get('inverted') === '1';
 
   return (
+    <>
+    <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent className="max-w-sm bg-[#163344] text-white border border-[#2dd4bf] rounded-xl flex flex-col items-center p-6">
+          <DialogHeader>
+            <DialogTitle className="text-emerald-500 text-2xl font-bold uppercase tracking-wider text-center w-full mt-2">Confirm Inversion</DialogTitle>
+            <div className="w-full flex justify-center mt-2 mb-6">
+                <span className="h-1 w-20 bg-[#2dd4bf] rounded-full"></span>
+            </div>
+            <DialogDescription className="text-lg text-white text-center">
+              Are you sure you want to <b>invert the rankings</b>? This will change the sorting order for everyone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 w-full mt-6">
+              <Button onClick={() => setIsConfirmOpen(false)} variant="outline" className="bg-[#fbcfe8] text-[#9d174d] hover:bg-[#f9a8d4] font-bold rounded-xl h-12 text-lg border-none cursor-pointer">
+                Cancel
+              </Button>
+              <Button onClick={executeInversion} className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl h-12 text-lg cursor-pointer">
+                Confirm
+              </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     <div 
         onClick={handleInvertRanckings} 
         className={`border backdrop-blur-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 p-2 rounded-md cursor-pointer flex items-center justify-center bg-gradient-to-r ${
@@ -134,5 +173,6 @@ export const InvertRanckings = () => {
     >   <span className="text-white text-sm">{isInverted?"Inverted Rank": "Invert Rank"}</span>
         <ArrowDownUp className={`text-white transition-transform duration-300 ${order === "desc" ? "rotate-180" : ""}`} />
     </div>
+    </>
   );
 };
