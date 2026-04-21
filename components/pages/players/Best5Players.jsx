@@ -46,8 +46,8 @@ const PlayerCard = ({
         onSelect("select", player);
       }}
       className={`mb-3 rounded-lg shadow transition-all font-sans ${canEdit
-          ? "cursor-pointer hover:bg-[#143238]"
-          : "opacity-0 cursor-not-allowed"
+        ? "cursor-pointer hover:bg-[#143238]"
+        : "opacity-0 cursor-not-allowed"
         } sm:px-4 sm:py-3`}
       style={{
         background: "#223848",

@@ -140,7 +140,7 @@ const AddRemoveBox = ({ ladderId, onSuccessRefresh }) => {
       </div>
 
       {/* Move - SHOW FOR minileague, best5, best3, winlose (NOT skill) */}
-      {(showMove && ladderType != "roster") && (
+      {(showMove && ladderType != "roster" && ladderType != "positive" && ladderType != "negative")  && (
         <div className="flex items-center justify-between gap-4">
           <span className="text-lg font-extrabold text-white tracking-wide">
             Move

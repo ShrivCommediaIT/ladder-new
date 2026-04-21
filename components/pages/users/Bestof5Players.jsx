@@ -81,8 +81,8 @@ export default function Bestof5Players() {
   // ================== FILTER ==================
   const filteredPlayers = searchTerm
     ? players.filter((p) =>
-        p.name?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      p.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : players;
 
   // ================== GRADES ==================
@@ -172,11 +172,10 @@ export default function Bestof5Players() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                   onClick={() => canEdit && handlePlayerClick(player)}
-                  className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all relative ${
-                    canEdit
+                  className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all relative ${canEdit
                       ? "cursor-pointer hover:bg-[#143238]"
                       : "opacity-60 cursor-not-allowed"
-                  }`}
+                    }`}
                   style={{
                     background: "#223848",
                     border: "2px solid #4eb0a2",
@@ -184,13 +183,13 @@ export default function Bestof5Players() {
                 >
                   <div className="absolute top-2 left-2 z-20 group">
                     <div className="bg-white rounded-full flex items-center justify-center cursor-pointer shadow-sm border border-gray-200" style={{ padding: '2px' }}>
-                      <input 
-                        type="radio" 
-                        name={`status_${player.id}`} 
-                        value={player.player_status} 
-                        checked 
+                      <input
+                        type="radio"
+                        name={`status_${player.id}`}
+                        value={player.player_status}
+                        checked
                         readOnly
-                        className={`w-3.5 h-3.5 outline-none cursor-pointer ${Number(player.player_status) === 1 ? 'accent-green-500' : 'accent-red-600'}`} 
+                        className={`w-3.5 h-3.5 outline-none cursor-pointer ${Number(player.player_status) === 1 ? 'accent-green-500' : 'accent-red-600'}`}
                       />
                     </div>
                     <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover:block bg-black/80 text-white text-[10px] font-semibold px-2 py-1 rounded whitespace-nowrap shadow border border-white/10 z-30 pointer-events-none">
@@ -199,12 +198,12 @@ export default function Bestof5Players() {
                   </div>
                   <div className="flex-1 min-w-0 mt-6">
                     <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-                      {player?.name || "N/A"}   
+                      {player?.name || "N/A"}
                       {player.age && (
-                      <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
-                        {player.age}
-                      </p>
-                    )}
+                        <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+                          {player.age}
+                        </p>
+                      )}
                     </div>
                     <div className="text-[#d4e5e8] text-xs truncate">
                       {player?.phone || "N/A"}

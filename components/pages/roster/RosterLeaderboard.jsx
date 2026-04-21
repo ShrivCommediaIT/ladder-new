@@ -16,107 +16,107 @@ import { getRequest } from "@/services/apiService";
 
 // ✅ Player Card
 const PlayerCard = ({ player, rank, onRedeemClick }) => {
-  
+
   const playerImageUrl = player.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
   return (
- <div className="flex items-center justify-between px-3 py-2 mb-3 rounded-lg bg-[#1a2f3d] border border-[#4eb0a2] h-30">
+    <div className="flex items-center justify-between px-3 py-2 mb-3 rounded-lg bg-[#1a2f3d] border border-[#4eb0a2] h-30">
 
-  {/* ===== DESKTOP VIEW (1024px+) ===== */}
-<div className="hidden md:flex items-center w-full">
+      {/* ===== DESKTOP VIEW (1024px+) ===== */}
+      <div className="hidden md:flex items-center w-full">
 
-  {/* Rank + Name */}
-  <div className="flex gap-3 items-center flex-shrink-0 w-[35%]">
-    <div className="w-8 h-8 rounded-full bg-[#48aaa8] text-white font-bold flex items-center justify-center text-sm flex-shrink-0">
-      {rank}
-    </div>
-    <div className="min-w-0">
-      <div className="text-white font-semibold text-sm truncate">{player?.name ?? "N/A"}</div>
-      <div className="text-gray-300 text-xs truncate">{player?.phone ?? "N/A"}</div>
-    </div>
-  </div>
-
-  {/* Status + Tokens */}
-  <div className="flex flex-col gap-1 flex-shrink-0 w-[35%]">
-    <div className="border border-white text-white text-xs px-2 py-0.5 w-fit">
-      {"status : " + player?.token_status ?? "Status: Club Icon"}
-    </div>
-    <div className="text-white text-sm">
-      Tokens - {player?.today_token ?? "N/A"}{" "}
-     <span
-        onClick={() => onRedeemClick(player)}
-        className="text-[#48aaa8] font-semibold cursor-pointer hover:underline"
-      >
-        Redeem
-      </span>   
-    </div>
-  </div>
-
-  {/* Total */}
-  <div className="flex-shrink-0 w-[15%] text-white text-xs">
-    Total = {player?.total_token ?? "N/A"}
-  </div>
-
-  {/* Avatar */}
-  <div className="w-[15%] flex justify-end">
-    <div className="w-10 h-10 rounded border border-[#4eb0a2] flex items-center justify-center overflow-hidden flex-shrink-0">
-      {playerImageUrl ? (
-        <Image src={playerImageUrl} alt={player.name} width={40} height={40} className="object-cover" unoptimized />
-      ) : (
-        <div className="text-[#48aaa8] text-[9px] text-center leading-tight font-medium">your<br />avatar</div>
-      )}
-    </div>
-  </div>
-
-</div>
-
-  {/* ===== MOBILE / TABLET VIEW (below 1024px) ===== */}
-  <div className="flex md:hidden items-center justify-between w-full gap-2">
-
-    {/* Left: Rank + Name + Phone + Redeem */}
-    <div className="flex items-start gap-2 flex-1 min-w-0">
-      <div className="w-7 h-7 rounded-full bg-[#48aaa8] text-white font-bold flex items-center justify-center text-xs flex-shrink-0 mt-1">
-        {rank}
-      </div>
-      <div className="flex flex-col min-w-0">
-        <div className="border border-white text-white text-[10px] px-1.5 py-0.5 w-fit mb-1 leading-tight">
-           {"status : " + player?.token_status ?? "Status: Club Legend"}
+        {/* Rank + Name */}
+        <div className="flex gap-3 items-center flex-shrink-0 w-[35%]">
+          {/* Avatar */}
+          <div className="w-[15%] flex justify-end">
+            <div className="w-10 h-10 rounded border border-[#4eb0a2] flex items-center justify-center overflow-hidden flex-shrink-0">
+              {playerImageUrl ? (
+                <Image src={playerImageUrl} alt={player.name} width={40} height={40} className="object-cover" unoptimized />
+              ) : (
+                <div className="text-[#48aaa8] text-[9px] text-center leading-tight font-medium">your<br />avatar</div>
+              )}
+            </div>
+          </div>
+          <div className="min-w-0">
+            <div className="text-white font-semibold text-sm truncate">{player?.name ?? "N/A"}</div>
+            <div className="text-gray-300 text-xs truncate">{player?.phone ?? "N/A"}</div>
+          </div>
         </div>
-        <div className="text-white font-bold text-xs truncate">{player?.name ?? "N/A"}</div>
-        <div className="text-gray-300 text-[10px]">{player?.phone ?? "N/A"}</div>
-        <div className="text-white text-[11px] mt-0.5">
-          {player?.today_token ?? "N/A"} to{" "}
-          <span
-          onClick={() => onRedeemClick(player)}
-          className="text-[#48aaa8] font-semibold cursor-pointer hover:underline"
-        >
-          Redeem
-        </span>
+
+        {/* Status + Tokens */}
+        <div className="flex flex-col gap-1 flex-shrink-0 w-[35%]">
+          <div className="border border-white text-white text-xs px-2 py-0.5 w-fit">
+            {"status : " + player?.token_status ?? "Status: Club Icon"}
+          </div>
+          <div className="text-white text-sm">
+            Tokens - {player?.today_token ?? "N/A"}{" "}
+            <span
+              onClick={() => onRedeemClick(player)}
+              className="text-[#48aaa8] font-semibold cursor-pointer hover:underline"
+            >
+              Redeem
+            </span>
+          </div>
         </div>
+
+        {/* Total */}
+        <div className="flex-shrink-0 w-[15%] text-white text-xs">
+          Total = {player?.total_token ?? "N/A"}
+        </div>
+
+        <div className="w-8 h-8 rounded-full bg-[#48aaa8] text-white font-bold flex items-center justify-center text-sm flex-shrink-0">
+          {rank}
+        </div>
+
+      </div>
+
+      {/* ===== MOBILE / TABLET VIEW (below 1024px) ===== */}
+      <div className="flex md:hidden items-center justify-between w-full gap-2">
+
+        {/* Left: Rank + Name + Phone + Redeem */}
+        <div className="flex items-start gap-2 flex-1 min-w-0">
+          <div className="w-7 h-7 rounded-full bg-[#48aaa8] text-white font-bold flex items-center justify-center text-xs flex-shrink-0 mt-1">
+            {rank}
+          </div>
+          <div className="flex flex-col min-w-0">
+            <div className="border border-white text-white text-[10px] px-1.5 py-0.5 w-fit mb-1 leading-tight">
+              {"status : " + player?.token_status ?? "Status: Club Legend"}
+            </div>
+            <div className="text-white font-bold text-xs truncate">{player?.name ?? "N/A"}</div>
+            <div className="text-gray-300 text-[10px]">{player?.phone ?? "N/A"}</div>
+            <div className="text-white text-[11px] mt-0.5">
+              {player?.today_token ?? "N/A"} to{" "}
+              <span
+                onClick={() => onRedeemClick(player)}
+                className="text-[#48aaa8] font-semibold cursor-pointer hover:underline"
+              >
+                Redeem
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Center: Total Tokens */}
+        <div className="flex flex-col items-center flex-shrink-0">
+          <div className="text-white text-[10px] font-medium text-center leading-tight">Total<br />Tokens</div>
+          <div className="bg-white text-black font-bold text-base px-3 py-0.5 mt-1 min-w-[44px] text-center rounded-sm">
+            {player?.total_token ?? "N/A"}
+          </div>
+        </div>
+
+        {/* Right: Avatar */}
+        <div className="w-11 h-11 rounded flex items-center justify-center flex-shrink-0 overflow-hidden bg-gray-200">
+          {playerImageUrl ? (
+            <Image src={playerImageUrl} alt={player.name} width={44} height={44} className="object-cover" unoptimized />
+          ) : (
+            <div className="text-[#48aaa8] text-[9px] text-center leading-tight font-medium">your<br />avatar</div>
+          )}
+        </div>
+
       </div>
     </div>
-
-    {/* Center: Total Tokens */}
-    <div className="flex flex-col items-center flex-shrink-0">
-      <div className="text-white text-[10px] font-medium text-center leading-tight">Total<br />Tokens</div>
-      <div className="bg-white text-black font-bold text-base px-3 py-0.5 mt-1 min-w-[44px] text-center rounded-sm">
-        {player?.total_token ?? "N/A"}
-      </div>
-    </div>
-
-    {/* Right: Avatar */}
-    <div className="w-11 h-11 rounded flex items-center justify-center flex-shrink-0 overflow-hidden bg-gray-200">
-      {playerImageUrl ? (
-        <Image src={playerImageUrl} alt={player.name} width={44} height={44} className="object-cover" unoptimized />
-      ) : (
-        <div className="text-[#48aaa8] text-[9px] text-center leading-tight font-medium">your<br />avatar</div>
-      )}
-    </div>
-
-  </div>
-</div>
   );
 };
 
@@ -132,10 +132,10 @@ const RosterLeaderboard = () => {
     (state) => state.rosterLeaderboard,
   );
 
-const [selectedPlayer, setSelectedPlayer] = useState(null);
-const [redeemOpen, setRedeemOpen] = useState(false);
-const [historyData, setHistoryData] = useState([]);
-const [loadingHistory, setLoadingHistory] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [redeemOpen, setRedeemOpen] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const refreshRef = useRef(false);
@@ -156,39 +156,46 @@ const [loadingHistory, setLoadingHistory] = useState(false);
 
 
   // ✅ search + alphabet priority sort
-const cleaned = searchQuery.toLowerCase().trim();
+  const cleaned = searchQuery.toLowerCase().trim();
 
-let working = data || [];
+  let working = data || [];
 
-// step 1 — filter if search present
-if (cleaned) {
-  working = working.filter((p) =>
-    p.name?.toLowerCase().includes(cleaned),
-  );
-}
-
-// step 2 — unique
-const uniquePlayers = Array.from(
-  new Map(working.map((p) => [p.id, p])).values(),
-);
-
-// step 3 — alphabet priority + rank sort
-const sortedPlayers = [...uniquePlayers].sort((a, b) => {
-  const aName = a.name?.toLowerCase() || "";
-  const bName = b.name?.toLowerCase() || "";
-
-  // ⭐ priority: startsWith searched letter
+  // step 1 — filter if search present
   if (cleaned) {
-    const aStarts = aName.startsWith(cleaned);
-    const bStarts = bName.startsWith(cleaned);
-
-    if (aStarts && !bStarts) return -1;
-    if (!aStarts && bStarts) return 1;
+    working = working.filter((p) =>
+      p.name?.toLowerCase().includes(cleaned),
+    );
   }
 
-  // fallback → rank sort
-  return 0;
-});
+  // step 2 — unique
+  const uniquePlayers = Array.from(
+    new Map(working.map((p) => [p.id, p])).values(),
+  );
+
+  // step 3 — alphabet priority + token sort + rank sort
+  const sortedPlayers = [...uniquePlayers].sort((a, b) => {
+    const aName = a.name?.toLowerCase() || "";
+    const bName = b.name?.toLowerCase() || "";
+
+    // ⭐ priority: startsWith searched letter
+    if (cleaned) {
+      const aStarts = aName.startsWith(cleaned);
+      const bStarts = bName.startsWith(cleaned);
+
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+    }
+
+    // ⭐ second priority: more total tokens on top
+    const aTokens = Number(a.total_token || 0);
+    const bTokens = Number(b.total_token || 0);
+    if (aTokens !== bTokens) {
+      return bTokens - aTokens;
+    }
+
+    // fallback → rank sort
+    return Number(a.rank || 0) - Number(b.rank || 0);
+  });
 
   // ✅ group by gradebar preset (roster section)
   const groupSize = 6;
@@ -204,30 +211,30 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
   }
 
   const handleRedeemClick = async (player) => {
-  setSelectedPlayer(player);
-  setRedeemOpen(true);
-  setLoadingHistory(true);
+    setSelectedPlayer(player);
+    setRedeemOpen(true);
+    setLoadingHistory(true);
 
-  try {
-    const admin = JSON.parse(sessionStorage.getItem("adminDetails"));
+    try {
+      const admin = JSON.parse(sessionStorage.getItem("adminDetails"));
 
-    const data = await getRequest("/user/tokenHistory", {
-      user_id: player.name,
-      admin_id: admin.id
-    });
+      const data = await getRequest("/user/tokenHistory", {
+        user_id: player.name,
+        admin_id: admin.id
+      });
 
-    if (data.status === true) {
-      setHistoryData(data.data || []);
-    } else {
+      if (data.status === true) {
+        setHistoryData(data.data || []);
+      } else {
+        setHistoryData([]);
+      }
+    } catch (err) {
+      console.error(err);
       setHistoryData([]);
+    } finally {
+      setLoadingHistory(false);
     }
-  } catch (err) {
-    console.error(err);
-    setHistoryData([]);
-  } finally {
-    setLoadingHistory(false);
-  }
-};
+  };
 
 
   return (
@@ -265,21 +272,21 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
               <PlayerCard
                 key={player.id}
                 player={player}
-                rank={player.rank || i + 1}
+                rank={i + 1}
                 onRedeemClick={handleRedeemClick}
               />
             ))}
           </div>
         )))}
-        <RedeemModal
-          open={redeemOpen}
-          onClose={() => setRedeemOpen(false)}
-          player={selectedPlayer}
-          history={historyData}
-          loading={loadingHistory}
-        />
+      <RedeemModal
+        open={redeemOpen}
+        onClose={() => setRedeemOpen(false)}
+        player={selectedPlayer}
+        history={historyData}
+        loading={loadingHistory}
+      />
     </div>
-    
+
   );
 };
 
