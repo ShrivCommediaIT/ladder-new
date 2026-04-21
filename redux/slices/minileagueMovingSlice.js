@@ -10,9 +10,9 @@ export const moveToMiniLeague = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      if (!user_id || !ladder_id || move_to_rank === "" || move_from_rank === "" || !move_from_section || !move_to_section) {
-        return rejectWithValue("All fields are required");
-      }
+      // if (!user_id || !ladder_id || move_to_rank === "" || move_from_rank === "" || !move_from_section || !move_to_section) {
+      //   return rejectWithValue("All fields are required");
+      // }
       const data = await getRequest(API_ENDPOINTS.MOVE_TO_MINILEAGUE, {
         user_id, ladder_id, move_to_rank, move_from_rank, move_from_section, move_to_section,
       });
