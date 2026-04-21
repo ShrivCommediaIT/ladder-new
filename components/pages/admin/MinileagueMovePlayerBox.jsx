@@ -21,24 +21,9 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
   const { loading } = useSelector((state) => state.minileaguePlayerMoving || {});
   const { data: sectionData } = useSelector((state) => state.minileague || {});
 
-      const [localUser, setLocalUser] = useState(null);
+  const [localUser, setLocalUser] = useState(null);
   
-    useEffect(() => {
-      if (typeof window !== "undefined") {
-        const raw = sessionStorage.getItem("userData");
-        if (raw) {
-          try {
-            const parsed = JSON.parse(raw);
-            setLocalUser(parsed);
-            console.log("local user loaded:", parsed);
-          } catch (e) {
-            console.error("Invalid userData in localStorage");
-          }
-        }
-      }
-    }, []);
   
-     const user_id = localUser?.id;
 
   const searchParams = useSearchParams();
   const ladder_id = searchParams.get("ladder_id");
@@ -64,6 +49,19 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
 
   /* ✅ FINAL MOVE HANDLER */
   const handleMove = async () => {
+ const raw = JSON.parse(sessionStorage.getItem("subAdmin"));
+       
+       
+          
+       
+    console.log("fromRank", {
+        user_id: raw?.user_id,
+        ladder_id,
+        move_to_rank: Number(toRank),
+        move_from_rank: Number(fromRank),
+        move_from_section: moveFromSection,
+        move_to_section: moveToSection,
+      });
 
     if (!fromRank || !toRank || !moveFromSection || !moveToSection) {
       toast.error("All fields are required");
@@ -72,7 +70,7 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
 
     const resultAction = await dispatch(
       moveToMiniLeague({
-        user_id,
+        user_id:raw?.user_id,
         ladder_id,
         move_to_rank: Number(toRank),
         move_from_rank: Number(fromRank),
