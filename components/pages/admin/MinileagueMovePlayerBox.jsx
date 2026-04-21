@@ -10,7 +10,7 @@ import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
 
-const MinileagueMovePlayerBox = ({ onCancel }) => {
+const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
   const [fromRank, setFromRank] = useState("");
   const [toRank, setToRank] = useState("");
   const [moveFromSection, setMoveFromSection] = useState("");
@@ -86,6 +86,7 @@ const MinileagueMovePlayerBox = ({ onCancel }) => {
 
       dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
       dispatch(fetchMiniLeague({ ladder_id, type: "minileague" }));
+      onSuccessRefresh?.();
 
       setFromRank("");
       setToRank("");

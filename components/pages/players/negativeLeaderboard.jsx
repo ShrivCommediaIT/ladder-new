@@ -347,10 +347,10 @@ const filteredPlayers = React.useMemo(() => {
             <p className="text-white text-center hidden">Loading...</p>
           )}
           <div className="space-y-2 mt-2">
-            {playerData.length === 0 ? (
+            {filteredPlayers.length === 0 ? (
               <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
             ) : (
-              playerData.map((player, index) => (
+              filteredPlayers.map((player, index) => (
                 <PlayerCard
                   key={player.id}
                   player={player}

@@ -6,22 +6,13 @@ import { API_ENDPOINTS } from "@/constants/api";
 // 1) Standard move
 export const movePlayer = createAsyncThunk(
   "playerMoving/movePlayer",
-  async (
-    { user_id, move_from_user_id, move_to_rank, move_from_rank, ladder_id, match_status, score, bet = "" },
-    { rejectWithValue }
-  ) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const params = {
-        user_id, ladder_id, match_status, move_to_rank, move_from_user_id, score,
-        ...(match_status === "beat" || match_status === "lost" ? { bet } : {}),
-      };
-      if (match_status === "beat" && move_from_rank) params.move_from_rank = move_from_rank;
-      if (match_status === "lost") params.move_to_rank = move_to_rank;
-
-      const data = await getRequest(API_ENDPOINTS.RESULT_SAVE, params);
+      const data = await getRequest(API_ENDPOINTS.RESULT_SAVE, payload);
       if (data.status === 200) {
         return {
-          success_message: data.message || (match_status === "beat" ? "Move Successful" : "Result Saved (Lost)"),
+          success_message: data.message || "Move Successful",
+          eligible_for_token: data.eligible_for_token,
           result: data,
         };
       }
@@ -53,17 +44,15 @@ export const movePlayer1 = createAsyncThunk(
 // 3) Best of 5
 export const movePlayerBestOf5 = createAsyncThunk(
   "playerMoving/movePlayerBestOf5",
-  async ({ ladder_id, match_status, user_id, score, move_to_rank, move_from_rank, bet = "" }, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const requiredFields = { ladder_id, match_status, user_id, move_to_rank, score, move_from_rank };
-      for (const [key, value] of Object.entries(requiredFields)) {
-        if (!value && value !== 0) return rejectWithValue(`Missing required field: ${key}`);
-      }
-      const data = await getRequest(API_ENDPOINTS.RESULT_BESTOF5, {
-        ladder_id, match_status, user_id, move_to_rank, score, move_from_rank, bet: bet || "",
-      });
+      const data = await getRequest(API_ENDPOINTS.RESULT_BESTOF5, payload);
       if (data.status === 200) {
-        return { success_message: data.message || "Best of 5 Result Saved", result: data };
+        return {
+          success_message: data.message || "Best of 5 Result Saved",
+          eligible_for_token: data.eligible_for_token,
+          result: data,
+        };
       }
       return rejectWithValue(data.message || "Best of 5 save failed");
     } catch (error) {
