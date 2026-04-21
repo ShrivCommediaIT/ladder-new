@@ -34,8 +34,7 @@ const AdminHideShowInfo = ({ isModel }) => {
       <div>
         <p className={`font-semibold ${headingText}`}>2. Create your Club Roster</p>
         <p>
-          Add your first sport section and assign a Section PIN from the same
-          drop-down menu.
+          This is essential for the recording of participation tokens and communications via the app
         </p>
       </div>
       
