@@ -19,8 +19,23 @@ const PlayerCard = ({ player, rank }) => {
     : Logo;
 
   return (
-    <div className="flex items-center justify-between px-3 py-3 mb-3 rounded-lg shadow bg-[#223848] border-2 border-[#4eb0a2]">
-      <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between px-3 py-3 mb-3 rounded-lg shadow bg-[#223848] border-2 border-[#4eb0a2] relative">
+      <div className="absolute top-2 left-2 z-20 group">
+        <div className="bg-white rounded-full flex items-center justify-center cursor-pointer shadow-sm border border-gray-200" style={{ padding: '2px' }}>
+          <input 
+            type="radio" 
+            name={`status_${player.id}`} 
+            value={player.player_status} 
+            checked 
+            readOnly
+            className={`w-3.5 h-3.5 outline-none cursor-pointer ${Number(player.player_status) === 1 ? 'accent-green-500' : 'accent-red-600'}`} 
+          />
+        </div>
+        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover:block bg-black/80 text-white text-[10px] font-semibold px-2 py-1 rounded whitespace-nowrap shadow border border-white/10 z-30 pointer-events-none">
+          {Number(player.player_status) === 1 ? 'Active' : 'Inactive'}
+        </div>
+      </div>
+      <div className="flex items-center gap-3 mt-6">
         <div className="w-9 h-9 rounded-full bg-[#48aaa8] text-white font-bold flex items-center justify-center">
           {rank}
         </div>
