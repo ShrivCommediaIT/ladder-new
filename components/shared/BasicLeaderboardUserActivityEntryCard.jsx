@@ -352,11 +352,13 @@ export default function BasicLeaderboardActivityEntryCard({
 
       if (res?.status === 200 || res?.status === "success") {
         toast.success("Result posted successfully!");
-        updateLadderToken({
-          user_id: playerName,
-          ladder_id: ladderId,
-          ladder_type: ladderTypeUpdate,
-        });
+        if(res?.eligible_for_token == 1){
+          updateLadderToken({
+            user_id: playerName,
+            ladder_id: ladderId,
+            ladder_type: ladderTypeUpdate,
+          });
+        }
        
         setOpenSuccess(true);
         return true;
@@ -739,7 +741,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
           {/* Body */}
           <div className="px-5 py-4 space-y-4">
-
+            <p className="text-sm text-red-600 text-italic text-center font-bold">Keep a note of your best score in the second box. </p>
             {/* Scores Row */}
             <div className="flex items-center justify-between text-lg font-bold">
               <div className="flex items-center gap-2">
@@ -758,6 +760,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 </span>
               </div>
             </div>
+            <p className="text-sm text-gray-600 font-bold">Note: Results posted without a witness will not qualify for a token.</p>
             {/* Witness */}
             <div>
               <label className="text-md font-medium">Witness: <span className="ml-3 font-bold"> {witnessBy || "—"} </span></label>

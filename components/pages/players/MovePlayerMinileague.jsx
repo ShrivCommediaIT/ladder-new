@@ -260,11 +260,13 @@ const MoveNumberMinileague = ({
       
       if (moveMiniLeagueRes.success_message == "Success") {
         toast.success(`Result posted in Section ${currentSection + 1}`, { autoClose: 2000 });
-        updateLadderToken({
-          user_id: selectedPlayer.name,
-          ladder_id : effectiveLadderId,
-          ladder_type: "minileague",
-        })
+        if(moveMiniLeagueRes?.eligible_for_token == 1){
+          updateLadderToken({
+            user_id: selectedPlayer.name,
+            ladder_id : effectiveLadderId,
+            ladder_type: "minileague",
+          })
+        }
       }else{
           toast.error("Failed to post result. Please try again.");
       }

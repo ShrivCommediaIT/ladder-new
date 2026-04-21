@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import MinileagueMovePlayerBox from "./MinileagueMovePlayerBox";
 import Best5MovePlayerBox from "./Best5MovePlayerBox";
 
-const MovePlayerBox = () => {
+const MovePlayerBox = ({ onSuccessRefresh }) => {
 
   const [open, setOpen] = useState(true);
 
@@ -33,7 +33,7 @@ const MovePlayerBox = () => {
   /* ========== RENDER ACCORDING TO TYPE ========== */
 
   if (ladderType === "minileague") {
-    return <MinileagueMovePlayerBox />;
+    return <MinileagueMovePlayerBox onSuccessRefresh={onSuccessRefresh} />;
   }
 
   // best5 + winlose + best3 => Best5MovePlayerBox
@@ -46,6 +46,7 @@ if (["best5", "winlose", "best3"].includes(ladderType)) {
     <Best5MovePlayerBox
       open={open}
       onClose={() => setOpen(false)}
+      onSuccessRefresh={onSuccessRefresh}
     />
   );
 }

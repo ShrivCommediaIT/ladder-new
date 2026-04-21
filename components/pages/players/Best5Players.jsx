@@ -138,7 +138,6 @@ const Best5Players = () => {
   const numericLadderId = Number(ladderId);
   const playerList = players?.[numericLadderId]?.data || [];
 
-  console.log("player.age==>1", players);
 
   useEffect(() => {
     if (user?.id) dispatch(fetchUserProfile(user.id));

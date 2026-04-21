@@ -169,6 +169,7 @@ const AddRemoveBox = ({ ladderId, onSuccessRefresh }) => {
                     <MovePlayerBox
                       onCancel={handleDialogClose(setMoveOpen)}
                       ladderId={currentLadderId}
+                      onSuccessRefresh={onSuccessRefresh}
                     />
                   </motion.div>
                 </DialogContent>

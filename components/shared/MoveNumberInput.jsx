@@ -166,6 +166,7 @@ const MoveNumberInput = ({
       setLoading(true);
 
       let payload;
+      const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
 
       if (ladderType === "best5" || ladderType === "best3") {
         payload = {
@@ -175,16 +176,30 @@ const MoveNumberInput = ({
           move_to_rank: Number(selectedNumber),
           move_from_rank: currentRank,
           score,
-          bet: betDescription,
+          admin_id: adminDetails?.id,
+          user_name: selectedPlayer.name,
+          witness_by: selectedPlayer.name,
+
+          // ✅ Only send bet for beat/lost
+          ...(resultType === "beat" || resultType === "lost"
+            ? { bet: betDescription }
+            : {}),
         };
         const movePlayer = await dispatch(movePlayerBestOf5(payload)).unwrap();
           if (movePlayer.success_message == "Success") {
           toast.success("Result posted successfully! ");
-          updateLadderToken({
-            user_id: selectedPlayer.name,
-            ladder_id,
-            ladder_type: ladderType,
-          })
+          if(movePlayer?.eligible_for_token == 1){
+            await updateLadderToken({
+              user_id: selectedPlayer.name,
+              ladder_id,
+              ladder_type: ladderType,
+            })
+            await updateLadderToken({
+              user_id: challengedPlayer.name,
+              ladder_id,
+              ladder_type: ladderType,
+            })
+          }
         } else {
           toast.error("Failed to post result. Please try again.");
         }
@@ -198,17 +213,32 @@ const MoveNumberInput = ({
           move_to_rank: Number(selectedNumber),
           move_from_rank: currentRank,
           score,
+          admin_id: adminDetails?.id,
+          user_name: selectedPlayer.name,
+          witness_by: selectedPlayer.name,
+
+          // ✅ Only send bet for beat/lost
+          ...(resultType === "beat" || resultType === "lost"
+            ? { bet: betDescription }
+            : {}),
         };
 
         const movePlayerRes = await dispatch(movePlayer(payload)).unwrap();
         
         if (movePlayerRes.success_message == "Success") {
           toast.success("Result posted successfully! ");
-          updateLadderToken({
-            user_id: selectedPlayer.name,
-            ladder_id,
-            ladder_type: ladderType,
-          })
+          if(movePlayerRes?.eligible_for_token == 1){
+            await updateLadderToken({
+              user_id: selectedPlayer.name,
+              ladder_id,
+              ladder_type: ladderType,
+            })
+            await updateLadderToken({
+              user_id: challengedPlayer.name,
+              ladder_id,
+              ladder_type: ladderType,
+            })
+          }
         } else {
           toast.error("Failed to post result. Please try again.");
         }

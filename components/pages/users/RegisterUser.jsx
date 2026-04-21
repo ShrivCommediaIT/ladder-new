@@ -96,7 +96,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
 
       setTimeout(() => router.replace(url), 1200);
     } else {
-      toast.error(res?.message || "Registration failed");
+      toast.error(res?.error_message || "Registration failed");
     }
   } catch {
     toast.error("Server error");
@@ -135,7 +135,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
             {/* DOB PICKER */}
   <div>
     <Label className="text-teal-400 mb-1">
-      Date of Birth:(Only for age related solutions)
+      Date of Birth:(for age related solutions)
     </Label>
 
     <Popover>

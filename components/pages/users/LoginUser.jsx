@@ -84,6 +84,11 @@ export default function LoginUser({ ladderId, ladderType }) {
         })
       );
 
+      sessionStorage.setItem(
+        "adminDetails",
+        JSON.stringify({id:res?.admin_id})
+      );
+
       toast.success("Login successful!");
 
       router.push(
