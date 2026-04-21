@@ -88,18 +88,21 @@ const MoveNumberInput = ({
 
   // FIXED: Correct payload structure
   const confirmMove = async () => {
+
     if (!user_id || !ladder_id || !currentId) {
       toast.error("Missing required information.");
       setShowConfirm(false);
       return;
     }
 
+
+
     try {
       setLoading(true);
 
       // PERFECT Payload for each API
       let payload;
-
+      const adminDetails = await JSON.parse(sessionStorage.getItem("adminDetails"));
 
       if (ladderType === "best5" || ladderType === "best3") {
         payload = {
@@ -109,6 +112,10 @@ const MoveNumberInput = ({
           move_to_rank: Number(selectedNumber),
           score,
           move_from_rank: currentRank,
+          admin_id: adminDetails.id,
+          user_name: selectedPlayer.name,
+          witness_by: "test",
+
 
           // ✅ Only send bet for beat/lost
           ...(resultType === "beat" || resultType === "lost"
@@ -117,17 +124,26 @@ const MoveNumberInput = ({
         };
 
         const movePlayer = await dispatch(movePlayerBestOf5(payload)).unwrap();
+        
         if (movePlayer.success_message == "Success") {
           toast.success("Result posted successfully! ");
-          updateLadderToken({
-            user_id: selectedPlayer.name,
-            ladder_id,
-            ladder_type: ladderType,
-          })
+          if(movePlayer?.eligible_for_token == 1){
+          await  updateLadderToken({
+              user_id: selectedPlayer.name,
+              ladder_id,
+              ladder_type: ladderType,
+            })
+
+          await  updateLadderToken({
+              user_id: challengedPlayer.name,
+              ladder_id,
+              ladder_type: ladderType,
+            })
         } else {
           toast.error("Failed to post result. Please try again.");
         }
 
+        }
       } else {
 
         payload = {
@@ -138,6 +154,9 @@ const MoveNumberInput = ({
           move_to_rank: Number(selectedNumber),
           move_from_rank: currentRank,
           score,
+          admin_id: adminDetails.id,
+          user_name: selectedPlayer.name,
+          witness_by: "test",
 
           // ✅ Only send bet for beat/lost
           ...(resultType === "beat" || resultType === "lost"
@@ -145,21 +164,29 @@ const MoveNumberInput = ({
             : {}),
         };
 
+        console.log("ladderType", payload);  
+
+
       const movePlayerRes =  await dispatch(movePlayer(payload)).unwrap();
         if (movePlayerRes.success_message == "Success") {
-
-          updateLadderToken({
-            user_id: selectedPlayer.name,
-            ladder_id,
-            ladder_type: "winloss",
-          })
+            if(movePlayerRes?.eligible_for_token == 1){
+            await updateLadderToken({
+              user_id: selectedPlayer.name,
+              ladder_id,
+              ladder_type: ladderType,
+            })
+            await  updateLadderToken({
+              user_id: challengedPlayer.name,
+              ladder_id,
+              ladder_type: ladderType,
+            })
+          }
           toast.success("Result posted successfully! ");
 
         } else {
           toast.error("Failed to post result. Please try again.");
 
         }
-      }
 
       // Refresh data
       const effectiveType = urlType || ladderType;
@@ -172,7 +199,7 @@ const MoveNumberInput = ({
       setShowConfirm(false);
       resetForm();
       onClose();
-
+      }
     } catch (err) {
       console.error("Error Details:", err);
       toast.error(err?.message);
@@ -488,7 +515,7 @@ const MoveNumberInput = ({
         <AlertDialogContent className="bg-gray-900 border-violet-500 text-gray-100 w-[92vw] sm:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold text-violet-400 flex items-center gap-2">
-              <CheckCircle className="text-green-500 h-5 w-5" /> Confirm Result
+              <CheckCircle className="text-green-500 h-5 w-5" /> Confirm Result         
             </AlertDialogTitle>
 
             <AlertDialogDescription className="text-start text-lg text-white">

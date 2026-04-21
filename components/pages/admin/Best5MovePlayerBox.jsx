@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 
 import { ArrowLeft, X, MoveUp } from "lucide-react";
 
-const Best5MovePlayerBox = ({ open, onClose = () => {} }) => {
+const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
 
     if (!open) return null;
 
@@ -88,7 +88,8 @@ const Best5MovePlayerBox = ({ open, onClose = () => {} }) => {
       if (response.status === 200) {
         toast.success("Player moved successfully");
 
-        dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
+        await dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
+        onSuccessRefresh?.();
 
         setFromRank("");
         setToRank("");

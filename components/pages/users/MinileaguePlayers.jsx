@@ -61,7 +61,7 @@ const PlayerCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       onClick={canEdit ? onClick : undefined}
-      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans sm:px-4 sm:py-3 ${
+      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans sm:px-4 sm:py-3 relative ${
         canEdit
           ? "cursor-pointer hover:bg-[#143238]"
           : "opacity-60 cursor-not-allowed"
@@ -71,18 +71,33 @@ const PlayerCard = ({
         border: "2px solid #4eb0a2",
       }}
     >
+      <div className="absolute top-2 left-2 z-20 group">
+        <div className="bg-white rounded-full flex items-center justify-center cursor-pointer shadow-sm border border-gray-200" style={{ padding: '2px' }}>
+          <input 
+            type="radio" 
+            name={`status_${player.id}`} 
+            value={player.player_status} 
+            checked 
+            readOnly
+            className={`w-3.5 h-3.5 outline-none cursor-pointer ${Number(player.player_status) === 1 ? 'accent-green-500' : 'accent-red-600'}`} 
+          />
+        </div>
+        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover:block bg-black/80 text-white text-[10px] font-semibold px-2 py-1 rounded whitespace-nowrap shadow border border-white/10 z-30 pointer-events-none">
+          {Number(player.player_status) === 1 ? 'Active' : 'Inactive'}
+        </div>
+      </div>
       {/* LEFT */}
-      <div className="flex-1 min-w-0 overflow-hidden">
+      <div className="flex-1 min-w-0 overflow-hidden mt-8">
         <div className="flex w-full items-center mb-2 min-w-0">
           <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#48aaa8] border-2 border-white text-lg sm:text-2xl font-bold text-white mr-2 shrink-0">
             {rank}
           </div>
 
-          <div className="flex-1 min-w-0 overflow-hidden">
-            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate max-w-[160px] sm:max-w-[240px]">
+          <div className="flex-1 min-w-0 overflow-hidden mb-3">
+            <div className="text-white flex items-center align-center gap-2 text-sm sm:text-base font-semibold truncate max-w-[160px] sm:max-w-[240px]">
               {player?.name || "N/A"}   
               {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+              <p className="text-white ml-10 border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
                 {player.age}
               </p>
             )}

@@ -22,8 +22,7 @@ const RedeemModal = ({ open, onClose, player, history, loading }) => {
                         <p className="font-bold mb-2 text-cyan-400">Discounts offered by SPONSOR</p>
 
                         <div className="space-y-1 text-xs">
-                            <div className="flex justify-between">
-                                <span className='text-cyan-400'>Tokens Saved</span>
+                            <div className="flex justify-end">
                                 <span className='text-cyan-400'>Discount</span>
                             </div>
                             <div className="flex justify-between">

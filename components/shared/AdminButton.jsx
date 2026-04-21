@@ -99,8 +99,8 @@ const AdminButton = () => {
 
   const refreshLeaderboard = () => {
     if (ladderId) {
-      if (isSkill) {
-        dispatch(fetchSkillLeaderboard({ ladder_id: ladderId, type: "skill" }));
+      if (isSkill || isPositive || isNegative) {
+        refreshSkillLeaderboard();
       } else {
         dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderType }));
         if (isMiniLeague) {
@@ -301,34 +301,30 @@ const AdminButton = () => {
           </Button>
         )}
 
-          <Dialog
-            open={openAddPlayerDialog}
-            onOpenChange={setOpenAddPlayerDialog}
-          >
-            <DialogTrigger asChild>
-              <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
-                <PlusCircle size={20} />
-                ADD/REMOVE/MOVE
-              </Button>
-            </DialogTrigger>
+        <Dialog
+          open={openAddPlayerDialog}
+          onOpenChange={setOpenAddPlayerDialog}
+        >
+          <DialogTrigger asChild>
+            <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
+              <PlusCircle size={20} />
+              ADD/REMOVE/MOVE
+            </Button>
+          </DialogTrigger>
 
-            <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="sr-only">
-                  Manage Players
-                </DialogTitle>
-              </DialogHeader>
+          <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="sr-only">
+                Manage Players
+              </DialogTitle>
+            </DialogHeader>
 
-              <AddRemoveBox
-                ladderId={ladderId}
-                onSuccessRefresh={
-                  isSkill
-                    ? refreshSkillLeaderboard
-                    : refreshLeaderboard
-                }
-              />
-            </DialogContent>
-          </Dialog>
+            <AddRemoveBox
+              ladderId={ladderId}
+              onSuccessRefresh={refreshLeaderboard}
+            />
+          </DialogContent>
+        </Dialog>
 
         {/* SKILL SPECIFIC BUTTONS */}
         {(isSkill || isPositive || isNegative) && (
@@ -352,10 +348,10 @@ const AdminButton = () => {
         )}
 
         {/* AGE FILTER BUTTON */}
-        { (isSkill || isPositive || isNegative) && 
-        <div  className="h-16 w-full">
-        <AgeFilter onSearch={handleAgeSearch} user={false} />
-        </div>
+        {(isSkill || isPositive || isNegative) &&
+          <div className="h-16 w-full">
+            <AgeFilter onSearch={handleAgeSearch} user={false} />
+          </div>
         }
 
         {/* SINGLE DIALOG */}

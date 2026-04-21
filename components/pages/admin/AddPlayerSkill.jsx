@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogDescription,
-  DialogFooter 
+  DialogFooter
 } from "@/components/ui/dialog";
 import { CheckCircle, AlertCircle, Phone, User } from "lucide-react";
 import { postWithParams } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 
 const SuccessDialog = ({ playerName, ladderId, onCloseAll }) => (
-  <Dialog open={true} onOpenChange={() => {}}>
+  <Dialog open={true} onOpenChange={() => { }}>
     <DialogContent className="sm:max-w-md bg-gradient-to-br from-green-500/10 to-emerald-500/10 
                               border-2 border-green-500/30 backdrop-blur-sm rounded-2xl">
       <DialogHeader>
@@ -61,7 +61,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       setError("Player name is required!");
       return;
@@ -86,10 +86,10 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
         setFormData({ name: "", phone: "" });
         onSuccessRefresh?.();
       } else {
-        throw new Error(response?.message || "Failed to add player");
+      setError(response?.error_message || "Failed to add player. Please try again.");
       }
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to add player. Please try again.");
+        throw new Error(response?.error_message || "Failed to add player");
     } finally {
       setLoading(false);
     }
@@ -110,7 +110,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
       <div className="space-y-2">
         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
           <User className="w-6 h-6" />
-          Add Skill Player
+          Add
         </h2>
       </div>
 
