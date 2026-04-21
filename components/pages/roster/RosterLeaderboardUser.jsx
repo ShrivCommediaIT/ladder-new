@@ -198,7 +198,7 @@ const sortedPlayers = [...uniquePlayers].sort((a, b) => {
               />
             ))}
           </div>
-        ))}
+        )))}
     </div>
   );
 };
