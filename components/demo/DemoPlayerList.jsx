@@ -30,6 +30,7 @@ export default function DemoPlayerList({ ladderId }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [customRanks, setCustomRanks] = useState({}); // ✅ local state to override rank
+  const [appliedAge, setAppliedAge] = useState(0);
 
   const user = useSelector((state) => state.user.user);
   const players = useSelector(
@@ -45,10 +46,14 @@ export default function DemoPlayerList({ ladderId }) {
 
   useEffect(() => {
     if (ladderId) {
-      dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl }));
+      const payload = { ladder_id: ladderId, type: ladderTypeFromUrl };
+      if (appliedAge > 0) {
+        payload.dob = appliedAge;
+      }
+      dispatch(fetchLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
     }
-  }, [dispatch, ladderId, ladderTypeFromUrl]);
+  }, [dispatch, ladderId, ladderTypeFromUrl, appliedAge]);
 
   const filteredPlayers = searchTerm
     ? players.filter((p) =>
@@ -117,7 +122,7 @@ export default function DemoPlayerList({ ladderId }) {
 
       {/* Search Input */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 mb-4">
-        <PlayerSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <PlayerSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} onAgeSearch={(age) => setAppliedAge(Number(age))} />
       </div>
 
       {grades.map((grade, gradeIndex) => (

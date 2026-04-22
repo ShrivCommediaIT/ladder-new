@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LogOut, UserCircle2, Shield, UserPlus, Key } from "lucide-react";
+import { LogOut, UserCircle2, Shield, UserPlus, Key, HelpCircle } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import Logo from "@/public/logo.jpg";
 import Link from "next/link";
@@ -41,35 +41,35 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
 
 
   // ✅ Get user from sessionStorage
- 
+
 
   useEffect(() => {
-  if (typeof window !== "undefined") {
-    try {
-      const storedAdmin = sessionStorage.getItem("userData");
-      const storedSubAdmin = sessionStorage.getItem("subAdmin");
+    if (typeof window !== "undefined") {
+      try {
+        const storedAdmin = sessionStorage.getItem("userData");
+        const storedSubAdmin = sessionStorage.getItem("subAdmin");
 
-      const admin = storedAdmin ? JSON.parse(storedAdmin) : null;
-      const subAdmin = storedSubAdmin ? JSON.parse(storedSubAdmin) : null;
+        const admin = storedAdmin ? JSON.parse(storedAdmin) : null;
+        const subAdmin = storedSubAdmin ? JSON.parse(storedSubAdmin) : null;
 
-      // ✅ Pehle role check karo
-      if (admin?.user_type === "admin") {
-        setUser(admin);
-        return;
+        // ✅ Pehle role check karo
+        if (admin?.user_type === "admin") {
+          setUser(admin);
+          return;
+        }
+
+        if (subAdmin?.user_type === "sub_admin") {
+          setUser(subAdmin);
+          return;
+        }
+
+        setUser(null);
+      } catch (err) {
+        console.error("Invalid user data in sessionStorage", err);
+        setUser(null);
       }
-
-      if (subAdmin?.user_type === "sub_admin") {
-        setUser(subAdmin);
-        return;
-      }
-
-      setUser(null);
-    } catch (err) {
-      console.error("Invalid user data in sessionStorage", err);
-      setUser(null);
     }
-  }
-}, []);
+  }, []);
 
 
   const finalUser = demoUser || user;
@@ -156,6 +156,8 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
 
           <DropdownMenuSeparator />
 
+
+
           {finalUser?.user_type === "sub_admin" && (
             <>
               <DropdownMenuItem
@@ -165,14 +167,6 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
                 <Shield className="mr-2 h-4 w-4 text-blue-600" />
                 Sub-Admin Dashboard
               </DropdownMenuItem>
-
-              {/* <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-red-600 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/30"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem> */}
             </>
           )}
 
@@ -211,6 +205,13 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
                   Register Player
                 </Link>
               )} */}
+              <DropdownMenuItem
+                onClick={() => router.push("/q-a")}
+                className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                <HelpCircle className="mr-2 h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+                Q & A
+              </DropdownMenuItem>
 
               <DropdownMenuItem
                 onClick={handleLogout}

@@ -10,8 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getRequest, postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { useSearchParams } from "next/navigation";
-import { ChevronDown, ChevronUp, Edit, Save, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Edit, Pen, Save, X } from "lucide-react";
 import EditDiscountToken from "@/components/shared/editDiscountToken";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 const LadderRulesCard = ({ ladderIdProp }) => {
   const searchParams = useSearchParams();
@@ -25,6 +26,9 @@ const LadderRulesCard = ({ ladderIdProp }) => {
 
   const [rulesList, setRulesList] = useState([]);
   const [tempRulesList, setTempRulesList] = useState([]);
+
+  const [editTitleId, setEditTitleId] = useState(null);
+  const [tempTitle, setTempTitle] = useState("");
 
   useEffect(() => {
     if (!ladderId) return;
@@ -75,6 +79,36 @@ const LadderRulesCard = ({ ladderIdProp }) => {
     setIsEditing(null);
   };
 
+  const handleSaveTitle = async () => {
+    if (!editTitleId) return;
+
+    try {
+      const rule = tempRulesList.find((r) => r.id === editTitleId);
+      if (!rule) return;
+
+      await postRequest(API_ENDPOINTS.UPDATE_RULES_DOCUMENT, {
+        id: rule.id,
+        title: tempTitle,
+        rules: rule.rules,
+      });
+
+      const updatedRules = rulesList.map((r) =>
+        r.id === editTitleId ? { ...r, title: tempTitle } : r
+      );
+      const updatedTempRules = tempRulesList.map((r) =>
+        r.id === editTitleId ? { ...r, title: tempTitle } : r
+      );
+
+      setRulesList(updatedRules);
+      setTempRulesList(updatedTempRules);
+      setEditTitleId(null);
+      toast.success("Title updated successfully.");
+    } catch (error) {
+      console.error("Error updating title:", error);
+      toast.error("Failed to update title. Please try again.");
+    }
+  };
+
   const toggleRule = (ruleId) => {
     setOpenRuleIds((prev) =>
       prev.includes(ruleId) ? prev.filter((id) => id !== ruleId) : [...prev, ruleId]
@@ -84,7 +118,7 @@ const LadderRulesCard = ({ ladderIdProp }) => {
   if (loading) {
     return (
       <div className="space-y-4 w-full p-6 rounded-3xl bg-white/5 border border-white/10 shadow-xl">
-        <h2 className="text-xl font-semibold text-amber-400">Ladder Rules</h2>
+        <h2 className="text-xl font-semibold text-blue-400">Ladder Rules</h2>
         <Skeleton className="h-10 w-full bg-gray-700" />
         <Skeleton className="h-24 w-full bg-gray-800" />
       </div>
@@ -134,9 +168,23 @@ const LadderRulesCard = ({ ladderIdProp }) => {
                   onClick={() => toggleRule(rule.id)}
                 >
                   <span>{rule.title || "Ladder Rules"}</span>
-                  <Button variant="ghost" size="icon" className="text-amber-400">
+                  <div className="flex">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-amber-400 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditTitleId(rule.id);
+                      setTempTitle(rule.title || "");
+                    }}
+                  >
+                    <Pen size={24} />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-amber-400 cursor-pointer">
                     {isOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
                   </Button>
+                  </div>
                 </div>
 
                 {isOpen && (
@@ -162,6 +210,30 @@ const LadderRulesCard = ({ ladderIdProp }) => {
           </div>
         );
       })}
+
+      <Dialog open={editTitleId !== null} onOpenChange={(open) => !open && setEditTitleId(null)}>
+        <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle>Edit Title</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              value={tempTitle}
+              onChange={(e) => setTempTitle(e.target.value)}
+              placeholder="Enter Title"
+              className="bg-gray-800 border-gray-700 text-white focus:ring-amber-500"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEditTitleId(null)} className="text-gray-300 hover:bg-gray-800 hover:text-white">
+              Cancel
+            </Button>
+            <Button onClick={handleSaveTitle} className="bg-blue-900 hover:bg-blue-950 text-white font-bold">
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

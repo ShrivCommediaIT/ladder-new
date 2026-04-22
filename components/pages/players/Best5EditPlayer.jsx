@@ -79,7 +79,7 @@ export const Best5EditPlayer = ({
     // { value: "status", label: "Status" },
     { value: "stats", label: "Stats" },
     { value: "edit", label: "Edit" },
-    { value: "load", label: "Upload" },
+    { value: "load", label: "Upload Avatar" },
   ];
 
   return (

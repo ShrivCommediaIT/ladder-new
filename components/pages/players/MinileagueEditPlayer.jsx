@@ -143,7 +143,7 @@ if (userData.user_type === "admin") {
     { value: "challenge", label: "Challenge" },
     { value: "stats", label: "Stats" },
     { value: "edit", label: "Edit" },
-    { value: "load", label: "Upload" },
+    { value: "load", label: "Upload Avatar" },
   ];
 
   const sectionName =
@@ -226,19 +226,13 @@ if (userData.user_type === "admin") {
               <PlayerStatsBox userId={playerId} ladderId={ladder_id} />
             </TabsContent>
 
-            {/* <TabsContent value="edit">
-              <EditPlayerDetails
-                userId={playerId}
-                ladderId={ladder_id}
-                onClose={onClose}
-              />
-            </TabsContent> */}
 
             <TabsContent value="edit">
               <EditPlayerDetails
                 userId={playerId}
                 ladderId={ladder_id} // YE ADD KARO (same as PlayerImage)
                 onClose={onClose}
+                minileagueSelectedPlayer={selectedPlayer}
               />
             </TabsContent>
 

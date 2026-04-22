@@ -125,7 +125,7 @@ const PlayerCard = ({
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
               {player?.name || "N/A"}   
               {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit">
+              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">
                 {player.age}
               </p>
             )}

@@ -95,19 +95,20 @@ const AdminButton = () => {
   const positiveAppliedAge = useSelector((state) => state.positiveLeaderBoard?.appliedAge || 0);
   const negativeAppliedAge = useSelector((state) => state.negativeLeaderBoard?.appliedAge || 0);
 
-  const appliedAge = isSkill ? skillAppliedAge : isPositive ? positiveAppliedAge : isNegative ? negativeAppliedAge : 0;
+  const [localAge, setLocalAge] = useState(0);
+
+  const appliedAge = isSkill ? skillAppliedAge : isPositive ? positiveAppliedAge : isNegative ? negativeAppliedAge : localAge;
 
   const refreshLeaderboard = () => {
     if (ladderId) {
-      if (isSkill || isPositive || isNegative) {
+      if (isSkill || isPositive || isNegative || ladderType === "best5" || ladderType === "best3" || ladderType === "winlose" || isMiniLeague) {
         refreshSkillLeaderboard();
       } else {
-        dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderType }));
-        if (isMiniLeague) {
-          dispatch(fetchMiniLeague({ ladder_id: ladderId, type: "minileague" }));
-        }
+        const payload = { ladder_id: ladderId, type: ladderType };
+        if (appliedAge > 0) payload.dob = appliedAge;
+        dispatch(fetchLeaderboard(payload));
         if (isRoster) {
-          dispatch(fetchRosterLeaderboard({ ladder_id: ladderId }));
+          dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: appliedAge > 0 ? appliedAge : undefined }));
         }
       }
     }
@@ -125,6 +126,12 @@ const AdminButton = () => {
     } else if (typeFromParams === "negative" || ladderTypeFromParams === "negative") {
       laddartype = "negative";
       fetchSliceLeaderboard = fetchNegativeLeaderboard;
+    } else if (ladderType === "best5" || ladderType === "best3" || ladderType === "winlose") {
+      laddartype = ladderType;
+      fetchSliceLeaderboard = fetchLeaderboard;
+    } else if (ladderType === "minileague") {
+      laddartype = "minileague";
+      fetchSliceLeaderboard = fetchMiniLeague;
     } else {
       laddartype = "skill";
       fetchSliceLeaderboard = fetchSkillLeaderboard;
@@ -133,8 +140,11 @@ const AdminButton = () => {
     const payload = {
       ladder_id: ladderId,
       type: laddartype,
-      sortbyskillnumber: skillNo,
     };
+
+    if (laddartype === "skill" || laddartype === "positive" || laddartype === "negative") {
+      payload.sortbyskillnumber = skillNo;
+    }
 
     const finalAge = ageOverride !== undefined ? ageOverride : appliedAge;
 
@@ -143,9 +153,11 @@ const AdminButton = () => {
     }
 
     dispatch(fetchSliceLeaderboard(payload));
-  };
 
-  const currentSetAppliedAge = isSkill ? setSkillAppliedAge : isPositive ? setPositiveAppliedAge : isNegative ? setNegativeAppliedAge : null;
+    if (laddartype === "minileague") {
+      dispatch(fetchLeaderboard({ ...payload, type: "minileague" }));
+    }
+  };
 
   useEffect(() => {
     if (ladderId) dispatch(fetchGradebars(ladderId));
@@ -226,13 +238,19 @@ const AdminButton = () => {
   const handleClearAll = () => {
     setIsSorted(false);
     setCurrentSkillNo(0);
-    if (currentSetAppliedAge) dispatch(currentSetAppliedAge(0));
+    if (isSkill) dispatch(setSkillAppliedAge(0));
+    else if (isPositive) dispatch(setPositiveAppliedAge(0));
+    else if (isNegative) dispatch(setNegativeAppliedAge(0));
+    else setLocalAge(0);
     refreshSkillLeaderboard(0, 0);
   };
 
   const handleAgeSearch = (age) => {
     const ageNum = Number(age);
-    if (currentSetAppliedAge) dispatch(currentSetAppliedAge(ageNum));
+    if (isSkill) dispatch(setSkillAppliedAge(ageNum));
+    else if (isPositive) dispatch(setPositiveAppliedAge(ageNum));
+    else if (isNegative) dispatch(setNegativeAppliedAge(ageNum));
+    else setLocalAge(ageNum);
     refreshSkillLeaderboard(currentSkillNo, ageNum);
     setIsSorted(true);
   };
@@ -348,11 +366,11 @@ const AdminButton = () => {
         )}
 
         {/* AGE FILTER BUTTON */}
-        {(isSkill || isPositive || isNegative) &&
-          <div className="h-16 w-full">
-            <AgeFilter onSearch={handleAgeSearch} user={false} />
-          </div>
-        }
+
+        <div className="h-16 w-full">
+          <AgeFilter onSearch={handleAgeSearch} user={false} />
+        </div>
+
 
         {/* SINGLE DIALOG */}
         <Dialog
