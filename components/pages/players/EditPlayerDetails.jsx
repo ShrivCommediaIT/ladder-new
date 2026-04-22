@@ -16,8 +16,17 @@ import {
   editUserDetails,
   resetEditPlayerState,
 } from "@/redux/slices/editdetailSlice";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice"; // ✅ ADDED FOR MINILEAGUE
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { format } from "date-fns";
+import { calculateAge } from "@/lib/utils";
 
 const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
   const dispatch = useDispatch();
@@ -43,9 +52,11 @@ const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
     id: "",
     user_id: "",
     name: "",
+    dob:null,
     phone: "",
   });
 
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [showSkeleton, setShowSkeleton] = useState(false);
   const cardRef = useRef(null);
 
@@ -67,16 +78,50 @@ const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
   // Prefill form
   useEffect(() => {
     if (selectedPlayer) {
+      let initialDob = null;
+      if (selectedPlayer.dob) {
+        if (selectedPlayer.dob instanceof Date) {
+          initialDob = selectedPlayer.dob;
+        } else if (typeof selectedPlayer.dob === "string") {
+          if (selectedPlayer.dob.includes("-")) {
+            // Handle YYYY-MM-DD (e.g., 2010-04-07)
+            const parts = selectedPlayer.dob.split("-");
+            if (parts.length === 3) {
+              initialDob = new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+          } else if (selectedPlayer.dob.includes("/")) {
+            // Handle DD/MM/YYYY
+            const parts = selectedPlayer.dob.split("/");
+            if (parts.length === 3) {
+              initialDob = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+          }
+
+          if (!initialDob) {
+            initialDob = new Date(selectedPlayer.dob);
+          }
+        }
+      }
+
+      const parsedDob = initialDob && !isNaN(initialDob.getTime()) ? initialDob : null;
+
       setForm({
         id: selectedPlayer.id || "",
         user_id:
           selectedPlayer.user_id?.toString() ||
           selectedPlayer.id?.toString() ||
           "",
+        dob: parsedDob,
         name: selectedPlayer.name || "",
         phone: selectedPlayer.phone || "",
       });
+
+      if (parsedDob) {
+        setCalendarMonth(parsedDob);
+      }
     }
+    console.log("selectedPlayer.dob",selectedPlayer);
+    
   }, [selectedPlayer]);
 
   const handleChange = (e) => {
@@ -92,7 +137,8 @@ const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
       return;
     }
 
-    const formData = { id: form.id, name: form.name, phone: form.phone };
+    const formData = { id: form.id, name: form.name, phone: form.phone, dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
+          age: calculateAge(form.dob), };
 
     setShowSkeleton(true);
     dispatch(editUserDetails({ user_id: form.user_id, formData }));
@@ -199,6 +245,48 @@ const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
                   required
                 />
               </motion.div>
+
+            <div>
+              <Label
+                htmlFor="dob"
+                className="text-gray-300 font-semibold py-2 text-lg"
+              >
+                Date of Birth
+              </Label>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Input
+                    id="dob"
+                    readOnly
+                    value={form.dob ? format(form.dob, "dd/MM/yyyy") : ""}
+                    placeholder="Enter Date of Birth"
+                    className="text-white text-start px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12 cursor-pointer"
+                  />
+                </PopoverTrigger>
+
+                <PopoverContent className="w-auto p-0 bg-slate-300 border-gray-700">
+                  <Calendar
+                    mode="single"
+                    selected={form.dob}
+                    month={calendarMonth}
+                    onMonthChange={setCalendarMonth}
+                    onSelect={(date) => {
+                      setForm((prev) => ({
+                        ...prev,
+                        dob: date,
+                      }));
+                      if (date) {
+                        setCalendarMonth(date);
+                      }
+                    }}
+                    captionLayout="dropdown"
+                    fromYear={1920}
+                    toYear={new Date().getFullYear()}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
               <motion.div whileHover={{ scale: 1.02 }}>
                 <Label htmlFor="phone" className="text-blue-200 mb-2 font-semibold">
