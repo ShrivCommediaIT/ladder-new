@@ -28,21 +28,22 @@ import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { format } from "date-fns";
 import { calculateAge } from "@/lib/utils";
 
-const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
+const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, onClose = () => {} }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
+  const ladderType = searchParams.get("type")
   const ladder_id = ladderId || searchParams.get("ladder_id"); // ✅ PRIORITIZE PROPS LADDER ID
+
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   const players =
     useSelector((state) => state.player?.players?.[ladder_id]?.data) || [];
 
-  const minileagueData = useSelector((state) => state.minileague?.data) || []; // ✅ MINILEAGUE DATA
+  const minileagueData = minileagueSelectedPlayer || []; // ✅ MINILEAGUE DATA
+
 
   const numericUserId = Number(userId);
-  const selectedPlayer =
-    players.length > 0
-      ? players.find((p) => Number(p.id) === numericUserId)
-      : null;
+  
 
   const { loading, successMessage, error } = useSelector(
     (state) => state.editdetail
@@ -59,6 +60,20 @@ const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [showSkeleton, setShowSkeleton] = useState(false);
   const cardRef = useRef(null);
+
+  useEffect(() => {
+    let selectedPlayer;
+    if(ladderType === "minileague"){
+       selectedPlayer = minileagueSelectedPlayer
+    }else{
+       selectedPlayer =
+    players.length > 0
+      ? players.find((p) => Number(p.id) === numericUserId)
+      : null;
+    }
+    setSelectedPlayer(selectedPlayer);
+    
+  }, []);
 
   // GSAP: animate card entrance
   useEffect(() => {
@@ -120,7 +135,6 @@ const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
         setCalendarMonth(parsedDob);
       }
     }
-    console.log("selectedPlayer.dob",selectedPlayer);
     
   }, [selectedPlayer]);
 
@@ -188,6 +202,8 @@ const EditPlayerDetails = ({ userId, ladderId, onClose = () => {} }) => {
       </Card>
     );
   }
+
+
 
   if (!selectedPlayer) {
     return (

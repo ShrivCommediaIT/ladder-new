@@ -73,14 +73,7 @@ export const EditPlayer = ({
   const selectedPlayer = Object.values(playersStore)
     .flatMap((g) => g?.data || [])
     .find((p) => Number(p.id) === playerId);
-
-  // CORRECT LADDER ID (REAL FIX)
-  // const ladder_id = selectedPlayer?.ladder_id;
-
-  // ✅ No fetch on modal open — data is already in Redux from parent page.
-  // Refresh happens after result/move in the effect below.
-
-  //  REAL-TIME UPDATE AFTER MOVE / RESULT
+  
   useEffect(() => {
     if (result?.success_message) {
       toast.success(result.success_message);
@@ -106,7 +99,7 @@ export const EditPlayer = ({
     // { value: "status", label: "Status" },
     { value: "stats", label: "Stats" },
     { value: "edit", label: "Edit" },
-    { value: "load", label: "Upload" },
+    { value: "load", label: "Upload Avatar" },
   ];
 
   return (

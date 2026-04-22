@@ -131,11 +131,12 @@ export const EditPlayer = ({
 
   const allTabs = [
     { value: "move", label: "Result" },
-    { value: "edit", label: "Edit" },
-    { value: "load", label: "Upload" },
-    { value: "stats", label: "Stats" },
     { value: "challenge", label: "Challenge" },
+    { value: "stats", label: "Stats" },
+    { value: "edit", label: "Edit" },
+    { value: "load", label: "Upload Avatar" },
   ];
+  
 
   /* If roster → only Edit + Upload */
 
