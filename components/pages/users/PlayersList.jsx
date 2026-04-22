@@ -67,21 +67,24 @@ export default function PlayersList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+  const [appliedAge, setAppliedAge] = useState(0);
 
   /* ------------------ FETCH DATA ------------------ */
 
   const refreshData = useCallback(() => {
     if (ladderId && ladderType) {
-      dispatch(
-        fetchLeaderboard({
-          ladder_id: ladderId,
-          type: ladderType
-        })
-      );
+      const payload = {
+        ladder_id: ladderId,
+        type: ladderType
+      };
+      if (appliedAge > 0) {
+        payload.dob = appliedAge;
+      }
+      dispatch(fetchLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
       setCacheBuster(Date.now());
     }
-  }, [dispatch, ladderId, ladderType]);
+  }, [dispatch, ladderId, ladderType, appliedAge]);
 
   useEffect(() => {
     refreshData();
@@ -156,7 +159,7 @@ export default function PlayersList() {
 
       {/* SEARCH */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
-        <PlayerSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <PlayerSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} onAgeSearch={(age) => setAppliedAge(Number(age))} />
       </div>
 
       {/* NO PLAYERS */}

@@ -69,14 +69,19 @@ export default function Bestof5Players() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+  const [appliedAge, setAppliedAge] = useState(0);
 
   // ================== FETCH DATA ==================
   useEffect(() => {
     if (ladderId) {
-      dispatch(fetchLeaderboard({ ladder_id: Number(ladderId), type: ladderType }));
+      const payload = { ladder_id: Number(ladderId), type: ladderType };
+      if (appliedAge > 0) {
+        payload.dob = appliedAge;
+      }
+      dispatch(fetchLeaderboard(payload));
       dispatch(fetchGradebars(Number(ladderId)));
     }
-  }, [dispatch, ladderId, ladderType]);
+  }, [dispatch, ladderId, ladderType, appliedAge]);
 
   // ================== FILTER ==================
   const filteredPlayers = searchTerm
@@ -141,7 +146,7 @@ export default function Bestof5Players() {
 
       {/* SEARCH */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
-        <PlayerSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <PlayerSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} onAgeSearch={(age) => setAppliedAge(Number(age))} />
       </div>
 
       {grades.length === 0 && (
