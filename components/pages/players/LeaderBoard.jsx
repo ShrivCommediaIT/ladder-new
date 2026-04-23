@@ -71,7 +71,7 @@ const LeaderBoard = () => {
                   >
                     <div className="flex flex-col w-full gap-2">
                       <div className="flex justify-between items-start mb-1 px-1">
-                        <PlayerStatusToggle player={player} user={user} />
+                        <PlayerStatusToggle player={player} user={false} />
                       </div>
                        <div className="flex gap-4 items-center">
                          <Image
