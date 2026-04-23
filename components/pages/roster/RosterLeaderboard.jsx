@@ -32,7 +32,7 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <PlayerStatusToggle player={player} user={currentUser} />
+        <PlayerStatusToggle player={player} user={false} />
       </div>
 
       <div className="flex items-center justify-between px-3 py-4">

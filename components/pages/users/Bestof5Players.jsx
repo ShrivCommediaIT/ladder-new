@@ -194,7 +194,7 @@ export default function Bestof5Players() {
                     className="flex justify-between items-center px-4 py-2"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <PlayerStatusToggle player={player} user={loggedInUser} />
+                    <PlayerStatusToggle player={player} user={true} />
                   </div>
                   <div className="flex-1 min-w-0 p-3">
                     <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">

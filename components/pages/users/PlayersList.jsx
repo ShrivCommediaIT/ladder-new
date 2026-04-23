@@ -216,7 +216,7 @@ export default function PlayersList() {
                     className="flex justify-between items-center px-4 py-2"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <PlayerStatusToggle player={player} user={reduxUser} />
+                    <PlayerStatusToggle player={player} user={true} />
                   </div>
 
                   <div className="flex items-center justify-between px-2 py-3 sm:px-4 sm:py-4">

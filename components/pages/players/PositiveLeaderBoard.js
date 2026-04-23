@@ -104,7 +104,7 @@ const PlayerCard = ({
   return (
     <Card onClick={() => onSkillClick(player.id, player.skills[0].skill_number)} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
       <div className="flex justify-between items-start mb-1 px-1" onClick={(e) => e.stopPropagation()}>
-        <PlayerStatusToggle player={player} user={currentUser} />
+        <PlayerStatusToggle player={player} user={false} />
       </div>
       <div    className="flex-1 min-w-0 curcer-pointer">
         {/* Header */}

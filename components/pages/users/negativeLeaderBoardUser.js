@@ -65,7 +65,7 @@ const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, is
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <PlayerStatusToggle player={player} user={loggedInUser} />
+        <PlayerStatusToggle player={player} user={true} />
       </div>
       <div className="flex-1 min-w-0 curcer-pointer p-3">
         {/* Header */}
