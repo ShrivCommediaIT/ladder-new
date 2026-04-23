@@ -49,20 +49,8 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
 
   /* ✅ FINAL MOVE HANDLER */
   const handleMove = async () => {
- const raw = JSON.parse(sessionStorage.getItem("subAdmin"));
+  const raw = JSON.parse(sessionStorage.getItem("subAdmin")) || JSON.parse(sessionStorage.getItem("adminDetails"))
        
-       
-          
-       
-    console.log("fromRank", {
-        user_id: raw?.user_id,
-        ladder_id,
-        move_to_rank: Number(toRank),
-        move_from_rank: Number(fromRank),
-        move_from_section: moveFromSection,
-        move_to_section: moveToSection,
-      });
-
     if (!fromRank || !toRank || !moveFromSection || !moveToSection) {
       toast.error("All fields are required");
       return;
@@ -70,7 +58,7 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
 
     const resultAction = await dispatch(
       moveToMiniLeague({
-        user_id:raw?.user_id,
+        user_id: raw?.user_id || raw?.id,
         ladder_id,
         move_to_rank: Number(toRank),
         move_from_rank: Number(fromRank),
