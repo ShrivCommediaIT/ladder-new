@@ -21,13 +21,14 @@ import BasicLeaderboardPrintSkillsSheet from "../admin/BasicLeaderboardPrintSkil
 import BasicLeaderboardActivityEntryCard from "../players/BasicLeaderboardActivityEntryCard";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import AgeFilter from "@/components/shared/AgeFilter";
+import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
 const getScoreBySkillNumber = (scores, skills, skillNumber) => {
   const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
   const skillObj = skills?.find((s) => s.skill_number === skillNumber);
-  
+
   const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
   const score = scoreObj ? Number(scoreObj.score) : 0;
   const inputScore =
@@ -86,29 +87,21 @@ const PlayerCard = ({
   ageRank,
   onSkillClick,
   isEditable,
+  loggedInUser,
 }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
-      <div className="absolute top-2 left-2 z-20 group">
-        <div className="bg-white rounded-full flex items-center justify-center cursor-pointer shadow-sm border border-gray-200" style={{ padding: '2px' }}>
-          <input 
-            type="radio" 
-            name={`status_${player.id}`} 
-            value={player.player_status} 
-            checked 
-            readOnly
-            className={`w-3.5 h-3.5 outline-none cursor-pointer ${Number(player.player_status) === 1 ? 'accent-green-500' : 'accent-red-600'}`} 
-          />
-        </div>
-        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover:block bg-black/80 text-white text-[10px] font-semibold px-2 py-1 rounded whitespace-nowrap shadow border border-white/10 z-30 pointer-events-none">
-          {Number(player.player_status) === 1 ? 'Active' : 'Inactive'}
-        </div>
+    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative">
+      <div
+        className="flex justify-between items-center px-4 py-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <PlayerStatusToggle player={player} user={loggedInUser} />
       </div>
-      <div className="flex-1 min-w-0 mt-6">
+      <div className="flex-1 min-w-0 p-3">
         {/* Header */}
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
@@ -123,12 +116,12 @@ const PlayerCard = ({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}   
+              {player?.name || "N/A"}
               {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">
-                {player.age}
-              </p>
-            )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">
+                  {player.age}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -141,7 +134,7 @@ const PlayerCard = ({
               </span>
               <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
             </div>
-            
+
             <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
               {Boolean(appliedAge) && (
                 <div className="flex flex-col items-center">
@@ -174,8 +167,8 @@ const PlayerCard = ({
                       isEditable && onSkillClick(player.id, skill.skill_number)
                     }
                     className={`relative min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded transition-all ${isEditable
-                        ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
-                        : "cursor-not-allowed bg-white opacity-40 text-gray-500"
+                      ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
+                      : "cursor-not-allowed bg-white opacity-40 text-gray-500"
                       }`}
                     title={
                       isEditable
@@ -207,8 +200,8 @@ const PlayerCard = ({
                   <div
                     key={i}
                     className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 ${scoreData.isTargetAchieved
-                        ? "bg-green-400 text-black shadow-md font-semibold"
-                        : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
+                      ? "bg-green-400 text-black shadow-md font-semibold"
+                      : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
                       } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
                     title={`Score: ${scoreData.score || 0} | Target: ${scoreData.target || "N/A"
                       }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
@@ -249,6 +242,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const { data = [], loading } = useSelector(
     (state) => state.skillLeaderboard || {},
   );
+  const loggedInUser = useSelector((state) => state.user?.user);
 
   const initialRows = Array.from({ length: 12 }, (_, i) => ({
     id: i + 1,
@@ -261,7 +255,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = sessionStorage.getItem("user");
+      const storedUser = sessionStorage.getItem("user") || sessionStorage.getItem("userData");
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
@@ -523,6 +517,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
                   ageRank={index + 1}
                   onSkillClick={handleSkillClick}
                   isEditable={isEditablePlayer}
+                  loggedInUser={loggedInUser}
                 />
               );
             })}

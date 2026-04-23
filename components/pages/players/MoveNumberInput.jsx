@@ -88,121 +88,85 @@ const MoveNumberInput = ({
 
   // FIXED: Correct payload structure
   const confirmMove = async () => {
-
     if (!user_id || !ladder_id || !currentId) {
       toast.error("Missing required information.");
       setShowConfirm(false);
       return;
     }
 
-
-
     try {
       setLoading(true);
 
-      // PERFECT Payload for each API
-      let payload;
-      const adminDetails = await JSON.parse(sessionStorage.getItem("adminDetails"));
+      const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails") || "{}");
 
+      // Common payload parts
+      const commonPayload = {
+        ladder_id,
+        match_status: resultType,
+        user_id,
+        move_to_rank: Number(selectedNumber),
+        move_from_rank: currentRank,
+        score,
+        admin_id: adminDetails.id,
+        user_name: selectedPlayer?.name,
+        witness_by: "test",
+        ...(resultType === "beat" || resultType === "lost"
+          ? { bet: betDescription }
+          : {}),
+      };
+
+      let response;
       if (ladderType === "best5" || ladderType === "best3") {
-        payload = {
-          ladder_id,
-          match_status: resultType,
-          user_id,
-          move_to_rank: Number(selectedNumber),
-          score,
-          move_from_rank: currentRank,
-          admin_id: adminDetails.id,
-          user_name: selectedPlayer.name,
-          witness_by: "test",
-
-
-          // ✅ Only send bet for beat/lost
-          ...(resultType === "beat" || resultType === "lost"
-            ? { bet: betDescription }
-            : {}),
-        };
-
-        const movePlayer = await dispatch(movePlayerBestOf5(payload)).unwrap();
-        
-        if (movePlayer.success_message == "Success") {
-          toast.success("Result posted successfully! ");
-          if(movePlayer?.eligible_for_token == 1){
-          await  updateLadderToken({
-              user_id: selectedPlayer.name,
-              ladder_id,
-              ladder_type: ladderType,
-            })
-
-          await  updateLadderToken({
-              user_id: challengedPlayer.name,
-              ladder_id,
-              ladder_type: ladderType,
-            })
-        } else {
-          toast.error("Failed to post result. Please try again.");
-        }
-
-        }
+        response = await dispatch(movePlayerBestOf5(commonPayload)).unwrap();
       } else {
-
-        payload = {
-          user_id,
-          ladder_id,
-          match_status: resultType,
+        const payload = {
+          ...commonPayload,
           move_from_user_id: currentId,
-          move_to_rank: Number(selectedNumber),
-          move_from_rank: currentRank,
-          score,
-          admin_id: adminDetails.id,
-          user_name: selectedPlayer.name,
-          witness_by: "test",
-
-          // ✅ Only send bet for beat/lost
-          ...(resultType === "beat" || resultType === "lost"
-            ? { bet: betDescription }
-            : {}),
         };
+        console.log("standard ladder move payload", payload);
+        response = await dispatch(movePlayer(payload)).unwrap();
+      }
 
-        console.log("ladderType", payload);  
+      if (response?.success_message === "Success") {
+        toast.success("Result posted successfully!");
 
-
-      const movePlayerRes =  await dispatch(movePlayer(payload)).unwrap();
-        if (movePlayerRes.success_message == "Success") {
-            if(movePlayerRes?.eligible_for_token == 1){
-            await updateLadderToken({
-              user_id: selectedPlayer.name,
-              ladder_id,
-              ladder_type: ladderType,
-            })
-            await  updateLadderToken({
-              user_id: challengedPlayer.name,
-              ladder_id,
-              ladder_type: ladderType,
-            })
+        // Handle token updates if eligible
+        if (response?.eligible_for_token == 1) {
+          try {
+            await Promise.all([
+              updateLadderToken({
+                user_id: selectedPlayer.name,
+                ladder_id,
+                ladder_type: ladderType,
+              }),
+              updateLadderToken({
+                user_id: challengedPlayer.name,
+                ladder_id,
+                ladder_type: ladderType,
+              })
+            ]);
+          } catch (tokenErr) {
+            console.error("Token Update Error:", tokenErr);
           }
-          toast.success("Result posted successfully! ");
-
-        } else {
-          toast.error("Failed to post result. Please try again.");
-
         }
 
-      // Refresh data
-      const effectiveType = urlType || ladderType;
-      await Promise.all([
-        dispatch(fetchLeaderboard({ ladder_id, type: effectiveType })),
-        dispatch(fetchUserActivity({ ladder_id })),
-      ]);
+        // Refresh data
+        const effectiveType = urlType || ladderType;
+        await Promise.all([
+          dispatch(fetchLeaderboard({ ladder_id, type: effectiveType })),
+          dispatch(fetchUserActivity({ ladder_id })),
+        ]);
 
-
-      setShowConfirm(false);
-      resetForm();
-      onClose();
+        // Close and Reset
+        setShowConfirm(false);
+        resetForm();
+        onClose();
+      } else {
+        toast.error(response?.message || "Failed to post result. Please try again.");
       }
     } catch (err) {
       console.error("Error Details:", err);
-      toast.error(err?.message);
+      toast.error(err?.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
@@ -262,12 +226,6 @@ const MoveNumberInput = ({
       return;
     }
 
-
-    // BLOCK CROSS-SECTION
-    if (currentSectionIndex !== targetSectionIndex) {
-      setShowSectionAlert(true);
-      return;
-    }
 
     // BLOCK CROSS-SECTION
     if (currentSectionIndex !== targetSectionIndex) {

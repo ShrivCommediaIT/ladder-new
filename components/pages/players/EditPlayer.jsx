@@ -178,7 +178,7 @@ export const EditPlayer = ({
               </TabsContent>
 
               <TabsContent value="load">
-                <PlayerImage userId={playerId} onClose={onClose} />
+                <PlayerImage userId={playerId} ladderId={ladder_id} ladderType={urlType} onClose={onClose} />
               </TabsContent>
 
               {/* <TabsContent value="status">
