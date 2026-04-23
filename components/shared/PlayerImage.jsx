@@ -15,12 +15,11 @@ import Image from "next/image";
 import Cropper from "react-easy-crop";
 import defaultAvatar from "@/public/logo.jpg";
 import { useSearchParams } from "next/navigation";
+import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { fetchUserActivity } from "@/redux/slices/activitySlice";
+import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 
-const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
-
-  const searchParams = useSearchParams();
-const ladderType = searchParams.get("type");
-
+const PlayerImage = ({ userId, ladderId, ladderType, onClose = () => { } }) => {
   const dispatch = useDispatch();
   const { loading, success, error } = useSelector(
     (state) => state.profileImage
@@ -46,25 +45,6 @@ const ladderType = searchParams.get("type");
       setPreview(URL.createObjectURL(file));
     }
   }, [file]);
-
-  // FIXED: Real-time refresh + auto-close after upload success
-  useEffect(() => {
-    if (success) {
-      
-      // REAL-TIME REFRESH - 800ms delay for smooth UX
-      const timer = setTimeout(() => {
-        // Refresh leaderboard data
-        if (ladderId) {
-          dispatch(fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" }));
-        }
-        
-        dispatch(resetProfileImageState());
-        onClose();
-      }, 800);
-
-      return () => clearTimeout(timer);
-    }
-  }, [success, ladderId, dispatch, onClose]);
 
   const handleImageChange = (e) => {
     const selected = e.target.files[0];
@@ -120,13 +100,79 @@ const ladderType = searchParams.get("type");
     setCropping(false);
   };
 
-  // FIXED: Simple upload handler
-  const handleUpload = () => {
+  // FIXED: Comprehensive real-time refresh after upload success
+  const handleUpload = async () => {
     if (!userId || !file) {
       toast.error("Please select an image first!");
       return;
     }
-    dispatch(uploadProfileImage({ id: userId, image: file }));
+
+    console.log("Shared PlayerImage: Starting upload...", { userId, file: file.name });
+
+    const result = await dispatch(
+      uploadProfileImage({
+        id: userId,
+        image: file
+      })
+    );
+
+    if (result.meta.requestStatus === "fulfilled") {
+      console.log("Shared PlayerImage: Upload successful, refreshing data...");
+
+      try {
+        // 1. Profile refresh
+        if (userId) {
+          console.log("Shared PlayerImage: Refreshing user profile for", userId);
+          await dispatch(fetchUserProfile(userId));
+        }
+
+        if (ladderId) {
+          // 2. MiniLeague refresh
+          console.log("Shared PlayerImage: Refreshing minileague for", ladderId);
+          await dispatch(fetchMiniLeague({
+            ladder_id: ladderId,
+            ladderType: "minileague",
+          }));
+
+          // 3. Refresh specific leaderboard
+          if (ladderType === "roster") {
+            console.log("Shared PlayerImage: Refreshing roster leaderboard", ladderId);
+            await dispatch(fetchRosterLeaderboard({ ladder_id: ladderId }));
+          } else if (ladderType) {
+            console.log("Shared PlayerImage: Refreshing specific leaderboard", { ladderId, ladderType });
+            await dispatch(fetchLeaderboard({
+              ladder_id: ladderId,
+              type: ladderType
+            }));
+          } else {
+            // Fallback refresh for all common types
+            const types = ["bestof3", "bestof5", "best3", "best5", "winlose"];
+            console.log("Shared PlayerImage: No ladderType provided, refreshing common types", types);
+            await Promise.all(types.map(type =>
+              dispatch(fetchLeaderboard({ ladder_id: ladderId, type }))
+            ));
+          }
+
+          // 4. Refresh activity
+          console.log("Shared PlayerImage: Refreshing user activity for", ladderId);
+          await dispatch(fetchUserActivity({ ladder_id: ladderId }));
+        }
+
+        console.log("Shared PlayerImage: Refresh complete, closing modal in 500ms");
+        toast.success("Profile image updated successfully!");
+
+        setTimeout(() => {
+          onClose();
+        }, 500);
+
+      } catch (err) {
+        console.error("Shared PlayerImage: Refresh failed", err);
+        toast.error("Image uploaded, but data refresh failed. Please refresh manually.");
+      }
+    } else {
+      console.error("Shared PlayerImage: Upload failed", result.error);
+      toast.error(result.error?.message || "Upload failed");
+    }
   };
 
   return (

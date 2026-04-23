@@ -47,14 +47,13 @@ const EditPlayerDetails = ({
     id: "",
     user_id: "",
     name: "",
-    dob:"",
+    dob: null,
     phone: "",
   });
 
   const [showSkeleton, setShowSkeleton] = useState(false);
 
-  // Auto-fill strictly from selectedPlayer (id/user_id/name/phone)
-  // Prefill form
+  // Prefill form strictly from selectedPlayer (id/user_id/name/phone/dob)
   useEffect(() => {
     if (selectedPlayer) {
       let initialDob = null;
@@ -85,11 +84,9 @@ const EditPlayerDetails = ({
       const parsedDob = initialDob && !isNaN(initialDob.getTime()) ? initialDob : null;
 
       setForm({
-        id: selectedPlayer.id || "",
+        id: (selectedPlayer.id ?? selectedPlayer.user_id)?.toString() || "",
         user_id:
-          selectedPlayer.user_id?.toString() ||
-          selectedPlayer.id?.toString() ||
-          "",
+          (selectedPlayer.user_id ?? selectedPlayer.id)?.toString() || "",
         dob: parsedDob,
         name: selectedPlayer.name || "",
         phone: selectedPlayer.phone || "",
@@ -98,9 +95,14 @@ const EditPlayerDetails = ({
       if (parsedDob) {
         setCalendarMonth(parsedDob);
       }
+    } else if (userId) {
+      setForm((prev) => ({
+        ...prev,
+        id: userId.toString(),
+        user_id: userId.toString(),
+      }));
     }
-    
-  }, [selectedPlayer]);
+  }, [selectedPlayer, userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

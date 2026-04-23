@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
 import { EditPlayer } from "@/components/shared/EditPlayer";
+import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import PlayerSearch from "./PlayerSearch";
 import {
   Dialog,
@@ -31,14 +32,26 @@ export default function PlayersList() {
 
   /* ------------------ LOGGED IN USER (LOCALSTORAGE) ------------------ */
 
-  const loggedInUser = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    return JSON.parse(sessionStorage.getItem("user") || "null");
+  const reduxUser = useSelector((state) => state.user?.user);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = sessionStorage.getItem("user") || sessionStorage.getItem("userData");
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          if (parsed && parsed.id) {
+            setCurrentUserId(Number(parsed.id));
+          }
+        } catch (err) {
+          console.error("Failed to parse user from session", err);
+        }
+      }
+    }
   }, []);
 
-  const loggedInUserId = Number(
-    loggedInUser?.id || null
-  );
+  const loggedInUserId = reduxUser?.id ? Number(reduxUser.id) : currentUserId;
 
   /* ------------------ REDUX ------------------ */
 
@@ -190,63 +203,57 @@ export default function PlayersList() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: pidx * 0.03 }}
                   onClick={() => handlePlayerClick(player)}
-                  className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans sm:px-4 sm:py-3 relative ${isCurrentUser
-                      ? "cursor-pointer hover:bg-[#143238]"
-                      : "opacity-60 cursor-not-allowed"
+                  className={`flex flex-col mb-3 rounded-lg shadow transition-all font-sans relative overflow-hidden ${isCurrentUser
+                    ? "cursor-pointer hover:bg-[#143238]"
+                    : "opacity-60 cursor-not-allowed"
                     }`}
                   style={{
                     background: "#223848",
                     border: "2px solid #4eb0a2",
                   }}
                 >
-                  <div className="absolute top-2 left-2 z-20 group">
-                    <div className="bg-white rounded-full flex items-center justify-center cursor-pointer shadow-sm border border-gray-200" style={{ padding: '2px' }}>
-                      <input
-                        type="radio"
-                        name={`status_${player.id}`}
-                        value={player.player_status}
-                        checked
-                        readOnly
-                        className={`w-3.5 h-3.5 outline-none cursor-pointer ${Number(player.player_status) === 1 ? 'accent-green-500' : 'accent-red-600'}`}
+                  <div
+                    className="flex justify-between items-center px-4 py-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <PlayerStatusToggle player={player} user={reduxUser} />
+                  </div>
+
+                  <div className="flex items-center justify-between px-2 py-3 sm:px-4 sm:py-4">
+                    {/* LEFT */}
+                    <div className="flex-1">
+                      <div className="flex w-full items-center mb-2">
+                        <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#48aaa8] border-2 border-white text-lg sm:text-2xl font-bold text-white mr-2 shrink-0">
+                          {player.rank || pidx + 1}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+                            {player?.name || "N/A"}
+                            {player.age && (
+                              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
+                                {player.age}
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-[#d4e5e8] text-xs truncate">
+                            {player?.phone || "N/A"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* RIGHT AVATAR */}
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center ml-3 shrink-0">
+                      <Image
+                        src={playerImageUrl}
+                        alt={player.name}
+                        width={96}
+                        height={96}
+                        className="object-cover w-full h-full rounded"
+                        unoptimized
                       />
                     </div>
-                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover:block bg-black/80 text-white text-[10px] font-semibold px-2 py-1 rounded whitespace-nowrap shadow border border-white/10 z-30 pointer-events-none">
-                      {Number(player.player_status) === 1 ? 'Active' : 'Inactive'}
-                    </div>
-                  </div>
-                  {/* LEFT */}
-                  <div className="flex-1 mt-6">
-                    <div className="flex w-full items-center mb-2">
-                      <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#48aaa8] border-2 border-white text-lg sm:text-2xl font-bold text-white mr-2 shrink-0">
-                        {player.rank || pidx + 1}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-                          {player?.name || "N/A"}
-                          {player.age && (
-                            <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                              {player.age}
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-[#d4e5e8] text-xs truncate">
-                          {player?.phone || "N/A"}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* RIGHT AVATAR */}
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center ml-3 shrink-0">
-                    <Image
-                      src={playerImageUrl}
-                      alt={player.name}
-                      width={96}
-                      height={96}
-                      className="object-cover w-full h-full rounded"
-                      unoptimized
-                    />
                   </div>
                 </motion.div>
               );

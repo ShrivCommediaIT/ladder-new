@@ -39,6 +39,7 @@ export const EditPlayer = ({
   currentId = null,
   setLoading = () => { },
   ladderId = null,
+  ladder_type: propLadderType = null,
 }) => {
   const dispatch = useDispatch();
 
@@ -47,8 +48,9 @@ export const EditPlayer = ({
   const [localUser, setLocalUser] = useState(null);
 
   const searchParams = useSearchParams();
-  const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
-  const urlType = searchParams.get("type") || ladderType;
+  const ladderTypeFromUrl = searchParams.get("ladder_type") || searchParams.get("type");
+  const ladderType = propLadderType || ladderTypeFromUrl;
+  const urlType = ladderType;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -58,9 +60,8 @@ export const EditPlayer = ({
   }, []);
 
   const userId = Number(localUser?.id || localUser?.user_id || null);
-  const ladder_id = Number(localUser?.ladder_id || null);
+  const ladder_id = Number(ladderId || localUser?.ladder_id || null);
 
-  /* -------------------- REDUX -------------------- */
 
   const storePlayers =
     useSelector((state) => state.player?.players?.[ladder_id]?.data) || [];
@@ -256,7 +257,7 @@ export const EditPlayer = ({
 
 
               <TabsContent value="load">
-                <PlayerImage userId={selectedPlayer?.id} onClose={onClose} />
+                <PlayerImage userId={selectedPlayer?.id} ladderId={ladder_id} ladderType={urlType || ladderType} onClose={onClose} />
               </TabsContent>
 
               {/* <TabsContent value="status">
