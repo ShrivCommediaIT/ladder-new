@@ -156,8 +156,6 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
 
           <DropdownMenuSeparator />
 
-
-
           {finalUser?.user_type === "sub_admin" && (
             <>
               <DropdownMenuItem
@@ -166,6 +164,13 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
               >
                 <Shield className="mr-2 h-4 w-4 text-blue-600" />
                 Sub-Admin Dashboard
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push("/q-a")}
+                className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                <HelpCircle className="mr-2 h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+                Q & A
               </DropdownMenuItem>
             </>
           )}

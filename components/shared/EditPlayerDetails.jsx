@@ -14,6 +14,7 @@ import {
 } from "@/redux/slices/editdetailSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import { toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "next/navigation";
@@ -133,7 +134,13 @@ const EditPlayerDetails = ({
         setShowSkeleton(false);
 
         if (ladderId) {
-          dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl }));
+          if (ladderTypeFromUrl === "roster") {
+            dispatch(fetchRosterLeaderboard({ ladder_id: ladderId }));
+          } else {
+            dispatch(
+              fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl })
+            );
+          }
           dispatch(
             fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" })
           );

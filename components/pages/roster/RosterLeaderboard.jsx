@@ -13,16 +13,20 @@ import Logo from "@/public/logo1.png";
 import LadderLinkPanel from "../players/LadderLinkPanel";
 import RedeemModal from "./RedeemModal";
 import { getRequest } from "@/services/apiService";
+import EditPlayer from "../../shared/EditPlayer";
 
 // ✅ Player Card
-const PlayerCard = ({ player, rank, onRedeemClick }) => {
+const PlayerCard = ({ player, rank, onRedeemClick, onEditClick }) => {
 
   const playerImageUrl = player.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
   return (
-    <div className="flex items-center justify-between px-3 py-2 mb-3 rounded-lg bg-[#1a2f3d] border border-[#4eb0a2] h-30">
+    <div
+      onClick={() => onEditClick(player)}
+      className="flex items-center justify-between px-3 py-2 mb-3 rounded-lg bg-[#1a2f3d] border border-[#4eb0a2] h-30 cursor-pointer hover:bg-[#244252] transition-colors"
+    >
 
       {/* ===== DESKTOP VIEW (1024px+) ===== */}
       <div className="hidden md:flex items-center w-full">
@@ -30,7 +34,7 @@ const PlayerCard = ({ player, rank, onRedeemClick }) => {
         {/* Rank + Name */}
         <div className="flex gap-3 items-center flex-shrink-0 w-[35%]">
           {/* Avatar */}
-          <div className="w-[15%] flex justify-end">
+          <div className="flex-shrink-0 flex justify-end">
             <div className="w-10 h-10 rounded border border-[#4eb0a2] flex items-center justify-center overflow-hidden flex-shrink-0">
               {playerImageUrl ? (
                 <Image src={playerImageUrl} alt={player.name} width={40} height={40} className="object-cover" unoptimized />
@@ -40,8 +44,17 @@ const PlayerCard = ({ player, rank, onRedeemClick }) => {
             </div>
           </div>
           <div className="min-w-0">
-            <div className="text-white font-semibold text-sm truncate">{player?.name ?? "N/A"}</div>
-            <div className="text-gray-300 text-xs truncate">{player?.phone ?? "N/A"}</div>
+            <div className="flex items-center min-w-0">
+              <div className="text-white font-semibold text-sm truncate">{player?.name ?? "N/A"}</div>
+              {player?.age && (
+                <div className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit ml-5">
+                  {player.age}
+                </div>
+              )}
+            </div>
+            <div className="text-gray-300 text-xs truncate flex items-center gap-2">
+              <span>{player?.phone ?? "N/A"}</span>
+            </div>
           </div>
         </div>
 
@@ -53,7 +66,10 @@ const PlayerCard = ({ player, rank, onRedeemClick }) => {
           <div className="text-white text-sm">
             Tokens - {player?.today_token ?? "N/A"}{" "}
             <span
-              onClick={() => onRedeemClick(player)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRedeemClick(player);
+              }}
               className="text-[#48aaa8] font-semibold cursor-pointer hover:underline"
             >
               Redeem
@@ -84,12 +100,24 @@ const PlayerCard = ({ player, rank, onRedeemClick }) => {
             <div className="border border-white text-white text-[10px] px-1.5 py-0.5 w-fit mb-1 leading-tight">
               {"status : " + player?.token_status ?? "Status: Club Legend"}
             </div>
-            <div className="text-white font-bold text-xs truncate">{player?.name ?? "N/A"}</div>
-            <div className="text-gray-300 text-[10px]">{player?.phone ?? "N/A"}</div>
+            <div className="flex items-center min-w-0">
+              <div className="text-white font-bold text-xs truncate">{player?.name ?? "N/A"}</div>
+              {player?.age && (
+                <div className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit ml-2">
+                  {player.age}
+                </div>
+              )}
+            </div>
+            <div className="text-gray-300 text-[10px] truncate flex items-center gap-1.5">
+              <span>{player?.phone ?? "N/A"}</span>
+            </div>
             <div className="text-white text-[11px] mt-0.5">
               {player?.today_token ?? "N/A"} to{" "}
               <span
-                onClick={() => onRedeemClick(player)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRedeemClick(player);
+                }}
                 className="text-[#48aaa8] font-semibold cursor-pointer hover:underline"
               >
                 Redeem
@@ -136,6 +164,9 @@ const RosterLeaderboard = () => {
   const [redeemOpen, setRedeemOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+
+  const [editOpen, setEditOpen] = useState(false);
+  const [editPlayerId, setEditPlayerId] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const refreshRef = useRef(false);
@@ -236,6 +267,11 @@ const RosterLeaderboard = () => {
     }
   };
 
+  const handleEditClick = (player) => {
+    setEditPlayerId(player.id);
+    setEditOpen(true);
+  };
+
 
   return (
     <div className="space-y-5">
@@ -274,6 +310,7 @@ const RosterLeaderboard = () => {
                 player={player}
                 rank={i + 1}
                 onRedeemClick={handleRedeemClick}
+                onEditClick={handleEditClick}
               />
             ))}
           </div>
@@ -284,6 +321,14 @@ const RosterLeaderboard = () => {
         player={selectedPlayer}
         history={historyData}
         loading={loadingHistory}
+      />
+
+      {/* Edit Player Modal */}
+      <EditPlayer
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        currentId={editPlayerId}
+        ladderId={ladderId}
       />
     </div>
 

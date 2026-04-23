@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import PlayerStatsBoxUser from "./PlayerStatsBoxUser";
@@ -46,7 +47,7 @@ export const EditPlayer = ({
   const [localUser, setLocalUser] = useState(null);
 
   const searchParams = useSearchParams();
-  const ladderType = searchParams.get("ladder_type");
+  const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
   const urlType = searchParams.get("type") || ladderType;
 
   useEffect(() => {
@@ -61,8 +62,12 @@ export const EditPlayer = ({
 
   /* -------------------- REDUX -------------------- */
 
-  const players =
+  const storePlayers =
     useSelector((state) => state.player?.players?.[ladder_id]?.data) || [];
+  const rosterPlayers =
+    useSelector((state) => state.rosterLeaderboard?.data) || [];
+
+  const players = ladderType === "roster" ? rosterPlayers : storePlayers;
 
   const selectedPlayer = useMemo(
     () => players.find((p) => Number(p.id) === Number(currentId)),
@@ -114,9 +119,14 @@ export const EditPlayer = ({
     }
 
     if (didSomething && ladder_id) {
-      dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
+      if (ladderType === "roster") {
+        dispatch(fetchRosterLeaderboard({ ladder_id }));
+      } else {
+        dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
+      }
+      onClose();
     }
-  }, [moving, status, image, dispatch, ladder_id]);
+  }, [moving, status, image, dispatch, ladder_id, ladderType, urlType, onClose]);
 
   /* -------------------- EDIT SKELETON -------------------- */
 
