@@ -55,7 +55,7 @@ const PlayerCard = ({
       }}
     >
       <div className="flex justify-between items-start mb-1 px-1 mt-1">
-        <PlayerStatusToggle player={player} user={currentUser} />
+        <PlayerStatusToggle player={player} user={false} />
       </div>
 
       <div className="flex items-center justify-between px-2 py-2 ">

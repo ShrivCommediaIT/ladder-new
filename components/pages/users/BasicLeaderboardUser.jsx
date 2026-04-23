@@ -99,7 +99,7 @@ const PlayerCard = ({
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <PlayerStatusToggle player={player} user={loggedInUser} />
+        <PlayerStatusToggle player={player} user={true} />
       </div>
       <div className="flex-1 min-w-0 p-3">
         {/* Header */}
