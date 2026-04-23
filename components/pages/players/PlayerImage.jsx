@@ -20,9 +20,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, UploadCloud, Loader2 } from "lucide-react";
 import defaultAvatar from "@/public/logo.jpg";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { fetchUserActivity } from "@/redux/slices/activitySlice";
+import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
+import { toast } from "react-toastify";
 
 
-const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
+const PlayerImage = ({ userId, ladderId, ladderType, onClose = () => { } }) => {
   const dispatch = useDispatch();
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -40,73 +43,6 @@ const PlayerImage = ({ userId, ladderId, onClose = () => {} }) => {
       dispatch(resetProfileImageState());
     };
   }, [dispatch]);
-
-  // FIXED: Real-time refresh on success
-  // useEffect(() => {
-  //   if (success) {
-  //     if (file) setPreview(URL.createObjectURL(file));
-  //     const timer = setTimeout(() => {
-  //       // REAL-TIME REFRESH
-  //       if (userId) {
-  //         dispatch(fetchUserProfile(userId));
-  //       }
-  //       if (ladderId) {
-  //         dispatch(fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" }));
-  //       }
-  //       onClose();
-  //     }, 800);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [success, onClose, file, userId, ladderId, dispatch]);
-
-
-useEffect(() => {
-  if (!success) return;
-
-  const refreshAllPlayers = async () => {
-
-    // Profile refresh
-    if (userId) {
-      await dispatch(fetchUserProfile(userId));
-    }
-
-    if (ladderId) {
-
-      // MiniLeague refresh
-      await dispatch(
-        fetchMiniLeague({
-          ladder_id: ladderId,
-          ladderType: "minileague",
-        })
-      );
-
-      // ⭐ All Leaderboards One-Time Refresh
-      await Promise.all([
-        dispatch(fetchLeaderboard({
-          ladder_id: ladderId,
-          type: "bestof3"
-        })),
-
-        dispatch(fetchLeaderboard({
-          ladder_id: ladderId,
-          type: "bestof5"
-        })),
-
-        dispatch(fetchLeaderboard({
-          ladder_id: ladderId,
-          type: "winlose"
-        }))
-      ]);
-
-    }
-
-    onClose();
-
-  };
-
-  refreshAllPlayers();
-
-}, [success]);
 
 
   const handleImageChange = (e) => {
@@ -164,55 +100,76 @@ useEffect(() => {
     }
   };
 
-  // const handleUpload = () => {
-  //   if (!userId || !file) return;
-  //   dispatch(uploadProfileImage({ id: userId, image: file }));
-  // };
-
 
   const handleUpload = async () => {
-  if (!userId || !file) return;
+    if (!userId || !file) return;
 
-  const result = await dispatch(
-    uploadProfileImage({
-      id: userId,
-      image: file
-    })
-  );
+    console.log("PlayerImage: Starting upload...", { userId, file: file.name });
 
-  // Upload success → instant refresh
-  if (result.meta.requestStatus === "fulfilled") {
+    const result = await dispatch(
+      uploadProfileImage({
+        id: userId,
+        image: file
+      })
+    );
 
-    // Profile refresh
-    dispatch(fetchUserProfile(userId));
+    if (result.meta.requestStatus === "fulfilled") {
+      console.log("PlayerImage: Upload successful, refreshing data...");
 
-    if (ladderId) {
+      try {
+        // 1. Profile refresh
+        if (userId) {
+          console.log("PlayerImage: Refreshing user profile for", userId);
+          await dispatch(fetchUserProfile(userId));
+        }
 
-      dispatch(fetchMiniLeague({
-        ladder_id: ladderId,
-        ladderType: "minileague"
-      }));
+        if (ladderId) {
+          // 2. MiniLeague refresh
+          console.log("PlayerImage: Refreshing minileague for", ladderId);
+          await dispatch(fetchMiniLeague({
+            ladder_id: ladderId,
+            ladderType: "minileague",
+          }));
 
-      dispatch(fetchLeaderboard({
-        ladder_id: ladderId,
-        type: "bestof3"
-      }));
+          // 3. Refresh specific leaderboard
+          if (ladderType === "roster") {
+            console.log("PlayerImage: Refreshing roster leaderboard", ladderId);
+            await dispatch(fetchRosterLeaderboard({ ladder_id: ladderId }));
+          } else if (ladderType) {
+            console.log("PlayerImage: Refreshing specific leaderboard", { ladderId, ladderType });
+            await dispatch(fetchLeaderboard({
+              ladder_id: ladderId,
+              type: ladderType
+            }));
+          } else {
+            // Fallback refresh for all common types
+            const types = ["bestof3", "bestof5", "best3", "best5", "winlose"];
+            console.log("PlayerImage: No ladderType provided, refreshing common types", types);
+            await Promise.all(types.map(type =>
+              dispatch(fetchLeaderboard({ ladder_id: ladderId, type }))
+            ));
+          }
 
-      dispatch(fetchLeaderboard({
-        ladder_id: ladderId,
-        type: "bestof5"
-      }));
+          // 4. Refresh activity
+          console.log("PlayerImage: Refreshing user activity for", ladderId);
+          await dispatch(fetchUserActivity({ ladder_id: ladderId }));
+        }
 
-      dispatch(fetchLeaderboard({
-        ladder_id: ladderId,
-        type: "winlose"
-      }));
+        console.log("PlayerImage: Refresh complete, closing modal in 500ms");
+        toast.success("Profile image updated successfully!");
 
+        setTimeout(() => {
+          onClose();
+        }, 500);
+
+      } catch (err) {
+        console.error("PlayerImage: Refresh failed", err);
+        toast.error("Image uploaded, but data refresh failed. Please refresh manually.");
+      }
+    } else {
+      console.error("PlayerImage: Upload failed", result.error);
     }
-
-    onClose();
-  }
-};
+  };
 
 
   return (

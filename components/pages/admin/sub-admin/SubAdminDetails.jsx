@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { LogOut, UserCircle2, Pencil } from "lucide-react";
+import { LogOut, UserCircle2, Pencil, HelpCircle } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import { postFormData } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
@@ -95,7 +95,7 @@ const SubAdminDetails = () => {
 
         toast.success("Profile image updated ");
       } else {
-      toast.error(res?.message || "Upload failed");
+        toast.error(res?.message || "Upload failed");
       }
     } catch (err) {
       console.error(err);
@@ -106,23 +106,23 @@ const SubAdminDetails = () => {
     }
   };
 
-    //  Safe image resolver
-const IMAGE_BASE = "https://ne-games.com/leaderBoard/uploads/";
+  //  Safe image resolver
+  const IMAGE_BASE = "https://ne-games.com/leaderBoard/uploads/";
 
-const getImageSrc = () => {
-  if (previewImage) return previewImage;
+  const getImageSrc = () => {
+    if (previewImage) return previewImage;
 
-  const img = user?.image;
-  console.log("image : ", img)
+    const img = user?.image;
+    console.log("image : ", img)
 
-  if (!img) return "/logo.jpg";
+    if (!img) return "/logo.jpg";
 
-  // if already full URL
-  if (img.startsWith("http")) return img;
+    // if already full URL
+    if (img.startsWith("http")) return img;
 
-  // if only filename came from API
-  return IMAGE_BASE + img;
-};
+    // if only filename came from API
+    return IMAGE_BASE + img;
+  };
 
 
   //  Logout
@@ -198,6 +198,15 @@ const getImageSrc = () => {
             <UserCircle2 className="w-4 h-4" />
             {user.name}
           </DropdownMenuLabel>
+
+          <DropdownMenuItem
+            onClick={() => router.push("/q-a")}
+            className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          >
+            <HelpCircle className="mr-2 h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+            Q & A
+          </DropdownMenuItem>
+
 
           <DropdownMenuItem
             onClick={handleLogout}

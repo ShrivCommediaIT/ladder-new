@@ -18,6 +18,7 @@ import { Funnel, X } from "lucide-react";
 import { fetchPositiveLeaderboard, setAppliedAge } from "@/redux/slices/positiveLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import AgeFilter from "@/components/shared/AgeFilter";
+import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -71,30 +72,21 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
 
 
 /* ---------------- PLAYER CARD ---------------- */
-const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, isEditable }) => {
+const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, isEditable, loggedInUser }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
 
   return (
-    <Card onClick={() => { onSkillClick(player.id, player.skills[0].skill_number) }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
-      <div className="absolute top-2 left-2 z-20 group">
-        <div className="bg-white rounded-full flex items-center justify-center cursor-pointer shadow-sm border border-gray-200" style={{ padding: '2px' }}>
-          <input 
-            type="radio" 
-            name={`status_${player.id}`} 
-            value={player.player_status} 
-            checked 
-            readOnly
-            className={`w-3.5 h-3.5 outline-none cursor-pointer ${Number(player.player_status) === 1 ? 'accent-green-500' : 'accent-red-600'}`} 
-          />
-        </div>
-        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover:block bg-black/80 text-white text-[10px] font-semibold px-2 py-1 rounded whitespace-nowrap shadow border border-white/10 z-30 pointer-events-none">
-          {Number(player.player_status) === 1 ? 'Active' : 'Inactive'}
-        </div>
+    <Card onClick={() => { onSkillClick(player.id, player.skills[0].skill_number) }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative">
+      <div
+        className="flex justify-between items-center px-4 py-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <PlayerStatusToggle player={player} user={loggedInUser} />
       </div>
-      <div className="flex-1 min-w-0 curcer-pointer mt-6">
+      <div className="flex-1 min-w-0 curcer-pointer p-3">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10">
@@ -109,12 +101,12 @@ const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, is
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}   
+              {player?.name || "N/A"}
               {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                {player.age}
-              </p>
-            )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
+                  {player.age}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -141,8 +133,8 @@ const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, is
       <div className="flex  justify-between mr-1">
         <div className="flex flex-col items-center mr-1">
           <span className={` flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border ${player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).isTargetAchieved
-              ? "bg-green-500"
-              : "bg-white"
+            ? "bg-green-500"
+            : "bg-white"
             } ${player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).witnessBy
               ? "underline decoration-black decoration-[3px] bg-green-400"
               : ""
@@ -168,10 +160,11 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
   const { data = [], loading, appliedAge } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
+  const loggedInUser = useSelector((state) => state.user?.user);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = sessionStorage.getItem("user");
+      const storedUser = sessionStorage.getItem("user") || sessionStorage.getItem("userData");
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
@@ -208,7 +201,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
   // REFRESH KEY TO CONTROL RELOADS (STOPS INFINITE LOOP)
   const refreshKey = useRef(0);
 
-   // REFRESH FUNCTION FIRST
+  // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
     (skillNo = selectedPositiveFilter, age = appliedAge) => {
       if (ladderId) {
@@ -332,67 +325,68 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
             </div>
 
             <div className="flex-1 w-full min-w-0">
-            {/* Buttons */}
-            <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0">
-              {!isSorted ? (
-                <Button
-                  onClick={handleSortBySkill}
-                  disabled={isRefreshing}
-                  className="bg-[#005F5A] text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
-                >
-                  <Funnel size={16} />
-                  Sort Performance
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleClearAll}
-                  disabled={isRefreshing}
-                  className="bg-red-600 text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
-                >
-                  <Funnel size={16} />
-                  Clear All
-                </Button>
-              )}
+              {/* Buttons */}
+              <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0">
+                {!isSorted ? (
+                  <Button
+                    onClick={handleSortBySkill}
+                    disabled={isRefreshing}
+                    className="bg-[#005F5A] text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
+                  >
+                    <Funnel size={16} />
+                    Sort Performance
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleClearAll}
+                    disabled={isRefreshing}
+                    className="bg-red-600 text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
+                  >
+                    <Funnel size={16} />
+                    Clear All
+                  </Button>
+                )}
 
-              {currentUserId && (
-                <Button
-                  onClick={handleSelfRemove}
-                  disabled={isRefreshing}
-                  className="bg-gradient-to-r from-red-500 to-red-500 hover:from-orange-600 hover:to-red-600 
+                {currentUserId && (
+                  <Button
+                    onClick={handleSelfRemove}
+                    disabled={isRefreshing}
+                    className="bg-gradient-to-r from-red-500 to-red-500 hover:from-orange-600 hover:to-red-600 
                        text-white font-bold rounded-md px-4 py-2 flex items-center gap-2 shadow-lg"
-                >
-                  <X size={16} className="w-4 h-4" />
-                  Click here to leave this solution
-                </Button>
-              )}
-               <div className="h-10 w-full">
-                <AgeFilter onSearch={handleAgeSearch} user={true} />
+                  >
+                    <X size={16} className="w-4 h-4" />
+                    Click here to leave this solution
+                  </Button>
+                )}
+                <div className="h-10 w-full">
+                  <AgeFilter onSearch={handleAgeSearch} user={true} />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Player Cards */}
-          <div className="space-y-2 mt-2 w-full">
-            {filteredPlayers.length === 0 ? (
-              <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
-            ) : (
-              filteredPlayers.map((player, index) => {
-                const isEditablePlayer = player.id === currentUserId;
-                return (
-                  <PlayerCard
-                  key={player.id}
-                  player={player}
-                  overallRank={player.rank || index + 1}
-                  appliedAge={appliedAge}
-                  ageRank={index + 1}
-                  onSkillClick={handleSkillClick}
-                  isEditable={isEditablePlayer}
-                />
-                );
-              })
-            )}
+            {/* Player Cards */}
+            <div className="space-y-2 mt-2 w-full">
+              {filteredPlayers.length === 0 ? (
+                <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+              ) : (
+                filteredPlayers.map((player, index) => {
+                  const isEditablePlayer = player.id === currentUserId;
+                  return (
+                    <PlayerCard
+                      key={player.id}
+                      player={player}
+                      overallRank={player.rank || index + 1}
+                      appliedAge={appliedAge}
+                      ageRank={index + 1}
+                      onSkillClick={handleSkillClick}
+                      isEditable={isEditablePlayer}
+                      loggedInUser={loggedInUser}
+                    />
+                  );
+                })
+              )}
+            </div>
           </div>
-        </div>
         </div>
       </main>
 

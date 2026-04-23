@@ -48,10 +48,7 @@ export const Best5EditPlayer = ({
     .find((p) => Number(p.id) === playerId);
 
   // ✅ CORRECT LADDER ID (REAL FIX)
-  const ladder_id = selectedPlayer?.ladder_id;
-
-  // ✅ No fetch on modal open — data is already in Redux from parent page.
-  // Post-action refresh is handled below after result/move.
+  const ladder_id = selectedPlayer?.ladder_id || searchParams.get("ladder_id");
 
   // ✅ 🔥 REAL-TIME UPDATE AFTER MOVE / RESULT
   useEffect(() => {
@@ -150,7 +147,7 @@ export const Best5EditPlayer = ({
               </TabsContent>
 
               <TabsContent value="load">
-                <PlayerImage userId={playerId} onClose={onClose} />
+                <PlayerImage userId={playerId} ladderId={ladder_id} ladderType={urlType || ladderType} onClose={onClose} />
               </TabsContent>
 
               {/* <TabsContent value="status">

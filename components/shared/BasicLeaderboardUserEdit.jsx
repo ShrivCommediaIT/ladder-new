@@ -63,17 +63,17 @@ export const BasicLeaderboardUserEdit = ({
   }, [result, moveError, dispatch]);
 
   useEffect(() => {
-    if ((type === "skill" || ladderType ==  "skill" ) && playersSkills){
+    if ((type === "skill" || ladderType == "skill") && playersSkills) {
       const selectedPlayer = playersSkills.find((p) => Number(p.id) === Number(playerId));
       setPlayers(selectedPlayer)
-    }else if ((type === "positive"  || ladderType ==  "positive" ) && playersPositive) {
+    } else if ((type === "positive" || ladderType == "positive") && playersPositive) {
       const selectedPlayer = playersPositive.find((p) => Number(p.id) === Number(playerId));
       setPlayers(selectedPlayer)
-    }else if ((type === "negative" || ladderType ==  "negative" ) && playersNegative) {
+    } else if ((type === "negative" || ladderType == "negative") && playersNegative) {
       const selectedPlayer = playersNegative.find((p) => Number(p.id) === Number(playerId));
       setPlayers(selectedPlayer)
     }
-  }, []);
+  }, [type, ladderType, playersSkills, playersPositive, playersNegative, playerId]);
 
   const [selectedTab, setSelectedTab] = useState("activity");
 

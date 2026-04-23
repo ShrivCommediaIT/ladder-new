@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
 import { EditPlayer } from "@/components/shared/EditPlayer";
+import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import PlayerSearch from "./PlayerSearch";
 import {
   Dialog,
@@ -29,24 +30,27 @@ export default function Bestof5Players() {
   const ladderTypeFromParams = searchParams.get("type");
 
   // ✅ user from localStorage
-  const userData =
-    typeof window !== "undefined"
-      ? JSON.parse(sessionStorage.getItem("userData") || "{}")
-      : {};
+  const [currentUser, setCurrentUser] = useState(null);
+  const reduxUser = useSelector((state) => state.user?.user);
 
-  let effectiveUserId = null;
-  let effectiveUserType = userData?.user_type || null;
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("user") || sessionStorage.getItem("userData");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.id) {
+            setCurrentUser(parsed);
+          }
+        } catch (e) {
+          console.error("Failed to parse user session", e);
+        }
+      }
+    }
+  }, []);
 
-  if (effectiveUserType === "admin") {
-    effectiveUserId = userData?.id;
-  } else if (effectiveUserType === "sub_admin") {
-    effectiveUserId = userData?.user_id;
-  }
-
-  const user = {
-    id: effectiveUserId,
-    user_type: effectiveUserType,
-  };
+  const user = reduxUser?.id ? reduxUser : currentUser;
+  const loggedInUser = user; // for toggle context
 
   // ✅ redux data
   const players =
@@ -178,30 +182,21 @@ export default function Bestof5Players() {
                   transition={{ duration: 0.3 }}
                   onClick={() => canEdit && handlePlayerClick(player)}
                   className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all relative ${canEdit
-                      ? "cursor-pointer hover:bg-[#143238]"
-                      : "opacity-60 cursor-not-allowed"
+                    ? "cursor-pointer hover:bg-[#143238]"
+                    : "opacity-60 cursor-not-allowed"
                     }`}
                   style={{
                     background: "#223848",
                     border: "2px solid #4eb0a2",
                   }}
                 >
-                  <div className="absolute top-2 left-2 z-20 group">
-                    <div className="bg-white rounded-full flex items-center justify-center cursor-pointer shadow-sm border border-gray-200" style={{ padding: '2px' }}>
-                      <input
-                        type="radio"
-                        name={`status_${player.id}`}
-                        value={player.player_status}
-                        checked
-                        readOnly
-                        className={`w-3.5 h-3.5 outline-none cursor-pointer ${Number(player.player_status) === 1 ? 'accent-green-500' : 'accent-red-600'}`}
-                      />
-                    </div>
-                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover:block bg-black/80 text-white text-[10px] font-semibold px-2 py-1 rounded whitespace-nowrap shadow border border-white/10 z-30 pointer-events-none">
-                      {Number(player.player_status) === 1 ? 'Active' : 'Inactive'}
-                    </div>
+                  <div
+                    className="flex justify-between items-center px-4 py-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <PlayerStatusToggle player={player} user={loggedInUser} />
                   </div>
-                  <div className="flex-1 min-w-0 mt-6">
+                  <div className="flex-1 min-w-0 p-3">
                     <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
                       {player?.name || "N/A"}
                       {player.age && (

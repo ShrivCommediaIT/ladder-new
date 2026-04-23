@@ -47,7 +47,7 @@ export const MinileagueEditPlayer = ({
 
   /* ---------------- REDUX ---------------- */
 
-  const ladderType = searchParams.get("ladder_type")
+  const ladderType = searchParams.get("ladder_type") || "minileague";
   
 
   const { error: moveError, result } =
