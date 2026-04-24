@@ -48,7 +48,6 @@ const AdminHideShowInfo = ({ isModel }) => {
 
       {/* Step 3 */}
       <div>
-        <p className={`font-semibold ${headingText}`}>4. Log in as Section Admin</p>
         <p>Log out of the Main Dashboard and log back in using:</p>
         <ul className="list-disc ml-5 mt-1 space-y-1">
           <li>Your Club ID</li>

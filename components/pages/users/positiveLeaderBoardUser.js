@@ -79,7 +79,7 @@ const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, is
 
 
   return (
-    <Card onClick={() => { onSkillClick(player.id, player.skills[0].skill_number) }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative">
+    <Card onClick={() => { onSkillClick(player.id, player.skills[0].skill_number) }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative gap-0 p-4">
       <div
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
