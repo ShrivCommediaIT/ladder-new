@@ -144,7 +144,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
       <div className="space-y-2">
         <label className="text-white font-semibold flex items-center gap-2">
           <Phone className="w-4 h-4" />
-          Phone Number
+          Phone Number (Optional)
         </label>
         <div className="relative">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">+91</div>

@@ -192,13 +192,13 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
             {/* ✅ EMAIL INPUT REMOVED FROM UI */}
 
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-300">Phone (optional)</Label>
+              <Label className="text-xs text-slate-300">Phone (Optional)</Label>
               <Input
                 type="tel"
                 className="h-10 bg-slate-900/60 border-slate-700/80 focus-visible:ring-slate-500 text-sm placeholder:text-slate-500"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter phone number"
+                placeholder="Enter phone number (Optional)"
               />
             </div>
 

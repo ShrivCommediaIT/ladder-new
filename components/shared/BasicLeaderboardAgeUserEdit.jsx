@@ -233,7 +233,7 @@ const BasicLeaderboardAgeUserEdit = ({
                 htmlFor="phone"
                 className="text-gray-300 font-semibold py-2 text-lg"
               >
-                Phone Number
+                Phone Number (Optional)
               </Label>
               <Input
                 id="phone"
@@ -241,7 +241,7 @@ const BasicLeaderboardAgeUserEdit = ({
                 type="tel"
                 value={form.phone}
                 onChange={handleChange}
-                placeholder="Enter phone number"
+                placeholder="Enter phone number (Optional)"
                 className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
               />
             </div>

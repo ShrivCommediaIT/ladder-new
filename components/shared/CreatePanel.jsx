@@ -104,7 +104,7 @@ const CreatePanel = ({
               CSV Instructions
             </p>
             <p>(1) Names in Column A Or</p>
-            <p>(2) Name + Phone Number</p>
+            <p>(2) Name + Phone Number (Optional)</p>
           </div>
 
           <label className="group flex flex-col items-center justify-center h-32 rounded-2xl border border-dashed border-white/20 bg-white/5 hover:bg-white/10 transition cursor-pointer relative">

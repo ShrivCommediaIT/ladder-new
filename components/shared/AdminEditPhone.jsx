@@ -129,11 +129,12 @@ const handleEdit = async () => {
         </div>
 
         <div className="flex-1">
-          <label className="text-sm text-zinc-300">Phone</label>
+          <label className="text-sm text-zinc-300">Phone (Optional)</label>
           <Input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="bg-zinc-800 text-white"
+            placeholder="Enter phone number (Optional)"
           />
         </div>
 
