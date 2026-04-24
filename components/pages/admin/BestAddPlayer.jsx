@@ -165,7 +165,7 @@ const handleSubmit = async () => {
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="Enter phone number"
+            placeholder="Enter phone number (Optional)"
             className="text-white font-semibold"
           />
         </div>

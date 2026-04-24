@@ -306,7 +306,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
 
               <motion.div whileHover={{ scale: 1.02 }}>
                 <Label htmlFor="phone" className="text-blue-200 mb-2 font-semibold">
-                  Phone Number
+                  Phone Number (Optional)
                 </Label>
                 <Input
                   id="phone"
@@ -315,7 +315,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                   value={form.phone}
                   onChange={handleChange}
                   className="bg-white/10 py-6 border-white/30 text-white focus:ring-2 focus:ring-cyan-400"
-                  required
+                  placeholder="Enter phone number (Optional)"
                 />
               </motion.div>
 
