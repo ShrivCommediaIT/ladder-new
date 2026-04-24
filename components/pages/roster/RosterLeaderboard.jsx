@@ -214,7 +214,7 @@ const RosterLeaderboard = () => {
 
   // step 3 — alphabet priority + token sort + rank sort
   const sortedPlayers = [...uniquePlayers].sort((a, b) => {
-    const aName = a.name?.toLowerCase() || "";
+   const aName = a.name?.toLowerCase() || "";
     const bName = b.name?.toLowerCase() || "";
 
     // ⭐ priority: startsWith searched letter
@@ -225,17 +225,8 @@ const RosterLeaderboard = () => {
       if (aStarts && !bStarts) return -1;
       if (!aStarts && bStarts) return 1;
     }
-
-    // ⭐ second priority: more total tokens on top
-    const aTokens = Number(a.total_token || 0);
-    const bTokens = Number(b.total_token || 0);
-    if (aTokens !== bTokens) {
-      return bTokens - aTokens;
-    }
-
-    // fallback → rank sort
-    return Number(a.rank || 0) - Number(b.rank || 0);
-  });
+    return 0;
+    });
 
   // ✅ group by gradebar preset (roster section)
   const groupSize = 6;
@@ -317,7 +308,7 @@ const RosterLeaderboard = () => {
               <PlayerCard
                 key={player.id}
                 player={player}
-                rank={i + 1}
+                rank={player.rank || i + 1}
                 onRedeemClick={handleRedeemClick}
                 onEditClick={handleEditClick}
                 currentUser={currentUser}

@@ -87,9 +87,6 @@ const StatsExplainedDialog = () => {
               // Default: Best of 5 points
               return (
                 <div className="space-y-2 sm:space-y-1">
-                  {(ladderType === "minileague") && <p className="flex items-center text-sm sm:text-base font-semibold mb-3">
-                    Sections of groups of players who all play each other within a certain time period with points allocated as below.  After that time period two payers go up a section and two go down.  Scoring is as follows:
-                  </p>}
                   <p className="flex items-center text-sm sm:text-base font-semibold">
                     <span className="w-6 h-6 sm:w-7 sm:h-7 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
                       🏆

@@ -377,7 +377,7 @@ const MovePlayerMinileague = ({
         "
       >
         <h3 className="mb-2 text-xl sm:text-2xl font-bold text-violet-200 text-center">
-          Record Match Result
+          Record Match Result  
           <span className="text-sm text-blue-400 block">
             {sectionName}
             <span className="text-green-400 ml-1">
