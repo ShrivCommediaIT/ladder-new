@@ -149,6 +149,7 @@ export const BasicLeaderboardUserEdit = ({
                   onClose={handleChildClose}
                   initialActivity={skillNumber}
                   playerName={selectedPlayer?.name || "Player"}
+                  selectedPlayer={selectedPlayer}
                 />
               </div>
             </TabsContent>
