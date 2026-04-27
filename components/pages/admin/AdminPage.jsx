@@ -1,77 +1,154 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { importRoster } from "@/redux/slices/rosterSlice";
 import Papa from "papaparse";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-import {
-  createLadder,
-} from "@/redux/slices/ladderSlice";
-import { fetchLadders } from "@/redux/slices/fetchLadderSlice";
-
 import { Card, CardContent } from "@/components/ui/card";
-
-// ⭐ MiniLeague Imports
-
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  ArrowRight,
+  CircleHelp,
+  FolderKanban,
+  Layers3,
+  Mail,
+  Plus,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  UploadCloud,
+  Users2,
+} from "lucide-react";
+import { motion } from "framer-motion";
 
-import { Layers, Users, UploadCloud, ListChecks, Play } from "lucide-react";
-
+import { importRoster } from "@/redux/slices/rosterSlice";
+import { createLadder } from "@/redux/slices/ladderSlice";
+import { fetchLadders } from "@/redux/slices/fetchLadderSlice";
 import UserDetails from "@/components/shared/UserDetails";
 import LadderList from "./LadderList";
-
+import DemoLadder from "./DemoLadder";
+import CreatePanel from "@/components/shared/CreatePanel";
+import AdminImportantInfo from "./info/AdminImportantInfo";
+import AdminHideShowInfo from "./info/AdminHideShowInfo";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import AdminImportantInfo from "./info/AdminImportantInfo";
-import AdminHideShowInfo from "./info/AdminHideShowInfo";
-import DemoLadder from "./DemoLadder";
-import CreatePanel from "@/components/shared/CreatePanel";
+
+const cardToneClasses = [
+  "from-cyan-500/[0.22] via-cyan-500/[0.06] to-transparent",
+  "from-blue-500/[0.18] via-blue-500/[0.06] to-transparent",
+  "from-emerald-500/[0.18] via-emerald-500/[0.06] to-transparent",
+  "from-fuchsia-500/[0.18] via-fuchsia-500/[0.06] to-transparent",
+];
+
+const startSteps = [
+  {
+    icon: Plus,
+    title: "Create the roster",
+    text: "Name your club roster and upload the CSV to get the player list ready.",
+  },
+  {
+    icon: UploadCloud,
+    title: "Check your player data",
+    text: "The uploader warns about duplicate names before anything is created.",
+  },
+  {
+    icon: Target,
+    title: "Launch competitions",
+    text: "Open any competition from the list and manage rankings, results, and updates.",
+  },
+];
+
+const brandGradient = "linear-gradient(135deg, #29abe2 0%, #1a3a8f 100%)";
 
 export default function AdminPage() {
   const [ladderName, setLadderName] = useState("");
   const [csvFile, setCsvFile] = useState(null);
   const [duplicateWarning, setDuplicateWarning] = useState(null);
-
-  const [solutionsOpen, setSolutionsOpen] = useState(false);
-  const [openQuickDesktop, setOpenQuickDesktop] = useState(false);
-  const [openQuickMobile, setOpenQuickMobile] = useState(false);
-
-  const { allLadders } = useSelector((state) => state.fetchLadder);
+  const [admin, setAdmin] = useState(null);
+  const [quickGuideOpen, setQuickGuideOpen] = useState(false);
+  const [solutionsInfoOpen, setSolutionsInfoOpen] = useState(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
 
   const loading = useSelector((state) => state.createLadder?.loading);
-
-  const [admin, setAdmin] = useState(null);
-
+  const { allLadders = [], loading: laddersLoading } = useSelector(
+    (state) => state.fetchLadder,
+  );
 
   useEffect(() => {
-      const storedAdmin = sessionStorage.getItem("adminDetails");
-      if (storedAdmin) {
-        try {
-          const parsed = JSON.parse(storedAdmin);
-          setAdmin(parsed);
-          return; 
-        } catch (err) {
-          console.error(err);
-        }
-      }
+    const storedAdmin = sessionStorage.getItem("adminDetails");
+    if (!storedAdmin) return;
+
+    try {
+      setAdmin(JSON.parse(storedAdmin));
+    } catch (error) {
+      console.error(error);
+      setAdmin(null);
+    }
   }, []);
+
+  useEffect(() => {
+    if (!admin?.id) return;
+    dispatch(fetchLadders({ userId: admin.id }));
+  }, [admin?.id, dispatch]);
+
+  const activeLadders = useMemo(
+    () => allLadders.filter((ladder) => ladder.created_by !== "demo"),
+    [allLadders],
+  );
+
+  const demoLadders = useMemo(
+    () => allLadders.filter((ladder) => ladder.created_by === "demo"),
+    [allLadders],
+  );
+
+  const rosterCount = useMemo(
+    () => activeLadders.filter((ladder) => ladder.type === "roster").length,
+    [activeLadders],
+  );
+
+  const adminFirstName = admin?.name?.trim()?.split(" ")[0] || "Admin";
+
+  const overviewCards = [
+    {
+      title: "Club Competitions",
+      value: activeLadders.length,
+      detail:
+        activeLadders.length > 0 ? "Ready to edit and manage" : "Create your first roster",
+      icon: Layers3,
+    },
+    {
+      title: "Roster Boards",
+      value: rosterCount,
+      detail: rosterCount > 0 ? "Player lists uploaded" : "Awaiting first upload",
+      icon: Users2,
+    },
+    {
+      title: "Demo Templates",
+      value: demoLadders.length,
+      detail: "Open these to explore the setup",
+      icon: Sparkles,
+    },
+    {
+      title: "Setup Status",
+      value: csvFile ? "CSV Ready" : laddersLoading ? "Syncing" : "Live",
+      detail: csvFile ? "Roster file is attached" : "Dashboard connected",
+      icon: ShieldCheck,
+    },
+  ];
 
   const checkCsvDuplicates = (file) => {
     return new Promise((resolve, reject) => {
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
-        transformHeader: (h) => h.trim().toLowerCase(),
+        transformHeader: (header) => header.trim().toLowerCase(),
         complete: (results) => {
           const rows = results.data || [];
 
@@ -80,17 +157,13 @@ export default function AdminPage() {
             return;
           }
 
-          // 🔍 auto detect name column
           const headers = Object.keys(rows[0]);
-
-          const nameKey = headers.find((h) => h.includes("name")) || headers[0];
-
+          const nameKey = headers.find((header) => header.includes("name")) || headers[0];
           const seen = new Set();
           const duplicates = [];
 
           for (const row of rows) {
             const raw = row[nameKey];
-
             if (!raw) continue;
 
             const normalized = raw
@@ -106,8 +179,6 @@ export default function AdminPage() {
             }
           }
 
-          console.log("Duplicate names →", duplicates);
-
           resolve({ duplicateNames: duplicates });
         },
         error: reject,
@@ -115,8 +186,8 @@ export default function AdminPage() {
     });
   };
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
+  const handleFileChange = async (event) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     setDuplicateWarning(null);
@@ -126,120 +197,102 @@ export default function AdminPage() {
     if (result.duplicateNames.length > 0) {
       setDuplicateWarning(result);
       setCsvFile(null);
-
       toast.error(
         `Duplicate names found: ${[...new Set(result.duplicateNames)].join(", ")}`,
       );
-
       return;
     }
 
     setCsvFile(file);
   };
 
-  // duplicate name check helper
   const ladderExists = (name) => {
-    if (!allLadders || !Array.isArray(allLadders)) return false;
+    if (!Array.isArray(allLadders)) return false;
+
     return allLadders.some(
-      (l) => l?.name?.toLowerCase().trim() === name.toLowerCase().trim(),
+      (ladder) => ladder?.name?.toLowerCase().trim() === name.toLowerCase().trim(),
     );
   };
 
-const handleCreateRoster = async () => {
-  const ladderType = "roster";
+  const handleCreateRoster = async () => {
+    const ladderType = "roster";
 
-  // ✅ CSV duplicate check
-  if (duplicateWarning) {
-    toast.warn("Please remove duplicate names first");
-    return;
-  }
-
-  const cleanName = ladderName.trim();
-
-  // ✅ basic validation
-  if (!admin?.id || !cleanName || !csvFile) {
-    toast.warn("Please enter roster name, upload CSV, and ensure login.");
-    return;
-  }
-
-  // ✅ duplicate ladder name check
-  if (ladderExists(cleanName)) {
-    toast.error("Roster name already exists — choose another");
-    return;
-  }
-
-  try {
-    // ✅ CREATE LADDER
-    const ladderResult = await dispatch(
-      createLadder({
-        user_id: admin.id,
-        name: cleanName,
-        type: ladderType,
-      })
-    ).unwrap();
-
-    // ✅ SAFE ID extraction (same as subadmin)
-    const createdLadderId =
-      ladderResult?.data?.ladder_id ??
-      ladderResult?.data?.id ??
-      ladderResult?.data?.data?.ladder_id ??
-      ladderResult?.data?.data?.id ??
-      ladderResult?.ladder_id ??
-      ladderResult?.id ??
-      ladderResult?.insertId ??
-      ladderResult?.ladder?.id;
-
-    if (!createdLadderId) {
-      toast.error("Roster created but ID missing");
+    if (duplicateWarning) {
+      toast.warn("Please remove duplicate names first");
       return;
     }
 
-    // ✅ IMPORT ROSTER CSV
-    await dispatch(
-      importRoster({
-        file: csvFile,
-        ladder_id: createdLadderId,
-      })
-    ).unwrap();
+    const cleanName = ladderName.trim();
 
-    toast.success("Roster created successfully!");
-
-    // ✅ refresh list (same pattern)
-    dispatch(
-      fetchLadders({
-        userId: admin.id,
-      })
-    );
-
-    // ✅ reset state
-    setLadderName("");
-    setCsvFile(null);
-
-    // ✅ redirect (optional but recommended)
-    setTimeout(() => {
-      router.push(
-        `/player-list?ladder_id=${createdLadderId}&type=roster`
-      );
-    }, 800);
-
-  } catch (error) {
-    console.error(error);
-
-    const msg =
-      error?.response?.data?.error_message ||
-      error?.message ||
-      "Create failed";
-
-    if (msg.toLowerCase().includes("exist")) {
-      toast.error("Roster name already exists");
-    } else {
-      toast.error(msg);
+    if (!admin?.id || !cleanName || !csvFile) {
+      toast.warn("Please enter roster name, upload CSV, and ensure login.");
+      return;
     }
-  }
-};
+
+    if (ladderExists(cleanName)) {
+      toast.error("Roster name already exists. Choose another.");
+      return;
+    }
+
+    try {
+      const ladderResult = await dispatch(
+        createLadder({
+          user_id: admin.id,
+          name: cleanName,
+          type: ladderType,
+        }),
+      ).unwrap();
+
+      const createdLadderId =
+        ladderResult?.data?.ladder_id ??
+        ladderResult?.data?.id ??
+        ladderResult?.data?.data?.ladder_id ??
+        ladderResult?.data?.data?.id ??
+        ladderResult?.ladder_id ??
+        ladderResult?.id ??
+        ladderResult?.insertId ??
+        ladderResult?.ladder?.id;
+
+      if (!createdLadderId) {
+        toast.error("Roster created but the ID was missing.");
+        return;
+      }
+
+      await dispatch(
+        importRoster({
+          file: csvFile,
+          ladder_id: createdLadderId,
+        }),
+      ).unwrap();
+
+      toast.success("Roster created successfully!");
+      dispatch(fetchLadders({ userId: admin.id }));
+      setLadderName("");
+      setCsvFile(null);
+      setDuplicateWarning(null);
+
+      setTimeout(() => {
+        router.push(`/player-list?ladder_id=${createdLadderId}&type=roster`);
+      }, 800);
+    } catch (error) {
+      console.error(error);
+
+      const message =
+        error?.response?.data?.error_message || error?.message || "Create failed";
+
+      if (message.toLowerCase().includes("exist")) {
+        toast.error("Roster name already exists");
+      } else {
+        toast.error(message);
+      }
+    }
+  };
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-[#05070f] via-[#0c1224] to-black text-white">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#07111f] text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(41,171,226,0.2),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(26,58,143,0.28),transparent_38%),linear-gradient(180deg,#07111f_0%,#030711_100%)]" />
+      <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:78px_78px]" />
+
       <ToastContainer
         position="top-right"
         autoClose={2500}
@@ -247,197 +300,295 @@ const handleCreateRoster = async () => {
         theme="dark"
       />
 
-      {/* HEADER MOBILE */}
-      <div className="sticky top-0 z-20 sm:hidden flex justify-between px-4 py-3 bg-black/70 backdrop-blur-xl border-b border-white/10">
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6 ">
-          {/* LEFT SIDE */}
-          <div className="flex flex-col gap-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
-              Admin Dashboard
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-2 text-sm sm:text-lg text-white">
-              <p>Getting Started</p>
-              <span>Quick Quide</span>
-
-              {/* INFO POPOVER */}
-              <Popover
-                open={openQuickMobile}
-                onOpenChange={setOpenQuickMobile}
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+        <motion.section
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_25px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-7"
+        >
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl space-y-5">
+              <div
+                className="inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
+                style={{
+                  borderColor: "rgba(41, 171, 226, 0.28)",
+                  backgroundColor: "rgba(10, 24, 54, 0.88)",
+                  color: "#7dd3fc",
+                }}
               >
-                <PopoverTrigger asChild>
-                  <button className="underline text-cyan-300 cursor-pointer">
-                    Quick Guide
-                  </button>
-                </PopoverTrigger>
-
-                <PopoverContent
-                  side="top"
-                  align="center"
-                  sideOffset={10}
-                  className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700
-    text-slate-900 px-2 py-4 rounded-lg shadow-2xl backdrop-blur-md"
-                >
-                  <AdminImportantInfo
-                    onClose={() => setOpenQuickMobile(false)}
-                  />
-                </PopoverContent>
-              </Popover>
-
-              {/* RIGHT SIDE — USER DETAILS */}
-              <div className="self-start sm:self-auto">
-                <UserDetails />
+                <span className="h-2.5 w-2.5 rounded-full bg-cyan-300" />
+                Sports Solutions Pro
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-5 pb-8 sm:pb-8">
-        {/* DESKTOP HEADER */}
-        <div className="hidden sm:flex justify-between items-center mb-6">
-          <div className="flex gap-2 items-center">
-            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
-              Admin Dashboard
-            </h1>
-
-            <div className="flex items-center gap-1">
-              <p className="text-lg text-white">Getting Started</p> -
-
-              <Popover
-                open={openQuickDesktop}
-                onOpenChange={setOpenQuickDesktop}
-              >
-                <PopoverTrigger asChild>
-                  <button className="underline text-cyan-300 cursor-pointer">
-                    Quick Guide
-                  </button>
-                </PopoverTrigger>
-
-                <PopoverContent
-                  side="top"
-                  align="center"
-                  sideOffset={10}
-                  className="w-[90vw] sm:w-xl bg-gray-300 border-slate-700
-    text-slate-900 px-2 py-4 rounded-lg shadow-2xl backdrop-blur-md"
-                >
-                  <AdminImportantInfo
-                    onClose={() => setOpenQuickDesktop(false)}
-                  />
-                </PopoverContent>
-              </Popover>
-
-            </div>
-          </div>
-
-          <div>
-            <UserDetails />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* LEFT SIDE */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* LADDER TYPES */}
-            <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-5">
-
-              <DemoLadder userId={admin?.id} />
-
-            </div>
-
-            {/* LADDER LIST */}
-            <div className="rounded-2xl bg-black/20 border border-white/10 p-3">
-              <div className="">
-                <LadderList userId={admin?.id} />
+              <div className="space-y-3">
+                <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl">
+                  Welcome back, {adminFirstName}
+                </h1>
+                <p className="max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+                  Manage rosters, launch competitions, and keep your club’s internal
+                  ladder system organized from one admin workspace.
+                </p>
               </div>
-            </div>
-          </div>
 
-          {/* RIGHT SIDE CREATE PANEL */}
-          <div className="lg:col-span-2 max-h-auto border-white/10 p-4 sm:p-6 rounded-md">
-
-
-            <div className="flex items-center justify-start gap-4 ">
-              <h3 className="text-lg font-semibold text-cyan-400 flex items-center gap-2">
-                <Layers className="h-5 w-5" />
-                Competitions Information
-              </h3>
-
-              <Popover open={solutionsOpen} onOpenChange={setSolutionsOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    onClick={() => setSolutionsOpen(!solutionsOpen)}
-                    className="cursor-pointer underline text-cyan-300 text-sm"
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <Popover open={quickGuideOpen} onOpenChange={setQuickGuideOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/18"
+                    >
+                      <CircleHelp className="h-4 w-4" />
+                      Quick Guide
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="start"
+                    sideOffset={10}
+                    className="w-[90vw] max-w-xl border-slate-700 bg-slate-100 px-2 py-4 text-slate-900 shadow-2xl"
                   >
-                    {solutionsOpen ? "Hide" : "Show"}
-                  </button>
-                </PopoverTrigger>
+                    <AdminImportantInfo onClose={() => setQuickGuideOpen(false)} />
+                  </PopoverContent>
+                </Popover>
 
-                <PopoverContent
-                  side="top"
-                  align="center"
-                  className="w-[90vw] sm:w-lg bg-gray-300 border-slate-700 text-slate-900 px-3 py-4 rounded-lg shadow-2xl z-50 backdrop-blur-md"
-                >
-
-                  <div className="text-sm">
+                <Popover open={solutionsInfoOpen} onOpenChange={setSolutionsInfoOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                    >
+                      <Layers3 className="h-4 w-4" />
+                      Competition Types
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="start"
+                    sideOffset={10}
+                    className="w-[90vw] max-w-lg border-slate-700 bg-slate-100 px-3 py-4 text-slate-900 shadow-2xl"
+                  >
                     <AdminHideShowInfo isModel={false} />
-                  </div>
-                </PopoverContent>
-              </Popover>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
 
-            <div className="text-white mt-12">
+            <div className="self-start rounded-[28px] border border-white/10 bg-[#081226]/[0.82] p-2 shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
+              <UserDetails />
+            </div>
+          </div>
+
+          <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {overviewCards.map(({ title, value, detail, icon: Icon }, index) => (
+              <div
+                key={title}
+                className={`relative overflow-hidden rounded-[26px] border border-white/10 bg-[#07152b]/[0.86] p-5 ${cardToneClasses[index] ? `bg-gradient-to-br ${cardToneClasses[index]}` : ""}`}
+              >
+                <div className="relative z-10 flex items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-slate-400">{title}</p>
+                    <p className="text-3xl font-black text-white">{value}</p>
+                    <p className="text-sm text-slate-300">{detail}</p>
+                  </div>
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                    style={{
+                      background: brandGradient,
+                      boxShadow: "0 14px 28px rgba(41, 171, 226, 0.22)",
+                    }}
+                  >
+                    <Icon className="h-5 w-5 text-white" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+          <div className="space-y-6">
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.05 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:p-6"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                    Workspace Flow
+                  </p>
+                  <h2 className="mt-2 text-2xl font-bold text-white">
+                    How to get a new club ready
+                  </h2>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200">
+                  <FolderKanban className="h-4 w-4" />
+                  {activeLadders.length > 0 ? "Club already live" : "Fresh setup"}
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                {startSteps.map(({ icon: Icon, title, text }) => (
+                  <div
+                    key={title}
+                    className="rounded-[24px] border border-white/10 bg-[#071325]/[0.88] p-5"
+                  >
+                    <div
+                      className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(41,171,226,0.24), rgba(26,58,143,0.42))",
+                      }}
+                    >
+                      <Icon className="h-5 w-5 text-cyan-200" />
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">{text}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
+
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.1 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
+            >
+              <div className="mb-4 flex items-center justify-between gap-3 px-1">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                    Demo Area
+                  </p>
+                  <h2 className="mt-2 text-2xl font-bold text-white">
+                    Explore ready-made examples
+                  </h2>
+                </div>
+                <div className="hidden rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300 sm:inline-flex">
+                  Test before you launch
+                </div>
+              </div>
+              <DemoLadder userId={admin?.id} />
+            </motion.section>
+
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.15 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
+            >
+              <div className="mb-4 px-1">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  Live Lists
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-white">
+                  Manage existing competitions
+                </h2>
+              </div>
+              <LadderList userId={admin?.id} />
+            </motion.section>
+          </div>
+
+          <div className="space-y-6">
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.08 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:p-6"
+            >
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                    Create Roster
+                  </p>
+                  <h2 className="mt-2 text-2xl font-bold text-white">
+                    Upload your players and start fast
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                    Add the roster name, upload the CSV, then jump straight into the
+                    player list editor.
+                  </p>
+                </div>
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                  style={{
+                    background: brandGradient,
+                    boxShadow: "0 14px 28px rgba(41, 171, 226, 0.22)",
+                  }}
+                >
+                  <ArrowRight className="h-5 w-5 text-white" />
+                </div>
+              </div>
+
               <CreatePanel
                 role="admin"
                 ladderName={ladderName}
                 setLadderName={setLadderName}
                 ladderType="roster"
-                setLadderType={() => { }}
+                setLadderType={() => {}}
                 csvFile={csvFile}
                 handleFileChange={handleFileChange}
                 handleCreate={handleCreateRoster}
                 loading={loading}
               />
-            </div>
+            </motion.section>
+
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.12 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:p-6"
+            >
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                Support
+              </p>
+              <h2 className="mt-2 text-2xl font-bold text-white">
+                Need a bespoke club setup?
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                Reach out for help with custom workflows, imports, or a competition setup
+                tailored to your club structure.
+              </p>
+
+              <a
+                href="mailto:support@sportssolutionspro.com"
+                className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/18"
+              >
+                <Mail className="h-4 w-4" />
+                support@sportssolutionspro.com
+              </a>
+            </motion.section>
+
+            {duplicateWarning && (
+              <Alert className="border-red-500/35 bg-red-500/10 text-red-50">
+                <AlertTitle>Duplicate players detected</AlertTitle>
+                <AlertDescription className="mt-2 text-red-100/90">
+                  {[...new Set(duplicateWarning.duplicateNames)].join(", ")}
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
-
-
         </div>
       </div>
 
-      <footer className="w-full bg-black/80 text-white p-6 sm:p-10">
-        <Card className="bg-gray-900/90 border border-white/10 shadow-lg">
-          <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
-            {/* Left Section */}
-            <div className="text-center sm:text-left">
-              <p className="text-sm text-gray-300 sm:text-base font-medium">
-                For any bespoke needs
+      <footer className="relative z-10 px-4 pb-8 sm:px-6 lg:px-8">
+        <Card className="mx-auto max-w-7xl border border-white/10 bg-black/55 text-white shadow-lg">
+          <CardContent className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-300">
+                Sports Solutions Pro Admin Workspace
               </p>
-              <a
-                href="mailto:support@sportssolutionspro.com"
-                className="mt-1 inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors text-sm sm:text-base font-semibold"
-              >
-                support@sportssolutionspro.com
-              </a>
+              <p className="mt-1 text-sm text-slate-400">
+                Roster setup, competition control, and player organization in one place.
+              </p>
             </div>
-
+            <p className="text-sm text-cyan-300">
+              {activeLadders.length > 0
+                ? `${activeLadders.length} competition${activeLadders.length === 1 ? "" : "s"} currently available`
+                : "No competitions created yet"}
+            </p>
           </CardContent>
         </Card>
       </footer>
-
-      {duplicateWarning && (
-        <Alert className="mt-4 border-red-500/40 bg-red-500/10">
-          <AlertTitle>Duplicate Players Detected</AlertTitle>
-          <AlertDescription>
-            {duplicateWarning.duplicateNames.length > 0 && (
-              <div>
-                Names:{" "}
-                {[...new Set(duplicateWarning.duplicateNames)].join(", ")}
-              </div>
-            )}
-          </AlertDescription>
-        </Alert>
-      )}
     </div>
   );
 }

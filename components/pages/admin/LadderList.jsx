@@ -23,8 +23,6 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
-
-import { fetchLadderByUserId } from "@/redux/slices/ladderSlice";
 import { ListChecks } from "lucide-react";
 
 const LadderList = ({ userId }) => {
@@ -50,12 +48,13 @@ const LadderList = ({ userId }) => {
       ? JSON.parse(sessionStorage.getItem("userData") || "null")
       : null;
 
-  useEffect(() => {
-    if (!userId) return;
-
+  const refreshLadders = () => {
     if (admin?.user_type === "admin") {
-      dispatch(fetchLadderByUserId({ userId: admin.id }));
-    } else if (subAdmin?.user_type === "sub_admin") {
+      dispatch(fetchLadders({ userId: admin.id }));
+      return;
+    }
+
+    if (subAdmin?.user_type === "sub_admin") {
       dispatch(
         fetchLadders({
           userId: subAdmin.user_id,
@@ -63,7 +62,12 @@ const LadderList = ({ userId }) => {
         }),
       );
     }
-  }, [userId, dispatch]);
+  };
+
+  useEffect(() => {
+    if (!userId) return;
+    refreshLadders();
+  }, [userId, admin?.id, admin?.user_type, subAdmin?.id, subAdmin?.user_id, subAdmin?.user_type]);
 
   const handleEditClick = (ladderId, ladderType, inverted) => {
     router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}&inverted=${inverted}`);
@@ -72,17 +76,7 @@ const LadderList = ({ userId }) => {
   const handleDelete = async (ladderId) => {
     try {
       await getRequest(API_ENDPOINTS.DELETE_LEADERBOARD, { ladder_id: ladderId });
-
-      if (admin?.user_type === "admin") {
-        dispatch(fetchLadderByUserId({ userId: admin.id }));
-      } else if (subAdmin?.user_type === "sub_admin") {
-        dispatch(
-          fetchLadders({
-            userId: subAdmin.user_id,
-            created_by: subAdmin.id,
-          }),
-        );
-      }
+      refreshLadders();
     } catch (error) {
       console.error("Delete failed:", error?.response?.data || error.message);
     } finally {

@@ -8,7 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import { fetchLadders } from "@/redux/slices/fetchLadderSlice";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { fetchLadderByUserId } from "@/redux/slices/ladderSlice";
 import { ListChecks, Info } from "lucide-react";
 
 import {
@@ -53,12 +52,13 @@ const DemoLadder = ({ userId }) => {
       ? JSON.parse(sessionStorage.getItem("userData") || "null")
       : null;
 
-  useEffect(() => {
-    if (!userId) return;
-
+  const refreshLadders = () => {
     if (admin?.user_type === "admin") {
-      dispatch(fetchLadderByUserId({ userId: admin.id }));
-    } else if (subAdmin?.user_type === "sub_admin") {
+      dispatch(fetchLadders({ userId: admin.id }));
+      return;
+    }
+
+    if (subAdmin?.user_type === "sub_admin") {
       dispatch(
         fetchLadders({
           userId: subAdmin.user_id,
@@ -66,7 +66,12 @@ const DemoLadder = ({ userId }) => {
         })
       );
     }
-  }, [userId, dispatch]);
+  };
+
+  useEffect(() => {
+    if (!userId) return;
+    refreshLadders();
+  }, [userId, admin?.id, admin?.user_type, subAdmin?.id, subAdmin?.user_id, subAdmin?.user_type]);
 
   const handleEditClick = (ladderId, ladderType) => {
     router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}`);
