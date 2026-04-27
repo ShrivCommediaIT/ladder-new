@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
 import { BasicLeaderboardEdit } from "./BasicLeaderboardEdit";
 import LadderLinkPanel from "./LadderLinkPanel";
-import { fetchSkillLeaderboard, setAppliedAge } from "@/redux/slices/BasicLeaderboardSlice";
+import { fetchSkillLeaderboard, setAppliedAge, setAgeFilter } from "@/redux/slices/BasicLeaderboardSlice";
 import { Button } from "@/components/ui/button";
 import { X, Trophy, ListOrdered } from "lucide-react";
 import { getRequest } from "@/services/apiService";
@@ -255,7 +255,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const { appliedAge } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleTargetAchieved = useCallback(() => {
@@ -269,7 +269,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, []);
 
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedSkillFilter, age = appliedAge) => {
+    (skillNo = selectedSkillFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
       if (ladderId) {
         setIsRefreshing(true);
         const params = {
@@ -279,13 +279,17 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         };
         if (age > 0) {
           params.dob = age;
+          params.age_type = ageType;
+        }
+        if (gender) {
+          params.gender = gender;
         }
         dispatch(fetchSkillLeaderboard(params)).finally(() => {
           setIsRefreshing(false);
         });
       }
     },
-    [dispatch, ladderId, selectedSkillFilter, appliedAge],
+    [dispatch, ladderId, selectedSkillFilter, appliedAge, appliedAgeType, appliedGender],
   );
 
 

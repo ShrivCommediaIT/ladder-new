@@ -110,6 +110,9 @@ const initialState = {
   status: "idle",
   lastUploadedCSV: null,
   invertRanking: false,
+  appliedAge: 0,
+  appliedAgeType: "under",
+  appliedGender: "",
 };
 
 const playersSlice = createSlice({
@@ -160,6 +163,12 @@ const playersSlice = createSlice({
       const [player] = ladder.data.splice(index, 1);
       player.rank = new_rank;
       ladder.data.splice(new_rank - 1, 0, player);
+    },
+    setAgeFilter: (state, action) => {
+      const { age, ageType, gender } = action.payload;
+      state.appliedAge = age;
+      state.appliedAgeType = ageType;
+      state.appliedGender = gender;
     },
   },
   extraReducers: (builder) => {
@@ -222,6 +231,7 @@ export const {
   setPlayers,
   updatePlayerRankDirect,
   toggleInvertRanking,
+  setAgeFilter,
 } = playersSlice.actions;
 
 export default playersSlice.reducer;

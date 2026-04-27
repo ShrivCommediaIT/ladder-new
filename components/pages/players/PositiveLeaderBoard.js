@@ -15,7 +15,7 @@ import { X, Trophy, ListOrdered } from "lucide-react";
 
 import PlayerSearchInput from "./PlayerSearchInput";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
-import { fetchPositiveLeaderboard, setAppliedAge } from "@/redux/slices/positiveLeaderBoardSlice";
+import { fetchPositiveLeaderboard, setAppliedAge, setAgeFilter } from "@/redux/slices/positiveLeaderBoardSlice";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
@@ -233,7 +233,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge } = useSelector(
+  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
   const currentUser = useSelector((state) => state.user?.user);
@@ -259,7 +259,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, []);
 
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
       if (ladderId) {
         const payload = {
           ladder_id: ladderId,
@@ -269,18 +269,23 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
         if (age > 0) {
           payload.dob = age;
+          payload.age_type = ageType;
+        }
+
+        if (gender) {
+          payload.gender = gender;
         }
 
         dispatch(fetchPositiveLeaderboard(payload));
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
   );
 
-  const handleAgeSearch = (age) => {
+  const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = Number(age);
-    dispatch(setAppliedAge(ageNum));
-    refreshLeaderboard(selectedPositiveFilter, ageNum);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
   };
   
 

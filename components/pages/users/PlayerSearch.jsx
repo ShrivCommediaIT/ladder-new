@@ -22,17 +22,17 @@ const PlayerSearch = ({ searchTerm, setSearchTerm, onAgeSearch, onClearFilters }
     setSearchTerm(val);
   };
 
-  const handleAgeSearch = (age) => {
+  const handleAgeSearch = (age, ageType, gender) => {
     setSelectedAge(age);
     if (onAgeSearch) {
-      onAgeSearch(age);
+      onAgeSearch(age, ageType, gender);
     }
   };
 
   const handleClearAll = () => {
     setSearchTerm("");
     setSelectedAge(null);
-    if (onAgeSearch) onAgeSearch(null);
+    if (onAgeSearch) onAgeSearch(null, "under", "");
     if (onClearFilters) onClearFilters();
   };
 

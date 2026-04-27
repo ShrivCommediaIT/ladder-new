@@ -141,7 +141,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge } = useSelector(
+  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const loggedInUser = useSelector((state) => state.user?.user);
@@ -186,7 +186,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
       if (ladderId) {
         const payload = {
           ladder_id: ladderId,
@@ -196,6 +196,11 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
 
         if (age > 0) {
           payload.dob = age;
+          payload.age_type = ageType;
+        }
+
+        if (gender) {
+          payload.gender = gender;
         }
 
         dispatch(fetchNegativeLeaderboard(payload)).finally(() => {
@@ -203,13 +208,13 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
         });
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
   );
 
-  const handleAgeSearch = (age) => {
+  const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = Number(age);
-    dispatch(setAppliedAge(ageNum));
-    refreshLeaderboard(selectedPositiveFilter, ageNum);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
     setIsSorted(true);
   };
 
@@ -243,8 +248,8 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const handleClearAll = useCallback(() => {
     setIsSorted(false);
     setSelectedSkillFilter(0);
-    dispatch(setAppliedAge(0));
-    refreshLeaderboard(0, 0);
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+    refreshLeaderboard(0, 0, "under", "");
   }, [refreshLeaderboard, dispatch]);
 
   const handleSkillClick = useCallback(

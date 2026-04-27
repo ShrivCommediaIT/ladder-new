@@ -50,11 +50,19 @@ const positiveLeaderboardSlice = createSlice({
     gradebars: [],
     ladderDetails: null,
     appliedAge: 0,
+    appliedAgeType: "under",
+    appliedGender: "",
     error: null,
   },
   reducers: {
     setAppliedAge: (state, action) => {
       state.appliedAge = action.payload;
+    },
+    setAgeFilter: (state, action) => {
+      const { age, ageType, gender } = action.payload;
+      state.appliedAge = age;
+      state.appliedAgeType = ageType;
+      state.appliedGender = gender;
     },
   },
   extraReducers: (builder) => {
@@ -86,5 +94,5 @@ const positiveLeaderboardSlice = createSlice({
   },
 });
 
-export const { setAppliedAge } = positiveLeaderboardSlice.actions;
+export const { setAppliedAge, setAgeFilter } = positiveLeaderboardSlice.actions;
 export default positiveLeaderboardSlice.reducer;
