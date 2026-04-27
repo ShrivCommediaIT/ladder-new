@@ -27,7 +27,8 @@ export default function BasicLeaderboardActivityEntryCard({
   skillActivityId,
   initialActivity,
   onClose,
-  playerName
+  playerName,
+  selectedPlayer
 }) {
   const [selectedActivity, setSelectedActivity] = useState(
     initialActivity || 1,
@@ -52,20 +53,63 @@ export default function BasicLeaderboardActivityEntryCard({
     setFieldKeystrokes(0);
   };
 
+
   const [zeroAction, setZeroAction] = useState(null);
   const [topScore, setTopScore] = useState(0);
+  const [loadingTopScore, setLoadingTopScore] = useState(true);
   const [openSuccessResult, setOpenSuccessResult] = useState(false);
+  const [hasEditedToday, setHasEditedToday] = useState(false);
 
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
-  const ladderType = searchParams.get("ladder_type"); 
+  const ladderType = searchParams.get("ladder_type");
+
+  useEffect(() => {
+    if (selectedPlayer && selectedPlayer.scores) {
+      const currentScoreObj = selectedPlayer.scores.find(s => s.skill_number === selectedActivity) || selectedPlayer.scores[0];
+
+      if (type === "negative" || ladderType === "negative") {
+        const negScore = currentScoreObj?.negative_ladder_score || currentScoreObj?.score;
+        if (negScore && negScore !== "0" && negScore !== 0) {
+          const parts = String(negScore).split(":");
+          if (parts.length === 3) {
+            const mm = parts[1].padStart(2, "0");
+            const [ss, msRaw] = parts[2].split(".");
+            const ms = (msRaw || "00").slice(0, 2).padStart(2, "0");
+            setMinStr(mm);
+            setSecStr(ss.padStart(2, "0"));
+            setMsStr(ms);
+          }
+        } else {
+          setMinStr("00"); setSecStr("00"); setMsStr("00");
+        }
+      } else {
+        const posScore = currentScoreObj?.score;
+        if (posScore !== undefined && posScore !== null) {
+          setValue(String(posScore));
+        } else {
+          setValue("0");
+        }
+      }
+      setHasEditedToday(false);
+    }
+  }, [selectedPlayer, type, ladderType, selectedActivity]);
+
+  // Negative best-result editing
+  const [editingBest, setEditingBest] = useState(false);
+  const [bestMinStr, setBestMinStr] = useState("00");
+  const [bestSecStr, setBestSecStr] = useState("00");
+  const [bestMsStr, setBestMsStr] = useState("00");
+  // Tracks whether numpad should target best-score inputs
+  const [bestInputFocused, setBestInputFocused] = useState(false);
+  const [bestActiveField, setBestActiveField] = useState("min");
+  const [bestFieldKeystrokes, setBestFieldKeystrokes] = useState(0);
 
 
 
   useEffect(() => {
     if (initialActivity) {
       setSelectedActivity(initialActivity);
-      setValue("0");
     }
   }, [initialActivity, skillSign]);
 
@@ -85,13 +129,11 @@ export default function BasicLeaderboardActivityEntryCard({
         setSkillDesc(data.skill_description || "");
         setSkillTarget(data.target || "No target"); // SET TARGET
         setSkillSign(data.skill_sign === "-" ? "-" : "+");
-        setValue("0");
       } catch (err) {
         console.error("Skill fetch failed", err);
         setSkillDesc("");
         setSkillTarget("No target"); // ERROR STATE
         setSkillSign("+");
-        setValue("0");
       } finally {
         setLoadingSkill(false);
       }
@@ -104,18 +146,36 @@ export default function BasicLeaderboardActivityEntryCard({
     if (!playerId || !skillActivityId) return;
 
     const fetchTopScore = async () => {
+      setLoadingTopScore(true);
       try {
         const bestScore = await getRequest("/user/getTopScore", {
           user_id: String(playerId),
           skill_activity_id: String(skillActivityId),
           score: "0",
         });
-        
+
         if (bestScore?.status === 200 || bestScore?.status === "success") {
-          setTopScore(bestScore?.data?.[0]?.top_score || 0);
+          const ts = bestScore?.data?.[0]?.top_score || 0;
+          setTopScore(ts);
+
+          // For negative type: parse the time string and pre-populate best* fields
+          // Format from server: "00:MM:SS.MS0" e.g. "00:01:23.450"
+          if ((type === "negative" || ladderType === "negative") && ts && ts !== 0 && ts !== "0") {
+            const parts = String(ts).split(":");
+            if (parts.length === 3) {
+              const mm = parts[1].padStart(2, "0");
+              const [ss, msRaw] = parts[2].split(".");
+              const ms = (msRaw || "00").slice(0, 2).padStart(2, "0");
+              setBestMinStr(mm);
+              setBestSecStr((ss || "00").padStart(2, "0"));
+              setBestMsStr(ms);
+            }
+          }
         }
       } catch (err) {
         console.error("Failed to load initial top score:", err);
+      } finally {
+        setLoadingTopScore(false);
       }
     };
 
@@ -124,53 +184,122 @@ export default function BasicLeaderboardActivityEntryCard({
 
   const handleDigit = (d) => {
 
+    // ✅ BEST SCORE INPUT FOCUSED — route numpad to best score states
+    if (bestInputFocused) {
+      if (type === "negative" || ladderType === "negative") {
+        if (!/^\d$/.test(d)) return;
+        if (bestActiveField === "min") {
+          setBestMinStr(prev => ((prev || "00") + d).slice(-2));
+          if (bestFieldKeystrokes === 1) { setBestActiveField("sec"); setBestFieldKeystrokes(0); }
+          else setBestFieldKeystrokes(1);
+        } else if (bestActiveField === "sec") {
+          setBestSecStr(prev => ((prev || "00") + d).slice(-2));
+          if (bestFieldKeystrokes === 1) { setBestActiveField("ms"); setBestFieldKeystrokes(0); }
+          else setBestFieldKeystrokes(1);
+        } else if (bestActiveField === "ms") {
+          setBestMsStr(prev => ((prev || "00") + d).slice(-2));
+          setBestFieldKeystrokes(bestFieldKeystrokes === 1 ? 0 : 1);
+        }
+      } else {
+        // positive / skill: update topScore
+        setTopScore(prev => {
+          const p = String(prev === 0 || prev === "0" ? "" : prev);
+          if (d === "." && p.includes(".")) return prev;
+          if (p === "" || (p === "0" && d !== ".")) return d;
+          if (p.includes(".") && d !== "-") {
+            const parts = p.split(".");
+            if (parts[1].length >= 2) return prev;
+          }
+          return p + d;
+        });
+      }
+      return;
+    }
+
     // ✅ NEGATIVE (TIMER MODE)
     if (type === "negative" || ladderType === "negative") {
       // 🚨 Ignore non-digit inputs
       if (!/^\d$/.test(d)) return;
-      if (activeField === "min") {
-        setMinStr(prev => ((prev || "00") + d).slice(-2));
-        if (fieldKeystrokes === 1) {
-          setActiveField("sec");
-          setFieldKeystrokes(0);
-        } else setFieldKeystrokes(1);
-      } else if (activeField === "sec") {
-        setSecStr(prev => ((prev || "00") + d).slice(-2));
-        if (fieldKeystrokes === 1) {
-          setActiveField("ms");
-          setFieldKeystrokes(0);
-        } else setFieldKeystrokes(1);
-      } else if (activeField === "ms") {
-        setMsStr(prev => ((prev || "00") + d).slice(-2));
-        setFieldKeystrokes(fieldKeystrokes === 1 ? 0 : 1);
+
+      let currentActiveField = activeField;
+      let currentFieldKeystrokes = fieldKeystrokes;
+
+      if (!hasEditedToday) {
+        setMinStr("00"); setSecStr("00"); setMsStr("00");
+        setHasEditedToday(true);
+        setActiveField("min");
+        currentActiveField = "min";
+        currentFieldKeystrokes = 0;
+      }
+
+      if (currentActiveField === "min") {
+        setMinStr(prev => ((!hasEditedToday ? "00" : prev || "00") + d).slice(-2));
+        if (currentFieldKeystrokes === 1) { setActiveField("sec"); setFieldKeystrokes(0); }
+        else setFieldKeystrokes(1);
+      } else if (currentActiveField === "sec") {
+        setSecStr(prev => ((!hasEditedToday ? "00" : prev || "00") + d).slice(-2));
+        if (currentFieldKeystrokes === 1) { setActiveField("ms"); setFieldKeystrokes(0); }
+        else setFieldKeystrokes(1);
+      } else if (currentActiveField === "ms") {
+        setMsStr(prev => ((!hasEditedToday ? "00" : prev || "00") + d).slice(-2));
+        setFieldKeystrokes(currentFieldKeystrokes === 1 ? 0 : 1);
       }
       return;
     }
 
     // ✅ NORMAL MODE (unchanged)
     setValue((prev) => {
-      if (d === "." && !prev) return prev;
-      if (d === "." && prev.includes(".")) return prev;
-      if (prev === "0" && d !== ".") return d;
+      const p = !hasEditedToday ? "0" : prev;
+      if (d === "." && !p) return p;
+      if (d === "." && p.includes(".")) return p;
+      if (p === "0" && d !== ".") return d;
 
       // Allow only 2 decimal places
-      if (prev.includes(".") && d !== "-") {
-        const parts = prev.split(".");
-        if (parts[1].length >= 2) return prev;
+      if (p.includes(".") && d !== "-") {
+        const parts = p.split(".");
+        if (parts[1].length >= 2) return p;
       }
 
       // 🔥 Optional: handle "-" properly (only at start)
       if (d === "-") {
-        if (!prev) return "-";
-        return prev; // ignore if already typing
+        if (!p || p === "0") return "-";
+        return p; // ignore if already typing
       }
 
-      return prev + d;
+      return p + d;
     });
+    setHasEditedToday(true);
   };
-  
+
   const handleBackspace = () => {
+    // ✅ BEST SCORE INPUT FOCUSED
+    if (bestInputFocused) {
+      if (type === "negative" || ladderType === "negative") {
+        if (bestActiveField === "ms") {
+          setBestMsStr(prev => { let val = (prev || "00").replace(/^0+/, ""); if (!val) { setBestActiveField("sec"); setBestFieldKeystrokes(0); return "00"; } return (val.slice(0, -1) || "00").padStart(2, "0"); });
+          setBestFieldKeystrokes(0);
+        } else if (bestActiveField === "sec") {
+          setBestSecStr(prev => { let val = (prev || "00").replace(/^0+/, ""); if (!val) { setBestActiveField("min"); setBestFieldKeystrokes(0); return "00"; } return (val.slice(0, -1) || "00").padStart(2, "0"); });
+          setBestFieldKeystrokes(0);
+        } else if (bestActiveField === "min") {
+          setBestMinStr(prev => { let val = (prev || "00").replace(/^0+/, ""); return (val.slice(0, -1) || "00").padStart(2, "0"); });
+          setBestFieldKeystrokes(0);
+        }
+      } else {
+        setTopScore(prev => { const p = String(prev); if (!p || p === "0") return 0; const nv = p.slice(0, -1); return nv || 0; });
+      }
+      return;
+    }
+
     if (type === "negative" || ladderType === "negative") {
+      if (!hasEditedToday) {
+        setMinStr("00"); setSecStr("00"); setMsStr("00");
+        setHasEditedToday(true);
+        setActiveField("min");
+        setFieldKeystrokes(0);
+        return;
+      }
+
       if (activeField === "ms") {
         setMsStr(prev => {
           let val = (prev || "00").replace(/^0+/, "");
@@ -203,32 +332,47 @@ export default function BasicLeaderboardActivityEntryCard({
       return;
     }
 
-    // normal mode
-    setValue((prev) => {
-      if (!prev) return "0";
-      let newVal = prev.slice(0, -1);
-      if (newVal === "" || newVal === "-") return "0";
-      return newVal;
-    });
-  };
+      setHasEditedToday(true);
+      setValue((prev) => {
+        const p = !hasEditedToday ? "0" : prev;
+        if (!p) return "0";
+        let newVal = p.slice(0, -1);
+        if (newVal === "" || newVal === "-") return "0";
+        return newVal;
+      });
+    };
 
   const handleClear = () => {
+    // ✅ BEST SCORE INPUT FOCUSED
+    if (bestInputFocused) {
+      if (type === "negative" || ladderType === "negative") {
+        setBestMinStr("00"); setBestSecStr("00"); setBestMsStr("00");
+        setBestActiveField("min"); setBestFieldKeystrokes(0);
+      } else {
+        setTopScore(0);
+      }
+      return;
+    }
+
     if (type === "negative" || ladderType === "negative") {
       setMinStr("00");
       setSecStr("00");
       setMsStr("00");
       setActiveField("min");
       setFieldKeystrokes(0);
+      setHasEditedToday(true);
       return;
     }
 
+    setHasEditedToday(true);
     setValue("0");
   };
+
   const handleInputChange = (e) => {
     const val = e.target.value;
-
-    if (/^-?\d*\.?\d{0,2}$/.test(val)) {
+    if (/^\d*\.?\d{0,2}$/.test(val) || val === "-") {
       setValue(val);
+      setHasEditedToday(true);
     }
   };
 
@@ -285,14 +429,14 @@ export default function BasicLeaderboardActivityEntryCard({
     }
 
     // ✅ If topScore is 0, send the current value (or current time string) as the best result
-    const currentVal = (type === "negative" || ladderType === "negative") 
-        ? `00:${minStr.padStart(2, "0")}:${secStr.padStart(2, "0")}.${msStr.padStart(2, "0")}0`
-        : value;
-    
+    const currentVal = (type === "negative" || ladderType === "negative")
+      ? `00:${minStr.padStart(2, "0")}:${secStr.padStart(2, "0")}.${msStr.padStart(2, "0")}0`
+      : value;
+
     const bestResultToSubmit = (topScore === 0 || topScore === "0") ? currentVal : topScore;
 
     return await submitScore(value, bestResultToSubmit, { m: minStr, s: secStr, ms: msStr });
-}
+  }
 
 
 
@@ -344,7 +488,8 @@ export default function BasicLeaderboardActivityEntryCard({
       };
 
       if (bestScore !== undefined && bestScore !== null) {
-        payload.best_result = bestScore;
+        // If no previous best score, fall back to the current score being submitted
+        payload.best_result = (bestScore === 0 || bestScore === "0") ? finalScore : bestScore;
       }
 
 
@@ -352,14 +497,14 @@ export default function BasicLeaderboardActivityEntryCard({
 
       if (res?.status === 200 || res?.status === "success") {
         toast.success("Result posted successfully!");
-        if(res?.eligible_for_token == 1){
+        if (res?.eligible_for_token == 1) {
           updateLadderToken({
             user_id: playerName,
             ladder_id: ladderId,
             ladder_type: ladderTypeUpdate,
           });
         }
-       
+
         setOpenSuccess(true);
         return true;
       } else {
@@ -406,7 +551,10 @@ export default function BasicLeaderboardActivityEntryCard({
 
   const getBestScore = async () => {
     if (ladderType === "negative" || type === "negative") {
-      await submitScore(value, topScore, { m: minStr, s: secStr, ms: msStr });
+      // Always build best_result from bestMin/Sec/MsStr (pre-populated from API or user-edited)
+      const bestValForNegative = `00:${bestMinStr.padStart(2, "0")}:${bestSecStr.padStart(2, "0")}.${bestMsStr.padStart(2, "0")}0`;
+      await submitScore(value, bestValForNegative, { m: minStr, s: secStr, ms: msStr });
+      setEditingBest(false);
       return;
     }
 
@@ -460,8 +608,8 @@ export default function BasicLeaderboardActivityEntryCard({
               </p>
             )}
           </div>
-          
-          {(ladderType !== "negative" && type !== "negative") && <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
+
+          <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
             <div className="flex-1 sm:flex-none flex flex-col items-center">
               <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
                 Today's Result
@@ -506,20 +654,69 @@ export default function BasicLeaderboardActivityEntryCard({
                 />
               )}
             </div>
-            
+
             <div className="flex-1 sm:flex-none flex flex-col items-center">
               <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
                 Best Result
               </label>
-              <input
-                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
-                value={(topScore === 0 || topScore === "0") 
-                  ? ((type === "negative" || ladderType === "negative") ? formatTimeInfo() : value) 
-                  : topScore}
-                onChange={(e) => setTopScore(e.target.value)}
-              />
+
+              {/* NEGATIVE: click to reveal time input */}
+              {(type === "negative" || ladderType === "negative") ? (
+                editingBest ? (
+                  <div className="flex items-center justify-center gap-[2px] mt-1 font-bold text-black bg-white rounded h-8 w-full sm:w-28 focus-within:ring-2 focus-within:ring-sky-500 overflow-hidden border border-gray-300 px-1">
+                    <input
+                      className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${bestActiveField === "min" ? "text-sky-600" : ""}`}
+                      value={bestMinStr}
+                      onChange={(e) => { let v = e.target.value.replace(/\D/g, ""); if (v.length > 2) v = v.slice(-2); setBestMinStr(v); }}
+                      onFocus={() => { setBestInputFocused(true); setBestActiveField("min"); setBestFieldKeystrokes(0); }}
+                      onClick={() => { setBestInputFocused(true); setBestActiveField("min"); setBestFieldKeystrokes(0); }}
+                      onBlur={() => { setBestMinStr(prev => (prev || "0").padStart(2, "0")); setBestInputFocused(false); }}
+                      placeholder="MM"
+                    />
+                    <span>:</span>
+                    <input
+                      className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${bestActiveField === "sec" ? "text-sky-600" : ""}`}
+                      value={bestSecStr}
+                      onChange={(e) => { let v = e.target.value.replace(/\D/g, ""); if (v.length > 2) v = v.slice(-2); setBestSecStr(v); }}
+                      onFocus={() => { setBestInputFocused(true); setBestActiveField("sec"); setBestFieldKeystrokes(0); }}
+                      onClick={() => { setBestInputFocused(true); setBestActiveField("sec"); setBestFieldKeystrokes(0); }}
+                      onBlur={() => { setBestSecStr(prev => (prev || "0").padStart(2, "0")); setBestInputFocused(false); }}
+                      placeholder="SS"
+                    />
+                    <span>.</span>
+                    <input
+                      className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${bestActiveField === "ms" ? "text-sky-600" : ""}`}
+                      value={bestMsStr}
+                      onChange={(e) => { let v = e.target.value.replace(/\D/g, ""); if (v.length > 2) v = v.slice(-2); setBestMsStr(v); }}
+                      onFocus={() => { setBestInputFocused(true); setBestActiveField("ms"); setBestFieldKeystrokes(0); }}
+                      onClick={() => { setBestInputFocused(true); setBestActiveField("ms"); setBestFieldKeystrokes(0); }}
+                      onBlur={() => { setBestMsStr(prev => (prev || "0").padStart(2, "0")); setBestInputFocused(false); }}
+                      placeholder="MS"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="w-full sm:w-28 h-8 flex items-center justify-center rounded text-slate-700 font-bold mt-1 bg-slate-300 cursor-pointer hover:bg-slate-200 text-sm"
+                    onClick={() => {
+                      setEditingBest(true);
+                    }}
+                    title="Click to edit best result"
+                  >
+                    {loadingTopScore ? "..." : `${bestMinStr}:${bestSecStr}.${bestMsStr}`}
+                  </div>
+                )
+              ) : (
+                /* POSITIVE / SKILL: plain input, numpad routes here when focused */
+                <input
+                  className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
+                  value={loadingTopScore ? "..." : topScore}
+                  onChange={(e) => setTopScore(e.target.value)}
+                  onFocus={() => setBestInputFocused(true)}
+                  onBlur={() => setBestInputFocused(false)}
+                />
+              )}
             </div>
-          </div>}
+          </div>
         </div>
 
         {/* ACTIVITY BUTTONS */}
@@ -660,6 +857,7 @@ export default function BasicLeaderboardActivityEntryCard({
             ladderType != "positive" &&
             ladderType != "negative" ? (<div className="grid grid-cols-2 gap-2">
               <button
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleDigit("0")}
                 className="h-9 bg-white text-black rounded font-bold"
               >
@@ -667,6 +865,7 @@ export default function BasicLeaderboardActivityEntryCard({
               </button>
 
               <button
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleDigit("-")}
                 className="h-9 bg-white text-black rounded font-bold"
               >
@@ -676,6 +875,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
             </div>) :
             (<button
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit("0")}
               className="h-9 bg-white text-black rounded font-bold"
             >
@@ -754,8 +954,8 @@ export default function BasicLeaderboardActivityEntryCard({
               <div className="flex items-center gap-2">
                 <span>Your Best Result</span>
                 <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
-                  {(topScore === 0 || topScore === "0") 
-                    ? ((type === "negative" || ladderType === "negative") ? formatTimeInfo() : value) 
+                  {(topScore === 0 || topScore === "0")
+                    ? ((type === "negative" || ladderType === "negative") ? formatTimeInfo() : value)
                     : topScore}
                 </span>
               </div>

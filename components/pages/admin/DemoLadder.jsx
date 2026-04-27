@@ -68,9 +68,6 @@ const DemoLadder = ({ userId }) => {
     }
   }, [userId, dispatch]);
 
-  const handleEditClick = (ladderId, ladderType) => {
-    router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}`);
-  };
 
   const demoLadders = allLadders?.filter(
     (ladder) => ladder.created_by === "demo"
@@ -128,70 +125,7 @@ const DemoLadder = ({ userId }) => {
 
             {/* Demo Ladders */}
             {showDemo && (
-              // <div className="space-y-3">
-
-              //   {demoLadders?.map((ladder, index) => {
-              //     return (
-              //       <motion.div
-              //         key={ladder.id}
-              //         initial={{ opacity: 0, y: 10 }}
-              //         animate={{ opacity: 1, y: 0 }}
-              //         transition={{ duration: 0.3 }}
-              //         className="flex flex-col sm:flex-row sm:items-center justify-between rounded-xl p-3 sm:px-4 sm:py-3 gap-3 bg-[#050810] border border-gray-700"
-              //       >
-
-              //         {/* Left */}
-
-              //         <div className="flex items-center gap-3 min-w-0">
-
-              //           <span className="text-cyan-500/70 font-mono text-xs sm:text-sm w-5">
-              //             {index + 1}.
-              //           </span>
-
-              //           <span className="font-medium text-white text-sm sm:text-base truncate">
-              //             {ladder.name}
-              //           </span>
-
-              //         </div>
-
-
-              //         {/* Right */}
-
-              //         <div className="flex items-center gap-2 w-full sm:w-auto">
-
-              //           <Button
-              //             size="sm"
-              //             variant="ghost"
-              //             className="flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm text-cyan-300 border border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"
-              //             onClick={() => handleEditClick(ladder.id, ladder.type)}
-              //           >
-              //             Test
-              //           </Button>
-
-              //           <Popover>
-              //             <PopoverTrigger asChild>
-              //               <button className="grid place-items-center h-8 w-8 rounded-full bg-white/10 text-cyan-300 hover:scale-110 transition cursor-pointer">
-              //                 <Info className="w-4 h-4" />
-              //               </button>
-              //             </PopoverTrigger>
-              //             <PopoverContent
-              //               side="right"
-              //               align="center"
-              //               className="max-w-xs sm:max-w-md border border-white/10 bg-[#0b1020]/95 text-white backdrop-blur-xl shadow-xl animate-in fade-in zoom-in"
-              //             >
-                         
-              //                 <p className="text-xs sm:text-sm leading-relaxed">
-              //                   {ladder.info}
-              //                 </p>
-                        
-              //             </PopoverContent>
-              //           </Popover>
-              //         </div>
-              //       </motion.div>
-              //     );
-              //   })}
-              // </div>
-              <LadderInfo />
+              <LadderInfo ladders={demoLadders} />
             )}
           </div>
         </div>
