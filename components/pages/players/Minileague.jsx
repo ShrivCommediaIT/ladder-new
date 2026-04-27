@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchUserProfile } from "@/redux/slices/profileSlice";
-import PlayerSearchInput from "./PlayerSearchInput";
+import PlayerSearch from "../users/PlayerSearch";
 import LadderLinkPanel from "./LadderLinkPanel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
@@ -113,6 +113,9 @@ const Minileague = () => {
   const [isProDialogOpen, setIsProDialogOpen] = useState(false);
   const [localGradebars, setLocalGradebars] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [appliedAge, setAppliedAge] = useState(0);
+  const [appliedAgeType, setAppliedAgeType] = useState("under");
+  const [appliedGender, setAppliedGender] = useState("");
   const isRefreshingRef = useRef(false);
 
   const playerList = players?.[ladderId]?.data || [];
@@ -167,7 +170,7 @@ const Minileague = () => {
 
   const grades = generateGrades(uniquePlayers);
 
-  const refreshLeaderboard = useCallback(async () => {
+  const refreshLeaderboard = useCallback(async (age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
     if (!ladderId || isRefreshingRef.current) return;
     isRefreshingRef.current = true;
     setLoadingPlayers(true);
@@ -175,15 +178,23 @@ const Minileague = () => {
 
     try {
       const urlType = searchParams.get("type") || searchParams.get("ladder_type");
+      const payload = { ladder_id: ladderId, type: urlType };
+      if (age > 0) {
+        payload.dob = age;
+        payload.age_type = ageType;
+      }
+      if (gender) {
+        payload.gender = gender;
+      }
       await Promise.all([
         dispatch(fetchGradebars(ladderId)),
-        dispatch(fetchLeaderboard({ ladder_id: ladderId, type: urlType })),
+        dispatch(fetchLeaderboard(payload)),
       ]);
     } finally {
       setLoadingPlayers(false);
       setTimeout(() => (isRefreshingRef.current = false), 1500);
     }
-  }, [ladderId, dispatch, searchParams]);
+  }, [ladderId, dispatch, searchParams, appliedAge, appliedAgeType, appliedGender]);
 
   useEffect(() => {
     if (!ladderId) return;
@@ -212,8 +223,18 @@ const Minileague = () => {
         {user?.user_type?.toLowerCase() === "admin" && ladderId && (
           <LadderLinkPanel ladderId={ladderId} />
         )}
-        <div className="w-full md:w-[40%]">
-          <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+        <div className="w-full">
+          <PlayerSearch 
+            searchTerm={searchQuery} 
+            setSearchTerm={setSearchQuery} 
+            onAgeSearch={(age, ageType, gender) => {
+              const ageNum = Number(age);
+              setAppliedAge(ageNum);
+              setAppliedAgeType(ageType || "under");
+              setAppliedGender(gender || "");
+              refreshLeaderboard(ageNum, ageType || "under", gender || "");
+            }}
+          />
         </div>
       </div>
 

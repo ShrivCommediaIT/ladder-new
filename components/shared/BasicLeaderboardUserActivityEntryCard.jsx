@@ -189,11 +189,11 @@ export default function BasicLeaderboardActivityEntryCard({
       if (type === "negative" || ladderType === "negative") {
         if (!/^\d$/.test(d)) return;
         if (bestActiveField === "min") {
-          setBestMinStr(prev => ((prev || "00") + d).slice(-2));
+          setBestMinStr(prev => { let val = ((prev || "00") + d).slice(-2); return parseInt(val) > 59 ? "59" : val; });
           if (bestFieldKeystrokes === 1) { setBestActiveField("sec"); setBestFieldKeystrokes(0); }
           else setBestFieldKeystrokes(1);
         } else if (bestActiveField === "sec") {
-          setBestSecStr(prev => ((prev || "00") + d).slice(-2));
+          setBestSecStr(prev => { let val = ((prev || "00") + d).slice(-2); return parseInt(val) > 59 ? "59" : val; });
           if (bestFieldKeystrokes === 1) { setBestActiveField("ms"); setBestFieldKeystrokes(0); }
           else setBestFieldKeystrokes(1);
         } else if (bestActiveField === "ms") {
@@ -233,11 +233,11 @@ export default function BasicLeaderboardActivityEntryCard({
       }
 
       if (currentActiveField === "min") {
-        setMinStr(prev => ((!hasEditedToday ? "00" : prev || "00") + d).slice(-2));
+        setMinStr(prev => { let val = ((!hasEditedToday ? "00" : prev || "00") + d).slice(-2); return parseInt(val) > 59 ? "59" : val; });
         if (currentFieldKeystrokes === 1) { setActiveField("sec"); setFieldKeystrokes(0); }
         else setFieldKeystrokes(1);
       } else if (currentActiveField === "sec") {
-        setSecStr(prev => ((!hasEditedToday ? "00" : prev || "00") + d).slice(-2));
+        setSecStr(prev => { let val = ((!hasEditedToday ? "00" : prev || "00") + d).slice(-2); return parseInt(val) > 59 ? "59" : val; });
         if (currentFieldKeystrokes === 1) { setActiveField("ms"); setFieldKeystrokes(0); }
         else setFieldKeystrokes(1);
       } else if (currentActiveField === "ms") {
@@ -379,16 +379,20 @@ export default function BasicLeaderboardActivityEntryCard({
   const handleMinChange = (e) => {
     let val = e.target.value.replace(/\D/g, "");
     if (val.length > 2) val = val.slice(-2);
+    if (parseInt(val) > 59) val = "59";
     setMinStr(val);
     setActiveField("min");
     setFieldKeystrokes(0);
+    setHasEditedToday(true);
   };
   const handleSecChange = (e) => {
     let val = e.target.value.replace(/\D/g, "");
     if (val.length > 2) val = val.slice(-2);
+    if (parseInt(val) > 59) val = "59";
     setSecStr(val);
     setActiveField("sec");
     setFieldKeystrokes(0);
+    setHasEditedToday(true);
   };
   const handleMsChange = (e) => {
     let val = e.target.value.replace(/\D/g, "");
@@ -396,6 +400,7 @@ export default function BasicLeaderboardActivityEntryCard({
     setMsStr(val);
     setActiveField("ms");
     setFieldKeystrokes(0);
+    setHasEditedToday(true);
   };
   const handleTimeBlur = () => {
     setMinStr(prev => (prev || "0").padStart(2, "0"));
@@ -667,7 +672,7 @@ export default function BasicLeaderboardActivityEntryCard({
                     <input
                       className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${bestActiveField === "min" ? "text-sky-600" : ""}`}
                       value={bestMinStr}
-                      onChange={(e) => { let v = e.target.value.replace(/\D/g, ""); if (v.length > 2) v = v.slice(-2); setBestMinStr(v); }}
+                      onChange={(e) => { let v = e.target.value.replace(/\D/g, ""); if (v.length > 2) v = v.slice(-2); if (parseInt(v) > 59) v = "59"; setBestMinStr(v); }}
                       onFocus={() => { setBestInputFocused(true); setBestActiveField("min"); setBestFieldKeystrokes(0); }}
                       onClick={() => { setBestInputFocused(true); setBestActiveField("min"); setBestFieldKeystrokes(0); }}
                       onBlur={() => { setBestMinStr(prev => (prev || "0").padStart(2, "0")); setBestInputFocused(false); }}
@@ -677,7 +682,7 @@ export default function BasicLeaderboardActivityEntryCard({
                     <input
                       className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${bestActiveField === "sec" ? "text-sky-600" : ""}`}
                       value={bestSecStr}
-                      onChange={(e) => { let v = e.target.value.replace(/\D/g, ""); if (v.length > 2) v = v.slice(-2); setBestSecStr(v); }}
+                      onChange={(e) => { let v = e.target.value.replace(/\D/g, ""); if (v.length > 2) v = v.slice(-2); if (parseInt(v) > 59) v = "59"; setBestSecStr(v); }}
                       onFocus={() => { setBestInputFocused(true); setBestActiveField("sec"); setBestFieldKeystrokes(0); }}
                       onClick={() => { setBestInputFocused(true); setBestActiveField("sec"); setBestFieldKeystrokes(0); }}
                       onBlur={() => { setBestSecStr(prev => (prev || "0").padStart(2, "0")); setBestInputFocused(false); }}

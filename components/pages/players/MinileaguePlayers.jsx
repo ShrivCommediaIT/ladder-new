@@ -4,7 +4,7 @@ import { IMAGE_BASE_URL } from "@/constants/api";
 import Image from "next/image";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
+import { fetchMiniLeague, setAgeFilter } from "@/redux/slices/minileagueSlice";
 import { setSelectedPlayer } from "@/redux/slices/leaderboardSlice";
 import { MinileagueEditPlayer } from "./MinileagueEditPlayer";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Minileague from "./Minileague";
-import MinileagueSearch from "./MinileagueSearch";
+import PlayerSearch from "../users/PlayerSearch";
 import { postWithParams } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -154,8 +154,8 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
   const ladderType = ladderTypeParam || parentLadderType || "minileague";
 
   const user = useSelector((state) => state.user?.user);
-  const sectionedPlayers =
-    useSelector((state) => state.minileague?.data) || [];
+  const { data: sectionedPlayers, appliedAge, appliedAgeType, appliedGender } =
+    useSelector((state) => state.minileague || {});
 
   const [loadingPlayers, setLoadingPlayers] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
@@ -181,15 +181,21 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
     if (!ladderId || isRefreshingRef.current) return;
     isRefreshingRef.current = true;
     setLoadingPlayers(true);
+    const payload = { ladder_id: ladderId, type: "minileague" };
+    if (appliedAge > 0) {
+      payload.dob = appliedAge;
+      payload.age_type = appliedAgeType;
+    }
+    if (appliedGender) {
+      payload.gender = appliedGender;
+    }
     try {
-      await dispatch(
-        fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" })
-      );
+      await dispatch(fetchMiniLeague(payload));
     } finally {
       setLoadingPlayers(false);
       isRefreshingRef.current = false;
     }
-  }, [ladderId, dispatch]);
+  }, [ladderId, dispatch, appliedAge, appliedAgeType, appliedGender]);
 
   useEffect(() => {
     refreshLeaderboard();
@@ -299,7 +305,13 @@ const finalSections = React.useMemo(() => {
 
   return (
     <div className="space-y-6">
-      <MinileagueSearch value={searchQuery} onChange={setSearchQuery} />
+      <PlayerSearch 
+        searchTerm={searchQuery} 
+        setSearchTerm={setSearchQuery} 
+        onAgeSearch={(age, ageType, gender) => {
+          dispatch(setAgeFilter({ age: Number(age), ageType, gender }));
+        }}
+      />
       <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />
       <ToastContainer />
 

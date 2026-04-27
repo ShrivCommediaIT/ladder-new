@@ -278,7 +278,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [openSort, setOpenSort] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const { appliedAge, appliedDob } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showRemove, setShowRemove] = useState(false);
 
@@ -335,7 +335,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = 0, age = appliedAge) => {
+    (skillNo = 0, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
       if (!ladderId || isRefreshing) return;
 
       setIsRefreshing(true);
@@ -347,19 +347,24 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
 
       if (age > 0) {
         payload.dob = age;
+        payload.age_type = ageType;
+      }
+
+      if (gender) {
+        payload.gender = gender;
       }
 
       dispatch(fetchSkillLeaderboard(payload)).finally(() => {
         setIsRefreshing(false);
       });
     },
-    [dispatch, ladderId, isRefreshing, appliedAge],
+    [dispatch, ladderId, isRefreshing, appliedAge, appliedAgeType, appliedGender],
   );
 
-  const handleAgeSearch = (age) => {
+  const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = Number(age);
-    dispatch(setAppliedAge(ageNum));
-    refreshLeaderboard(selectedSkillFilter, ageNum);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+    refreshLeaderboard(selectedSkillFilter, ageNum, ageType, gender);
     setIsSorted(true);
   };
 
@@ -394,8 +399,8 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const handleClearAll = useCallback(() => {
     setIsSorted(false);
     setSelectedSkillFilter(0);
-    dispatch(setAppliedAge(0));
-    refreshLeaderboard(0, 0);
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+    refreshLeaderboard(0, 0, "under", "");
   }, [refreshLeaderboard]);
 
   const handleSkillClick = useCallback(
