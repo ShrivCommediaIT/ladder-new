@@ -66,7 +66,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
   useEffect(() => {
     if (selectedPlayer && selectedPlayer.scores) {
-      const currentScoreObj = selectedPlayer.scores.find(s => s.skill_number === selectedActivity) || selectedPlayer.scores[0];
+      const currentScoreObj = selectedPlayer.scores.find(s => s.skill_number === selectedActivity) || selectedPlayer.scores[skillActivityId];
 
       if (type === "negative" || ladderType === "negative") {
         const negScore = currentScoreObj?.negative_ladder_score || currentScoreObj?.score;

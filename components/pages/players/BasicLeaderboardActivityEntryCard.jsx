@@ -54,7 +54,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
   useEffect(() => {
     if (selectedPlayer && selectedPlayer.scores && selectedPlayer.scores.length > 0) {
-      const currentScoreObj = selectedPlayer.scores.find(s => s.skill_number === selectedActivity) || selectedPlayer.scores[0];
+      const currentScoreObj = selectedPlayer.scores.find(s => s.skill_number === selectedActivity) || selectedPlayer.scores[skillActivityId];
       const posScore = currentScoreObj?.score;
       if (posScore !== undefined && posScore !== null) {
         setValue(String(posScore));
