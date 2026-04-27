@@ -6,13 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchLeaderboard,
   setSelectedPlayer,
+  setAgeFilter,
 } from "@/redux/slices/leaderboardSlice";
 import { EditPlayer } from "./EditPlayer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchUserProfile } from "@/redux/slices/profileSlice";
-import PlayerSearchInput from "./PlayerSearchInput";
+import PlayerSearch from "../users/PlayerSearch";
 import LadderLinkPanel from "./LadderLinkPanel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchGradebars, resetGradebar } from "@/redux/slices/gradebarSlice";
@@ -113,6 +114,9 @@ const Best5Players = () => {
     players,
     selectedPlayer,
     loading: reduxLoading,
+    appliedAge,
+    appliedAgeType,
+    appliedGender,
   } = useSelector((state) => state.player);
   const { gradebarDetails, gradebar } = useSelector((state) => state.gradebar);
 
@@ -210,19 +214,29 @@ const Best5Players = () => {
 
   const urlType = searchParams.get("type") || searchParams.get("ladder_type");
 
-  const refreshLeaderboard = useCallback(async (forceRefresh = false) => {
+  const refreshLeaderboard = useCallback(async (forceRefresh = false, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
     if (!ladderId || isRefreshingRef.current) return;
     isRefreshingRef.current = true;
     setLoadingPlayers(true);
     setRefreshKey((prev) => prev + 1);
 
     try {
+      const payload = {
+        ladder_id: ladderId,
+        type: urlType || "bestof5"
+      };
+
+      if (age > 0) {
+        payload.dob = age;
+        payload.age_type = ageType;
+      }
+      if (gender) {
+        payload.gender = gender;
+      }
+
       await Promise.all([
         dispatch(fetchGradebars(ladderId)),
-        dispatch(fetchLeaderboard({
-          ladder_id: ladderId,
-          type: urlType || "bestof5"
-        })),
+        dispatch(fetchLeaderboard(payload)),
       ]);
     } catch (error) {
       console.error("Refresh failed:", error);
@@ -230,7 +244,7 @@ const Best5Players = () => {
       setLoadingPlayers(false);
       setTimeout(() => (isRefreshingRef.current = false), 1500);
     }
-  }, [ladderId, dispatch, urlType]);
+  }, [ladderId, dispatch, urlType, appliedAge, appliedAgeType, appliedGender]);
 
   useEffect(() => {
     if (!ladderId) return;
@@ -300,10 +314,16 @@ const Best5Players = () => {
     <div id="print-section" className="space-y-4 relative" key={refreshKey}>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
-      <div className="flex  gap-2 justify-between w-full">
+      <div className="flex gap-2 justify-between w-full">
         <div className="w-full text-white md:w-full">
-          {playerList.length > 0 && (
-            <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+          {playerList.length >= 0 && (
+            <PlayerSearch 
+              searchTerm={searchQuery} 
+              setSearchTerm={setSearchQuery} 
+              onAgeSearch={(age, ageType, gender) => {
+                dispatch(setAgeFilter({ age: Number(age), ageType, gender }));
+              }}
+            />
           )}
         </div>
         <div className="flex gap-3">
