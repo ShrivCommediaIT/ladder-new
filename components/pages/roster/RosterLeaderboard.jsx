@@ -213,7 +213,8 @@ const RosterLeaderboard = () => {
   );
 
   // step 3 — alphabet priority + token sort + rank sort
-  const sortedPlayers = [...uniquePlayers].sort((a, b) => {
+  const sortedPlayers = [...uniquePlayers]
+  .sort((a, b) => {
    const aName = a.name?.toLowerCase() || "";
     const bName = b.name?.toLowerCase() || "";
 

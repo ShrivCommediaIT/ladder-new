@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import ActivityLogUser from "@/components/shared/ActivityLogUser";
 import PlayersList from "@/components/pages/users/PlayersList";
 import BasicLeaderboardUser from "@/components/pages/users/BasicLeaderboardUser";
+import RosterLeaderboardUser from "@/components/pages/users/RosterLeaderboardUser";
 
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
@@ -99,6 +100,17 @@ function UserPageRedirectRouter() {
         <NegativeLeaderboardUser
           ladderId={ladderId}
           ladderType={ladderType}
+        />
+      );
+    }
+
+    const isRoster = ladderType === "roster";
+
+    if (isRoster) {
+      return (
+        <RosterLeaderboardUser
+          ladderId={ladderId}
+          editableUserId={loggedInUserId}
         />
       );
     }
