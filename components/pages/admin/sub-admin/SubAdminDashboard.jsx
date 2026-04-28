@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -27,7 +27,34 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Link from "next/link";
-import { Layers, Users, UploadCloud, ListChecks, Play } from "lucide-react";
+import { Layers, Users, UploadCloud, ListChecks, Play, ShieldCheck, Sparkles, Target, FolderKanban, ArrowRight, Mail, Plus } from "lucide-react";
+
+const cardToneClasses = [
+  "from-cyan-500/[0.22] via-cyan-500/[0.06] to-transparent",
+  "from-blue-500/[0.18] via-blue-500/[0.06] to-transparent",
+  "from-emerald-500/[0.18] via-emerald-500/[0.06] to-transparent",
+  "from-fuchsia-500/[0.18] via-fuchsia-500/[0.06] to-transparent",
+];
+
+const startSteps = [
+  {
+    icon: Plus,
+    title: "Create the solution",
+    text: "Name your competition and upload the CSV to get the player list ready.",
+  },
+  {
+    icon: UploadCloud,
+    title: "Check your player data",
+    text: "The uploader warns about duplicate names before anything is created.",
+  },
+  {
+    icon: Target,
+    title: "Launch competitions",
+    text: "Open any competition from the list and manage rankings, results, and updates.",
+  },
+];
+
+const brandGradient = "linear-gradient(135deg, #29abe2 0%, #1a3a8f 100%)";
 
 import LadderList from "../LadderList";
 import LadderInfo from "../LadderInfo";
@@ -45,14 +72,66 @@ export default function SubAdminDashboard() {
   const [ladderType, setLadderType] = useState("winlose");
   const [duplicateWarning, setDuplicateWarning] = useState(null);
 
+
+
+  const subAdmin =
+    typeof window !== "undefined"
+      ? JSON.parse(sessionStorage.getItem("subAdmin") || "null")
+      : null;
+
+  const [user, setUser] = useState(null);
+
   const { allLadders } = useSelector((state) => state.fetchLadder);
+
+  const loading = useSelector((state) => state.createLadder?.loading);
 
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const loading = useSelector((state) => state.createLadder?.loading);
+  const activeLadders = useMemo(
+    () => allLadders.filter((ladder) => ladder.created_by !== "demo"),
+    [allLadders],
+  );
 
-  const [user, setUser] = useState(null);
+  const demoLadders = useMemo(
+    () => allLadders.filter((ladder) => ladder.created_by === "demo"),
+    [allLadders],
+  );
+
+  const rosterCount = useMemo(
+    () => activeLadders.filter((ladder) => ladder.type === "roster").length,
+    [activeLadders],
+  );
+
+  const subAdminFirstName = subAdmin?.name?.trim()?.split(" ")[0] || "Sub-Admin";
+
+  const overviewCards = [
+    {
+      title: "Competitions",
+      value: activeLadders.length,
+      detail:
+        activeLadders.length > 0 ? "Ready to edit and manage" : "Create your first competition",
+      icon: Layers,
+    },
+    {
+      title: "Roster Boards",
+      value: rosterCount,
+      detail: rosterCount > 0 ? "Player lists uploaded" : "Awaiting first upload",
+      icon: Users,
+    },
+    {
+      title: "Demo Templates",
+      value: demoLadders.length,
+      detail: "Open these to explore the setup",
+      icon: Sparkles,
+    },
+    {
+      title: "Setup Status",
+      value: csvFile ? "CSV Ready" : loading ? "Syncing" : "Live",
+      detail: csvFile ? "Solution file is attached" : "Dashboard connected",
+      icon: ShieldCheck,
+    },
+  ];
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -133,11 +212,6 @@ export default function SubAdminDashboard() {
       });
     });
   };
-
-  const subAdmin =
-    typeof window !== "undefined"
-      ? JSON.parse(sessionStorage.getItem("subAdmin") || "null")
-      : null;
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
@@ -299,7 +373,10 @@ export default function SubAdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-[#05070f] via-[#0c1224] to-black text-white">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#07111f] text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(41,171,226,0.2),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(26,58,143,0.28),transparent_38%),linear-gradient(180deg,#07111f_0%,#030711_100%)]" />
+      <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:78px_78px]" />
+
       <ToastContainer
         position="top-right"
         autoClose={2500}
@@ -307,164 +384,260 @@ export default function SubAdminDashboard() {
         theme="dark"
       />
 
-      {/* HEADER MOBILE */}
-      <div className="sticky top-0 z-20 sm:hidden flex justify-between px-4 py-3 bg-black/70 backdrop-blur-xl border-b border-white/10">
-        <div className="mb-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            {/* LEFT CONTENT */}
-            <div className="min-w-0 flex-1">
-              {/* RIGHT PROFILE */}
-              <div className="flex justify-end items-center gap-4">
-                <div>
-                  <h1
-                    className="text-xl sm:text-2xl font-extrabold 
-                     bg-gradient-to-r from-cyan-300 to-fuchsia-300 
-                     text-transparent bg-clip-text"
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+        <motion.section
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_25px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-7"
+        >
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl space-y-5">
+              <div
+                className="inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
+                style={{
+                  borderColor: "rgba(41, 171, 226, 0.28)",
+                  backgroundColor: "rgba(10, 24, 54, 0.88)",
+                  color: "#7dd3fc",
+                }}
+              >
+                <span className="h-2.5 w-2.5 rounded-full bg-cyan-300" />
+                Sports Solutions Pro
+              </div>
+
+              <div className="space-y-3">
+                <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl">
+                  Welcome back, {subAdminFirstName}
+                </h1>
+                <p className="max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+                  Manage competitions for your section and keep your club's internal ladder system organized from your sub-admin workspace.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <div className="inline-flex items-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200">
+                  <Layers className="h-4 w-4" />
+                  Section: {subAdmin?.sport_name || "N/A"}
+                </div>
+              </div>
+            </div>
+
+            <div className="self-start rounded-[28px] border border-white/10 bg-[#081226]/[0.82] p-2 shadow-[0_18px_50px_rgba(0,0,0,0.24)]">
+              <SubAdminDetails />
+            </div>
+          </div>
+
+          <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {overviewCards.map(({ title, value, detail, icon: Icon }, index) => (
+              <div
+                key={title}
+                className={`relative overflow-hidden rounded-[26px] border border-white/10 bg-[#07152b]/[0.86] p-5 ${cardToneClasses[index] ? `bg-gradient-to-br ${cardToneClasses[index]}` : ""}`}
+              >
+                <div className="relative z-10 flex items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-slate-400">{title}</p>
+                    <p className="text-3xl font-black text-white">{value}</p>
+                    <p className="text-sm text-slate-300">{detail}</p>
+                  </div>
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                    style={{
+                      background: brandGradient,
+                      boxShadow: "0 14px 28px rgba(41, 171, 226, 0.22)",
+                    }}
                   >
-                    Sub-admin Dashboard
-                  </h1>
-
-                  <div className="mt-2 flex flex-wrap items-center gap-2 text-sm sm:text-base">
-                    <span className="text-white/60">—</span>
-
-                    <span className="text-[#F0ACFF] font-medium">Section:</span>
-
-                    <p
-                      className="
-                      relative overflow-hidden
-                      text-sm sm:text-lg font-semibold text-white/90 capitalize
-                      px-4 py-1 rounded-md 
-                      bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
-                      backdrop-blur-md
-
-                      transition-all duration-700 ease-out
-                      hover:scale-[1.04]
-                      hover:shadow-[0_0_20px_rgba(240,172,255,0.25)]
-                    "
-                    >
-                      {subAdmin?.sport_name || "N/A"}
-                    </p>
+                    <Icon className="h-5 w-5 text-white" />
                   </div>
                 </div>
+              </div>
+            ))}
+          </div>
+        </motion.section>
 
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+          <div className="space-y-6">
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.05 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:p-6"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <SubAdminDetails />
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                    Workspace Flow
+                  </p>
+                  <h2 className="mt-2 text-2xl font-bold text-white">
+                    How to get a new competition ready
+                  </h2>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200">
+                  <FolderKanban className="h-4 w-4" />
+                  {activeLadders.length > 0 ? "Section active" : "Fresh setup"}
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-5 pb-8 sm:pb-8">
-        {/* DESKTOP HEADER */}
-
-        <div className="hidden sm:flex justify-between items-center mb-6">
-          <div className="flex gap-2 items-center">
-            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
-              Sub-admin Dashboard
-            </h1>
-
-            <div className="flex items-center gap-2 animate-fade-in">
-              <span className="text-white/50">—</span>
-
-              <p className="text-sm sm:text-lg text-[#F0ACFF] tracking-wide">
-                Section:
-              </p>
-
-              <p
-                className="
-      relative overflow-hidden
-      text-sm sm:text-lg font-semibold text-white/90 capitalize
-      px-4 py-1 rounded-md 
-      bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
-      backdrop-blur-md
-
-      transition-all duration-700 ease-out
-      hover:scale-[1.04]
-      hover:shadow-[0_0_20px_rgba(240,172,255,0.25)]
-    "
-              >
-                {subAdmin?.sport_name || "N/A"}
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <SubAdminDetails />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* LEFT SIDE */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* LADDER TYPES */}
-            <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-5">
-              <h3 className="text-lg font-semibold text-cyan-400 flex items-center gap-2 mb-3">
-                <Layers className="h-5 w-5" /> Solutions Available
-              </h3>
-              <LadderInfo  ladders={allLadders} />
-            </div>
-
-            {/* LADDER LIST */}
-            <div className="rounded-2xl bg-black/20 border border-white/10 p-5">
-              <div className="max-h-[320px] overflow-y-auto">
-                <LadderList
-                  userId={subAdmin?.user_id}
-                  createdBy={subAdmin?.id}
-                />
+              <div className="mt-6 grid gap-4 lg:grid-cols-3">
+                {startSteps.map(({ icon: Icon, title, text }) => (
+                  <div
+                    key={title}
+                    className="rounded-[24px] border border-white/10 bg-[#071325]/[0.88] p-5"
+                  >
+                    <div
+                      className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(41,171,226,0.24), rgba(26,58,143,0.42))",
+                      }}
+                    >
+                      <Icon className="h-5 w-5 text-cyan-200" />
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">{text}</p>
+                  </div>
+                ))}
               </div>
-            </div>
+            </motion.section>
+
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.15 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
+            >
+              <div className="mb-4 px-1">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  Solutions Available
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-white">
+                  Competition types you can create
+                </h2>
+              </div>
+              <LadderInfo ladders={allLadders} />
+            </motion.section>
+
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.2 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
+            >
+              <div className="mb-4 px-1">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  Live Lists
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-white">
+                  Manage existing competitions
+                </h2>
+              </div>
+              <LadderList
+                userId={subAdmin?.user_id}
+                createdBy={subAdmin?.id}
+              />
+            </motion.section>
           </div>
 
-          {/* RIGHT SIDE CREATE PANEL */}
-          <CreatePanel
-            role="subadmin"
-            ladderName={ladderName}
-            setLadderName={setLadderName}
-            ladderType={ladderType}
-            setLadderType={setLadderType}
-            csvFile={csvFile}
-            handleFileChange={handleFileChange}
-            handleCreate={handleCreateLadder}
-            loading={loading}
-            sportName={subAdmin?.sport_name}
-          />
-        </div>
-      </div>
+          <div className="space-y-6">
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.08 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:p-6"
+            >
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                    Create Solution
+                  </p>
+                  <h2 className="mt-2 text-2xl font-bold text-white">
+                    Upload your players and start fast
+                  </h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                    Add the competition name, upload the CSV, then jump straight into the
+                    player list editor.
+                  </p>
+                </div>
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                  style={{
+                    background: brandGradient,
+                    boxShadow: "0 14px 28px rgba(41, 171, 226, 0.22)",
+                  }}
+                >
+                  <ArrowRight className="h-5 w-5 text-white" />
+                </div>
+              </div>
 
-      <footer className="w-full bg-black/80 text-white p-6 sm:p-10">
-        <Card className="bg-gray-900/90 border border-white/10 shadow-lg">
-          <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
-            {/* Left Section */}
-            <div className="text-center sm:text-left">
-              <p className="text-sm text-gray-300 sm:text-base font-medium">
-                For any bespoke needs
+              <CreatePanel
+                role="subadmin"
+                ladderName={ladderName}
+                setLadderName={setLadderName}
+                ladderType={ladderType}
+                setLadderType={setLadderType}
+                csvFile={csvFile}
+                handleFileChange={handleFileChange}
+                handleCreate={handleCreateLadder}
+                loading={loading}
+                sportName={subAdmin?.sport_name}
+              />
+            </motion.section>
+
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.12 }}
+              className="rounded-[30px] border border-white/10 bg-white/5 p-5 backdrop-blur-xl sm:p-6"
+            >
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                Support
               </p>
+              <h2 className="mt-2 text-2xl font-bold text-white">
+                Need help with your section?
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                Reach out for help with custom workflows, imports, or competition setup
+                tailored to your sport section.
+              </p>
+
               <a
                 href="mailto:support@sportssolutionspro.com"
-                className="mt-1 inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors text-sm sm:text-base font-semibold"
+                className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/18"
               >
+                <Mail className="h-4 w-4" />
                 support@sportssolutionspro.com
               </a>
+            </motion.section>
+
+            {duplicateWarning && (
+              <Alert className="border-red-500/35 bg-red-500/10 text-red-50">
+                <AlertTitle>Duplicate players detected</AlertTitle>
+                <AlertDescription className="mt-2 text-red-100/90">
+                  {[...new Set(duplicateWarning.duplicateNames)].join(", ")}
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <footer className="relative z-10 px-4 pb-8 sm:px-6 lg:px-8">
+        <Card className="mx-auto max-w-7xl border border-white/10 bg-black/55 text-white shadow-lg">
+          <CardContent className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-slate-300">
+                Sports Solutions Pro Sub-Admin Workspace
+              </p>
+              <p className="mt-1 text-sm text-slate-400">
+                Competition setup, ranking control, and player organization for your section.
+              </p>
             </div>
+            <p className="text-sm text-cyan-300">
+              {activeLadders.length > 0
+                ? `${activeLadders.length} competition${activeLadders.length === 1 ? "" : "s"} currently available`
+                : "No competitions created yet"}
+            </p>
           </CardContent>
         </Card>
       </footer>
-
-      {duplicateWarning && (
-        <Alert className="mt-4 border-red-500/40 bg-red-500/10">
-          <AlertTitle>Duplicate Players Detected</AlertTitle>
-          <AlertDescription>
-            {duplicateWarning.duplicateNames.length > 0 && (
-              <div>
-                Names:{" "}
-                {[...new Set(duplicateWarning.duplicateNames)].join(", ")}
-              </div>
-            )}
-          </AlertDescription>
-        </Alert>
-      )}
     </div>
   );
 }

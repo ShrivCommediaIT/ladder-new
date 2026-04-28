@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
@@ -32,6 +32,20 @@ export default function LadderInfo({ladders}) {
     window.addEventListener("resize", checkScreen);
     return () => window.removeEventListener("resize", checkScreen);
   }, []);
+
+  const uniqueLadders = useMemo(() => {
+    if (!ladders || ladders.length === 0) return [];
+
+    const byType = new Map();
+    for (const ladder of ladders) {
+      const typeKey = ladder?.type || "unknown";
+      if (!byType.has(typeKey)) {
+        byType.set(typeKey, ladder);
+      }
+    }
+
+    return Array.from(byType.values());
+  }, [ladders]);
 
   return (
     <motion.div
@@ -52,9 +66,9 @@ export default function LadderInfo({ladders}) {
         "
       >
         <ul className="space-y-3">
-          {ladders && ladders.map((ladder, index) => (
+          {uniqueLadders && uniqueLadders.map((ladder, index) => (
             <motion.li
-              key={ladder.id}
+              key={ladder.type || index}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
