@@ -14,7 +14,7 @@ import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUser
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
-import { fetchNegativeLeaderboard, setAppliedAge } from "@/redux/slices/negativeLeaderBoardSlice";
+import { fetchNegativeLeaderboard, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -203,6 +203,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
           payload.gender = gender;
         }
 
+        setIsRefreshing(true);
         dispatch(fetchNegativeLeaderboard(payload)).finally(() => {
           setIsRefreshing(false);
         });

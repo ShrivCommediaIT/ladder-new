@@ -15,7 +15,7 @@ import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUser
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
-import { fetchPositiveLeaderboard, setAppliedAge } from "@/redux/slices/positiveLeaderBoardSlice";
+import { fetchPositiveLeaderboard, setAgeFilter } from "@/redux/slices/positiveLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -220,6 +220,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId }) => {
           payload.gender = gender;
         }
 
+        setIsRefreshing(true);
         dispatch(fetchPositiveLeaderboard(payload)).finally(() => {
           setIsRefreshing(false);
         });

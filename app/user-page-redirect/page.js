@@ -66,16 +66,9 @@ function UserPageRedirectRouter() {
   const isPositive = ladderType === "positive";
   const isNegative = ladderType === "negative";
 
-  // ---------------- FETCH DATA ----------------
-  useEffect(() => {
-    if (!ladderId || !ladderType) return;
-
-    if (isMiniLeague) {
-      dispatch(fetchMiniLeague({ ladder_id: Number(ladderId), type: "minileague" }));
-    } else {
-      dispatch(fetchLeaderboard({ ladder_id: Number(ladderId), type: ladderType }));
-    }
-  }, [dispatch, ladderId, ladderType, isMiniLeague]);
+  // ---------------- FETCH DATA REMOVED ----------------
+  // Redundant fetch removed because child components (MinileaguePlayers, BasicLeaderboardUser, etc.) 
+  // handle their own data fetching including specific filters like age and gender.
 
   // ---------------- PLAYERS RENDER ----------------
   const renderPlayers = () => {

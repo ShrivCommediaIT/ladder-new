@@ -11,10 +11,14 @@ export const fetchRosterLeaderboard = createAsyncThunk(
         type: "roster",
         ...payload
       });
+      const isArray = Array.isArray(data);
+      const rawData = isArray ? data : (data?.data || data?.players || data?.users_record || []);
+      const playersData = Array.isArray(rawData) ? rawData : [rawData];
+
       return {
-        ...data,
-        data: data?.data || [],
-        ladderDetails: data?.ladderDetails || null,
+        ...(isArray ? {} : data),
+        data: playersData,
+        ladderDetails: !isArray ? (data?.ladderDetails || null) : null,
       };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
