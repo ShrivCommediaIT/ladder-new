@@ -11,6 +11,22 @@ import {
 import { CheckCircle, AlertCircle, Phone, User } from "lucide-react";
 import { postWithParams } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { format } from "date-fns";
+import { calculateAge } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
 
 const SuccessDialog = ({ playerName, ladderId, onCloseAll }) => (
   <Dialog open={true} onOpenChange={() => { }}>
@@ -45,6 +61,8 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
+    dob: undefined,
+    gender: "male",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -71,11 +89,19 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
     setError("");
 
     try {
-      const response = await postWithParams(API_ENDPOINTS.ADD_USER_SKILLBOARD, {
+      const payload = {
         ladder_id: ladderId,
         name: formData.name.trim(),
         phone: formData.phone.trim() || undefined,
-      });
+        gender: formData.gender,
+      };
+
+      if (formData.dob) {
+        payload.age = calculateAge(formData.dob);
+        payload.dob = format(formData.dob, "dd/MM/yyyy");
+      }
+
+      const response = await postWithParams(API_ENDPOINTS.ADD_USER_SKILLBOARD, payload);
 
       if (response?.status === 200) {
         setSuccessData({
@@ -83,7 +109,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
           ladderId,
         });
         setShowSuccess(true);
-        setFormData({ name: "", phone: "" });
+        setFormData({ name: "", phone: "", dob: undefined, gender: "male" });
         onSuccessRefresh?.();
       } else {
       setError(response?.error_message || "Failed to add player. Please try again.");
@@ -159,6 +185,55 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
           />
         </div>
         <p className="text-xs text-gray-500">Enter 10-digit number (optional)</p>
+      </div>
+
+      {/* Gender Field */}
+      <div className="space-y-2">
+        <label className="text-white font-semibold flex items-center gap-2">
+          Gender
+        </label>
+        <Select
+          value={formData.gender}
+          onValueChange={(val) => setFormData({ ...formData, gender: val })}
+        >
+          <SelectTrigger className="w-full p-4 bg-white/10 border border-white/30 rounded-xl text-white focus:ring-2 focus:ring-blue-400/50 transition-all h-14">
+            <SelectValue placeholder="Select Gender" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-800 border-gray-700 text-white">
+            <SelectItem value="male">Male</SelectItem>
+            <SelectItem value="female">Female</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* DOB Field */}
+      <div className="space-y-2">
+        <label className="text-white font-semibold flex items-center gap-2">
+          <CalendarIcon className="w-4 h-4" />
+          Date of Birth
+        </label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full p-4 bg-white/10 border border-white/30 rounded-xl text-white flex justify-start items-center gap-2 hover:bg-white/20 h-14"
+            >
+              <CalendarIcon className="w-4 h-4 text-gray-400" />
+              {formData.dob ? format(formData.dob, "dd/MM/yyyy") : <span className="text-gray-400">Select Date of Birth</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0 bg-slate-800 border-gray-700">
+            <Calendar
+              mode="single"
+              selected={formData.dob}
+              onSelect={(date) => setFormData({ ...formData, dob: date })}
+              captionLayout="dropdown"
+              fromYear={1920}
+              toYear={new Date().getFullYear()}
+              className="bg-slate-900 text-white border-gray-700"
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Action Buttons */}

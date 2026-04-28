@@ -202,7 +202,7 @@ const PlayerCard = ({
                 ? "underline decoration-black decoration-[3px] bg-green-400"
                 : ""
             }`}>
-              {toTotalSeconds(player && player?.scores[0]?.negative_ladder_score) || 0}
+              {toTotalSeconds(player && player?.total_point) || 0}
             </span>
           </div>
             {player && player?.skills?.length > 0 ?null : (

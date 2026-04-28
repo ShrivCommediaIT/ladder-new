@@ -292,9 +292,6 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
       ) : (
         !loading && sections.map((section, idx) => (
           <div key={idx} className="mb-8 px-4">
-            <div className="mb-3 sticky top-0 bg-[#223848] px-4 py-2 rounded-lg shadow-lg text-xl text-white font-bold tracking-wide z-10">
-              {section.label}
-            </div>
             <div className="space-y-3">
               {section.players.map((player, i) => (
                 <PlayerCard

@@ -25,6 +25,22 @@ import {
 } from "@/components/ui/dialog";
 
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { calculateAge } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
 
 export default function BestAddPlayer({ onClose, onSuccessRefresh }) {
   const dispatch = useDispatch();
@@ -38,6 +54,8 @@ export default function BestAddPlayer({ onClose, onSuccessRefresh }) {
   // Email state ki ab zaroorat nahi hai UI ke liye
   const [phone, setPhone] = useState("");
   const [rank, setRank] = useState("");
+  const [dob, setDob] = useState(undefined);
+  const [gender, setGender] = useState("male");
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [welcomeMsg, setWelcomeMsg] = useState("");
@@ -71,6 +89,12 @@ const handleSubmit = async () => {
   if (rank) formData.append("rank", rank);
   if (phone) formData.append("phone", phone);
   if (profileFile) formData.append("file", profileFile);
+  
+  formData.append("gender", gender);
+  if (dob) {
+    formData.append("age", calculateAge(dob));
+    formData.append("dob", format(dob, "dd/MM/yyyy"));
+  }
 
   try {
     const response = await postFormData(API_ENDPOINTS.ADD_BY_ADMIN, formData);
@@ -84,6 +108,8 @@ const handleSubmit = async () => {
       setName("");
       setPhone("");
       setRank("");
+      setDob(undefined);
+      setGender("male");
       setProfileImage(null);
       setProfileFile(null);
 
@@ -179,6 +205,53 @@ const handleSubmit = async () => {
             placeholder="Enter rank"
             className="text-white font-semibold"
           />
+        </div>
+
+        {/* GENDER */}
+        <div className="space-y-1">
+          <Label className="text-white font-semibold">Gender</Label>
+          <Select
+            value={gender}
+            onValueChange={setGender}
+          >
+            <SelectTrigger className="bg-gray-800/50 border-gray-700 text-white w-full h-10">
+              <SelectValue placeholder="Select Gender" />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-800 border-gray-700 text-white">
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* DOB PICKER */}
+        <div className="space-y-1">
+          <Label className="text-white font-semibold">
+            Date of Birth
+          </Label>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start cursor-pointer bg-gray-800/50 border-gray-700 text-white h-10"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dob ? format(dob, "dd/MM/yyyy") : "Select Date of birth"}
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-auto p-0 cursor-pointer bg-slate-300 border-gray-700">
+              <Calendar
+                mode="single"
+                selected={dob}
+                onSelect={setDob}
+                captionLayout="dropdown"
+                fromYear={1920}
+                toYear={new Date().getFullYear()}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </CardContent>
 
