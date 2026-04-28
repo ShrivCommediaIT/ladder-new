@@ -168,7 +168,7 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
   const ladderId = propLadderId || searchParams.get("ladder_id");
 
   const { data, gradebarDetails, loading, error } = useSelector((state) => state.rosterLeaderboard);
-  const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.leaderboard || {});
+  const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.player || {});
   const reduxUser = useSelector((state) => state.user?.user);
 
   const [currentUserId, setCurrentUserId] = useState(null);
