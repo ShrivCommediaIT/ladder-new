@@ -51,6 +51,7 @@ export default function BasicLeaderboardActivityEntryCard({
   const handleFocus = (field) => {
     setActiveField(field);
     setFieldKeystrokes(0);
+    setBestInputFocused(false);
   };
 
 
@@ -615,7 +616,9 @@ export default function BasicLeaderboardActivityEntryCard({
           </div>
 
           <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
-            <div className="flex-1 sm:flex-none flex flex-col items-center">
+            <div className="flex-1 sm:flex-none flex flex-col items-center"
+              onClick={() => setBestInputFocused(false)}
+            >
               <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
                 Today's Result
               </label>
@@ -655,6 +658,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 <input
                   className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
                   value={value}
+                  onFocus={() => setBestInputFocused(false)}
                   onChange={(e) => handleInputChange(e)}
                 />
               )}
@@ -704,10 +708,15 @@ export default function BasicLeaderboardActivityEntryCard({
                     className="w-full sm:w-28 h-8 flex items-center justify-center rounded text-slate-700 font-bold mt-1 bg-slate-300 cursor-pointer hover:bg-slate-200 text-sm"
                     onClick={() => {
                       setEditingBest(true);
+                      setBestInputFocused(true);
+                      setBestActiveField("min");
+                      setBestFieldKeystrokes(0);
                     }}
                     title="Click to edit best result"
                   >
-                    {loadingTopScore ? "..." : `${bestMinStr}:${bestSecStr}.${bestMsStr}`}
+                    {loadingTopScore ? "..." : 
+                      selectedPlayer?.total_point || "0"
+                    }
                   </div>
                 )
               ) : (

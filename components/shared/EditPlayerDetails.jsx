@@ -17,6 +17,13 @@ import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import { toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useSearchParams } from "next/navigation";
 import {
   Popover,
@@ -49,6 +56,7 @@ const EditPlayerDetails = ({
     name: "",
     dob: null,
     phone: "",
+    gender: "male",
   });
 
   const [showSkeleton, setShowSkeleton] = useState(false);
@@ -90,6 +98,7 @@ const EditPlayerDetails = ({
         dob: parsedDob,
         name: selectedPlayer.name || "",
         phone: selectedPlayer.phone || "",
+        gender: selectedPlayer.gender || "male",
       });
 
       if (parsedDob) {
@@ -121,6 +130,7 @@ const EditPlayerDetails = ({
       id: form.id,
       name: form.name,
       phone: form.phone,
+      gender: form.gender,
       dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
       age: calculateAge(form.dob),
     };
@@ -263,6 +273,22 @@ const EditPlayerDetails = ({
                 placeholder="Enter phone number (Optional)"
                 className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
               />
+            </div>
+
+            <div className="w-full">
+              <Label className="text-gray-300 font-semibold py-2 text-lg">Gender</Label>
+              <Select
+                value={form.gender}
+                onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
+              >
+                <SelectTrigger className="bg-gray-700/50 border-gray-500 w-full text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12">
+                  <SelectValue placeholder="Select Gender" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <Button

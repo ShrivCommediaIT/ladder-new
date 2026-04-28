@@ -45,7 +45,7 @@ const pendingRequests = new Set();
 export const fetchLeaderboard = createAsyncThunk(
   "players/fetchLeaderboard",
   async (payload, { rejectWithValue }) => {
-    const requestKey = `${payload.ladder_id}-${payload.type || "default"}`;
+    const requestKey = `${payload.ladder_id}-${payload.type || "default"}-${payload.dob || 0}-${payload.age_type || ""}-${payload.gender || ""}`;
     try {
       const res = await getRequest(API_ENDPOINTS.LEADERBOARD, {
         ...payload
@@ -53,12 +53,16 @@ export const fetchLeaderboard = createAsyncThunk(
       if (!res) throw new Error("Failed to fetch leaderboard");
 
       // Resilient Payload: Spread original response + provide explicit keys
+      const isArray = Array.isArray(res);
+      const rawData = isArray ? res : (res?.data || res?.players || res?.users_record || []);
+      const playersData = Array.isArray(rawData) ? rawData : [rawData];
+
       return { 
-        ...res,
-        ladder_id: Number(payload.ladder_id || res.ladder_id),
-        data: res?.data || [],
-        image_path: res?.image_path || "",
-        ladderDetails: res?.ladderDetails || {},
+        ...(isArray ? {} : res),
+        ladder_id: Number(payload.ladder_id || (!isArray ? res.ladder_id : 0)),
+        data: playersData,
+        image_path: !isArray ? (res?.image_path || "") : "",
+        ladderDetails: !isArray ? (res?.ladderDetails || {}) : {},
       };
     } catch (error) {
       return rejectWithValue(error.message || "Unknown error");
@@ -69,7 +73,7 @@ export const fetchLeaderboard = createAsyncThunk(
   {
     // 🚦 Skip if an identical request is already in-flight
     condition: (payload) => {
-      const requestKey = `${payload.ladder_id}-${payload.type || "default"}`;
+      const requestKey = `${payload.ladder_id}-${payload.type || "default"}-${payload.dob || 0}-${payload.age_type || ""}-${payload.gender || ""}`;
       if (pendingRequests.has(requestKey)) return false; // abort — already pending
       pendingRequests.add(requestKey);
       return true;

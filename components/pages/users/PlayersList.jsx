@@ -21,14 +21,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
 
-export default function PlayersList() {
+export default function PlayersList({ ladderId: propLadderId, ladderType: propLadderType }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
   /* ------------------ GET FROM SEARCH PARAMS ------------------ */
 
-  const ladderId = Number(searchParams.get("ladder_id"));
-  const ladderTypeFromParams = searchParams.get("ladder_type");
+  const ladderId = Number(propLadderId || searchParams.get("ladder_id"));
+  const ladderTypeFromParams = propLadderType || searchParams.get("ladder_type");
 
   /* ------------------ LOGGED IN USER (LOCALSTORAGE) ------------------ */
 
@@ -181,8 +181,12 @@ export default function PlayersList() {
           searchTerm={searchTerm} 
           setSearchTerm={setSearchTerm} 
           onAgeSearch={(age, ageType, gender) => {
-            dispatch(setAgeFilter({ age: Number(age), ageType, gender }));
+            const ageNum = Number(age);
+            dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
           }} 
+          onClearFilters={() => {
+            dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+          }}
         />
       </div>
 

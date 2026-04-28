@@ -9,6 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
@@ -28,7 +35,7 @@ import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { format } from "date-fns";
 import { calculateAge } from "@/lib/utils";
 
-const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, onClose = () => {} }) => {
+const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, onClose = () => {}, isReadOnly = false }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderType = searchParams.get("type")
@@ -55,6 +62,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
     name: "",
     dob:null,
     phone: "",
+    gender: "male",
   });
 
   const [calendarMonth, setCalendarMonth] = useState(new Date());
@@ -129,6 +137,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
         dob: parsedDob,
         name: selectedPlayer.name || "",
         phone: selectedPlayer.phone || "",
+        gender: selectedPlayer.gender || "male",
       });
 
       if (parsedDob) {
@@ -151,7 +160,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
       return;
     }
 
-    const formData = { id: form.id, name: form.name, phone: form.phone, dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
+    const formData = { id: form.id, name: form.name, phone: form.phone, gender: form.gender, dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
           age: calculateAge(form.dob), };
 
     setShowSkeleton(true);
@@ -319,14 +328,32 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                 />
               </motion.div>
 
-              <motion.div whileTap={{ scale: 0.95 }}>
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-cyan-700 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-6 rounded-xl shadow-lg transition-all duration-300 cursor-pointer"
-                  disabled={loading}
+              {/* GENDER */}
+              { ladderType !== "minileague" && <motion.div whileHover={{ scale: 1.02 }} className="space-y-2 w-full">
+                <Label className="text-blue-200 font-semibold">Gender</Label>
+                <Select
+                  value={form.gender}
+                  onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
+                  disabled={isReadOnly}
                 >
-                  {loading ? "Saving..." : " Save Changes"}
-                </Button>
+                  <SelectTrigger className="bg-white/10 border-white/30 text-white w-full focus:ring-2 focus:ring-cyan-400 py-6 h-12">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-white/20 text-white">
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </motion.div>}
+
+              <motion.div whileTap={{ scale: 0.95 }}>
+                  <Button
+                    type="submit"
+                    className={`w-full bg-gradient-to-r from-cyan-700 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-6 rounded-xl shadow-lg transition-all duration-300 ${isReadOnly ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                    disabled={loading || isReadOnly}
+                  >
+                    {loading ? "Saving..." : (isReadOnly ? "Read Only Mode" : " Save Changes")}
+                  </Button>
               </motion.div>
             </motion.form>
           )}

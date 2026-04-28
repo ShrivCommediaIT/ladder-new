@@ -51,10 +51,10 @@ const AgeFilter = ({ onSearch, user }) => {
     if (dobInput.length === 10 || calculatedAge !== "") {
       onSearch(calculatedAge, ageType, gender);
       setOpen(false);
-      setDobInput("");
-      setCalculatedAge("");
-      setGender("");
-      setAgeType("under");
+      // setDobInput("");
+      // setCalculatedAge("");
+      // setGender("");
+      // setAgeType("under");
       toast.success("Searching by Filter!");
     } else {
       toast.error("Please enter a valid age or date");
