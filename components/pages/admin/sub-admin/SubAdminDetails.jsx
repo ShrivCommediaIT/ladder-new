@@ -200,7 +200,7 @@ const SubAdminDetails = () => {
           </DropdownMenuLabel>
 
           <DropdownMenuItem
-            onClick={() => router.push("/q-a")}
+            onClick={() => window.open("/q-a", "_blank")}
             className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
             <HelpCircle className="mr-2 h-4 w-4 text-zinc-600 dark:text-zinc-400" />

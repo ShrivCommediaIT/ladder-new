@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "react-toastify";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   movePlayer,
   movePlayerBestOf5,
@@ -73,6 +74,8 @@ const MoveNumberInput = ({
   const [betDescription, setBetDescription] = useState("");
 
   const [showRankAlert, setShowRankAlert] = useState(false);
+  const [showSectionAlert, setShowSectionAlert] = useState(false);
+  const preset = useSelector((state) => state.gradebar?.preset) || 6;
 
   /* -------------------- DATA -------------------- */
   const challengedPlayer =
@@ -151,9 +154,24 @@ const MoveNumberInput = ({
 
     if (!challengedPlayer) return;
 
-    // BLOCK SELF OR LOWER RANK
+    //  REAL SECTION BY RANK (NOT BY FIELD)
+    const currentSectionIndex = Math.floor(
+      (Number(currentRank) - 1) / Number(preset)
+    );
+
+    const targetSectionIndex = Math.floor(
+      (Number(challengedPlayer.rank) - 1) / Number(preset)
+    );
+
+    // BLOCK SELF OR LOWER RANK (Ranks are 1-based, 1 is best)
     if (Number(selectedNumber) >= Number(currentRank)) {
       setShowRankAlert(true);
+      return;
+    }
+
+    // BLOCK CROSS-SECTION
+    if (currentSectionIndex !== targetSectionIndex) {
+      setShowSectionAlert(true);
       return;
     }
 
@@ -281,15 +299,29 @@ const MoveNumberInput = ({
       </h2>
 
      
-      <div className="flex justify-center gap-6 mb-2">
-        <div
-          onClick={() => setResultType("beat")}
-          className={`px-5 py-1 rounded-full cursor-pointer transition ${resultType === "beat"
-              ? "bg-green-500 text-black font-semibold"
-              : "bg-gray-700 hover:bg-gray-600"
-            }`}
-        >
-          Beat
+      {/* Result Selection */}
+      <div className="flex items-center justify-center mx-auto gap-10 mb-2 p-3 rounded-xl ">
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="beat"
+            checked={resultType === "beat"}
+            onCheckedChange={(val) => setResultType(val ? "beat" : "")}
+            className="border-green-300 data-[state=checked]:bg-green-500"
+          />
+          <label htmlFor="beat" className="text-base font-medium cursor-pointer">
+            Beat
+          </label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="lost"
+            checked={resultType === "lost"}
+            onCheckedChange={(val) => setResultType(val ? "lost" : "")}
+            className="border-red-300 data-[state=checked]:bg-red-500"
+          />
+          <label htmlFor="lost" className="text-base font-medium cursor-pointer">
+            Lost to
+          </label>
         </div>
       </div>
 
@@ -383,7 +415,7 @@ const MoveNumberInput = ({
             </AlertDialogTitle>
 
             <AlertDialogDescription className="text-start text-lg text-white">
-              {`${selectedPlayer?.name || "Player"} beat ${challengedPlayer?.name || "Player"
+              {`${selectedPlayer?.name || "Player"} ${resultType === "beat" ? "beat" : "lost to"} ${challengedPlayer?.name || "Player"
                 } ${score || ""}`}
             </AlertDialogDescription>
 
@@ -447,6 +479,27 @@ const MoveNumberInput = ({
             </AlertDialogAction>
           </AlertDialogFooter>
 
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showSectionAlert} onOpenChange={setShowSectionAlert}>
+        <AlertDialogContent className="bg-gray-900 border-yellow-500 text-gray-100 w-[92vw] sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-yellow-400">
+              Invalid Section!
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-300 mt-3 text-sm text-start">
+              You can only post results against players within your own minileague/section.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-5">
+            <AlertDialogAction
+              onClick={() => setShowSectionAlert(false)}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </motion.div>

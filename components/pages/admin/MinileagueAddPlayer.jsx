@@ -18,6 +18,22 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { calculateAge } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
 
 export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
   const dispatch = useDispatch();
@@ -39,6 +55,8 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
   const [submitting, setSubmitting] = useState(false);
   const [welcomeMsg, setWelcomeMsg] = useState("");
   const [showDialog, setShowDialog] = useState(false);
+  const [dob, setDob] = useState(undefined);
+  const [gender, setGender] = useState("male");
 
 
   useEffect(() => {
@@ -76,6 +94,11 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
     if (rank) formData.append("rank", rank);
     if (phone) formData.append("phone", phone);
     if (profileFile) formData.append("file", profileFile);
+    formData.append("gender", gender);
+    if (dob) {
+      formData.append("age", calculateAge(dob));
+      formData.append("dob", format(dob, "dd/MM/yyyy"));
+    }
 
     try {
       const response = await postFormData(API_ENDPOINTS.MINILEAGUE_ADD_BY_ADMIN, formData);
@@ -91,6 +114,8 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
           setSelectedSection("");
           setProfileImage(null);
           setProfileFile(null);
+          setDob(undefined);
+          setGender("male");
 
           setLoading(true);
         await dispatch(fetchMiniLeague({ ladder_id }));
@@ -192,13 +217,13 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
             {/* ✅ EMAIL INPUT REMOVED FROM UI */}
 
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-300">Phone (optional)</Label>
+              <Label className="text-xs text-slate-300">Phone (Optional)</Label>
               <Input
                 type="tel"
                 className="h-10 bg-slate-900/60 border-slate-700/80 focus-visible:ring-slate-500 text-sm placeholder:text-slate-500"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter phone number"
+                placeholder="Enter phone number (Optional)"
               />
             </div>
 
@@ -233,6 +258,53 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
                 placeholder="Enter ladder position"
                 required
               />
+            </div>
+
+            {/* GENDER */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300 font-semibold">Gender</Label>
+              <Select
+                value={gender}
+                onValueChange={setGender}
+              >
+                <SelectTrigger className="bg-slate-900/60 border-slate-700/80 text-white w-full h-10">
+                  <SelectValue placeholder="Select Gender" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* DOB PICKER */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300 font-semibold">
+                Date of Birth
+              </Label>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start cursor-pointer bg-slate-900/60 border-slate-700/80 text-white h-10"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dob ? format(dob, "dd/MM/yyyy") : "Select Date of birth"}
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-auto p-0 cursor-pointer bg-slate-300 border-gray-700">
+                  <Calendar
+                    mode="single"
+                    selected={dob}
+                    onSelect={setDob}
+                    captionLayout="dropdown"
+                    fromYear={1920}
+                    toYear={new Date().getFullYear()}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 

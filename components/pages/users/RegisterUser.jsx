@@ -24,6 +24,13 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { calculateAge } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 
@@ -33,6 +40,7 @@ const schema = z
     dob: z.date().optional(), // optional now
     password: z.string().regex(/^\d{4}$/, "PIN must be 4 digits"),
     confirmPassword: z.string(),
+    gender: z.string().optional(),
   })
   .refine((d) => d.password === d.confirmPassword, {
     message: "PIN does not match",
@@ -54,6 +62,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
       dob: undefined,
       password: "",
       confirmPassword: "",
+      gender: "male",
     },
   });
 
@@ -78,7 +87,8 @@ export default function RegisterUser({ ladderId, ladderType }) {
       ladder_id: ladderId,
       ladder_type: ladderType,
       age: age,
-      dob: dobString
+      dob: dobString,
+      gender: ladderType !== "minileague" ? values.gender : undefined,
     };
 
 
@@ -131,6 +141,25 @@ export default function RegisterUser({ ladderId, ladderType }) {
               />
               <p className="text-red-400 text-xs">{errors.name?.message}</p>
             </div>
+
+            {/* GENDER */}
+            {ladderType !== "minileague" && (
+              <div>
+                <Label className="text-teal-400 mb-1">Gender</Label>
+                <Select
+                  value={watch("gender")}
+                  onValueChange={(val) => setValue("gender", val)}
+                >
+                  <SelectTrigger className="bg-gray-800 border-gray-700 text-white w-full">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* DOB PICKER */}
   <div>

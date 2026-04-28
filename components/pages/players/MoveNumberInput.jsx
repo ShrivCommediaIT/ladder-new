@@ -117,7 +117,11 @@ const MoveNumberInput = ({
 
       let response;
       if (ladderType === "best5" || ladderType === "best3") {
-        response = await dispatch(movePlayerBestOf5(commonPayload)).unwrap();
+        if (ladderType === "best5") {
+          response = await dispatch(movePlayerBestOf5(commonPayload)).unwrap();
+        } else {
+          response = await dispatch(movePlayer(commonPayload)).unwrap();
+        }
       } else {
         const payload = {
           ...commonPayload,
@@ -220,8 +224,13 @@ const MoveNumberInput = ({
     );
 
 
-    // ❌ BLOCK SELF OR LOWER RANK
-    if (Number(selectedNumber) >= Number(currentRank)) {
+    // ❌ BLOCK INVALID RANK
+    if (resultType === "beat" && Number(selectedNumber) >= Number(currentRank)) {
+      setShowRankAlert(true);
+      return;
+    }
+
+    if (resultType === "lost" && Number(selectedNumber) >= Number(currentRank)) {
       setShowRankAlert(true);
       return;
     }
@@ -307,6 +316,17 @@ const MoveNumberInput = ({
               />
               <label htmlFor="beat" className="text-base font-medium cursor-pointer">
                 Beat
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="lost"
+                checked={resultType === "lost"}
+                onCheckedChange={(val) => setResultType(val ? "lost" : "")}
+                className="border-red-300 data-[state=checked]:bg-red-500"
+              />
+              <label htmlFor="lost" className="text-base font-medium cursor-pointer">
+                Lost to
               </label>
             </div>
           </div>
@@ -473,12 +493,13 @@ const MoveNumberInput = ({
         <AlertDialogContent className="bg-gray-900 border-violet-500 text-gray-100 w-[92vw] sm:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold text-violet-400 flex items-center gap-2">
-              <CheckCircle className="text-green-500 h-5 w-5" /> Confirm Result         
+              <CheckCircle className="text-green-500 h-5 w-5" /> Confirm Result
             </AlertDialogTitle>
 
             <AlertDialogDescription className="text-start text-lg text-white">
-              {`${selectedPlayer?.name || "Player"} beat ${challengedPlayer?.name || "Player"
-                } ${score || ""}`}
+              {resultType === "lost"
+                ? `${selectedPlayer?.name || "Player"} lost to ${challengedPlayer?.name || "Player"} ${score || ""}`
+                : `${selectedPlayer?.name || "Player"} beat ${challengedPlayer?.name || "Player"} ${score || ""}`}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -536,8 +557,9 @@ const MoveNumberInput = ({
             </AlertDialogTitle>
 
             <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
-
-              You can only challenge higher ranked players.
+              {resultType === "lost"
+                ? "You can only report a loss to lower ranked players."
+                : "You can only challenge higher ranked players."}
             </AlertDialogDescription>
           </AlertDialogHeader>
 

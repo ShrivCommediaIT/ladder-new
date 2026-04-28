@@ -7,12 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
+import { fetchMiniLeague, setAgeFilter } from "@/redux/slices/minileagueSlice";
 import { setSelectedPlayer } from "@/redux/slices/leaderboardSlice";
 import { MinileagueEditPlayer } from "@/components/shared/MinileagueEditPlayer";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import { Skeleton } from "@/components/ui/skeleton";
-import PlayerSearchInput from "../players/PlayerSearchInput";
+import PlayerSearch from "./PlayerSearch";
 import {
   Dialog,
   DialogContent,
@@ -164,8 +164,8 @@ const PlayerCard = ({
 
 const MinileaguePlayers = ({ ladderId }) => {
   const dispatch = useDispatch();
-  const sectionedPlayers =
-    useSelector((state) => state.minileague?.data) || [];
+  const { data: sectionedPlayers, appliedAge, appliedAgeType, appliedGender } =
+    useSelector((state) => state.minileague || {});
   const loggedInUser = useSelector((state) => state.user?.user);
 
   const user =
@@ -188,15 +188,21 @@ const MinileaguePlayers = ({ ladderId }) => {
     if (!ladderId || isRefreshingRef.current) return;
     isRefreshingRef.current = true;
     setLoadingPlayers(true);
+    const payload = { ladder_id: ladderId, type: "minileague" };
+    if (appliedAge > 0) {
+      payload.dob = appliedAge;
+      payload.age_type = appliedAgeType;
+    }
+    if (appliedGender) {
+      payload.gender = appliedGender;
+    }
     try {
-      await dispatch(
-        fetchMiniLeague({ ladder_id: ladderId, type: "minileague" })
-      );
+      await dispatch(fetchMiniLeague(payload));
     } finally {
       setLoadingPlayers(false);
       isRefreshingRef.current = false;
     }
-  }, [ladderId, dispatch]);
+  }, [ladderId, dispatch, appliedAge, appliedAgeType, appliedGender]);
 
   useEffect(() => {
     refreshLeaderboard();
@@ -255,7 +261,16 @@ const MinileaguePlayers = ({ ladderId }) => {
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
-        <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+        <PlayerSearch 
+          searchTerm={searchQuery} 
+          setSearchTerm={setSearchQuery} 
+          onAgeSearch={(age, ageType, gender) => {
+            dispatch(setAgeFilter({ age: Number(age), ageType, gender }));
+          }}
+          onClearFilters={() => {
+            dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+          }}
+        />
       </div>
 
       {loadingPlayers ? (

@@ -16,7 +16,7 @@ import { X, Trophy, ListOrdered } from "lucide-react";
 import PlayerSearchInput from "./PlayerSearchInput";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
 import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
-import { fetchNegativeLeaderboard, setAppliedAge } from "@/redux/slices/negativeLeaderBoardSlice";
+import { fetchNegativeLeaderboard, setAppliedAge, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
@@ -202,7 +202,7 @@ const PlayerCard = ({
                 ? "underline decoration-black decoration-[3px] bg-green-400"
                 : ""
             }`}>
-              {toTotalSeconds(player && player?.scores[0]?.negative_ladder_score) || 0}
+              {toTotalSeconds(player && player?.total_point) || 0}
             </span>
           </div>
             {player && player?.skills?.length > 0 ?null : (
@@ -220,7 +220,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge } = useSelector(
+  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const currentUser = useSelector((state) => state.user?.user);
@@ -246,7 +246,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, []);
 
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
       if (ladderId) {
         const payload = {
           ladder_id: ladderId,
@@ -256,18 +256,23 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
         if (age > 0) {
           payload.dob = age;
+          payload.age_type = ageType;
+        }
+
+        if (gender) {
+          payload.gender = gender;
         }
 
         dispatch(fetchNegativeLeaderboard(payload));
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
   );
 
-  const handleAgeSearch = (age) => {
+  const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = Number(age);
-    dispatch(setAppliedAge(ageNum));
-    refreshLeaderboard(selectedPositiveFilter, ageNum);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
   };
 
   useEffect(() => {

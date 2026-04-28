@@ -15,7 +15,7 @@ import { X, Trophy, ListOrdered } from "lucide-react";
 
 import PlayerSearchInput from "./PlayerSearchInput";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
-import { fetchPositiveLeaderboard, setAppliedAge } from "@/redux/slices/positiveLeaderBoardSlice";
+import { fetchPositiveLeaderboard, setAppliedAge, setAgeFilter } from "@/redux/slices/positiveLeaderBoardSlice";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
@@ -37,7 +37,10 @@ const PlayerCard = ({
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
     const skillObj = skills?.find((s) => s.skill_number === skillNumber);
-
+    const witnessBy =
+      scoreObj?.witness_by ||
+      skillObj?.witness_by ||
+      "";
     const score = scoreObj ? Number(scoreObj.score) : 0; // 🔒 internal logic
     const inputScore =
       scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
@@ -72,12 +75,12 @@ const PlayerCard = ({
     }
 
     return {
+      witnessBy,
       score,
       displayScore,
       target,
       isTargetAchieved,
       input_score: inputScore,
-      witnessBy: scoreObj?.witness_by || null,
     };
   };
 
@@ -99,17 +102,21 @@ const PlayerCard = ({
       onTargetAchieved(player.name, achievedTargets);
     }
   }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
-  
+
+  const getRankBySkillNumber = (ranks, skillNumber) => {
+    const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
+    return rankObj ? rankObj.rank : "-";
+  };
 
   return (
-    <Card onClick={() => onSkillClick(player.id, player.skills[0].skill_number)} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
-      <div className="flex justify-between items-start mb-1 px-1" onClick={(e) => e.stopPropagation()}>
+    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
+      <div className="flex justify-between items-start mb-1 px-1">
         <PlayerStatusToggle player={player} user={false} />
       </div>
-      <div    className="flex-1 min-w-0 curcer-pointer">
+      <div className="flex-1 min-w-0">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10">
+        <div className="flex items-center gap-2 sm:gap-3 mb-2">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
             <Image
               src={playerImageUrl}
               alt={player?.name}
@@ -121,55 +128,102 @@ const PlayerCard = ({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}   
+              {player?.name || "N/A"}
               {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                {player.age}
-              </p>
-            )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">
+                  {player.age}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
             </div>
           </div>
-          <div className="flex shrink-0 items-center justify-end gap-2">
-            {Boolean(appliedAge) && (
-              <div className="flex flex-col items-center">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
-                  {ageRank}
-                </div>
-                <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-0.5 whitespace-nowrap">Age Rank</p>
-              </div>
-            )}
+          <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
             <div className="flex flex-col items-center">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
-                {overallRank}
+              <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm shadow-sm leading-none h-7 sm:h-auto flex items-center">
+                {Math.abs(player.total_point || 0)}
+              </span>
+              <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
+            </div>
+
+            <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
+              {Boolean(appliedAge) && (
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                    {ageRank}
+                  </div>
+                  <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-1 whitespace-nowrap">Age Rank</p>
+                </div>
+              )}
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                  {overallRank}
+                </div>
+                <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
               </div>
-              <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-0.5 whitespace-nowrap">Overall Rank</p>
             </div>
           </div>
         </div>
+
+        {player.skills?.length > 0 ? (
+          <>
+            <div className="flex gap-[3px] overflow-y-visible pb-2 mb-1">
+              {player.skills.map((skill, i) => {
+                const isNegative = skill.skill_sign === "-";
+
+                return (
+                  <div
+                    key={i}
+                    onClick={() => onSkillClick(player.id, skill.skill_number)}
+                    className="cursor-pointer min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded bg-white hover:bg-emerald-500 transition-all hover:scale-110 relative"
+                    title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
+                  >
+                    {/* minus sign box ke upar */}
+                    {isNegative && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
+                        −
+                      </span>
+                    )}
+
+                    {skill.skill_number}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
+            <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
+              {player.skills.map((skill, i) => {
+                const scoreData = getScoreBySkillNumber(
+                  player.scores || [],
+                  player.skills || [],
+                  skill.skill_number,
+                );
+                return (
+                  <div
+                    key={i}
+                    className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
+                      ? "bg-green-400 text-black shadow-md font-semibold"
+                      : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
+                      } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
+                    title={`Score: ${scoreData.score} | Target: ${scoreData.target || "N/A"
+                      }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
+                  >
+                    {Math.abs(scoreData.displayScore || 0)}
+                  </div>
+                );
+              })}
+            </div>
+
+
+          </>
+        ) : (
+          <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
+            No skills data
+          </div>
+        )}
       </div>
-        <div  className="flex  justify-between mr-1">
-          <div className="flex flex-col items-center mr-1">
-            <span className={` flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border ${ 
-              player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).isTargetAchieved 
-              ? "bg-green-500" 
-              : "bg-white" 
-            } ${
-              player?.skills?.length > 0 && getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).witnessBy 
-              ? "underline decoration-black decoration-[3px] bg-green-400" 
-              : "" 
-            }`}>
-              {player?.skills?.length > 0 ? getScoreBySkillNumber(player.scores || [], player.skills || [], player.skills[0].skill_number).displayScore : 0}
-            </span>
-          </div>
-            {player && player?.skills?.length > 0 ?null : (
-            <div className="h-7 p-3 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
-                No skills data
-            </div>
-            )}  
-        </div>
     </Card>
   );
 };
@@ -179,7 +233,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge } = useSelector(
+  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
   const currentUser = useSelector((state) => state.user?.user);
@@ -205,7 +259,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, []);
 
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
       if (ladderId) {
         const payload = {
           ladder_id: ladderId,
@@ -215,18 +269,23 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
         if (age > 0) {
           payload.dob = age;
+          payload.age_type = ageType;
+        }
+
+        if (gender) {
+          payload.gender = gender;
         }
 
         dispatch(fetchPositiveLeaderboard(payload));
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
   );
 
-  const handleAgeSearch = (age) => {
+  const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = Number(age);
-    dispatch(setAppliedAge(ageNum));
-    refreshLeaderboard(selectedPositiveFilter, ageNum);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
   };
   
 

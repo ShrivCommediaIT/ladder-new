@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { fetchLeaderboard, setAgeFilter } from "@/redux/slices/leaderboardSlice";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
 import { EditPlayer } from "@/components/shared/EditPlayer";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -21,14 +21,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
 
-export default function PlayersList() {
+export default function PlayersList({ ladderId: propLadderId, ladderType: propLadderType }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
   /* ------------------ GET FROM SEARCH PARAMS ------------------ */
 
-  const ladderId = Number(searchParams.get("ladder_id"));
-  const ladderTypeFromParams = searchParams.get("ladder_type");
+  const ladderId = Number(propLadderId || searchParams.get("ladder_id"));
+  const ladderTypeFromParams = propLadderType || searchParams.get("ladder_type");
 
   /* ------------------ LOGGED IN USER (LOCALSTORAGE) ------------------ */
 
@@ -67,6 +67,8 @@ export default function PlayersList() {
     useSelector((state) => state.player?.players?.[ladderId]?.ladderDetails) ||
     {};
 
+  const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.player || {});
+
   const ladderType =
     ladderTypeFromParams ||
     ladderDetails?.type?.toLowerCase() ||
@@ -80,7 +82,6 @@ export default function PlayersList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
-  const [appliedAge, setAppliedAge] = useState(0);
 
   /* ------------------ FETCH DATA ------------------ */
 
@@ -92,12 +93,16 @@ export default function PlayersList() {
       };
       if (appliedAge > 0) {
         payload.dob = appliedAge;
+        payload.age_type = appliedAgeType;
+      }
+      if (appliedGender) {
+        payload.gender = appliedGender;
       }
       dispatch(fetchLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
       setCacheBuster(Date.now());
     }
-  }, [dispatch, ladderId, ladderType, appliedAge]);
+  }, [dispatch, ladderId, ladderType, appliedAge, appliedAgeType, appliedGender]);
 
   useEffect(() => {
     refreshData();
@@ -172,7 +177,17 @@ export default function PlayersList() {
 
       {/* SEARCH */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
-        <PlayerSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} onAgeSearch={(age) => setAppliedAge(Number(age))} />
+        <PlayerSearch 
+          searchTerm={searchTerm} 
+          setSearchTerm={setSearchTerm} 
+          onAgeSearch={(age, ageType, gender) => {
+            const ageNum = Number(age);
+            dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+          }} 
+          onClearFilters={() => {
+            dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+          }}
+        />
       </div>
 
       {/* NO PLAYERS */}

@@ -14,7 +14,7 @@ import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUser
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
-import { fetchNegativeLeaderboard, setAppliedAge } from "@/redux/slices/negativeLeaderBoardSlice";
+import { fetchNegativeLeaderboard, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -60,7 +60,7 @@ const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, is
 
 
   return (
-    <Card onClick={() => { onSkillClick(player.id, player.skills[0].skill_number) }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative">
+    <Card onClick={() => { onSkillClick(player.id, player.skills[0].skill_number) }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative p-4 gap-0">
       <div
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
@@ -141,7 +141,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge } = useSelector(
+  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const loggedInUser = useSelector((state) => state.user?.user);
@@ -186,7 +186,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
       if (ladderId) {
         const payload = {
           ladder_id: ladderId,
@@ -196,20 +196,26 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
 
         if (age > 0) {
           payload.dob = age;
+          payload.age_type = ageType;
         }
 
+        if (gender) {
+          payload.gender = gender;
+        }
+
+        setIsRefreshing(true);
         dispatch(fetchNegativeLeaderboard(payload)).finally(() => {
           setIsRefreshing(false);
         });
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
   );
 
-  const handleAgeSearch = (age) => {
+  const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = Number(age);
-    dispatch(setAppliedAge(ageNum));
-    refreshLeaderboard(selectedPositiveFilter, ageNum);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
     setIsSorted(true);
   };
 
@@ -243,8 +249,8 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const handleClearAll = useCallback(() => {
     setIsSorted(false);
     setSelectedSkillFilter(0);
-    dispatch(setAppliedAge(0));
-    refreshLeaderboard(0, 0);
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+    refreshLeaderboard(0, 0, "under", "");
   }, [refreshLeaderboard, dispatch]);
 
   const handleSkillClick = useCallback(

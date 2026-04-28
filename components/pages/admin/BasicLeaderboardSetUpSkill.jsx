@@ -258,7 +258,7 @@ export default function BasicLeaderboardSetUpSkill({
           </div>
 
           <div className="max-h-[25vh] overflow-y-auto py-2 space-y-1.5">
-            {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ?
+            {(type !== "negative" && ladderType !== "negative") ?
               rows.map((row) => (
                 <div key={row.id} className="flex items-start ">
                   {/* Skill No. + +/- */}

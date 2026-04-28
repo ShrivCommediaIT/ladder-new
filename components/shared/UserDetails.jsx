@@ -142,7 +142,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
               <span className="text-sm font-semibold text-zinc-100 capitalize dark:text-zinc-200">
                 {finalUser?.name || "Guest"}
               </span>
-              <span className="text-xs text-zinc-300">Profile</span>
+              <span className="text-xs text-zinc-300">{finalUser?.user_type === "sub_admin"?"Sub Admin":"Admin"}</span>
             </div>
             <IoIosArrowDown size={18} className="text-zinc-600" />
           </div>
@@ -166,7 +166,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
                 Sub-Admin Dashboard
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => router.push("/q-a")}
+                onClick={() => window.open("/q-a", "_blank")}
                 className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
                 <HelpCircle className="mr-2 h-4 w-4 text-zinc-600 dark:text-zinc-400" />
@@ -211,7 +211,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
                 </Link>
               )} */}
               <DropdownMenuItem
-                onClick={() => router.push("/q-a")}
+                onClick={() => window.open("/q-a", "_blank")}
                 className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
                 <HelpCircle className="mr-2 h-4 w-4 text-zinc-600 dark:text-zinc-400" />

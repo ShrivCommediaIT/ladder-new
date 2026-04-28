@@ -25,7 +25,8 @@ export default function BasicLeaderboardActivityEntryCard({
   skillActivityId,
   initialActivity,
   onClose,
-  playerName
+  playerName,
+  selectedPlayer
 }) {
   const [selectedActivity, setSelectedActivity] = useState(initialActivity || 1);
   const [value, setValue] = useState("0");
@@ -41,13 +42,29 @@ export default function BasicLeaderboardActivityEntryCard({
   const [skillTarget, setSkillTarget] = useState("");
   const [openZeroAlert, setOpenZeroAlert] = useState(false);
   const [zeroAction, setZeroAction] = useState(null);
+  const [bestInputFocused, setBestInputFocused] = useState(false);
+  const [loadingTopScore, setLoadingTopScore] = useState(true);
+  const [hasEditedToday, setHasEditedToday] = useState(false);
   // "ok" | "reset" | null
   useEffect(() => {
     if (initialActivity) {
       setSelectedActivity(initialActivity);
-      setValue("0");
     }
   }, [initialActivity]);
+
+  useEffect(() => {
+    if (selectedPlayer && selectedPlayer.scores && selectedPlayer.scores.length > 0) {
+      const currentScoreObj = selectedPlayer.scores.find(s => s.skill_number === selectedActivity) || selectedPlayer.scores[skillActivityId];
+      const posScore = currentScoreObj?.score;
+      if (posScore !== undefined && posScore !== null) {
+        setValue(String(posScore));
+      } else {
+        setValue("0");
+      }
+      setHasEditedToday(false);
+    }
+  }, [selectedPlayer, selectedActivity]);
+
 
   useEffect(() => {
     if (!selectedActivity || !ladderId) return;
@@ -64,7 +81,6 @@ export default function BasicLeaderboardActivityEntryCard({
         setSkillDesc(data.skill_description || "");
         setSkillTarget(data.target || "No target");
         setSkillSign(data.skill_sign === "-" ? "-" : "+");
-        setValue("0");
       } catch (err) {
         console.error("Skill fetch failed", err);
       } finally {
@@ -76,22 +92,53 @@ export default function BasicLeaderboardActivityEntryCard({
 
   /* ---------------- INPUT HANDLERS ---------------- */
   const handleDigit = (d) => {
+    if (bestInputFocused) {
+      setTopScore((prev) => {
+        const p = String(prev === 0 || prev === "0" ? "" : prev);
+        if (p === "0" && d !== ".") return d;
+        if (p === "") return d;
+        if (p.includes(".") && d !== "-") {
+          const parts = p.split(".");
+          if (parts[1].length >= 2) return prev;
+        }
+        return p + d;
+      });
+      return;
+    }
+
     setValue((prev) => {
-      if (prev === "0") return d;
+      const p = !hasEditedToday ? "0" : prev;
+      if (p === "0" && d !== ".") return d;
       // Allow only 2 decimal places
-      if (prev.includes(".")) {
-        const parts = prev.split(".");
-        if (parts[1].length >= 2) return prev;
+      if (p.includes(".")) {
+        const parts = p.split(".");
+        if (parts[1].length >= 2) return p;
       }
-      return prev + d;
+      return p + d;
     });
+    setHasEditedToday(true);
   };
 
   const handleBackspace = () => {
-    setValue((prev) => (prev.length <= 1 ? "0" : prev.slice(0, -1)));
+    if (bestInputFocused) {
+      setTopScore((prev) => { const p = String(prev); if (!p || p === "0") return 0; const nv = p.slice(0, -1); return nv || 0; });
+      return;
+    }
+    setHasEditedToday(true);
+    setValue((prev) => {
+      const p = !hasEditedToday ? "0" : prev;
+      return p.length <= 1 ? "0" : p.slice(0, -1);
+    });
   };
 
-  const handleClear = () => setValue("0");
+  const handleClear = () => {
+    if (bestInputFocused) {
+      setTopScore(0);
+      return;
+    }
+    setHasEditedToday(true);
+    setValue("0");
+  };
 
 
   /* ---------------- SAVE LOGIC ---------------- */
@@ -205,6 +252,7 @@ export default function BasicLeaderboardActivityEntryCard({
     if (!playerId || !skillActivityId) return;
 
     const fetchTopScore = async () => {
+      setLoadingTopScore(true);
       try {
         const bestScore = await getRequest(API_ENDPOINTS.GET_TOP_SCORE, {
           user_id: String(playerId),
@@ -218,6 +266,8 @@ export default function BasicLeaderboardActivityEntryCard({
         }
       } catch (err) {
         console.error("Failed to load initial top score:", err);
+      } finally {
+        setLoadingTopScore(false);
       }
     };
 
@@ -258,6 +308,7 @@ export default function BasicLeaderboardActivityEntryCard({
                     const val = e.target.value;
                     if (/^\d*\.?\d{0,2}$/.test(val) || val === "-") {
                       setValue(val);
+                      setHasEditedToday(true);
                     }
                   }}
                 />
@@ -268,9 +319,11 @@ export default function BasicLeaderboardActivityEntryCard({
                 Best Result 
               </label>
               <input
-                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none"
-                value={(topScore === 0 || topScore === "0") ? value : topScore}
+                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
+                value={loadingTopScore ? "..." : topScore}
                 onChange={(e) => setTopScore(e.target.value)}
+                onFocus={() => setBestInputFocused(true)}
+                onBlur={() => setBestInputFocused(false)}
               />
             </div>
           </div>
@@ -312,6 +365,7 @@ export default function BasicLeaderboardActivityEntryCard({
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
             <button
               key={d}
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit(String(d))}
               className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all font-bold"
             >
@@ -321,6 +375,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
           {/* Last row */}
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={handleClear}
             className="h-9 bg-red-500 text-white rounded font-bold uppercase text-[10px]"
           >
@@ -330,6 +385,7 @@ export default function BasicLeaderboardActivityEntryCard({
           {/* Split 0 into two buttons */}
           <div className="grid grid-cols-2 gap-2">
             <button
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit("0")}
               className="h-9 bg-white text-black rounded font-bold"
             >
@@ -337,6 +393,7 @@ export default function BasicLeaderboardActivityEntryCard({
             </button>
 
             <button
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit("-")}
               className="h-9 bg-white text-black rounded font-bold"
             >
@@ -345,6 +402,7 @@ export default function BasicLeaderboardActivityEntryCard({
           </div>
 
           <button
+            onMouseDown={(e) => e.preventDefault()}
             onClick={handleBackspace}
             className="h-9 bg-orange-400 text-white rounded font-bold"
           >
