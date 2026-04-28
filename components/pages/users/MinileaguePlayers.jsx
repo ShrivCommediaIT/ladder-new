@@ -267,6 +267,9 @@ const MinileaguePlayers = ({ ladderId }) => {
           onAgeSearch={(age, ageType, gender) => {
             dispatch(setAgeFilter({ age: Number(age), ageType, gender }));
           }}
+          onClearFilters={() => {
+            dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+          }}
         />
       </div>
 

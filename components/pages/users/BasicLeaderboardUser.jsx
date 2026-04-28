@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
-import { fetchSkillLeaderboard, setAppliedAge } from "@/redux/slices/BasicLeaderboardSlice";
+import { fetchSkillLeaderboard, setAgeFilter } from "@/redux/slices/BasicLeaderboardSlice";
 import PlayerSearchInput from "../players/PlayerSearchInput";
 import BasicLeaderboardShort from "../admin/BasicLeaderboardShort";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";

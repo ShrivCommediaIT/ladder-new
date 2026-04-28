@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import ActivityLogUser from "@/components/shared/ActivityLogUser";
 import PlayersList from "@/components/pages/users/PlayersList";
 import BasicLeaderboardUser from "@/components/pages/users/BasicLeaderboardUser";
+import RosterLeaderboardUser from "@/components/pages/users/RosterLeaderboardUser";
 
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
@@ -66,16 +67,9 @@ function UserPageRedirectRouter() {
   const isPositive = ladderType === "positive";
   const isNegative = ladderType === "negative";
 
-  // ---------------- FETCH DATA ----------------
-  useEffect(() => {
-    if (!ladderId || !ladderType) return;
-
-    if (isMiniLeague) {
-      dispatch(fetchMiniLeague({ ladder_id: Number(ladderId), type: "minileague" }));
-    } else {
-      dispatch(fetchLeaderboard({ ladder_id: Number(ladderId), type: ladderType }));
-    }
-  }, [dispatch, ladderId, ladderType, isMiniLeague]);
+  // ---------------- FETCH DATA REMOVED ----------------
+  // Redundant fetch removed because child components (MinileaguePlayers, BasicLeaderboardUser, etc.) 
+  // handle their own data fetching including specific filters like age and gender.
 
   // ---------------- PLAYERS RENDER ----------------
   const renderPlayers = () => {
@@ -106,6 +100,17 @@ function UserPageRedirectRouter() {
         <NegativeLeaderboardUser
           ladderId={ladderId}
           ladderType={ladderType}
+        />
+      );
+    }
+
+    const isRoster = ladderType === "roster";
+
+    if (isRoster) {
+      return (
+        <RosterLeaderboardUser
+          ladderId={ladderId}
+          editableUserId={loggedInUserId}
         />
       );
     }

@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
 import UploadPlayerLists from "@/components/pages/uploadCsv/UploadPlayerLists";
-import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { fetchLeaderboard, setAgeFilter } from "@/redux/slices/leaderboardSlice";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { clearActivityState } from "@/redux/slices/activitySlice";
@@ -264,28 +264,33 @@ const AdminButton = () => {
     else if (isPositive) dispatch(setPositiveAgeFilter(resetFilter));
     else if (isNegative) dispatch(setNegativeAgeFilter(resetFilter));
     else {
+      dispatch(setAgeFilter(resetFilter));
       setLocalAge(0);
       setLocalAgeType("under");
       setLocalGender("");
     }
     refreshSkillLeaderboard(0, 0);
+    if (isRoster) {
+      dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, age: 0, ageType: "under", gender: "" }));
+    }
   };
 
   const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = Number(age);
     const filter = { age: ageNum, ageType, gender };
-    
+
     if (isSkill) dispatch(setSkillAgeFilter(filter));
     else if (isPositive) dispatch(setPositiveAgeFilter(filter));
     else if (isNegative) dispatch(setNegativeAgeFilter(filter));
     else {
+      dispatch(setAgeFilter(filter));
       setLocalAge(ageNum);
       setLocalAgeType(ageType);
       setLocalGender(gender);
     }
 
     const laddartype = typeFromParams === "positive" ? "positive" : (typeFromParams === "negative" ? "negative" : (isSkill ? "skill" : ladderType));
-    
+
     const payload = {
       ladder_id: ladderId,
       type: laddartype,
@@ -294,13 +299,27 @@ const AdminButton = () => {
       age_type: ageType,
       gender: gender
     };
-    
+
     let fetchSliceLeaderboard;
     if (laddartype === "positive") fetchSliceLeaderboard = fetchPositiveLeaderboard;
     else if (laddartype === "negative") fetchSliceLeaderboard = fetchNegativeLeaderboard;
-    else fetchSliceLeaderboard = fetchSkillLeaderboard;
+    else if (laddartype === "best5" || laddartype === "best3" || laddartype === "winlose" || laddartype === "bestof5" || laddartype === "bestof3" || laddartype === "roster") {
+      fetchSliceLeaderboard = fetchLeaderboard;
+    } else {
+      fetchSliceLeaderboard = fetchSkillLeaderboard;
+    }
 
     dispatch(fetchSliceLeaderboard(payload));
+
+    if (isRoster) {
+      dispatch(fetchRosterLeaderboard({
+        ladder_id: ladderId,
+        dob: ageNum > 0 ? ageNum : undefined,
+        age_type: ageNum > 0 ? ageType : undefined,
+        gender: gender || undefined
+      }));
+    }
+
     setIsSorted(true);
   };
 
@@ -394,7 +413,6 @@ const AdminButton = () => {
         </Dialog>
 
         {/* SKILL SPECIFIC BUTTONS */}
-        {(isSkill || isPositive || isNegative) && (
           <>
             {(!isSorted && appliedAge === 0) ? (
               <Button
@@ -412,7 +430,6 @@ const AdminButton = () => {
               </Button>
             )}
           </>
-        )}
 
         {/* AGE FILTER BUTTON */}
 

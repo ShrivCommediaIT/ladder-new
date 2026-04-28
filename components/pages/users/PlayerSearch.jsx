@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 import { LucideSearch, X, RotateCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AgeFilter from "@/components/shared/AgeFilter";
+import { useSearchParams } from "next/navigation";
 
 const PlayerSearch = ({ searchTerm, setSearchTerm, onAgeSearch, onClearFilters }) => {
   const [open, setOpen] = useState(true); // ✅ always open by default
   const [selectedAge, setSelectedAge] = useState(null);
-
+  const searchParams = useSearchParams();
+  const ladderType = searchParams.get("type");
   // 📱 ensure open on all screen sizes
   useEffect(() => {
     setOpen(true);
@@ -84,9 +86,11 @@ const PlayerSearch = ({ searchTerm, setSearchTerm, onAgeSearch, onClearFilters }
       </AnimatePresence>
 
       {/* 🎂 Age Filter */}
-      <div className="h-10 flex-shrink-0">
-        <AgeFilter onSearch={handleAgeSearch} user={true} />
-      </div>
+      {!ladderType && (
+        <div className="h-10 flex-shrink-0">
+          <AgeFilter onSearch={handleAgeSearch} user={true} />
+        </div>
+      )}
 
       {/* 🔄 Clear All Filters button — only shows when filters are active */}
       <AnimatePresence>
