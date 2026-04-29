@@ -309,7 +309,8 @@ const finalSections = React.useMemo(() => {
         searchTerm={searchQuery} 
         setSearchTerm={setSearchQuery} 
         onAgeSearch={(age, ageType, gender) => {
-          dispatch(setAgeFilter({ age: Number(age), ageType, gender }));
+          const ageNum = age ? Number(age) : "";
+          dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
         }}
       />
       <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />

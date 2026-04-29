@@ -14,7 +14,7 @@ const AgeFilter = ({ onSearch, user }) => {
   const [dobInput, setDobInput] = useState("");
   const [calculatedAge, setCalculatedAge] = useState("");
   const [gender, setGender] = useState(""); // "" | "male" | "female"
-  const [ageType, setAgeType] = useState("under"); // "under" | "over"
+  const [ageType, setAgeType] = useState(""); // "under" | "over"
 
 
   const handleDobChange = (e) => {
@@ -48,17 +48,18 @@ const AgeFilter = ({ onSearch, user }) => {
   };
 
   const applyAgeFilter = () => {
-    if (dobInput.length === 10 || calculatedAge !== "") {
-      onSearch(calculatedAge, ageType, gender);
+      const ageValue = calculatedAge && calculatedAge !== "0" ? calculatedAge : "";
+      const ageTypeValue = ageValue ? ageType || "under" : "";
+      const genderValue = gender || "";
+
+      if (!ageValue && !genderValue) {
+        toast.error("Please select age or gender filter before searching.");
+        return;
+      }
+
+      onSearch(ageValue, ageTypeValue, genderValue);
       setOpen(false);
-      // setDobInput("");
-      // setCalculatedAge("");
-      // setGender("");
-      // setAgeType("under");
       toast.success("Searching by Filter!");
-    } else {
-      toast.error("Please enter a valid age or date");
-    }
   };
 
   return (
@@ -70,7 +71,7 @@ const AgeFilter = ({ onSearch, user }) => {
           setDobInput("");
           setCalculatedAge("");
           setGender("");
-          setAgeType("under");
+          setAgeType("");
         }
       }}
     >
@@ -121,7 +122,7 @@ const AgeFilter = ({ onSearch, user }) => {
 
         <div className="flex flex-col items-center w-full gap-4 relative">
           <p className="text-xl font-semibold text-[#2dd4bf]">
-            {ageType === "under" ? "Born Before" : "Born After"}
+            {ageType === "under" ? "Born Before" : ageType === "over" ? "Born After" : "Select Age Type"}
           </p>
           <div className="flex justify-center w-full">
             <input
@@ -133,7 +134,7 @@ const AgeFilter = ({ onSearch, user }) => {
             />
           </div>
           <div className="text-white text-lg mt-2 flex items-center justify-center gap-2">
-            <span className="font-semibold text-gray-300">that's {ageType === "under" ? "under" : "over"}</span>
+            <span className="font-semibold text-gray-300">that's {ageType === "under" ? "under" : ageType === "over" ? "over" : "selected"}</span>
             <div className="flex items-center">
               <span className="text-white w-4 border-b-2 border-white mr-[1px]"></span>
               <input
@@ -153,7 +154,7 @@ const AgeFilter = ({ onSearch, user }) => {
               setDobInput("");
               setCalculatedAge("");
               setGender("");
-              setAgeType("under");
+              setAgeType("");
             }}
             className="bg-[#fbcfe8] text-[#9d174d] hover:bg-[#f9a8d4] font-bold rounded-xl h-12 text-lg"
           >
