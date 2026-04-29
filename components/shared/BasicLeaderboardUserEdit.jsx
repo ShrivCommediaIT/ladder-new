@@ -90,7 +90,7 @@ export const BasicLeaderboardUserEdit = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="min-w-md md:min-w-[700px] lg:min-w-[900px] bg-gray-900 text-white">
+      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[700px] lg:max-w-[900px] mx-auto bg-gray-900 text-white max-h-[90vh] overflow-y-auto">
         <DialogTitle className="text-xl font-bold border-b border-gray-700 p-4">
           {selectedPlayer?.name || "Player"}
         </DialogTitle>

@@ -436,7 +436,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
       <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
-        <DialogContent className="max-w-md p-0 overflow-hidden">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
 
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b">
@@ -490,7 +490,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
       <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden max-h-[90vh] overflow-y-auto">
 
           {/* HEADER BAR (like system popup) */}
           <div className="flex items-center justify-between bg-white px-3 py-2 border-b">
