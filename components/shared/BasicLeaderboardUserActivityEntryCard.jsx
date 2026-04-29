@@ -811,9 +811,9 @@ export default function BasicLeaderboardActivityEntryCard({
 
           {(type === "negative" || ladderType === "negative") && (
             <div className="flex items-center gap-2  w-full">
-              <div className="w-1/2 flex items-center justify-center gap-1 text-2xl text-black font-semibold bg-slate-200 rounded-md h-[40px] px-1 sm:px-3 shadow-inner min-w-[120px]">
+              <div className="w-1/2 flex items-center justify-center gap-1 text-sm md:text-2xl text-black font-semibold bg-slate-200 rounded-md h-[40px] px-1 sm:px-3 shadow-inner min-w-[120px]">
                 <input
-                  className={`w-10 text-center bg-transparent outline-none p-0 ${activeField === "min" ? "text-sky-600" : ""}`}
+                  className={`w-8 text-center bg-transparent outline-none p-0 ${activeField === "min" ? "text-sky-600" : ""}`}
                   value={minStr}
                   onChange={handleMinChange}
                   onFocus={() => handleFocus("min")}
@@ -823,7 +823,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 />
                 <span className="pb-1">:</span>
                 <input
-                  className={`w-10 text-center bg-transparent outline-none p-0 ${activeField === "sec" ? "text-sky-600" : ""}`}
+                  className={`w-8 text-center bg-transparent outline-none p-0 ${activeField === "sec" ? "text-sky-600" : ""}`}
                   value={secStr}
                   onChange={handleSecChange}
                   onFocus={() => handleFocus("sec")}
@@ -833,7 +833,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 />
                 <span className="pb-1">.</span>
                 <input
-                  className={`w-10 text-center bg-transparent outline-none p-0 ${activeField === "ms" ? "text-sky-600" : ""}`}
+                  className={`w-8 text-center bg-transparent outline-none p-0 ${activeField === "ms" ? "text-sky-600" : ""}`}
                   value={msStr}
                   onChange={handleMsChange}
                   onFocus={() => handleFocus("ms")}
