@@ -69,27 +69,27 @@ const CreatePanel = ({
               className="mt-1 h-11 w-full rounded-xl bg-white/10 border border-white/10 px-3 text-white"
             >
               <option className="bg-black" value="winlose">
-                Win / Lose Ladder
+                Ladder (Win/Lose)
               </option>
               <option className="bg-black" value="best3">
-                Best of 3 Ladder
+                Ladder (Best of 3)
               </option>
               <option className="bg-black" value="best5">
-                Best of 5 Ladder
+                Ladder (Best of 5)
               </option>
               <option className="bg-black" value="minileague">
                 MiniLeagues
               </option>
               <option className="bg-black" value="skill">
-                Skills/Performance Challenge Board
+                Skills/Performance Challenge Boards (Desc/Asc)
               </option>
 
               {/* ❌ ROSTER HIDDEN */}
               <option className="bg-black" value="positive">
-                 LeaderBoard
+                Leaderboard (Desc/Asc)
               </option>
               <option className="bg-black" value="negative">
-                LeaderBoard (Times)
+                Leaderboard (Time Desc/Asc)
               </option>
             </select>
           </div>
