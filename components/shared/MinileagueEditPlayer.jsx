@@ -168,7 +168,7 @@ export const MinileagueEditPlayer = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="min-w-full md:min-w-[700px] lg:min-w-[900px] bg-gray-900 text-white">
+      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[700px] lg:max-w-[900px] mx-auto bg-gray-900 text-white max-h-[90vh] overflow-y-auto">
         <DialogTitle className="p-2 border-b border-gray-700 text-violet-400">
           {selectedPlayer?.name || "Player"}
         </DialogTitle>

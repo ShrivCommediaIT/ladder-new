@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { getRequest, postRequest } from "@/services/apiService";
+import { getRequest, postRequest, postUrlEncoded } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -333,15 +333,15 @@ export default function BasicLeaderboardActivityEntryCard({
       return;
     }
 
-      setHasEditedToday(true);
-      setValue((prev) => {
-        const p = !hasEditedToday ? "0" : prev;
-        if (!p) return "0";
-        let newVal = p.slice(0, -1);
-        if (newVal === "" || newVal === "-") return "0";
-        return newVal;
-      });
-    };
+    setHasEditedToday(true);
+    setValue((prev) => {
+      const p = !hasEditedToday ? "0" : prev;
+      if (!p) return "0";
+      let newVal = p.slice(0, -1);
+      if (newVal === "" || newVal === "-") return "0";
+      return newVal;
+    });
+  };
 
   const handleClear = () => {
     // ✅ BEST SCORE INPUT FOCUSED
@@ -503,27 +503,27 @@ export default function BasicLeaderboardActivityEntryCard({
 
       setSaving(true);
 
-      const payload = {
-        user_id: playerId,
-        skill_activity_id: skillActivityId,
-        score: finalScore,
-        witness_by: witnessBy.trim(),
-        admin_id: adminDetails.id,
-        ladder_id: ladderId,
-        user_name: playerName,
-      };
+      const witnessValue =
+        witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
+      const params = new URLSearchParams();
+      params.append("user_id", String(playerId));
+      params.append("skill_activity_id", String(skillActivityId));
+      params.append("score", String(finalScore));
+      params.append("witness_by", witnessValue);
+      params.append("admin_id", adminDetails.id);
+      params.append("ladder_id", ladderId);
+      params.append("user_name", playerName);
+
+
 
       if (bestScore !== undefined && bestScore !== null) {
-        // If no previous best score or the best score is a zero value, fall back to the current score being submitted
-        payload.best_result = isEmptyBestResult(bestScore) ? finalScore : bestScore;
+        params.append("best_result", String(bestScore));
       }
+      const skillsPost = await postUrlEncoded(`/${URl}`, params);
 
-
-      const res = await postRequest(`/${URl}`, payload);
-
-      if (res?.status === 200 || res?.status === "success") {
+      if (skillsPost?.status === 200 || skillsPost?.status === "success") {
         toast.success("Result posted successfully!");
-        if (res?.eligible_for_token == 1) {
+        if (skillsPost?.eligible_for_token == 1) {
           updateLadderToken({
             user_id: playerName,
             ladder_id: ladderId,
@@ -534,7 +534,7 @@ export default function BasicLeaderboardActivityEntryCard({
         setOpenSuccess(true);
         return true;
       } else {
-        toast.error(res.error_message);
+        toast.error(skillsPost.error_message);
         return false;
       }
     } catch (err) {
@@ -741,7 +741,7 @@ export default function BasicLeaderboardActivityEntryCard({
                     }}
                     title="Click to edit best result"
                   >
-                    {loadingTopScore ? "..." : 
+                    {loadingTopScore ? "..." :
                       selectedPlayer?.total_point || "0"
                     }
                   </div>
@@ -944,7 +944,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
       {/* AUTO-CLOSE SUCCESS DIALOG */}
       <Dialog open={openSuccess} onOpenChange={handleSuccessClose}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-sm mx-auto">
           <DialogHeader>
             <DialogTitle className="text-emerald-500 text-xl">
               Score Saved
@@ -971,7 +971,7 @@ export default function BasicLeaderboardActivityEntryCard({
       </Dialog>
 
       <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
-        <DialogContent className="max-w-md p-0 overflow-hidden">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
 
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b">
@@ -1030,7 +1030,7 @@ export default function BasicLeaderboardActivityEntryCard({
       {/* ZERO SCORE ALERT */}
 
       <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden max-h-[90vh] overflow-y-auto">
 
           {/* HEADER BAR (like system popup) */}
           <div className="flex items-center justify-between bg-white px-3 py-2 border-b">

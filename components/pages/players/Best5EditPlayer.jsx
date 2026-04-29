@@ -81,7 +81,7 @@ export const Best5EditPlayer = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="min-w-full md:min-w-[700px] lg:min-w-[900px] border border-gray-700 bg-gray-900 text-gray-100 rounded-xl max-w-4xl">
+      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[700px] lg:max-w-[900px] mx-auto border border-gray-700 bg-gray-900 text-gray-100 rounded-xl max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogTitle className="text-2xl font-bold text-violet-400 border-b border-gray-800">
           {selectedPlayer
             ? `Edit Player: ${selectedPlayer.name} (Rank: ${selectedPlayer.rank})`
