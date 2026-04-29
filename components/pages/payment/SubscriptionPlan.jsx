@@ -313,7 +313,7 @@ export default function SubscriptionPlan({ ladderId }) {
 
   return (
     <main
-      className="px-4 py-6 sm:px-8 md:px-12 lg:px-20 xl:px-32 max-w-7xl mx-auto min-h-screen"
+      className="px-4 py-6 sm:px-8 md:px-12 lg:px-20 xl:px-32 w-full mx-auto min-h-screen"
     >
       {/* ✅ Subscription Cards */}
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-4 max-w-5xl mx-auto">

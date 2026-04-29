@@ -12,6 +12,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
+
 export default function CreateClubSetup() {
   const [activeTab, setActiveTab] = useState("master");
   const router = useRouter();
@@ -31,17 +33,15 @@ export default function CreateClubSetup() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#312e81] pb-24">
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-[#07111f] text-white">
+      {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
+      <PlayerLevelNavbar activeTab="dashboard" />
+
       {/* Glow effects */}
       <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-blue-600/30 blur-3xl" />
       <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-purple-600/30 blur-3xl" />
 
-      {/* TOP BAR */}
-      <div className="relative z-10 flex flex-col items-center gap-6 p-4 pt-8 sm:pt-12">
-        <h1 className="text-xl md:text-xl xl:text-3xl mr-8 font-extrabold text-white">
-          Sports Solutions Pro
-        </h1>
-
+      <div className="w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 pt-10 pb-8 relative z-10 flex flex-col items-center gap-6">
         {/* Tabs with Popover for Mobile & Desktop Click */}
         <div className="flex items-center gap-3 bg-white/10 backdrop-blur px-2 py-2 rounded-2xl border border-white/10">
           <button

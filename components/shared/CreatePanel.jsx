@@ -22,7 +22,7 @@ const CreatePanel = ({
 
   return (
     <div className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl p-4 sm:p-6 rounded-3xl">
-      
+
       {/* HEADER */}
       <h3 className="text-lg font-bold text-cyan-400 flex items-center gap-2 mb-4">
         <Users className="h-5 w-5" />
@@ -30,7 +30,7 @@ const CreatePanel = ({
       </h3>
 
       <div className="space-y-4">
-        
+
         {/* NAME */}
         <div>
           <Label className="text-md text-white">Name :</Label>
@@ -86,7 +86,7 @@ const CreatePanel = ({
 
               {/* ❌ ROSTER HIDDEN */}
               <option className="bg-black" value="positive">
-                 LeaderBoard
+                LeaderBoard
               </option>
               <option className="bg-black" value="negative">
                 LeaderBoard (Times)
@@ -144,8 +144,8 @@ const CreatePanel = ({
           {loading
             ? "Creating..."
             : isAdmin
-            ? "Create a Roster"
-            : "Create Solution"}
+              ? "Create a Roster"
+              : "Create Solution"}
         </Button>
       </div>
     </div>

@@ -7,9 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import PlayersLists1 from "./PlayersLists1";
 import ActivityLog from "./ActivityList";
-import PlayerHeading from "./PlayerHeading";
 import LeaderBoard from "./LeaderBoard";
-import UserDetails from "@/components/shared/UserDetails";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import LadderRulesCard from "./LadderRulesCard";
@@ -19,6 +17,7 @@ import AdminEditPhone from "@/components/shared/AdminEditPhone";
 import { useSearchParams, useRouter } from "next/navigation";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import MusicDownloadList from "./MusicDownloadList";
+import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
 
 export const PlayerLists = () => {
   const dispatch = useDispatch();
@@ -101,28 +100,11 @@ export const PlayerLists = () => {
 
   return (
     <div className="bg-gray-800 min-h-screen">
-      {/* 🔹 Sticky Header */}
-      <div className="sm:flex justify-between top-0 z-50 backdrop-blur-md px-4 py-4">
-        <div className="">
-          <div className="flex-1 min-w-0 ">
-            <PlayerHeading />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* <button
-            onClick={handlePrintClick}
-            className="px-8 py-1 text-white bg-gradient-to-r from-[#8dd5f1] to-blue-800 rounded-lg font-semibold text-xl border hover cursor-pointer transition"
-          >
-            Print
-          </button> */}
-
-          <UserDetails />
-        </div>
-      </div>
+      {/* 🔹 Unified Sticky Navbar (Admin & Sub-Admin) */}
+      <PlayerLevelNavbar activeTab="players" />
 
       {/* 🔹 Main Section */}
-      <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-6">
+      <div className="w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 flex flex-col lg:flex-row gap-6">
         {/* 🔹 Left/Main Column */}
         <div className="flex-1 flex flex-col gap-4 min-w-0">
           <div className="flex flex-col gap-4 lg:hidden">

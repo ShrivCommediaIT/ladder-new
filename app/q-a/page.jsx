@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from 'react';
-import UserDetails from "@/components/shared/UserDetails";
+import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
 
 // ─── Q&A DATA ────────────────────────────────────────────────────────────────
 const qaData = [
@@ -245,30 +245,11 @@ const QAndAPage = () => {
   const [qaOpen, setQaOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-[#05070f] via-[#0c1224] to-black text-white">
-      {/* UNIVERSAL NAVBAR */}
-      <div className="fixed top-0 left-0 right-0 w-full z-50 flex justify-between items-center px-4 sm:px-8 py-3 sm:py-4 bg-[#05070f]/80 backdrop-blur-xl border-b border-white/10 shadow-lg">
-        {/* <div className="flex items-center gap-3">
-          <img
-            src="/qa-logo.png"
-            alt="Q&A"
-            className="h-10 sm:h-12 w-auto object-contain"
-          />
-        </div> */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-cyan-600 to-blue-700 text-white shadow-md text-lg">
-            🏟
-          </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
-            Q &amp; A
-          </h1>
-        </div>
-        <div className="flex items-center">
-          <UserDetails />
-        </div>
-      </div>
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-[#07111f] text-white">
+      {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
+      <PlayerLevelNavbar activeTab="" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-24 sm:pt-28 pb-8">
+      <div className="w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 pt-10 pb-8">
 
         <div className="max-w-4xl mx-auto rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-6 sm:p-8">
 

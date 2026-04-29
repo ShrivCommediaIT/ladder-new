@@ -18,7 +18,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
-export default function LadderInfo({ladders}) {
+export default function LadderInfo({ ladders }) {
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
@@ -55,7 +55,7 @@ export default function LadderInfo({ladders}) {
       className="w-full rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-4 sm:p-5"
     >
       {/* Yaha scroll add kar rahe hain */}
-      <div 
+      <div
         className="
           max-h-[320px]     
           overflow-y-auto        
@@ -80,9 +80,9 @@ export default function LadderInfo({ladders}) {
               "
               onClick={() => handleEditClick(ladder.id, ladder.type)}
             >
-              <div  className="flex items-center gap-2 text-white/90">
+              <div className="flex items-center gap-2 text-white/90">
                 <span className="text-sm sm:text-base font-medium">
-                  {ladder.type}
+                  {ladder.name}
                 </span>
               </div>
 
@@ -93,9 +93,8 @@ export default function LadderInfo({ladders}) {
                       <Info className="w-4 h-4" />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="max-w-xs sm:max-w-md border border-white/10 bg-[#0b1020]/95 text-white backdrop-blur-xl shadow-xl animate-in fade-in zoom-in">
-
-                      <p className="text-xs sm:text-sm leading-relaxed">{ladder.info}</p>
+                  <PopoverContent className="w-[90vw] max-w-sm border border-white/10 bg-[#0b1020]/95 text-white backdrop-blur-xl shadow-xl animate-in fade-in zoom-in">
+                    <p className="text-xs sm:text-sm leading-relaxed">{ladder.info}</p>
                   </PopoverContent>
                 </Popover>
               ) : (

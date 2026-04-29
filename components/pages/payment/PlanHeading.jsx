@@ -161,7 +161,7 @@ export default function PlanHeading() {
   return (
     <main className="landing-page min-h-screen bg-[var(--landing-bg)] text-[var(--landing-text)]">
       <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-20 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center">
             <Image
               src={topLogo}
@@ -202,7 +202,7 @@ export default function PlanHeading() {
 
         {mobileMenuOpen && (
           <div className="border-t border-slate-200 bg-white md:hidden">
-            <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6">
+            <div className="mx-auto flex max-w-full flex-col gap-4 px-4 py-5 sm:px-6">
               {navItems.map((item) => (
                 <a
                   key={item.label}
@@ -225,7 +225,7 @@ export default function PlanHeading() {
         <div className="absolute top-0 right-0 -z-10 h-[800px] w-[800px] translate-x-1/3 -translate-y-1/4 rounded-full bg-gradient-to-br from-blue-50 to-[color:rgba(41,171,226,0.10)] blur-3xl opacity-70" />
         <div className="absolute bottom-0 left-0 -z-10 h-[600px] w-[600px] -translate-x-1/4 translate-y-1/4 rounded-full bg-gradient-to-tr from-slate-100 to-[color:rgba(26,58,143,0.08)] blur-3xl opacity-70" />
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <motion.div
               initial={{ opacity: 0, y: 18 }}
@@ -307,7 +307,7 @@ export default function PlanHeading() {
         id="clubs"
         className="bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] py-12 text-white"
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
             {stats.map((stat) => (
               <div
@@ -325,7 +325,7 @@ export default function PlanHeading() {
       </section>
 
       <section id="features" className="bg-white py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
               WHY CLUBS CHOOSE US
@@ -365,7 +365,7 @@ export default function PlanHeading() {
         className="relative overflow-hidden bg-slate-50 py-24"
       >
         <div className="absolute inset-0 opacity-[0.03] [background-image:url('https://www.transparenttextures.com/patterns/cubes.png')]" />
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
               Simple Pricing, No Surprises
@@ -504,7 +504,7 @@ export default function PlanHeading() {
       </section>
 
       <footer id="contact" className="bg-slate-900 py-12 text-slate-400">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
             <div className="md:col-span-2">
               <Image

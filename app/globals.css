@@ -3,7 +3,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-body{
+body {
   font-family: "Inter", "Ubuntu", sans-serif;
   font-weight: 400;
 }
@@ -14,12 +14,14 @@ body{
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-  background: #6366f1; /* indigo-500 */
+  background: #6366f1;
+  /* indigo-500 */
   border-radius: 8px;
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-  background: #ddd6fe; /* purple-200 */
+  background: #ddd6fe;
+  /* purple-200 */
 }
 
 /* 🌐 Custom Global Scrollbar - Modern Gradient Style */
@@ -29,21 +31,24 @@ body{
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #7c3aed, #db2777); /* from-indigo-600 to-pink-600 */
+  background: linear-gradient(to bottom, #7c3aed, #db2777);
+  /* from-indigo-600 to-pink-600 */
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #f3e8ff; /* purple-100 */
+  background-color: #f3e8ff;
+  /* purple-100 */
   border-radius: 10px;
 }
 
 /* Firefox support */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #7c3aed #f3e8ff; /* thumb track */
+  scrollbar-color: #7c3aed #f3e8ff;
+  /* thumb track */
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -166,14 +171,17 @@ body{
   * {
     @apply border-border outline-ring/50;
   }
+
   html {
     scroll-behavior: smooth;
   }
+
   body {
     @apply bg-background text-foreground;
     letter-spacing: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 }
 
@@ -185,12 +193,20 @@ body{
 /* animate flash */
 
 @keyframes flash {
-  0%, 100% { opacity: 1; }
-  80% { opacity: 0; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 0;
+  }
 }
 
 .flash-fast {
-  animation: flash 2s infinite; /* ab aur fast blink karega */
+  animation: flash 2s infinite;
+  /* ab aur fast blink karega */
 }
 
 /* print css */
@@ -199,10 +215,12 @@ body{
   body * {
     visibility: hidden;
   }
+
   #print-section,
   #print-section * {
     visibility: visible;
   }
+
   #print-section {
     position: absolute;
     left: 0;
@@ -212,9 +230,17 @@ body{
 }
 
 @keyframes slow-flash {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 .slow-flash-animation {
@@ -224,9 +250,6 @@ body{
 .slow-flash-animation:hover {
   animation-play-state: paused;
 }
-
-
-
 
 /* Print A4 size */
 
@@ -242,7 +265,8 @@ body{
   }
 
   main {
-    display: none !important; /* hide dark UI */
+    display: none !important;
+    /* hide dark UI */
   }
 
   .print-page {
@@ -251,30 +275,42 @@ body{
   }
 }
 
-
-
-
-
-
-
-
-
-
 /* ============ flower */
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
-  50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+    opacity: 0.8;
+  }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse-once {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .flower-container {
@@ -292,72 +328,94 @@ body{
   animation: float linear infinite;
 }
 
-
-
 /* 🎉 Flower Celebration Animations */
 @keyframes float {
-  0%, 100% { 
-    transform: translateY(0) rotate(0deg) scale(1); 
-    opacity: 1; 
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
   }
-  33% { 
-    transform: translateY(-30px) rotate(120deg) scale(1.2); 
-    opacity: 0.9; 
+
+  33% {
+    transform: translateY(-30px) rotate(120deg) scale(1.2);
+    opacity: 0.9;
   }
-  66% { 
-    transform: translateY(-15px) rotate(240deg) scale(0.9); 
-    opacity: 0.7; 
+
+  66% {
+    transform: translateY(-15px) rotate(240deg) scale(0.9);
+    opacity: 0.7;
   }
 }
 
 @keyframes explode {
-  0% { 
-    transform: scale(0.5) rotate(0deg); 
-    opacity: 1; 
+  0% {
+    transform: scale(0.5) rotate(0deg);
+    opacity: 1;
   }
-  50% { 
-    transform: scale(1.3) rotate(180deg); 
-    opacity: 1; 
+
+  50% {
+    transform: scale(1.3) rotate(180deg);
+    opacity: 1;
   }
-  100% { 
-    transform: scale(1) rotate(360deg); 
-    opacity: 0; 
+
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 0;
   }
 }
 
 @keyframes explode-delay {
-  0% { 
-    transform: scale(0.3) rotate(0deg); 
-    opacity: 1; 
+  0% {
+    transform: scale(0.3) rotate(0deg);
+    opacity: 1;
   }
-  50% { 
-    transform: scale(1.1) rotate(180deg); 
-    opacity: 1; 
+
+  50% {
+    transform: scale(1.1) rotate(180deg);
+    opacity: 1;
   }
-  100% { 
-    transform: scale(0.8) rotate(360deg); 
-    opacity: 0; 
+
+  100% {
+    transform: scale(0.8) rotate(360deg);
+    opacity: 0;
   }
 }
 
 @keyframes pulse-slow {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
 }
 
 @keyframes bounce-subtle {
-  0%, 100% { transform: scale(1.15); }
-  50% { transform: scale(1.25); }
+
+  0%,
+  100% {
+    transform: scale(1.15);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
 }
 
 @keyframes ping-slow {
-  0% { 
-    transform: scale(1); 
-    opacity: 1; 
+  0% {
+    transform: scale(1);
+    opacity: 1;
   }
-  75%, 100% { 
-    transform: scale(2); 
-    opacity: 0; 
+
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
   }
 }
 
@@ -378,13 +436,12 @@ body{
   animation: float 4s ease-in-out infinite;
 }
 
-
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
