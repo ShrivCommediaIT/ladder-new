@@ -283,7 +283,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   );
 
   const handleAgeSearch = (age, ageType, gender) => {
-    const ageNum = Number(age);
+    const ageNum = age ? Number(age) : "";
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
     refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
   };
@@ -299,7 +299,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     if (ladderId) {
       refreshLeaderboard();
     }
-  }, [ladderId, refreshLeaderboard]);
+  }, [ladderId]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

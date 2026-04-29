@@ -276,7 +276,7 @@ const AdminButton = () => {
   };
 
   const handleAgeSearch = (age, ageType, gender) => {
-    const ageNum = Number(age);
+    const ageNum = age ? Number(age) : "";
     const filter = { age: ageNum, ageType, gender };
 
     if (isSkill) dispatch(setSkillAgeFilter(filter));
@@ -301,9 +301,8 @@ const AdminButton = () => {
     };
 
     let fetchSliceLeaderboard;
-    if (laddartype === "positive") fetchSliceLeaderboard = fetchPositiveLeaderboard;
-    else if (laddartype === "negative") fetchSliceLeaderboard = fetchNegativeLeaderboard;
-    else if (laddartype === "best5" || laddartype === "best3" || laddartype === "winlose" || laddartype === "bestof5" || laddartype === "bestof3" || laddartype === "roster") {
+   
+   if (laddartype === "best5" || laddartype === "best3" || laddartype === "winlose" || laddartype === "bestof5" || laddartype === "bestof3" || laddartype === "roster") {
       fetchSliceLeaderboard = fetchLeaderboard;
     } else {
       fetchSliceLeaderboard = fetchSkillLeaderboard;
