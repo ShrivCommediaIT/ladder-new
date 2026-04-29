@@ -68,7 +68,7 @@ export default function LadderInfo({ladders}) {
             >
               <div  className="flex items-center gap-2 text-white/90">
                 <span className="text-sm sm:text-base font-medium">
-                  {ladder.type}
+                  {ladder.name}
                 </span>
               </div>
 

@@ -416,6 +416,26 @@ export default function BasicLeaderboardActivityEntryCard({
     return `${m}:${s}.${ms}`;
   };
 
+  const isEmptyBestResult = (bestScore) => {
+    if (bestScore === undefined || bestScore === null) return true;
+    if (bestScore === 0 || bestScore === "0" || bestScore === "") return true;
+    if (typeof bestScore === "string") {
+      const normalized = bestScore.trim();
+      return /^0+(?::0{2})+(?:\.0+)?$/.test(normalized);
+    }
+    return false;
+  };
+
+  const formatNegativeDisplay = (timeStr) => {
+    if (!timeStr) return "";
+    const normalized = String(timeStr).trim();
+    const match = normalized.match(/^(?:00:)?(\d{2}):(\d{2})\.(\d{2})\d?$/);
+    if (match) {
+      return `${match[1]}:${match[2]}.${match[3]}`;
+    }
+    return normalized.replace(/^00:/, "");
+  };
+
   const handleEnter = async () => {
     if (!skillActivityId || !playerId) return;
 
@@ -439,7 +459,7 @@ export default function BasicLeaderboardActivityEntryCard({
       ? `00:${minStr.padStart(2, "0")}:${secStr.padStart(2, "0")}.${msStr.padStart(2, "0")}0`
       : value;
 
-    const bestResultToSubmit = (topScore === 0 || topScore === "0") ? currentVal : topScore;
+    const bestResultToSubmit = isEmptyBestResult(topScore) ? currentVal : topScore;
 
     return await submitScore(value, bestResultToSubmit, { m: minStr, s: secStr, ms: msStr });
   }
@@ -494,8 +514,8 @@ export default function BasicLeaderboardActivityEntryCard({
       };
 
       if (bestScore !== undefined && bestScore !== null) {
-        // If no previous best score, fall back to the current score being submitted
-        payload.best_result = (bestScore === 0 || bestScore === "0") ? finalScore : bestScore;
+        // If no previous best score or the best score is a zero value, fall back to the current score being submitted
+        payload.best_result = isEmptyBestResult(bestScore) ? finalScore : bestScore;
       }
 
 
@@ -546,26 +566,33 @@ export default function BasicLeaderboardActivityEntryCard({
     setOpenZeroAlert(false);
 
     if (type === "ok") {
-      const bestResultToSubmit = (topScore === 0 || topScore === "0") ? 0 : topScore;
+      const bestResultToSubmit = isEmptyBestResult(topScore) ? 0 : topScore;
       submitScore(0, bestResultToSubmit);
     } else if (type === "reset") {
       setValue("-");
-      const bestResultToSubmit = (topScore === 0 || topScore === "0") ? "-" : topScore;
+      const bestResultToSubmit = isEmptyBestResult(topScore) ? "-" : topScore;
       submitScore("-", bestResultToSubmit);
     }
   };
 
   const getBestScore = async () => {
     if (ladderType === "negative" || type === "negative") {
-      // Always build best_result from bestMin/Sec/MsStr (pre-populated from API or user-edited)
+      // Build best_result from bestMin/Sec/MsStr (pre-populated from API or user-edited)
       const bestValForNegative = `00:${bestMinStr.padStart(2, "0")}:${bestSecStr.padStart(2, "0")}.${bestMsStr.padStart(2, "0")}0`;
-      await submitScore(value, bestValForNegative, { m: minStr, s: secStr, ms: msStr });
+      setTopScore(bestValForNegative);
+      setOpenSuccessResult(true);
       setEditingBest(false);
       return;
     }
 
-    if (value == 0 || value == "-" || ladderType === "positive" || type === "positive") {
+    if (value == 0 || value == "-") {
       await handleEnter();
+      return;
+    }
+
+    // For skill and positive types, use the edited topScore without fetching
+    if (ladderType === "skill" || ladderType === "positive" || type === "positive") {
+      setOpenSuccessResult(true);
       return;
     }
 
@@ -961,16 +988,20 @@ export default function BasicLeaderboardActivityEntryCard({
               <div className="flex items-center gap-2">
                 <span>Today’s Result</span>
                 <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
-                  {value}
+                  {(type === "negative" || ladderType === "negative") ? formatTimeInfo() : value}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <span>Your Best Result</span>
                 <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
-                  {(topScore === 0 || topScore === "0")
-                    ? ((type === "negative" || ladderType === "negative") ? formatTimeInfo() : value)
-                    : topScore}
+                  {(() => {
+                    const current = (type === "negative" || ladderType === "negative") ? formatTimeInfo() : value;
+                    if (isEmptyBestResult(topScore)) return current;
+                    return (type === "negative" || ladderType === "negative")
+                      ? formatNegativeDisplay(topScore)
+                      : topScore;
+                  })()}
                 </span>
               </div>
             </div>

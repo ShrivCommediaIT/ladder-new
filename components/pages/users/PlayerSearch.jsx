@@ -86,11 +86,9 @@ const PlayerSearch = ({ searchTerm, setSearchTerm, onAgeSearch, onClearFilters }
       </AnimatePresence>
 
       {/* 🎂 Age Filter */}
-      {!ladderType && (
-        <div className="h-10 flex-shrink-0">
-          <AgeFilter onSearch={handleAgeSearch} user={true} />
-        </div>
-      )}
+      {!ladderType && <div className="h-10 flex-shrink-0">
+        <AgeFilter onSearch={handleAgeSearch} user={true} />
+      </div>}
 
       {/* 🔄 Clear All Filters button — only shows when filters are active */}
       <AnimatePresence>

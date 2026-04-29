@@ -31,13 +31,13 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
 
   const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
   const score = scoreObj ? Number(scoreObj.score) : 0;
+  const bestScore = scoreObj ? Number(scoreObj.best_score) : 0; 
   const inputScore =
     scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
       ? Number(scoreObj.input_score)
       : null;
 
-  const displayScore =
-    inputScore !== null && !isNaN(inputScore) ? inputScore : score;
+  const displayScore = bestScore; 
 
   const target =
     skillObj?.target !== null && skillObj?.target !== undefined
