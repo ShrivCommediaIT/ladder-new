@@ -85,6 +85,10 @@ export default function SubAdminDashboard() {
     }
   }, []);
 
+  const demoLadders = allLadders?.filter(
+    (ladder) => ladder.created_by === "demo"
+  );
+
   const checkCsvDuplicates = (file) => {
     return new Promise((resolve, reject) => {
       Papa.parse(file, {
@@ -403,7 +407,7 @@ export default function SubAdminDashboard() {
               <h3 className="text-lg font-semibold text-cyan-400 flex items-center gap-2 mb-3">
                 <Layers className="h-5 w-5" /> Solutions Available
               </h3>
-              <LadderInfo  ladders={allLadders} />
+              <LadderInfo  ladders={demoLadders} />
             </div>
 
             {/* LADDER LIST */}

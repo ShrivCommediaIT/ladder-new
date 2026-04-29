@@ -92,7 +92,7 @@ const LadderList = ({ userId }) => {
 
 
 const filteredLadders = allLadders?.filter(
-  (ladder) => ladder.created_by !== "demo"
+  (ladder) => ((ladder.created_by !==  "demo" && ladder.type !== "roster"))
 );
 
 const initialLadders = filteredLadders?.slice(0, 5);
@@ -155,6 +155,11 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                   : "h-auto"
               }`}
             >
+              {visibleLadders?.length === 0 && !loading && (
+                <p className="text-xs sm:text-sm text-white/50 px-2 text-center">
+                  No competitions to display.
+                </p>
+              )}
               {visibleLadders?.map((ladder, index) => {
                 const isDemo = ladder.created_by === "demo";
 
