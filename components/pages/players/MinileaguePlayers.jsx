@@ -27,6 +27,7 @@ import PlayerSearch from "../users/PlayerSearch";
 import { postWithParams } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
+import PlayerSearchInput from "./PlayerSearchInput";
 
 /* ================= Player Card ================= */
 const PlayerCard = ({
@@ -305,14 +306,9 @@ const finalSections = React.useMemo(() => {
 
   return (
     <div className="space-y-6">
-      <PlayerSearch 
-        searchTerm={searchQuery} 
-        setSearchTerm={setSearchQuery} 
-        onAgeSearch={(age, ageType, gender) => {
-          const ageNum = age ? Number(age) : "";
-          dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-        }}
-      />
+     <div className="flex flex-col gap-2">
+          <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+      </div>
       <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />
       <ToastContainer />
 

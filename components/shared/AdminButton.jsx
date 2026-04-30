@@ -166,23 +166,7 @@ const AdminButton = () => {
       type: laddartype,
     };
 
-    if (laddartype === "skill" || laddartype === "positive" || laddartype === "negative") {
-      payload.sortbyskillnumber = skillNo;
-    }
-
-    const finalAge = ageOverride !== undefined ? ageOverride : appliedAge;
-    const finalAgeType = appliedAgeType;
-    const finalGender = appliedGender;
-
-    if (finalAge > 0) {
-      payload.dob = finalAge;
-      if (finalAgeType) payload.age_type = finalAgeType;
-    }
     
-    if (finalGender) {
-      payload.gender = finalGender;
-    }
-
     dispatch(fetchSliceLeaderboard(payload));
 
     if (laddartype === "minileague") {
@@ -270,17 +254,6 @@ const AdminButton = () => {
     setIsSorted(false);
     setCurrentSkillNo(0);
     setAgeFilterResetSignal((prev) => prev + 1);
-    const resetFilter = { age: "", ageType: "", gender: "" };
-    if (isSkill) dispatch(setSkillAgeFilter(resetFilter));
-    else if (isPositive) dispatch(setPositiveAgeFilter(resetFilter));
-    else if (isNegative) dispatch(setNegativeAgeFilter(resetFilter));
-    else {
-      dispatch(setAgeFilter(resetFilter));
-      setLocalAge("");
-      setLocalAgeType("");
-      setLocalGender("");
-    }
-
     // Refresh with cleared filters
     if (ladderId) {
       if (isSkill || isPositive || isNegative || ladderType === "best5" || ladderType === "best3" || ladderType === "winlose" || isMiniLeague) {
@@ -438,7 +411,7 @@ const AdminButton = () => {
 
         {/* SKILL SPECIFIC BUTTONS */}
           <>
-            {!hasFiltersApplied() ? (
+            {!isSorted ? (
               <Button
                 onClick={handleSortBySkill}
                 className="bg-[#163344] border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"

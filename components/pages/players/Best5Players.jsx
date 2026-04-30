@@ -24,6 +24,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { postRequest } from "@/services/apiService";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
+import PlayerSearchInput from "./PlayerSearchInput";
 //  PlayerCard Component
 const PlayerCard = ({
   player,
@@ -314,22 +315,11 @@ const Best5Players = () => {
     <div id="print-section" className="space-y-4 relative" key={refreshKey}>
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
-      <div className="flex gap-2 justify-between w-full">
-        <div className="w-full text-white md:w-full">
-          {playerList.length >= 0 && (
-            <PlayerSearch 
-              searchTerm={searchQuery} 
-              setSearchTerm={setSearchQuery} 
-              onAgeSearch={(age, ageType, gender) => {
-                const ageNum = age ? Number(age) : "";
-                dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-              }}
-            />
-          )}
-        </div>
-        <div className="flex gap-3">
-        </div>
-      </div>
+
+        <div className="flex flex-col gap-2">
+            <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+          </div>
+
 
       {/* Ladder link + search */}
       <div className="flex flex-col gap-3 sm:flex-col md:items-center md:gap-2 md:justify-between">
