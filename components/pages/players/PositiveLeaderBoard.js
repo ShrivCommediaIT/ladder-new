@@ -266,16 +266,6 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           type: "positive",
           sortbyskillnumber: skillNo,
         };
-
-        if (age > 0) {
-          payload.dob = age;
-          payload.age_type = ageType;
-        }
-
-        if (gender) {
-          payload.gender = gender;
-        }
-
         dispatch(fetchPositiveLeaderboard(payload));
       }
     },

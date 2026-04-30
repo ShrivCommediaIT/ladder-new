@@ -19,57 +19,101 @@ import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 /* ---------------- PLAYER CARD ---------------- */
-const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, isEditable, loggedInUser }) => {
+const PlayerCard = ({
+  player,
+  overallRank,
+  appliedAge,
+  ageRank,
+  onSkillClick,
+  onTargetAchieved,
+  currentUser,
+}) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
+  const getScoreBySkillNumber = (scores, skills, skillNumber) => {
+    const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
+    const skillObj = skills?.find((s) => s.skill_number === skillNumber);
+    const witnessBy =
+      scoreObj?.witness_by ||
+      skillObj?.witness_by ||
+      "";
+    const score = scoreObj ? Number(scoreObj.score) : 0; // 🔒 internal logic
+    const bestScore = scoreObj ? Number(scoreObj.best_score) : 0; 
+    const inputScore =
+      scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
+        ? Number(scoreObj.input_score)
+        : null;
 
-  const toTotalSeconds = (score) => {
-    if (!score) return 0;
-    const strScore = String(score);
+    const displayScore = bestScore; // Always show best score
 
-    if (!strScore.includes(":")) {
-      return Number(strScore) || 0;
+    const target =
+      skillObj?.target !== null && skillObj?.target !== undefined
+        ? Number(skillObj.target)
+        : null;
+
+    const mode = skillObj?.skill_sign || "+";
+
+    let isTargetAchieved = false;
+
+    if (
+      target !== null &&
+      target !== 0 &&
+      score !== 0 && // still using real score
+      !isNaN(target) &&
+      !isNaN(score)
+    ) {
+      if (mode === "+") {
+        isTargetAchieved = score >= target;
+      } else {
+        // minus mode → target negative stored hota hai
+        isTargetAchieved = score >= Math.abs(target);
+      }
     }
 
-    const parts = strScore.split(":");
-    let hh = 0, mm = 0, secMsStr = "0";
-
-    if (parts.length === 3) {
-      hh = Number(parts[0]);
-      mm = Number(parts[1]);
-      secMsStr = parts[2];
-    } else if (parts.length === 2) {
-      mm = Number(parts[0]);
-      secMsStr = parts[1];
-    } else {
-      secMsStr = parts[0];
-    }
-
-    const [ss, ms = "0"] = secMsStr.split(".");
-
-    const total =
-      hh * 3600 +
-      mm * 60 +
-      Number(ss) +
-      Number(ms.padEnd(2, "0").substring(0, 2)) / 100;
-
-    return total;
+    return {
+      witnessBy,
+      score,
+      displayScore,
+      target,
+      isTargetAchieved,
+      input_score: inputScore,
+    };
   };
 
+  const achievedTargets =
+    player.skills
+      ?.map((skill) => {
+        const scoreData = getScoreBySkillNumber(
+          player.scores || [],
+          player.skills || [],
+          skill.skill_number,
+        );
+        return scoreData.isTargetAchieved;
+      })
+      .filter(Boolean).length || 0;
+
+  //  Trigger celebration when targets achieved
+useEffect(() => {
+    if (achievedTargets > 0) {
+      onTargetAchieved(player.name, achievedTargets);
+    }
+  }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
+
+  const getRankBySkillNumber = (ranks, skillNumber) => {
+    const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
+    return rankObj ? rankObj.rank : "-";
+  };
 
   return (
-    <Card onClick={() => { onSkillClick(player.id, player.skills[0].skill_number) }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative p-4 gap-0">
-      <div
-        className="flex justify-between items-center px-4 py-2"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
+      <div className="flex justify-between items-start mb-1 px-1">
         <PlayerStatusToggle player={player} user={true} />
       </div>
-      <div className="flex-1 min-w-0 curcer-pointer p-3">
+      <div className="flex-1 min-w-0">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10">
+        <div className="flex items-center gap-2 sm:gap-3 mb-2">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
             <Image
               src={playerImageUrl}
               alt={player?.name}
@@ -83,7 +127,7 @@ const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, is
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
               {player?.name || "N/A"}
               {player.age && (
-                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">
                   {player.age}
                 </p>
               )}
@@ -92,41 +136,87 @@ const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, is
               {player?.phone || "N/A"}
             </div>
           </div>
-          <div className="flex shrink-0 items-center justify-end gap-2">
-            {Boolean(appliedAge) && (
-              <div className="flex flex-col items-center">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
-                  {ageRank}
-                </div>
-                <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-0.5 whitespace-nowrap">Age Rank</p>
-              </div>
-            )}
+          <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
             <div className="flex flex-col items-center">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
-                {overallRank}
+              <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm shadow-sm leading-none h-7 sm:h-auto flex items-center">
+                {Math.abs(player.total_point || 0)}
+              </span>
+              <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
+            </div>
+
+            <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
+              {Boolean(appliedAge) && (
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                    {ageRank}
+                  </div>
+                  <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-1 whitespace-nowrap">Age Rank</p>
+                </div>
+              )}
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                  {overallRank}
+                </div>
+                <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
               </div>
-              <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-0.5 whitespace-nowrap">Overall Rank</p>
             </div>
           </div>
         </div>
-      </div>
-      <div className="flex  justify-between mr-1">
-        <div className="flex flex-col items-center mr-1">
-          <span className={` flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border ${player?.skills?.length > 0 &&
-            Number(player.skills[0].target) > 0 &&
-            toTotalSeconds(player?.scores?.[0]?.negative_ladder_score || "0") > 0 &&
-            Number(player.skills[0].target) >= toTotalSeconds(player?.scores?.[0]?.negative_ladder_score || "0")
-            ? "bg-green-500"
-            : "bg-white"
-            } ${player?.skills?.length > 0 && player?.scores?.[0]?.witness_by
-              ? "underline decoration-black decoration-[3px] bg-green-400"
-              : ""
-            }`}>
-            {toTotalSeconds(player && player?.scores[0]?.negative_ladder_score) || 0}
-          </span>
-        </div>
-        {player && player?.skills?.length > 0 ? null : (
-          <div className="h-7 p-3 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
+
+        {player.skills?.length > 0 ? (
+          <>
+            <div className="flex gap-[3px] overflow-y-visible pb-2 mb-1">
+              {player.skills.map((skill, i) => {
+                const isNegative = skill.skill_sign === "-";
+
+                return (
+                  <div
+                    key={i}
+                    onClick={() => onSkillClick(player.id, skill.skill_number)}
+                    className="cursor-pointer min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded bg-white hover:bg-emerald-500 transition-all hover:scale-110 relative"
+                    title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
+                  >
+                    {/* minus sign box ke upar */}
+                    {isNegative && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
+                        −
+                      </span>
+                    )}
+
+                    {skill.skill_number}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
+            <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
+              {player.skills.map((skill, i) => {
+                const scoreData = getScoreBySkillNumber(
+                  player.scores || [],
+                  player.skills || [],
+                  skill.skill_number,
+                );
+                return (
+                  <div
+                    key={i}
+                    className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
+                      ? "bg-green-400 text-black shadow-md font-semibold"
+                      : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
+                      } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
+                    title={`Score: ${scoreData.score} | Target: ${scoreData.target || "N/A"
+                      }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
+                  >
+                    {Math.abs(scoreData.displayScore || 0)}
+                  </div>
+                );
+              })}
+            </div>
+
+
+          </>
+        ) : (
+          <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
             No skills data
           </div>
         )}
@@ -134,6 +224,7 @@ const PlayerCard = ({ player, overallRank, appliedAge, ageRank, onSkillClick, is
     </Card>
   );
 };
+
 
 /* ---------------- MAIN COMPONENT ---------------- */
 const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
