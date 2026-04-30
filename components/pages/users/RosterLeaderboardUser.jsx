@@ -275,6 +275,12 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
           onClearFilters={() => {
             dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
           }}
+          activeFilters={
+            Boolean(searchTerm) ||
+            appliedAge > 0 ||
+            Boolean(appliedGender)
+          }
+          defaultAge={appliedAge}
         />
       </div>
 
