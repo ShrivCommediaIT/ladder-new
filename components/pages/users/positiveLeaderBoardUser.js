@@ -8,8 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
-import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
-import PlayerSearchInput from "../players/PlayerSearchInput";
+import PlayerSearch from "./PlayerSearch";
 import BasicLeaderboardShort from "../admin/BasicLeaderboardShort";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X } from "lucide-react";
 import { fetchPositiveLeaderboard, setAgeFilter } from "@/redux/slices/positiveLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
-import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import LadderLinkPanel from "../players/LadderLinkPanel";
 
@@ -297,8 +295,9 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillNumber, setSelectedSkillNumber] = useState(null);
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSorted, setIsSorted] = useState(false);
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
- const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
     setTimeout(
@@ -335,10 +334,29 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
 
   const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = age ? Number(age) : "";
+    const isClearing = age === null || age === "";
+
+    if (isClearing) {
+      setIsSorted(false);
+      setSelectedPositiveFilter(0);
+    } else {
+      setIsSorted(true);
+    }
+
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
+    refreshLeaderboard(isClearing ? 0 : selectedPositiveFilter, ageNum, ageType, gender);
   };
-  
+
+  const handleClearFilters = useCallback(() => {
+    setSearchQuery("");
+    setIsSorted(false);
+    setSelectedPositiveFilter(0);
+  }, []);
+
+  const hasFiltersApplied =
+    Boolean(searchQuery) ||
+    appliedAge > 0 ||
+    Boolean(appliedGender);
 
   useEffect(() => {
     if (onPlayerAdded) {
@@ -426,7 +444,14 @@ const filteredPlayers = useMemo(() => {
     <>
       <main className="min-h-screen flex justify-start md:justify-center relative">
         <div className="w-full max-w-2xl px-2 space-y-4">
-          <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+          <PlayerSearch
+            searchTerm={searchQuery}
+            setSearchTerm={setSearchQuery}
+            onAgeSearch={handleAgeSearch}
+            onClearFilters={handleClearFilters}
+            activeFilters={hasFiltersApplied}
+            defaultAge={appliedAge}
+          />
           <LadderLinkPanel ladderId={ladderId} ladderType="positive" />
           {loading && (
             <p className="text-white text-center hidden">Loading...</p>

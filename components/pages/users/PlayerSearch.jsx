@@ -5,17 +5,33 @@ import { Input } from "@/components/ui/input";
 import { LucideSearch, X, RotateCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AgeFilter from "@/components/shared/AgeFilter";
-import { useSearchParams } from "next/navigation";
 
-const PlayerSearch = ({ searchTerm, setSearchTerm, onAgeSearch, onClearFilters }) => {
+const PlayerSearch = ({
+  searchTerm,
+  setSearchTerm,
+  onAgeSearch,
+  onClearFilters,
+  activeFilters = false,
+  defaultAge = null,
+  resetSignal,
+}) => {
   const [open, setOpen] = useState(true); // ✅ always open by default
-  const [selectedAge, setSelectedAge] = useState(null);
-  const searchParams = useSearchParams();
-  const ladderType = searchParams.get("type");
-  // 📱 ensure open on all screen sizes
+  const [selectedAge, setSelectedAge] = useState(defaultAge > 0 ? defaultAge : null);
+  const [clearSignal, setClearSignal] = useState(0);
+
+  useEffect(() => {
+    if (resetSignal !== undefined) {
+      setClearSignal((prev) => prev + 1);
+    }
+  }, [resetSignal]);
+
   useEffect(() => {
     setOpen(true);
   }, []);
+
+  useEffect(() => {
+    setSelectedAge(defaultAge > 0 ? defaultAge : null);
+  }, [defaultAge]);
 
   const handleSearchChange = (e) => {
     let val = e.target.value;
@@ -34,11 +50,15 @@ const PlayerSearch = ({ searchTerm, setSearchTerm, onAgeSearch, onClearFilters }
   const handleClearAll = () => {
     setSearchTerm("");
     setSelectedAge(null);
-    if (onAgeSearch) onAgeSearch(null, "under", "");
+    setClearSignal((prev) => prev + 1);
+    if (onAgeSearch) onAgeSearch(null, "", "");
     if (onClearFilters) onClearFilters();
   };
 
-  const hasActiveFilters = searchTerm || selectedAge;
+  const hasActiveFilters =
+    Boolean(searchTerm) ||
+    (selectedAge !== null && selectedAge !== "") ||
+    activeFilters;
 
   return (
     <div className="flex items-center gap-2 w-full max-w-md flex-wrap">
@@ -86,9 +106,9 @@ const PlayerSearch = ({ searchTerm, setSearchTerm, onAgeSearch, onClearFilters }
       </AnimatePresence>
 
       {/* 🎂 Age Filter */}
-      {!ladderType && <div className="h-10 flex-shrink-0">
-        <AgeFilter onSearch={handleAgeSearch} user={true} />
-      </div>}
+      <div className="h-10 flex-shrink-0">
+        <AgeFilter onSearch={handleAgeSearch} user={true} resetSignal={clearSignal} />
+      </div>
 
       {/* 🔄 Clear All Filters button — only shows when filters are active */}
       <AnimatePresence>
