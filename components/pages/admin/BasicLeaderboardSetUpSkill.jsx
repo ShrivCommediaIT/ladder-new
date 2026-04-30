@@ -158,12 +158,12 @@ export default function BasicLeaderboardSetUpSkill({
         return;
       }
 
-      const minusWithoutTarget = rows.find(
+      const minusWithoutTarget = (type !== "negative" && ladderType !== "negative") ? rows.find(
         (row) =>
           row.mode === "minus" &&
           String(row.description || "").trim() !== "" &&
           String(row.target || "").trim() === "",
-      );
+      ) : null;
 
       if (minusWithoutTarget) {
         setValidationMessage(
@@ -187,7 +187,7 @@ export default function BasicLeaderboardSetUpSkill({
           return {
             skill_number: row.id,
             skill_description: String(row.description || "").trim(),
-            skill_sign: rows.mode,
+            skill_sign: row.mode,
             target: targetNum !== null && !isNaN(targetNum) ? targetNum : targetStr,
             unit: String(row.unit || "").trim(),
           };
@@ -250,7 +250,7 @@ export default function BasicLeaderboardSetUpSkill({
           {/* FIXED: Single line header with proper alignment */}
           <div className="sm:px-2 px-8 py-1  border-b border-white/10">
             <div className="flex items-end gap-2 text-white text-xs font-medium ">
-              {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : null}
+              {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : (type === "negative" || ladderType === "negative") ? <div className="w-20 flex items-center">Activity No.</div> : null}
               <div className="w-[120px]">Target</div>
               <div className="w-[200px]">{(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? "Skill Name" : "Activity"}</div>
               {(type !== "negative" && ladderType !== "negative") && <div className="w-[120px] translate">Units Of Measurement</div>}
@@ -286,9 +286,9 @@ export default function BasicLeaderboardSetUpSkill({
 
                   <div className="flex gap-2 w-[250px] items-start flex-1">
                     {(type === "negative" || ladderType === "negative") ? (
-                      <TargetTimerInput 
-                        value={row.target} 
-                        onChange={(val) => updateRow(row.id, { target: val })} 
+                      <TargetTimerInput
+                        value={row.target}
+                        onChange={(val) => updateRow(row.id, { target: val })}
                       />
                     ) : (
                       <Textarea
@@ -328,52 +328,45 @@ export default function BasicLeaderboardSetUpSkill({
                   </div>
                 </div>
               )) :
-              <div className="flex items-start p-3">
-                {/* Skill No. + +/- */}
-                <div className="flex gap-2 w-[250px] items-start flex-1">
-                  {(type === "negative" || ladderType === "negative") ? (
-                    <TargetTimerInput 
-                      value={rows[0].target} 
-                      onChange={(val) => updateRow(1, { target: val })} 
+              rows.map((row) => (
+                <div key={row.id} className="flex items-start p-3">
+                  {/* Activity No. */}
+                  <div className="flex flex-col w-20 pt-1">
+                    <div className="bg-white text-black font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
+                      {row.id}
+                    </div>
+                  </div>
+
+                  {/* Activity fields */}
+                  <div className="flex gap-2 w-[250px] items-start flex-1">
+                    <TargetTimerInput
+                      value={row.target}
+                      onChange={(val) => updateRow(row.id, { target: val })}
                     />
-                  ) : (
+
                     <Textarea
                       rows={1}
-                      placeholder="Target"
-                      value={rows[0].target !== "" ? rows[0].target : ""}  // ✅ raw string
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        // ✅ max 2 digits after decimal
-                        if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
-                          updateRow(1, { target: val });
-                        }
-                      }}
-                      className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
-                    />
-                  )}
-
-                  <Textarea
-                    rows={1}
-                    placeholder={`Skill 1 description`}
-                    value={String(rows[0].description || "")}
-                    onChange={(e) =>
-                      updateRow(1, { description: e.target.value })
-                    }
-                    className="bg-white text-black text-xs w-[300px] rounded-md border border-slate-400 p-2 resize-none leading-tight"
-                  />
-
-                  {(type !== "negative" && ladderType !== "negative") && (
-                    <Textarea
-                      rows={1}
-                      placeholder="Unit"
-                      value={rows[0].unit}
+                      placeholder={`Activity ${row.id} description`}
+                      value={String(row.description || "")}
                       onChange={(e) =>
-                        updateRow(1, { unit: e.target.value })
+                        updateRow(row.id, { description: e.target.value })
                       }
-                      className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
-                    />)}
+                      className="bg-white text-black text-xs w-[300px] rounded-md border border-slate-400 p-2 resize-none leading-tight"
+                    />
+
+                    {(type !== "negative" && ladderType !== "negative") && (
+                      <Textarea
+                        rows={1}
+                        placeholder="Unit"
+                        value={row.unit}
+                        onChange={(e) =>
+                          updateRow(row.id, { unit: e.target.value })
+                        }
+                        className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
+                      />)}
+                  </div>
                 </div>
-              </div>
+              ))
             }
           </div>
 
