@@ -75,6 +75,11 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
   const [dialogMessage, setDialogMessage] = useState("");
   const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.player || {});
 
+  const hasFiltersApplied =
+    Boolean(searchTerm) ||
+    appliedAge > 0 ||
+    Boolean(appliedGender);
+
   // ================== FETCH DATA ==================
   useEffect(() => {
     if (ladderId) {
@@ -89,7 +94,7 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
       dispatch(fetchLeaderboard(payload));
       dispatch(fetchGradebars(Number(ladderId)));
     }
-  }, [dispatch, ladderId, ladderType, appliedAge]);
+  }, [dispatch, ladderId, ladderType, appliedAge, appliedAgeType, appliedGender]);
 
   // ================== FILTER ==================
   const filteredPlayers = searchTerm
@@ -164,6 +169,8 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
           onClearFilters={() => {
             dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
           }}
+          activeFilters={hasFiltersApplied}
+          defaultAge={appliedAge}
         />
       </div>
 

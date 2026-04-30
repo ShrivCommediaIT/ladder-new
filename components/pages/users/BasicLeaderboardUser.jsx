@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
 import { fetchSkillLeaderboard, setAgeFilter } from "@/redux/slices/BasicLeaderboardSlice";
-import PlayerSearchInput from "../players/PlayerSearchInput";
+import PlayerSearch from "./PlayerSearch";
 import BasicLeaderboardShort from "../admin/BasicLeaderboardShort";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,6 @@ import { API_ENDPOINTS } from "@/constants/api";
 import BasicLeaderboardPrintSkillsSheet from "../admin/BasicLeaderboardPrintSkillsSheet";
 import BasicLeaderboardActivityEntryCard from "../players/BasicLeaderboardActivityEntryCard";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
-import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
@@ -281,6 +280,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showRemove, setShowRemove] = useState(false);
+  const [playerSearchResetSignal, setPlayerSearchResetSignal] = useState(0);
 
   const [currentUserId, setCurrentUserId] = useState(null);
   const [dialogMessage, setDialogMessage] = useState("");
@@ -347,7 +347,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
 
       if (age > 0) {
         payload.dob = age;
-        payload.age_type = ageType;
+        if (ageType) payload.age_type = ageType;
       }
 
       if (gender) {
@@ -363,10 +363,27 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = age ? Number(age) : "";
+    const isClearing = age === null || age === "";
+
+    if (isClearing) {
+      setIsSorted(false);
+      setSelectedSkillFilter(0);
+    } else {
+      setIsSorted(true);
+    }
+
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(selectedSkillFilter, ageNum, ageType, gender);
-    setIsSorted(true);
+    refreshLeaderboard(isClearing ? 0 : selectedSkillFilter, ageNum, ageType, gender);
   };
+
+  const handleClearFilters = useCallback(() => {
+    setSearchQuery("");
+  }, []);
+
+  const hasFiltersApplied =
+    Boolean(searchQuery) ||
+    appliedAge > 0 ||
+    Boolean(appliedGender);
 
   // MANUAL REFRESH HANDLERS (only when explicitly called)
   const handleSelfRemove = useCallback(() => {
@@ -399,8 +416,10 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const handleClearAll = useCallback(() => {
     setIsSorted(false);
     setSelectedSkillFilter(0);
-    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
-    refreshLeaderboard(0, 0, "under", "");
+    setSearchQuery("");
+    setPlayerSearchResetSignal((prev) => prev + 1);
+    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+    refreshLeaderboard(0, 0, "", "");
   }, [refreshLeaderboard]);
 
   const handleSkillClick = useCallback(
@@ -456,9 +475,14 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
           <div className="flex flex-col sm:flex-col sm:items-start gap-2">
             {/* Search Input */}
             <div className="flex-1 w-full min-w-0">
-              <PlayerSearchInput
-                value={searchQuery}
-                onChange={setSearchQuery}
+              <PlayerSearch
+                searchTerm={searchQuery}
+                setSearchTerm={setSearchQuery}
+                onAgeSearch={handleAgeSearch}
+                onClearFilters={handleClearFilters}
+                activeFilters={hasFiltersApplied}
+                defaultAge={appliedAge}
+                resetSignal={playerSearchResetSignal}
               />
             </div>
 
@@ -501,9 +525,6 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
                 ladderId={ladderId}
                 className="hidden"
               />
-              <div className="h-10 w-full">
-                <AgeFilter onSearch={handleAgeSearch} user={true} />
-              </div>
             </div>
           </div>
 

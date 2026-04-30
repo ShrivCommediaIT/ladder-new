@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +9,21 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { calculateAge } from "@/lib/utils";
 
-const AgeFilter = ({ onSearch, user }) => {
+const AgeFilter = ({ onSearch, user, resetSignal }) => {
   const [open, setOpen] = useState(false);
   const [dobInput, setDobInput] = useState("");
   const [calculatedAge, setCalculatedAge] = useState("");
   const [gender, setGender] = useState(""); // "" | "male" | "female"
   const [ageType, setAgeType] = useState(""); // "under" | "over"
+
+  useEffect(() => {
+    if (resetSignal !== undefined) {
+      setDobInput("");
+      setCalculatedAge("");
+      setGender("");
+      setAgeType("");
+    }
+  }, [resetSignal]);
 
 
   const handleDobChange = (e) => {
@@ -49,15 +58,20 @@ const AgeFilter = ({ onSearch, user }) => {
 
   const applyAgeFilter = () => {
       const ageValue = calculatedAge && calculatedAge !== "0" ? calculatedAge : "";
-      const ageTypeValue = ageValue ? ageType || "under" : "";
+      const ageTypeValue = ageValue ? ageType : "";
       const genderValue = gender || "";
 
       if (!ageValue && !genderValue) {
-        toast.error("Please select age or gender filter before searching.");
+        toast.error("Please select at least one filter before searching.");
         return;
       }
 
-      onSearch(ageValue, ageTypeValue, genderValue);
+      if (ageValue && !ageType) {
+        toast.error("Please select the age type before searching.");
+        return;
+      }
+
+      onSearch(ageValue || "", ageTypeValue, genderValue);
       setOpen(false);
       toast.success("Searching by Filter!");
   };
