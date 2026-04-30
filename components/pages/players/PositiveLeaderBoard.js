@@ -42,13 +42,13 @@ const PlayerCard = ({
       skillObj?.witness_by ||
       "";
     const score = scoreObj ? Number(scoreObj.score) : 0; // 🔒 internal logic
+    const bestScore = scoreObj ? Number(scoreObj.best_score) : 0; 
     const inputScore =
       scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
         ? Number(scoreObj.input_score)
         : null;
 
-    const displayScore =
-      inputScore !== null && !isNaN(inputScore) ? inputScore : score;
+    const displayScore = bestScore; // Always show best score
 
     const target =
       skillObj?.target !== null && skillObj?.target !== undefined
@@ -283,7 +283,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   );
 
   const handleAgeSearch = (age, ageType, gender) => {
-    const ageNum = Number(age);
+    const ageNum = age ? Number(age) : "";
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
     refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
   };
@@ -299,7 +299,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     if (ladderId) {
       refreshLeaderboard();
     }
-  }, [ladderId, refreshLeaderboard]);
+  }, [ladderId]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

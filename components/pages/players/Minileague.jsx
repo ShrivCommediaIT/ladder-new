@@ -228,11 +228,11 @@ const Minileague = () => {
             searchTerm={searchQuery} 
             setSearchTerm={setSearchQuery} 
             onAgeSearch={(age, ageType, gender) => {
-              const ageNum = Number(age);
+              const ageNum = age ? Number(age) : "";
               setAppliedAge(ageNum);
-              setAppliedAgeType(ageType || "under");
+              setAppliedAgeType(ageNum ? ageType || "under" : "");
               setAppliedGender(gender || "");
-              refreshLeaderboard(ageNum, ageType || "under", gender || "");
+              refreshLeaderboard(ageNum, ageNum ? ageType || "under" : "", gender || "");
             }}
           />
         </div>

@@ -158,7 +158,7 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
           searchTerm={searchTerm} 
           setSearchTerm={setSearchTerm} 
           onAgeSearch={(age, ageType, gender) => {
-            const ageNum = Number(age);
+            const ageNum = age ? Number(age) : "";
             dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
           }} 
           onClearFilters={() => {

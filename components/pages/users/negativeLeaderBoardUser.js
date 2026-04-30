@@ -213,7 +213,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   );
 
   const handleAgeSearch = (age, ageType, gender) => {
-    const ageNum = Number(age);
+    const ageNum = age ? Number(age) : "";
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
     refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
     setIsSorted(true);

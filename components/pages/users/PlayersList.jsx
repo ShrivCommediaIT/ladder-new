@@ -181,7 +181,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
           searchTerm={searchTerm} 
           setSearchTerm={setSearchTerm} 
           onAgeSearch={(age, ageType, gender) => {
-            const ageNum = Number(age);
+            const ageNum = age ? Number(age) : "";
             dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
           }} 
           onClearFilters={() => {

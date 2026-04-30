@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { getRequest, postRequest } from "@/services/apiService";
+import { getRequest, postRequest, postUrlEncoded } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -333,15 +333,15 @@ export default function BasicLeaderboardActivityEntryCard({
       return;
     }
 
-      setHasEditedToday(true);
-      setValue((prev) => {
-        const p = !hasEditedToday ? "0" : prev;
-        if (!p) return "0";
-        let newVal = p.slice(0, -1);
-        if (newVal === "" || newVal === "-") return "0";
-        return newVal;
-      });
-    };
+    setHasEditedToday(true);
+    setValue((prev) => {
+      const p = !hasEditedToday ? "0" : prev;
+      if (!p) return "0";
+      let newVal = p.slice(0, -1);
+      if (newVal === "" || newVal === "-") return "0";
+      return newVal;
+    });
+  };
 
   const handleClear = () => {
     // ✅ BEST SCORE INPUT FOCUSED
@@ -416,6 +416,26 @@ export default function BasicLeaderboardActivityEntryCard({
     return `${m}:${s}.${ms}`;
   };
 
+  const isEmptyBestResult = (bestScore) => {
+    if (bestScore === undefined || bestScore === null) return true;
+    if (bestScore === 0 || bestScore === "0" || bestScore === "") return true;
+    if (typeof bestScore === "string") {
+      const normalized = bestScore.trim();
+      return /^0+(?::0{2})+(?:\.0+)?$/.test(normalized);
+    }
+    return false;
+  };
+
+  const formatNegativeDisplay = (timeStr) => {
+    if (!timeStr) return "";
+    const normalized = String(timeStr).trim();
+    const match = normalized.match(/^(?:00:)?(\d{2}):(\d{2})\.(\d{2})\d?$/);
+    if (match) {
+      return `${match[1]}:${match[2]}.${match[3]}`;
+    }
+    return normalized.replace(/^00:/, "");
+  };
+
   const handleEnter = async () => {
     if (!skillActivityId || !playerId) return;
 
@@ -439,7 +459,7 @@ export default function BasicLeaderboardActivityEntryCard({
       ? `00:${minStr.padStart(2, "0")}:${secStr.padStart(2, "0")}.${msStr.padStart(2, "0")}0`
       : value;
 
-    const bestResultToSubmit = (topScore === 0 || topScore === "0") ? currentVal : topScore;
+    const bestResultToSubmit = isEmptyBestResult(topScore) ? currentVal : topScore;
 
     return await submitScore(value, bestResultToSubmit, { m: minStr, s: secStr, ms: msStr });
   }
@@ -483,27 +503,27 @@ export default function BasicLeaderboardActivityEntryCard({
 
       setSaving(true);
 
-      const payload = {
-        user_id: playerId,
-        skill_activity_id: skillActivityId,
-        score: finalScore,
-        witness_by: witnessBy.trim(),
-        admin_id: adminDetails.id,
-        ladder_id: ladderId,
-        user_name: playerName,
-      };
+      const witnessValue =
+        witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
+      const params = new URLSearchParams();
+      params.append("user_id", String(playerId));
+      params.append("skill_activity_id", String(skillActivityId));
+      params.append("score", String(finalScore));
+      params.append("witness_by", witnessValue);
+      params.append("admin_id", adminDetails.id);
+      params.append("ladder_id", ladderId);
+      params.append("user_name", playerName);
+
+
 
       if (bestScore !== undefined && bestScore !== null) {
-        // If no previous best score, fall back to the current score being submitted
-        payload.best_result = (bestScore === 0 || bestScore === "0") ? finalScore : bestScore;
+        params.append("best_result", String(bestScore));
       }
+      const skillsPost = await postUrlEncoded(`/${URl}`, params);
 
-
-      const res = await postRequest(`/${URl}`, payload);
-
-      if (res?.status === 200 || res?.status === "success") {
+      if (skillsPost?.status === 200 || skillsPost?.status === "success") {
         toast.success("Result posted successfully!");
-        if (res?.eligible_for_token == 1) {
+        if (skillsPost?.eligible_for_token == 1) {
           updateLadderToken({
             user_id: playerName,
             ladder_id: ladderId,
@@ -514,7 +534,7 @@ export default function BasicLeaderboardActivityEntryCard({
         setOpenSuccess(true);
         return true;
       } else {
-        toast.error(res.error_message);
+        toast.error(skillsPost.error_message);
         return false;
       }
     } catch (err) {
@@ -546,26 +566,33 @@ export default function BasicLeaderboardActivityEntryCard({
     setOpenZeroAlert(false);
 
     if (type === "ok") {
-      const bestResultToSubmit = (topScore === 0 || topScore === "0") ? 0 : topScore;
+      const bestResultToSubmit = isEmptyBestResult(topScore) ? 0 : topScore;
       submitScore(0, bestResultToSubmit);
     } else if (type === "reset") {
       setValue("-");
-      const bestResultToSubmit = (topScore === 0 || topScore === "0") ? "-" : topScore;
+      const bestResultToSubmit = isEmptyBestResult(topScore) ? "-" : topScore;
       submitScore("-", bestResultToSubmit);
     }
   };
 
   const getBestScore = async () => {
     if (ladderType === "negative" || type === "negative") {
-      // Always build best_result from bestMin/Sec/MsStr (pre-populated from API or user-edited)
+      // Build best_result from bestMin/Sec/MsStr (pre-populated from API or user-edited)
       const bestValForNegative = `00:${bestMinStr.padStart(2, "0")}:${bestSecStr.padStart(2, "0")}.${bestMsStr.padStart(2, "0")}0`;
-      await submitScore(value, bestValForNegative, { m: minStr, s: secStr, ms: msStr });
+      setTopScore(bestValForNegative);
+      setOpenSuccessResult(true);
       setEditingBest(false);
       return;
     }
 
-    if (value == 0 || value == "-" || ladderType === "positive" || type === "positive") {
+    if (value == 0 || value == "-") {
       await handleEnter();
+      return;
+    }
+
+    // For skill and positive types, use the edited topScore without fetching
+    if (ladderType === "skill" || ladderType === "positive" || type === "positive") {
+      setOpenSuccessResult(true);
       return;
     }
 
@@ -714,7 +741,7 @@ export default function BasicLeaderboardActivityEntryCard({
                     }}
                     title="Click to edit best result"
                   >
-                    {loadingTopScore ? "..." : 
+                    {loadingTopScore ? "..." :
                       selectedPlayer?.total_point || "0"
                     }
                   </div>
@@ -784,9 +811,9 @@ export default function BasicLeaderboardActivityEntryCard({
 
           {(type === "negative" || ladderType === "negative") && (
             <div className="flex items-center gap-2  w-full">
-              <div className="w-1/2 flex items-center justify-center gap-1 text-2xl text-black font-semibold bg-slate-200 rounded-md h-[40px] px-1 sm:px-3 shadow-inner min-w-[120px]">
+              <div className="w-1/2 flex items-center justify-center gap-1 text-sm md:text-2xl text-black font-semibold bg-slate-200 rounded-md h-[40px] px-1 sm:px-3 shadow-inner min-w-[120px]">
                 <input
-                  className={`w-10 text-center bg-transparent outline-none p-0 ${activeField === "min" ? "text-sky-600" : ""}`}
+                  className={`w-8 text-center bg-transparent outline-none p-0 ${activeField === "min" ? "text-sky-600" : ""}`}
                   value={minStr}
                   onChange={handleMinChange}
                   onFocus={() => handleFocus("min")}
@@ -796,7 +823,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 />
                 <span className="pb-1">:</span>
                 <input
-                  className={`w-10 text-center bg-transparent outline-none p-0 ${activeField === "sec" ? "text-sky-600" : ""}`}
+                  className={`w-8 text-center bg-transparent outline-none p-0 ${activeField === "sec" ? "text-sky-600" : ""}`}
                   value={secStr}
                   onChange={handleSecChange}
                   onFocus={() => handleFocus("sec")}
@@ -806,7 +833,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 />
                 <span className="pb-1">.</span>
                 <input
-                  className={`w-10 text-center bg-transparent outline-none p-0 ${activeField === "ms" ? "text-sky-600" : ""}`}
+                  className={`w-8 text-center bg-transparent outline-none p-0 ${activeField === "ms" ? "text-sky-600" : ""}`}
                   value={msStr}
                   onChange={handleMsChange}
                   onFocus={() => handleFocus("ms")}
@@ -917,7 +944,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
       {/* AUTO-CLOSE SUCCESS DIALOG */}
       <Dialog open={openSuccess} onOpenChange={handleSuccessClose}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-sm mx-auto">
           <DialogHeader>
             <DialogTitle className="text-emerald-500 text-xl">
               Score Saved
@@ -944,7 +971,7 @@ export default function BasicLeaderboardActivityEntryCard({
       </Dialog>
 
       <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
-        <DialogContent className="max-w-md p-0 overflow-hidden">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
 
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b">
@@ -961,16 +988,20 @@ export default function BasicLeaderboardActivityEntryCard({
               <div className="flex items-center gap-2">
                 <span>Today’s Result</span>
                 <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
-                  {value}
+                  {(type === "negative" || ladderType === "negative") ? formatTimeInfo() : value}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <span>Your Best Result</span>
                 <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
-                  {(topScore === 0 || topScore === "0")
-                    ? ((type === "negative" || ladderType === "negative") ? formatTimeInfo() : value)
-                    : topScore}
+                  {(() => {
+                    const current = (type === "negative" || ladderType === "negative") ? formatTimeInfo() : value;
+                    if (isEmptyBestResult(topScore)) return current;
+                    return (type === "negative" || ladderType === "negative")
+                      ? formatNegativeDisplay(topScore)
+                      : topScore;
+                  })()}
                 </span>
               </div>
             </div>
@@ -999,7 +1030,7 @@ export default function BasicLeaderboardActivityEntryCard({
       {/* ZERO SCORE ALERT */}
 
       <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden max-h-[90vh] overflow-y-auto">
 
           {/* HEADER BAR (like system popup) */}
           <div className="flex items-center justify-between bg-white px-3 py-2 border-b">

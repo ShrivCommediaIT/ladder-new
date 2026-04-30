@@ -164,6 +164,8 @@ export default function SubAdminDashboard() {
     }
   }, []);
 
+
+
   const checkCsvDuplicates = (file) => {
     return new Promise((resolve, reject) => {
       Papa.parse(file, {
@@ -410,7 +412,7 @@ export default function SubAdminDashboard() {
 
               <div className="space-y-3">
                 <h1 className="text-2xl font-black tracking-tight text-white sm:text-5xl">
-                  Welcome back Sub Admin Dashboard, {subAdminFirstName}
+                  Welcome back, {subAdminFirstName}
                 </h1>
                 <p className="max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
                   Manage competitions for your section and keep your club's internal ladder system organized from your sub-admin workspace.
@@ -418,9 +420,10 @@ export default function SubAdminDashboard() {
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <div className="inline-flex items-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200">
-                  <Layers className="h-4 w-4" />
-                  Section: {subAdmin?.sport_name || "N/A"}
+                <div className="inline-flex items-center gap-2.5 rounded-2xl border border-cyan-400/30 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 px-4 py-3 text-sm shadow-[0_0_15px_rgba(41,171,226,0.15)] transition-all hover:scale-[1.02]">
+                  <Layers className="h-4 w-4 text-cyan-300" />
+                  <span className="font-medium text-cyan-100/70">Section:</span>
+                  <span className="font-bold capitalize text-cyan-300">{subAdmin?.sport_name || "N/A"}</span>
                 </div>
               </div>
             </div>
@@ -511,7 +514,7 @@ export default function SubAdminDashboard() {
                   Competition types you can create
                 </h2>
               </div>
-              <LadderInfo ladders={allLadders} />
+              <LadderInfo ladders={demoLadders} />
             </motion.section>
 
             <motion.section
