@@ -289,7 +289,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#07111f] text-white">
+    <div className="relative min-h-screen bg-[#07111f] text-white">
       {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
       <PlayerLevelNavbar activeTab="dashboard" />
 
@@ -403,7 +403,7 @@ export default function AdminPage() {
           </div>
         </motion.section>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr] items-start">
           <div className="space-y-6">
             <motion.section
               initial={{ opacity: 0, y: 20 }}
@@ -487,7 +487,7 @@ export default function AdminPage() {
             </motion.section>
           </div>
 
-          <div className="space-y-6 sticky top-[80px] self-start z-40">
+          <div className="space-y-6 sticky top-24 z-40">
             <motion.section
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
