@@ -19,56 +19,6 @@ import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import LadderLinkPanel from "../players/LadderLinkPanel";
 
-/* ---------------- HELPER FUNCTIONS ---------------- */
-
-const getScoreBySkillNumber = (scores, skills, skillNumber) => {
-  const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
-  const skillObj = skills?.find((s) => s.skill_number === skillNumber);
-
-  const score = scoreObj ? Number(scoreObj.score) : 0;
-  const bestScore = scoreObj ? Number(scoreObj.best_score) : 0;
-
-  const inputScore =
-    scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
-      ? Number(scoreObj.input_score)
-      : null;
-
-  // display priority = input_score first
-  const displayScore = bestScore
-
-  const target =
-    skillObj?.target !== null && skillObj?.target !== undefined
-      ? Number(skillObj.target)
-      : null;
-
-  const mode = skillObj?.skill_sign || "+";
-
-  let isTargetAchieved = false;
-
-  if (
-    target !== null &&
-    target !== 0 &&
-    score !== 0 &&
-    !isNaN(target) &&
-    !isNaN(score)
-  ) {
-    if (mode === "+") {
-      isTargetAchieved = score >= target;
-    } else {
-      // SAME as working component
-      isTargetAchieved = score >= Math.abs(target);
-    }
-  }
-
-  return {
-    score,
-    displayScore,
-    target,
-    isTargetAchieved,
-    witnessBy: scoreObj?.witness_by || null,
-  };
-};
-
 
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({
@@ -79,6 +29,7 @@ const PlayerCard = ({
   onSkillClick,
   onTargetAchieved,
   currentUser,
+  isInverted,
 }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
@@ -115,12 +66,7 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      if (mode === "+") {
-        isTargetAchieved = score >= target;
-      } else {
-        // minus mode → target negative stored hota hai
-        isTargetAchieved = score >= Math.abs(target);
-      }
+     isTargetAchieved = isInverted ? score > target : score < target;
     }
 
     return {
@@ -282,9 +228,10 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
+  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
+  const isInverted = ladderDetails?.inverted;
   const currentUser = useSelector((state) => state.user?.user);
 
   // CELEBRATION STATE ONLY
@@ -467,6 +414,7 @@ const filteredPlayers = useMemo(() => {
                   overallRank={player.rank || index + 1}
                   appliedAge={appliedAge}
                   ageRank={index + 1}
+                  isInverted={isInverted}
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}
                   currentUser={currentUser}

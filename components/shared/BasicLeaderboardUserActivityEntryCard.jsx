@@ -16,6 +16,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { updateLadderToken } from "@/helper/helperApi";
+import { convertTimeToSeconds } from "@/helper/helperFunction";
 
 
 
@@ -33,6 +34,7 @@ export default function BasicLeaderboardActivityEntryCard({
   const [selectedActivity, setSelectedActivity] = useState(
     initialActivity || 1,
   );
+
   const [value, setValue] = useState("0");
   const [witnessBy, setWitnessBy] = useState("");
   const [skillSign, setSkillSign] = useState("+");
@@ -436,6 +438,7 @@ export default function BasicLeaderboardActivityEntryCard({
     return normalized.replace(/^00:/, "");
   };
 
+
   const handleEnter = async () => {
     if (!skillActivityId || !playerId) return;
 
@@ -742,8 +745,9 @@ export default function BasicLeaderboardActivityEntryCard({
                     title="Click to edit best result"
                   >
                     {loadingTopScore ? "..." :
-                      selectedPlayer?.total_point || "0"
+                      convertTimeToSeconds(selectedPlayer?.scores?.[initialActivity - 1]?.negative_ladder_bestscore) || "0"
                     }
+                    {console.log("result", convertTimeToSeconds(selectedPlayer?.scores?.[initialActivity - 1]?.negative_ladder_bestscore) || "0")}
                   </div>
                 )
               ) : (

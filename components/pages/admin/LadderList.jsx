@@ -91,9 +91,17 @@ const LadderList = ({ userId }) => {
   };
 
 
-const filteredLadders = allLadders?.filter(
-  (ladder) => ((ladder.created_by !==  "demo" && ladder.type !== "roster"))
-);
+let filteredLadders = [];
+
+if (subAdmin?.user_type === "sub_admin") {
+  filteredLadders = allLadders?.filter(
+    (ladder) => ladder.created_by !== "demo"  && ladder.type !== "roster"
+  );
+} else if (admin?.user_type === "admin") {    
+  filteredLadders = allLadders?.filter(
+    (ladder) => ladder.created_by !== "demo"
+  );
+} 
 
 const initialLadders = filteredLadders?.slice(0, 5);
 const visibleLadders = seeAll ? filteredLadders : initialLadders;

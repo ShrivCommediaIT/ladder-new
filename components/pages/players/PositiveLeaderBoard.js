@@ -27,6 +27,7 @@ const PlayerCard = ({
   overallRank,
   appliedAge,
   ageRank,
+  isInverted,
   onSkillClick,
   onTargetAchieved,
   currentUser,
@@ -66,12 +67,7 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      if (mode === "+") {
-        isTargetAchieved = score >= target;
-      } else {
-        // minus mode → target negative stored hota hai
-        isTargetAchieved = score >= Math.abs(target);
-      }
+      isTargetAchieved = isInverted ? score > target : score < target;
     }
 
     return {
@@ -233,9 +229,11 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
+  const { data = [], loading,ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
+  const isInverted = ladderDetails?.inverted
+
   const currentUser = useSelector((state) => state.user?.user);
 
   // CELEBRATION STATE ONLY
@@ -381,6 +379,7 @@ const filteredPlayers = React.useMemo(() => {
                   overallRank={player.rank || index + 1}
                   appliedAge={appliedAge}
                   ageRank={index + 1}
+                  isInverted={isInverted}
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}
                   currentUser={currentUser}
