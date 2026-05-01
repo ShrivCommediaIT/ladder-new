@@ -29,7 +29,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
   const skillObj = skills?.find((s) => s.skill_number === skillNumber);
 
   const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
-  const score = scoreObj ? Number(scoreObj.score) : 0;
+  const score = scoreObj ? Number(scoreObj.best_score) : 0;
   const bestScore = scoreObj ? Number(scoreObj.best_score) : 0; 
   const inputScore =
     scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
@@ -287,7 +287,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   // REFRESH KEY TO CONTROL RELOADS (STOPS INFINITE LOOP)
   const refreshKey = useRef(0);
 
-  const isInverted = ladderDetails?.inverted
+  const isInverted = ladderDetails?.inverted == 0;
 
   useEffect(() => {
     if (!ladderId) return;

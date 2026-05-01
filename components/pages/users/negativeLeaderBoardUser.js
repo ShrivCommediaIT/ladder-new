@@ -44,7 +44,7 @@ const PlayerCard = ({
       skillObj?.witness_by ||
       "";
 
-    const rawNegativeScore = scoreObj?.negative_ladder_score;
+    const rawNegativeScore = scoreObj?.negative_ladder_bestscore;
     const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
 
     const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
@@ -174,7 +174,7 @@ useEffect(() => {
                   <div
                     key={i}
                     onClick={() => onSkillClick(player.id, skill.skill_number)}
-                    className={`${skillCellClass} cursor-pointer text-black bg-white relative`}
+                    className={`${skillCellClass} cursor-pointer text-black bg-white hover:bg-emerald-500 relative`}
                     title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
                   >
                     {/* minus sign box ke upar */}
@@ -238,7 +238,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
     (state) => state.negativeLeaderBoard || {},
   );
   const loggedInUser = useSelector((state) => state.user?.user);
-  const isInverted = ladderDetails?.inverted
+  const isInverted = ladderDetails?.inverted == 0;
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedUser = sessionStorage.getItem("user") || sessionStorage.getItem("userData");

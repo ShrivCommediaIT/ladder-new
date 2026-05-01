@@ -41,7 +41,7 @@ const PlayerCard = ({
       scoreObj?.witness_by ||
       skillObj?.witness_by ||
       "";
-    const score = scoreObj ? Number(scoreObj.score) : 0; // 🔒 internal logic
+    const score = scoreObj ? Number(scoreObj.best_score) : 0; // 🔒 internal logic
     const bestScore = scoreObj ? Number(scoreObj.best_score) : 0;
     const inputScore =
       scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
@@ -231,7 +231,7 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
   const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
-  const isInverted = ladderDetails?.inverted;
+  const isInverted = ladderDetails?.inverted == 0;;
   const currentUser = useSelector((state) => state.user?.user);
 
   // CELEBRATION STATE ONLY
