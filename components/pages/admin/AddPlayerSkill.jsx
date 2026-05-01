@@ -11,12 +11,6 @@ import {
 import { CheckCircle, AlertCircle, Phone, User } from "lucide-react";
 import { postWithParams } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -27,6 +21,7 @@ import {
 import { format } from "date-fns";
 import { calculateAge } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
+import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
 
 const SuccessDialog = ({ playerName, ladderId, onCloseAll }) => (
   <Dialog open={true} onOpenChange={() => { }}>
@@ -212,28 +207,12 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
           <CalendarIcon className="w-4 h-4" />
           Date of Birth
         </label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full p-4 bg-white/10 border border-white/30 rounded-xl text-white flex justify-start items-center gap-2 hover:bg-white/20 h-14"
-            >
-              <CalendarIcon className="w-4 h-4 text-gray-400" />
-              {formData.dob ? format(formData.dob, "dd/MM/yyyy") : <span className="text-gray-400">Select Date of Birth</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-slate-800 border-gray-700">
-            <Calendar
-              mode="single"
-              selected={formData.dob}
-              onSelect={(date) => setFormData({ ...formData, dob: date })}
-              captionLayout="dropdown"
-              fromYear={1920}
-              toYear={new Date().getFullYear()}
-              className="bg-slate-900 text-white border-gray-700"
-            />
-          </PopoverContent>
-        </Popover>
+        <DateOfBirthInput
+          id="dob"
+          value={formData.dob}
+          onChange={(date) => setFormData({ ...formData, dob: date })}
+          className="w-full bg-white/10 border border-white/30 rounded-xl text-white h-14"
+        />
       </div>
 
       {/* Action Buttons */}

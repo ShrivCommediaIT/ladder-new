@@ -23,17 +23,12 @@ import {
   editUserDetails,
   resetEditPlayerState,
 } from "@/redux/slices/editdetailSlice";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
 
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice"; // ✅ ADDED FOR MINILEAGUE
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { format } from "date-fns";
-import { calculateAge } from "@/lib/utils";
+import { calculateAge, parseDobToDate } from "@/lib/utils";
 
 const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, onClose = () => {}, isReadOnly = false }) => {
   const dispatch = useDispatch();
@@ -65,7 +60,6 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
     gender: "male",
   });
 
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [showSkeleton, setShowSkeleton] = useState(false);
   const cardRef = useRef(null);
 
@@ -101,32 +95,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
   // Prefill form
   useEffect(() => {
     if (selectedPlayer) {
-      let initialDob = null;
-      if (selectedPlayer.dob) {
-        if (selectedPlayer.dob instanceof Date) {
-          initialDob = selectedPlayer.dob;
-        } else if (typeof selectedPlayer.dob === "string") {
-          if (selectedPlayer.dob.includes("-")) {
-            // Handle YYYY-MM-DD (e.g., 2010-04-07)
-            const parts = selectedPlayer.dob.split("-");
-            if (parts.length === 3) {
-              initialDob = new Date(parts[0], parts[1] - 1, parts[2]);
-            }
-          } else if (selectedPlayer.dob.includes("/")) {
-            // Handle DD/MM/YYYY
-            const parts = selectedPlayer.dob.split("/");
-            if (parts.length === 3) {
-              initialDob = new Date(parts[2], parts[1] - 1, parts[0]);
-            }
-          }
-
-          if (!initialDob) {
-            initialDob = new Date(selectedPlayer.dob);
-          }
-        }
-      }
-
-      const parsedDob = initialDob && !isNaN(initialDob.getTime()) ? initialDob : null;
+      const parsedDob = parseDobToDate(selectedPlayer.dob);
 
       setForm({
         id: selectedPlayer.id || "",
@@ -139,10 +108,6 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
         phone: selectedPlayer.phone || "",
         gender: selectedPlayer.gender || "male",
       });
-
-      if (parsedDob) {
-        setCalendarMonth(parsedDob);
-      }
     }
     
   }, [selectedPlayer]);
@@ -279,38 +244,17 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                 Date of Birth
               </Label>
 
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Input
-                    id="dob"
-                    readOnly
-                    value={form.dob ? format(form.dob, "dd/MM/yyyy") : ""}
-                    placeholder="Enter Date of Birth"
-                    className="text-white text-start px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12 cursor-pointer"
-                  />
-                </PopoverTrigger>
-
-                <PopoverContent className="w-auto p-0 bg-slate-300 border-gray-700">
-                  <Calendar
-                    mode="single"
-                    selected={form.dob}
-                    month={calendarMonth}
-                    onMonthChange={setCalendarMonth}
-                    onSelect={(date) => {
-                      setForm((prev) => ({
-                        ...prev,
-                        dob: date,
-                      }));
-                      if (date) {
-                        setCalendarMonth(date);
-                      }
-                    }}
-                    captionLayout="dropdown"
-                    fromYear={1920}
-                    toYear={new Date().getFullYear()}
-                  />
-                </PopoverContent>
-              </Popover>
+              <DateOfBirthInput
+                id="dob"
+                value={form.dob}
+                onChange={(date) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    dob: date,
+                  }))
+                }
+                className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+              />
             </div>
 
               <motion.div whileHover={{ scale: 1.02 }}>
