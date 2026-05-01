@@ -36,7 +36,7 @@ const PlayerCard = ({
       scoreObj?.witness_by ||
       skillObj?.witness_by ||
       "";
-    const score = scoreObj ? Number(scoreObj.score) : 0; // 🔒 internal logic
+    const score = scoreObj ? Number(scoreObj.best_score) : 0; // 🔒 internal logic
     const bestScore = scoreObj ? Number(scoreObj.best_score) : 0; 
     const inputScore =
       scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
@@ -248,7 +248,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
   const { appliedAge,ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const isInverted = ladderDetails?.inverted;
+  const isInverted = ladderDetails?.inverted == 0;
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
     setTimeout(
