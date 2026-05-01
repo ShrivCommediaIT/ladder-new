@@ -9,12 +9,8 @@ import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
 import { BasicLeaderboardEdit } from "./BasicLeaderboardEdit";
 import LadderLinkPanel from "./LadderLinkPanel";
-import { fetchSkillLeaderboard, setAppliedAge, setAgeFilter } from "@/redux/slices/BasicLeaderboardSlice";
-import { Button } from "@/components/ui/button";
-import { X, Trophy, ListOrdered } from "lucide-react";
-import { getRequest } from "@/services/apiService";
+import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import PlayerSearchInput from "./PlayerSearchInput";
-import AgeFilter from "../../shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 
@@ -28,6 +24,7 @@ const PlayerCard = ({
   onSkillClick,
   onTargetAchieved,
   currentUser,
+  isInverted,
 }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
@@ -63,12 +60,7 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      if (mode === "+") {
-        isTargetAchieved = score >= target;
-      } else {
-        // minus mode → target negative stored hota hai
-        isTargetAchieved = score >= Math.abs(target);
-      }
+      isTargetAchieved = isInverted ? score > target : score < target;
     }
 
     return {
@@ -254,9 +246,9 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge,ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
-
+  const isInverted = ladderDetails?.inverted;
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
     setTimeout(
@@ -383,6 +375,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}
                   currentUser={currentUser}
+                  isInverted={isInverted}
                 />
               ))
             )}

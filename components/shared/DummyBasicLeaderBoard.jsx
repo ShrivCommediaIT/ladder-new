@@ -37,13 +37,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     !isNaN(target) &&
     !isNaN(score)
   ) {
-    if (mode === "+") {
-      // PLUS
-      isTargetAchieved = score >= target;
-    } else {
-      // MINUS (example target -10, pass range: -10 to -1)
-      isTargetAchieved = score >= target && score < 0;
-    }
+   isTargetAchieved = isInverted ? score > target : score < target;
   }
 
   return {
@@ -60,7 +54,7 @@ const getRankBySkillNumber = (ranks, skillNumber) => {
 
 /* ---------------- PLAYER CARD ---------------- */
 
-const PlayerCard = ({ player, overallRank, onSkillClick, isEditable }) => {
+const PlayerCard = ({ player, overallRank, onSkillClick, isEditable,isInverted }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
@@ -184,10 +178,10 @@ const DummyBasicLeaderboard = ({ ladderId: propLadderId }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading } = useSelector(
+  const { data = [],ladderDetails, loading } = useSelector(
     (state) => state.skillLeaderboard || {}
   );
-
+const isInverted = ladderDetails?.inverted;
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [selectedSkillNumber, setSelectedSkillNumber] = useState(null);
@@ -268,6 +262,7 @@ const DummyBasicLeaderboard = ({ ladderId: propLadderId }) => {
                   overallRank={player.rank || index + 1}
                   onSkillClick={handleSkillClick}
                   isEditable={isEditablePlayer}
+                  isInverted={isInverted}
                 />
               );
             })}
