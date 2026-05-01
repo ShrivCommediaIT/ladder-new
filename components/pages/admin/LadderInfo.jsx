@@ -52,7 +52,7 @@ export default function LadderInfo({ ladders }) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-full rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-4 sm:p-5"
+      className="w-full rounded-2xl border border-border bg-card shadow-sm p-4 sm:p-5"
     >
       {/* Yaha scroll add kar rahe hain */}
       <div
@@ -74,13 +74,12 @@ export default function LadderInfo({ ladders }) {
               transition={{ delay: index * 0.1 }}
               className="
                 group flex items-center justify-between 
-                rounded-xl border border-white/10 bg-black/30 
-                px-3 py-3 hover:bg-white/10 hover:shadow-lg 
-                hover:shadow-cyan-500/10 transition
+                rounded-xl border border-border bg-muted/20 
+                px-3 py-3 hover:bg-muted transition shadow-sm
               "
               onClick={() => handleEditClick(ladder.id, ladder.type)}
             >
-              <div className="flex items-center gap-2 text-white/90">
+              <div className="flex items-center gap-2 text-foreground">
                 <span className="text-sm sm:text-base font-medium">
                   {ladder.name}
                 </span>
@@ -108,7 +107,7 @@ export default function LadderInfo({ ladders }) {
                     <TooltipContent
                       side="right"
                       sideOffset={10}
-                      className="max-w-md border border-white/10 bg-[#0b1020]/95 text-white backdrop-blur-xl shadow-xl animate-in fade-in zoom-in"
+                      className="max-w-md border border-border bg-card/95 text-foreground backdrop-blur-xl shadow-xl animate-in fade-in zoom-in"
                     >
                       <p className="text-sm leading-relaxed">{ladder.info}</p>
                     </TooltipContent>

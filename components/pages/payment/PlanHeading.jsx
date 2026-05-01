@@ -241,7 +241,7 @@ export default function PlanHeading() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.05 }}
-              className="mt-6 mb-8 text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 md:text-7xl"
+              className="mt-6 mb-8 text-5xl font-extrabold leading-[1.1] tracking-tight text-foreground md:text-7xl"
             >
               Run Your Club
               <br />
@@ -254,7 +254,7 @@ export default function PlanHeading() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="mx-auto mb-10 max-w-3xl text-xl leading-relaxed text-slate-600 md:text-2xl"
+              className="mx-auto mb-10 max-w-3xl text-xl leading-relaxed text-muted-foreground md:text-2xl"
             >
               Automated ladders, mini-leagues, leaderboards and challenge
               boards, all in one platform built for indoor sports clubs.
@@ -327,7 +327,7 @@ export default function PlanHeading() {
       <section id="features" className="bg-white py-24">
         <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
+            <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
               WHY CLUBS CHOOSE US
             </h2>
             <p className="text-xl text-slate-600">Everything Your Club Needs</p>
@@ -367,7 +367,7 @@ export default function PlanHeading() {
         <div className="absolute inset-0 opacity-[0.03] [background-image:url('https://www.transparenttextures.com/patterns/cubes.png')]" />
         <div className="relative z-10 mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
+            <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
               Simple Pricing, No Surprises
             </h2>
             <p className="mb-2 text-xl text-slate-600">
@@ -390,7 +390,7 @@ export default function PlanHeading() {
               >
                 {plan.featured && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <span className="rounded-full bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] px-3 py-1 text-xs font-bold tracking-[0.14em] text-white uppercase">
+                    <span className="rounded-full bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] px-3 py-1 text-xs font-bold tracking-[0.14em] text-foreground uppercase">
                       Most Popular
                     </span>
                   </div>
@@ -522,17 +522,17 @@ export default function PlanHeading() {
               <h3 className="mb-4 font-semibold text-white">Product</h3>
               <ul className="space-y-2">
                 <li>
-                  <a href="#features" className="transition-colors hover:text-white">
+                  <a href="#features" className="transition-colors hover:text-foreground">
                     Features
                   </a>
                 </li>
                 <li>
-                  <a href="#pricing" className="transition-colors hover:text-white">
+                  <a href="#pricing" className="transition-colors hover:text-foreground">
                     Pricing
                   </a>
                 </li>
                 <li>
-                  <a href="#clubs" className="transition-colors hover:text-white">
+                  <a href="#clubs" className="transition-colors hover:text-foreground">
                     Clubs
                   </a>
                 </li>
@@ -543,19 +543,19 @@ export default function PlanHeading() {
               <h3 className="mb-4 font-semibold text-white">Company</h3>
               <ul className="space-y-2">
                 <li>
-                  <a href="#" className="transition-colors hover:text-white">
+                  <a href="#" className="transition-colors hover:text-foreground">
                     Privacy Policy
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="transition-colors hover:text-white">
+                  <a href="#" className="transition-colors hover:text-foreground">
                     Terms of Service
                   </a>
                 </li>
                 <li>
                   <a
                     href="mailto:support@sportssolutionspro.com"
-                    className="transition-colors hover:text-white"
+                    className="transition-colors hover:text-foreground"
                   >
                     Support
                   </a>
@@ -563,7 +563,7 @@ export default function PlanHeading() {
                 <li>
                   <a
                     href="mailto:support@sportssolutionspro.com"
-                    className="transition-colors hover:text-white"
+                    className="transition-colors hover:text-foreground"
                   >
                     Contact
                   </a>

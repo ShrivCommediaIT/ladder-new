@@ -3,7 +3,7 @@ import React from 'react'
 
 const ClubIdPageRouter = () => {
   return (
-    <div>
+    <div className="min-h-screen w-full">
         <LoginByClubId />
     </div>
   )

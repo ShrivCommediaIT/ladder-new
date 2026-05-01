@@ -16,7 +16,10 @@ import {
   Users,
   BarChart3,
   BookOpen,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { clubIdPage, subAdminPage, adminPage, createClubId } from "@/helper/RouteName";
 import { resetUserState } from "@/redux/slices/userSlice";
 import ChangePassword from "@/components/pages/admin/ChangePassword";
@@ -51,6 +54,12 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
 
   const profileRef = useRef(null);
   const mobileMenuRef = useRef(null);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // ── Load user from sessionStorage ──────────────────────────────────────────
   useEffect(() => {
@@ -117,12 +126,10 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
     <>
       {/* ── Navbar ─────────────────────────────────────────────────────────── */}
       <nav
-        className="fixed top-0 left-0 right-0 z-50 w-full"
+        className="fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-[20px]"
         style={{
-          background: "linear-gradient(180deg, #0d1117 0%, #0a0f1a 100%)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
+          background: "var(--navbar-bg)",
+          borderBottom: "1px solid var(--navbar-border)",
         }}
       >
         <div className="mx-auto w-full px-2.5 sm:px-8 lg:px-12 xl:px-16">
@@ -140,7 +147,7 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
               >
                 <span className="text-xs font-black text-white">S</span>
               </div>
-              <span className="hidden text-sm font-bold text-white sm:block">
+              <span className="hidden text-sm font-bold text-nav-text sm:block">
                 Sports <span style={{ color: "#29abe2" }}>Pro</span>
               </span>
             </button>
@@ -155,15 +162,16 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
                     onClick={() => handleTabClick(key)}
                     className="relative flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200"
                     style={{
-                      color: isActive ? "#fff" : "rgba(255,255,255,0.55)",
+                      color: isActive ? "var(--primary)" : "var(--foreground)",
+                      opacity: isActive ? 1 : 0.6,
                       background: isActive ? "rgba(41,171,226,0.14)" : "transparent",
                       border: isActive ? "1px solid rgba(41,171,226,0.25)" : "1px solid transparent",
                     }}
                     onMouseEnter={(e) => {
-                      if (!isActive) e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+                      if (!isActive) e.currentTarget.style.color = theme === "dark" ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.85)";
                     }}
                     onMouseLeave={(e) => {
-                      if (!isActive) e.currentTarget.style.color = "rgba(255,255,255,0.55)";
+                      if (!isActive) e.currentTarget.style.color = theme === "dark" ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.55)";
                     }}
                   >
                     {label}
@@ -196,6 +204,15 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
                 Quick Guide
               </button>
 
+              {/* Theme Toggle */}
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+                aria-label="Toggle theme"
+              >
+                {mounted && (theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />)}
+              </button>
+
               {/* User Avatar / Dropdown */}
               <div className="relative" ref={profileRef}>
                 <button
@@ -215,8 +232,8 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
                   <div
                     className="absolute right-0 top-10 w-52 rounded-xl py-2 z-50 shadow-2xl"
                     style={{
-                      background: "#0d1117",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: "var(--navbar-bg)",
+                      border: "1px solid var(--navbar-border)",
                     }}
                   >
                     {/* User info header */}
@@ -228,7 +245,7 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
                     {/* Dashboard */}
                     <button
                       onClick={handleDashboard}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                      className={`flex w-full items-center gap-2 px-4 py-2 text-sm hover:transition-colors ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                     >
                       <Shield className="h-4 w-4 text-blue-400" />
                       {user?.user_type === "sub_admin" ? "Sub-Admin Dashboard" : "Admin Dashboard"}
@@ -238,7 +255,7 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
                     {user?.user_type === "admin" && (
                       <button
                         onClick={() => { router.push(createClubId); setProfileOpen(false); }}
-                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                        className={`flex w-full items-center gap-2 px-4 py-2 text-sm hover:transition-colors ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                       >
                         <UserCircle2 className="h-4 w-4 text-blue-400" />
                         Generate Club ID
@@ -249,7 +266,7 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
                     {user?.user_type === "admin" && (
                       <button
                         onClick={() => { setIsChangePasswordOpen(true); setProfileOpen(false); }}
-                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                        className={`flex w-full items-center gap-2 px-4 py-2 text-sm hover:transition-colors ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                       >
                         <Key className="h-4 w-4 text-emerald-400" />
                         Change Password
@@ -259,7 +276,7 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
                     {/* Q & A */}
                     <button
                       onClick={() => { window.open("/q-a", "_blank"); setProfileOpen(false); }}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                      className={`flex w-full items-center gap-2 px-4 py-2 text-sm hover:transition-colors ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                     >
                       <HelpCircle className="h-4 w-4 text-slate-400" />
                       Q &amp; A
@@ -295,8 +312,8 @@ const PlayerLevelNavbar = ({ activeTab = "players", ladderName, demoLadderName }
         {mobileOpen && (
           <div
             ref={mobileMenuRef}
-            className="md:hidden border-t border-white/10 px-4 pb-4 pt-2"
-            style={{ background: "#0d1117" }}
+            className="md:hidden border-t border-nav-border px-4 pb-4 pt-2"
+            style={{ background: "var(--navbar-bg)" }}
           >
             {NAV_LINKS.map(({ label, icon: Icon, key }) => {
               const isActive = currentTab === key;

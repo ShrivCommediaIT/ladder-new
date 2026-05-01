@@ -114,6 +114,19 @@ body {
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Semantic Theme Classes */
+  --color-nav-bg: var(--navbar-bg);
+  --color-nav-border: var(--navbar-border);
+  --color-nav-text: var(--navbar-text);
+  
+  --color-auth-card-bg: var(--auth-card-bg);
+  --color-auth-card-border: var(--auth-card-border);
+  --color-auth-card-shadow: var(--auth-card-shadow);
+  
+  --color-input-theme-bg: var(--input-bg);
+  --color-input-theme-border: var(--input-border);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -132,10 +145,62 @@ body {
   
   --landing-primary: var(--primary);
   --landing-secondary: var(--secondary);
-  --landing-bg: var(--dark-theme);
-  --landing-text: #FFFFFF;
-  --landing-muted: #94a3b8;
+  --landing-bg: #FFFFFF;
+  --landing-text: #07111f;
+  --landing-muted: #64748b;
   
+  --background: #FFFFFF;
+  --foreground: #07111f;
+  
+  --card: #FFFFFF;
+  --card-foreground: #07111f;
+  
+  --popover: #FFFFFF;
+  --popover-foreground: #07111f;
+  
+  --primary-foreground: #FFFFFF;
+  --secondary-foreground: #FFFFFF;
+  
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  
+  --accent: #f1f5f9;
+  --accent-foreground: var(--primary);
+  
+  --destructive: #ef4444;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: var(--primary);
+  
+  --chart-1: #29abe2;
+  --chart-2: #1a3a8f;
+  --chart-3: #7dd3fc;
+  --chart-4: #38bdf8;
+  --chart-5: #0ea5e9;
+  
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #07111f;
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(0, 0, 0, 0.05);
+  --sidebar-accent-foreground: var(--primary);
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: var(--primary);
+
+  /* Semantic Component Variables (Portal Default - Light) */
+  --navbar-bg: rgba(255, 255, 255, 0.95);
+  --navbar-border: rgba(0, 0, 0, 0.05);
+  --navbar-text: #07111f;
+  
+  --auth-card-bg: #FFFFFF;
+  --auth-card-border: rgba(0, 0, 0, 0.05);
+  --auth-card-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+  
+  --input-bg: #f8fafc;
+  --input-border: #e2e8f0;
+}
+
+.dark {
   --background: var(--dark-theme);
   --foreground: #FFFFFF;
   
@@ -145,68 +210,30 @@ body {
   --popover: #0f172a;
   --popover-foreground: #FFFFFF;
   
-  --primary-foreground: #FFFFFF;
-  --secondary-foreground: #FFFFFF;
-  
   --muted: rgba(255, 255, 255, 0.1);
   --muted-foreground: #94a3b8;
   
   --accent: rgba(41, 171, 226, 0.15);
   --accent-foreground: var(--primary);
   
-  --destructive: #ef4444;
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.1);
-  --ring: var(--primary);
-  
-  --chart-1: #29abe2;
-  --chart-2: #1a3a8f;
-  --chart-3: #7dd3fc;
-  --chart-4: #38bdf8;
-  --chart-5: #0ea5e9;
   
   --sidebar: #080c14;
   --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: rgba(255, 255, 255, 0.05);
-  --sidebar-accent-foreground: var(--primary);
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: var(--primary);
-}
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Semantic Component Variables - Dark */
+  --navbar-bg: linear-gradient(180deg, #0d1117 0%, #0a0f1a 100%);
+  --navbar-border: rgba(255, 255, 255, 0.07);
+  --navbar-text: #FFFFFF;
+  
+  --auth-card-bg: rgba(10, 24, 54, 0.94);
+  --auth-card-border: rgba(255, 255, 255, 0.1);
+  --auth-card-shadow: 0 30px 80px rgba(0, 0, 0, 0.34);
+  
+  --input-bg: #1a254f;
+  --input-border: rgba(120, 147, 214, 0.28);
 }
 
 @layer base {
@@ -248,27 +275,6 @@ body {
 
 .flash-fast {
   animation: flash 2s infinite;
-  /* ab aur fast blink karega */
-}
-
-/* print css */
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-
-  #print-section,
-  #print-section * {
-    visibility: visible;
-  }
-
-  #print-section {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
 }
 
 @keyframes slow-flash {
@@ -298,96 +304,27 @@ body {
 @media print {
   @page {
     size: A4;
-    margin: 15mm;
+    margin: 1cm;
+  }
+
+  .no-print {
+    display: none !important;
   }
 
   body {
-    background: white !important;
+    background-color: white !important;
     color: black !important;
   }
 
-  main {
-    display: none !important;
-    /* hide dark UI */
-  }
-
-  .print-page {
-    background: white !important;
-    color: black !important;
+  .print-container {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 
-/* ============ flower */
-
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
-    opacity: 1;
-  }
-
-  50% {
-    transform: translateY(-20px) rotate(180deg);
-    opacity: 0.8;
-  }
-}
-
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes pulse-once {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-.flower-container {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.flower-particle {
-  position: absolute;
-  animation: float linear infinite;
-}
-
-/* 🎉 Flower Celebration Animations */
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg) scale(1);
-    opacity: 1;
-  }
-
-  33% {
-    transform: translateY(-30px) rotate(120deg) scale(1.2);
-    opacity: 0.9;
-  }
-
-  66% {
-    transform: translateY(-15px) rotate(240deg) scale(0.9);
-    opacity: 0.7;
-  }
+/* Animation utilities */
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s ease-out forwards;
 }
 
 @keyframes explode {

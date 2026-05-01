@@ -25,8 +25,9 @@ import { adminPage, subAdminPage } from "@/helper/RouteName";
 import Link from "next/link";
 import { loginPage } from "@/helper/RouteName";
 
-import { LogIn, Loader2, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { LogIn, Loader2, Eye, EyeOff, ArrowRight, Shield, Key, ShieldCheck } from "lucide-react";
 import Image from "next/image";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import {
   Dialog,
   DialogContent,
@@ -122,11 +123,11 @@ export default function LoginByClubForm() {
 
       const user =
         values.userType === "sub_admin"
-          ? { ...res.subadmin, isLoggedIn: true }
-          : { ...res.data, isLoggedIn: true };
+          ? { ...(res.subadmin || {}), isLoggedIn: true }
+          : { ...(res.data || {}), isLoggedIn: true };
 
       sessionStorage.setItem(storageKey, JSON.stringify(user));
-      sessionStorage.setItem("adminDetails", JSON.stringify({ ...res.data, }));
+      sessionStorage.setItem("adminDetails", JSON.stringify({ ...(res.data || {}), }));
 
       const route = values.userType === "sub_admin" ? subAdminPage : adminPage;
 
@@ -155,8 +156,12 @@ export default function LoginByClubForm() {
   return (
     <>
       <ToastContainer />
-      <div className="min-h-screen overflow-hidden bg-background">
-        <div className="relative min-h-screen">
+      <div className="min-h-screen overflow-y-auto bg-background">
+      {/* Floating Theme Toggle */}
+      <div className="fixed top-4 right-4 z-[60]">
+        <ThemeToggle />
+      </div>
+      <div className="relative min-h-screen">
           <div
             className="absolute inset-0"
             style={{
@@ -174,10 +179,9 @@ export default function LoginByClubForm() {
               maskImage: "linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.45))",
             }}
           />
-
-          <div className="relative z-10 grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="relative z-10 flex min-h-screen flex-col lg:flex-row">
             {/* Left Side - Image and Text */}
-            <div className="relative min-h-[380px] overflow-hidden px-6 py-10 sm:px-10 lg:min-h-screen lg:px-14 lg:py-14">
+            <div className="relative flex min-h-[400px] w-full flex-col overflow-hidden px-6 py-10 sm:px-10 lg:min-h-screen lg:w-[58%] lg:px-14 lg:py-14">
               <div className="absolute inset-0">
                 <Image
                   src="/login/select-game.3.jpeg"
@@ -210,262 +214,299 @@ export default function LoginByClubForm() {
                   </div>
 
                   <div className="space-y-6">
-                    <h1 className="text-h11 font-bold text-white">
-                      Welcome Back,
-                    </h1>
-                    <p className="text-p2 text-gray-300">
-                      Manage your sports club with ease. Access ladders, players, and competitions all in one place.
+                    <h1 className="text-h11 font-bold text-white">Welcome Back,</h1>
+                    <p className="text-p2 text-slate-300">
+                      Manage your sports club with ease. Access ladders, players, and competitions
+                      all in one place.
                     </p>
                   </div>
-                </div>
 
-                <div className="space-y-4 pb-2 lg:pb-10">
-                  <div className="flex items-center gap-3">
-                    <div className="flex -space-x-2">
-                      <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-blue-400 to-purple-500" />
-                      <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-green-400 to-blue-500" />
-                      <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-purple-400 to-pink-500" />
+                  <div className="space-y-4 pb-2 lg:pb-10">
+                    <div className="flex items-center gap-3">
+                      <div className="flex -space-x-2">
+                        <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-blue-400 to-purple-500" />
+                        <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-green-400 to-blue-500" />
+                        <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-purple-400 to-pink-500" />
+                      </div>
+                      <p className="text-sm text-slate-300">
+                        Join <span className="font-semibold text-white">10,000+</span> clubs
+                        worldwide
+                      </p>
                     </div>
-                    <p className="text-sm text-gray-300">
-                      Join <span className="font-semibold text-white">10,000+</span> clubs worldwide
-                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Side - Login Card */}
-            <div className="flex min-h-screen items-center justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
-              <Card className="w-full max-w-md shadow-2xl rounded-3xl bg-gray-900/95 backdrop-blur-md border border-teal-500"
+            <section className="relative flex w-full flex-1 items-center justify-center bg-muted/30 px-4 py-8 sm:px-6 lg:w-[42%] lg:px-10">
+              <Card
+                className="w-full max-w-[470px] border px-0 py-0 shadow-2xl rounded-[32px] overflow-hidden"
                 style={{
-                  borderColor: "rgba(255, 255, 255, 0.1)",
-                  backgroundColor: "rgba(10, 24, 54, 0.94)",
+                  background: "var(--auth-card-bg)",
+                  borderColor: "var(--auth-card-border)",
+                  boxShadow: "var(--auth-card-shadow)",
+                  backdropFilter: "blur(18px)",
                 }}
               >
-                <CardContent>
-                  {/* Heading */}
-                  <div className="flex flex-col items-center gap-4 mb-6">
-
-                    <h2 className="text-h3 font-extrabold text-white text-center">
-                      Club Access
-                    </h2>
-
-                    <p className="text-p2 text-gray-300 text-center">
-                      Enter your Club ID and PIN to access the dashboard
-                    </p>
-                  </div>
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
-                      {/* Club ID */}
-                      <FormField
-                        control={form.control}
-                        name="clubId"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-p3 block mb-2.5 font-semibold text-slate-200">
-                              Club ID
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="Enter Club ID (A-Z only)"
-                                maxLength={8}
-                                className="h-[52px] rounded-2xl border-0 bg-[#1a254f] text-white placeholder:text-slate-400 focus-visible:ring-2"
-                                style={{
-                                  boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
-                                }}
-                                onChange={(e) =>
-                                  field.onChange(
-                                    e.target.value
-                                      .toUpperCase()
-                                      .replace(/[^A-Z]/g, "")
-                                  )
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* PIN */}
-                      <FormField
-                        control={form.control}
-                        name="pin"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-p3 block mb-2.5 font-semibold text-slate-200">
-                              4-Digit PIN
-                            </FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <Input
-                                  {...field}
-                                  type={showPassword ? "text" : "password"}
-                                  maxLength={4}
-                                  inputMode="numeric"
-                                  onChange={(e) =>
-                                    field.onChange(e.target.value.replace(/\D/g, "").slice(0, 4))
-                                  }
-                                  className="h-[52px] rounded-2xl border-0 bg-[#1a254f] px-11 text-white placeholder:text-slate-400 focus-visible:ring-2"
-                                  style={{
-                                    boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
-                                  }}
-                                  placeholder="Enter 4 digit PIN"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => setShowPassword(!showPassword)}
-                                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-gray-200 h-6 w-6 rounded-full flex items-center justify-center"
-                                >
-                                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                </button>
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Login Type */}
-                      <FormField
-                        control={form.control}
-                        name="userType"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-p3 block mb-2.5 font-semibold text-slate-200">
-                              Login As
-                            </FormLabel>
-                            <FormControl>
-                              <div className="flex rounded-[22px] border p-1.5" style={{ borderColor: "rgba(255, 255, 255, 0.08)", backgroundColor: "rgba(255, 255, 255, 0.043)" }}>
-                                <button
-                                  type="button"
-                                  onClick={() => field.onChange("admin")}
-                                  className="flex-1 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200"
-                                  style={
-                                    field.value === "admin"
-                                      ? {
-                                          background: "var(--background-image-gradient-brand)",
-                                          color: "#ffffff",
-                                          boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
-                                        }
-                                      : {
-                                          color: "rgba(215, 228, 255, 0.76)",
-                                        }
-                                  }
-                                >
-                                  Admin
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => field.onChange("sub_admin")}
-                                  className="flex-1 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200"
-                                  style={
-                                    field.value === "sub_admin"
-                                      ? {
-                                          background: "var(--background-image-gradient-brand)",
-                                          color: "#ffffff",
-                                          boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
-                                        }
-                                      : {
-                                          color: "rgba(215, 228, 255, 0.76)",
-                                        }
-                                  }
-                                >
-                                  Section Admin
-                                </button>
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Saved Credentials */}
-                      {userData.login_id && (
-                        <div className="rounded-lg border border-gray-600 bg-gray-800/50 p-4 flex items-center justify-between text-sm">
-                          <div className="space-y-1">
-                            <p className="text-gray-300">
-                              <span className="font-medium">ID:</span> {userData.login_id}
-                            </p>
-                            <p className="text-gray-300">
-                              <span className="font-medium">PIN:</span> {userData.password}
-                            </p>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={handleCopy}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                          >
-                            Copy
-                          </Button>
-                        </div>
-                      )}
-
-                      {/* Button */}
-                      <Button
-                        type="submit"
-                        disabled={loading}
-                        className="h-[52px] w-full rounded-2xl text-base font-bold text-white"
+                <CardContent className="px-5 py-6 sm:px-8 sm:py-8">
+                  <div className="space-y-6">
+                    {/* Header Branding */}
+                    <div className="flex items-center gap-4">
+                      <div
+                        className="flex h-14 w-14 items-center justify-center rounded-2xl"
                         style={{
                           background: "var(--background-image-gradient-brand)",
-                          boxShadow: "0 16px 34px rgba(41, 171, 226, 0.28)",
+                          boxShadow: "0 12px 28px rgba(41, 171, 226, 0.28)",
                         }}
                       >
-                        {loading ? "Logging in..." : "Login"}
-                        {!loading && <ArrowRight className="h-5 w-5" />}
-                      </Button>
-                    </form>
-                  </Form>
+                        <ShieldCheck className="h-7 w-7 text-white" />
+                      </div>
 
-                  {/* Register or other link */}
-                  <div className="mt-6 text-center text-p3 text-gray-400">
-                    <p>
-                      Already have an account?{" "}
-                      <Link
-                        href={loginPage}
-                        className="text-primary font-semibold hover:underline"
-                      >
-                        Login with admin
-                      </Link>
-                    </p>
-                    <p className="mt-2">
-                      Need help?{" "}
-                      <Link
-                        href={loginPage}
-                        className="text-primary font-semibold hover:underline"
-                      >
-                        Contact Support
-                      </Link>
-                    </p>
+                      <div>
+                        <p className="text-lg font-semibold text-foreground">Sports Solutions Pro</p>
+                        <p className="text-sm text-muted-foreground">Club Portal</p>
+                      </div>
+                    </div>
+
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
+                        {/* Club ID */}
+                        <FormField
+                          control={form.control}
+                          name="clubId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-p3 block mb-2.5 font-semibold text-foreground">
+                                Club ID
+                              </FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Shield className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
+                                  <Input
+                                    {...field}
+                                    placeholder="Enter Club ID (A-Z only)"
+                                    maxLength={8}
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                                    style={{
+                                      backgroundColor: "var(--input-bg)",
+                                      boxShadow: "inset 0 0 0 1px var(--input-border)",
+                                    }}
+                                    onChange={(e) =>
+                                      field.onChange(
+                                        e.target.value.toUpperCase().replace(/[^A-Z]/g, "")
+                                      )
+                                    }
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage className="text-xs text-red-300" />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* PIN */}
+                        <FormField
+                          control={form.control}
+                          name="pin"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-p3 block mb-2.5 font-semibold text-foreground">
+                                4-Digit PIN
+                              </FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Key className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
+                                  <Input
+                                    {...field}
+                                    type={showPassword ? "text" : "password"}
+                                    maxLength={4}
+                                    inputMode="numeric"
+                                    onChange={(e) =>
+                                      field.onChange(e.target.value.replace(/\D/g, "").slice(0, 4))
+                                    }
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                                    style={{
+                                      backgroundColor: "var(--input-bg)",
+                                      boxShadow: "inset 0 0 0 1px var(--input-border)",
+                                    }}
+                                    placeholder="Enter 4 digit PIN"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 transition hover:text-primary"
+                                  >
+                                    {showPassword ? (
+                                      <EyeOff className="h-4 w-4" />
+                                    ) : (
+                                      <Eye className="h-4 w-4" />
+                                    )}
+                                  </button>
+                                </div>
+                              </FormControl>
+                              <FormMessage className="text-xs text-red-300" />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Login Type Switcher (TabButton Style) */}
+                        <FormField
+                          control={form.control}
+                          name="userType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-p3 block mb-2.5 font-semibold text-foreground">
+                                Login As
+                              </FormLabel>
+                              <FormControl>
+                                <div
+                                  className="flex rounded-[22px] border p-1.5"
+                                  style={{
+                                    borderColor: "var(--border)",
+                                    backgroundColor: "var(--muted)",
+                                  }}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => field.onChange("admin")}
+                                    className="flex-1 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200"
+                                    style={
+                                      field.value === "admin"
+                                        ? {
+                                            background: "var(--background-image-gradient-brand)",
+                                            color: "#ffffff",
+                                            boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
+                                          }
+                                        : {
+                                            color: "var(--muted-foreground)",
+                                          }
+                                    }
+                                  >
+                                    Admin
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => field.onChange("sub_admin")}
+                                    className="flex-1 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200"
+                                    style={
+                                      field.value === "sub_admin"
+                                        ? {
+                                            background: "var(--background-image-gradient-brand)",
+                                            color: "#ffffff",
+                                            boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
+                                          }
+                                        : {
+                                            color: "var(--muted-foreground)",
+                                          }
+                                    }
+                                  >
+                                    Section Admin
+                                  </button>
+                                </div>
+                              </FormControl>
+                              <FormMessage className="text-xs text-red-300" />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Saved Credentials */}
+                        {userData.login_id && (
+                          <div className="rounded-2xl border border-border bg-muted/40 p-4 flex items-center justify-between text-sm shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                            <div className="space-y-1">
+                              <p className="text-muted-foreground">
+                                <span className="font-medium text-foreground">ID:</span>{" "}
+                                {userData.login_id}
+                              </p>
+                              <p className="text-muted-foreground">
+                                <span className="font-medium text-foreground">PIN:</span>{" "}
+                                {userData.password}
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={handleCopy}
+                              className="rounded-xl border-border bg-background/50 text-primary hover:bg-muted font-semibold shadow-sm"
+                            >
+                              Copy
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Submit Button */}
+                        <Button
+                          type="submit"
+                          disabled={loading}
+                          className="h-[56px] w-full rounded-2xl text-base font-bold text-white transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
+                          style={{
+                            background: "var(--background-image-gradient-brand)",
+                            boxShadow: "0 16px 34px rgba(41, 171, 226, 0.28)",
+                          }}
+                        >
+                          {loading ? (
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          ) : (
+                            <>
+                              Login to Club <ArrowRight className="ml-2 h-5 w-5" />
+                            </>
+                          )}
+                        </Button>
+                      </form>
+                    </Form>
+
+                    {/* Footer Links */}
+                    <div className="mt-8 pt-6 border-t border-border/50 text-center text-p3 text-muted-foreground">
+                      <p>
+                        Admin or Section Admin?{" "}
+                        <Link
+                          href={loginPage}
+                          className="text-primary font-semibold hover:underline"
+                        >
+                          Access Portal
+                        </Link>
+                      </p>
+                      <p className="mt-3">
+                        Need assistance?{" "}
+                        <a
+                          href="mailto:support@sportssolutionspro.com"
+                          className="text-primary font-semibold hover:underline"
+                        >
+                          Contact Support
+                        </a>
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Error Dialog (Only shows on failure) */}
+              {/* Error Dialog */}
               <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md border-border bg-card text-foreground rounded-[32px]">
                   <DialogHeader>
-                    <DialogTitle className="text-destructive">
+                    <DialogTitle className="text-destructive text-xl font-bold">
                       {dialogTitle}
                     </DialogTitle>
-                    <DialogDescription>{dialogMessage}</DialogDescription>
+                    <DialogDescription className="text-muted-foreground pt-2">
+                      {dialogMessage}
+                    </DialogDescription>
                   </DialogHeader>
-                  <DialogFooter>
-                    <Button onClick={() => setOpen(false)} variant="destructive">
-                      OK
+                  <DialogFooter className="sm:justify-center pt-4">
+                    <Button
+                      onClick={() => setOpen(false)}
+                      variant="destructive"
+                      className="rounded-xl px-8 font-semibold"
+                    >
+                      OK, Understood
                     </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-            </div>
+            </section>
           </div>
         </div>
       </div>
-
-
     </>
   );
 }
+

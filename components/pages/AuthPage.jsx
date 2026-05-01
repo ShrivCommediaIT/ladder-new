@@ -21,6 +21,7 @@ import {
   UserRound,
   Users2,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
@@ -90,7 +91,7 @@ function TabButton({ active, children, onClick }) {
               boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
             }
           : {
-              color: "rgba(215, 228, 255, 0.76)",
+              color: "var(--muted-foreground)",
             }
       }
     >
@@ -247,8 +248,12 @@ export default function AuthPage({ initialMode = "login" }) {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-background">
-      <div className="relative min-h-screen">
+      <div className="min-h-screen overflow-hidden bg-background">
+        {/* Floating Theme Toggle */}
+        <div className="fixed top-4 right-4 z-[60]">
+          <ThemeToggle />
+        </div>
+        <div className="relative min-h-screen">
         <div
           className="absolute inset-0"
           style={{
@@ -336,10 +341,11 @@ export default function AuthPage({ initialMode = "login" }) {
 
           <section className="relative flex items-center justify-center px-4 py-8 sm:px-6 lg:px-10">
             <Card
-              className="w-full max-w-[470px] gap-0 overflow-hidden rounded-[32px] border px-0 py-0 shadow-[0_30px_80px_rgba(0,0,0,0.34)]"
+              className="w-full max-w-[470px] gap-0 rounded-[32px] border px-0 py-0 shadow-2xl"
               style={{
-                borderColor: "rgba(255, 255, 255, 0.1)",
-                backgroundColor: "rgba(10, 24, 54, 0.94)",
+                background: "var(--auth-card-bg)",
+                borderColor: "var(--auth-card-border)",
+                boxShadow: "var(--auth-card-shadow)",
                 backdropFilter: "blur(18px)",
               }}
             >
@@ -357,15 +363,15 @@ export default function AuthPage({ initialMode = "login" }) {
                     </div>
 
                     <div>
-                      <p className="text-lg font-semibold text-white">Sports Solutions Pro</p>
-                      <p className="text-sm text-slate-400">Admin Dashboard </p>
+                      <p className="text-lg font-semibold text-foreground">Sports Solutions Pro</p>
+                      <p className="text-sm text-muted-foreground">Admin Dashboard </p>
                     </div>
                   </div>
                   <div
                     className="flex rounded-[22px] border p-1.5"
                     style={{
-                      borderColor: "rgba(255, 255, 255, 0.08)",
-                      backgroundColor: "rgba(255, 255, 255, 0.045)",
+                      borderColor: "var(--border)",
+                      backgroundColor: "var(--muted)",
                     }}
                   >
                     <TabButton active={mode === "login"} onClick={() => switchMode("login")}>
@@ -384,20 +390,21 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-p3 mb-2.5 block font-semibold text-slate-200">
+                              <FormLabel className="text-p3 mb-2.5 block font-semibold text-foreground">
                                 Email
                               </FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                                  <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
                                   <Input
                                     type="email"
                                     autoComplete="email"
                                     placeholder="Enter your email address"
                                     {...field}
-                                    className="h-[52px] rounded-2xl border-0 bg-[#1a254f] pl-11 text-white placeholder:text-slate-400 focus-visible:ring-2"
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
-                                      boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                                      backgroundColor: "var(--input-bg)",
+                                      boxShadow: "inset 0 0 0 1px var(--input-border)",
                                     }}
                                   />
                                 </div>
@@ -412,26 +419,27 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-p3 mb-2.5 block font-semibold text-slate-200">
+                              <FormLabel className="text-p3 mb-2.5 block font-semibold text-foreground">
                                 Password
                               </FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
                                   <Input
                                     type={showLoginPassword ? "text" : "password"}
                                     autoComplete="current-password"
                                     placeholder="Enter your password"
                                     {...field}
-                                    className="h-[52px] rounded-2xl border-0 bg-[#1a254f] px-11 text-white placeholder:text-slate-400 focus-visible:ring-2"
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
-                                      boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                                      backgroundColor: "var(--input-bg)",
+                                      boxShadow: "inset 0 0 0 1px var(--input-border)",
                                     }}
                                   />
                                   <button
                                     type="button"
                                     onClick={() => setShowLoginPassword((prev) => !prev)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-white"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 transition hover:text-primary"
                                   >
                                     {showLoginPassword ? (
                                       <EyeOff className="h-4 w-4" />
@@ -471,19 +479,20 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-p3 font-semibold text-slate-200">
+                              <FormLabel className="text-p3 font-semibold text-foreground">
                                 Full Name
                               </FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <UserRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                                  <UserRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
                                   <Input
                                     autoComplete="name"
                                     placeholder="Enter your full name"
                                     {...field}
-                                    className="h-[52px] rounded-2xl border-0 bg-[#1a254f] pl-11 text-white placeholder:text-slate-400 focus-visible:ring-2"
+                                    className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
-                                      boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                                      backgroundColor: "var(--input-bg)",
+                                      boxShadow: "inset 0 0 0 1px var(--input-border)",
                                     }}
                                   />
                                 </div>
@@ -498,20 +507,21 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-sm font-semibold text-slate-200">
+                              <FormLabel className="text-p3 font-semibold text-foreground">
                                 Email
                               </FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                                  <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
                                   <Input
                                     type="email"
                                     autoComplete="email"
                                     placeholder="Enter your email address"
                                     {...field}
-                                    className="h-[52px] rounded-2xl border-0 bg-[#1a254f] pl-11 text-white placeholder:text-slate-400 focus-visible:ring-2"
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
-                                      boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                                      backgroundColor: "var(--input-bg)",
+                                      boxShadow: "inset 0 0 0 1px var(--input-border)",
                                     }}
                                   />
                                 </div>
@@ -521,31 +531,34 @@ export default function AuthPage({ initialMode = "login" }) {
                           )}
                         />
 
+
+
                         <FormField
                           control={registerForm.control}
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-p3 font-semibold text-slate-200">
+                              <FormLabel className="text-p3 font-semibold text-foreground">
                                 Password
                               </FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
                                   <Input
                                     type={showRegisterPassword ? "text" : "password"}
                                     autoComplete="new-password"
                                     placeholder="Create your password"
                                     {...field}
-                                    className="h-[52px] rounded-2xl border-0 bg-[#1a254f] px-11 text-white placeholder:text-slate-400 focus-visible:ring-2"
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
-                                      boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                                      backgroundColor: "var(--input-bg)",
+                                      boxShadow: "inset 0 0 0 1px var(--input-border)",
                                     }}
                                   />
                                   <button
                                     type="button"
                                     onClick={() => setShowRegisterPassword((prev) => !prev)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-white"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 transition hover:text-primary"
                                   >
                                     {showRegisterPassword ? (
                                       <EyeOff className="h-4 w-4" />
@@ -565,26 +578,27 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="confirmPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-p3 font-semibold text-slate-200">
+                              <FormLabel className="text-p3 font-semibold text-foreground">
                                 Confirm Password
                               </FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
                                   <Input
                                     type={showConfirmPassword ? "text" : "password"}
                                     autoComplete="new-password"
                                     placeholder="Confirm your password"
                                     {...field}
-                                    className="h-[52px] rounded-2xl border-0 bg-[#1a254f] px-11 text-white placeholder:text-slate-400 focus-visible:ring-2"
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
-                                      boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                                      backgroundColor: "var(--input-bg)",
+                                      boxShadow: "inset 0 0 0 1px var(--input-border)",
                                     }}
                                   />
                                   <button
                                     type="button"
                                     onClick={() => setShowConfirmPassword((prev) => !prev)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-white"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/60 transition hover:text-primary"
                                   >
                                     {showConfirmPassword ? (
                                       <EyeOff className="h-4 w-4" />
@@ -615,7 +629,7 @@ export default function AuthPage({ initialMode = "login" }) {
                     </Form>
                   )}
 
-                  <div className="space-y-2 text-center text-sm text-slate-400">
+                  <div className="space-y-2 text-center text-sm text-muted-foreground">
                     {mode === "login" ? (
                       <button
                         type="button"
@@ -664,18 +678,14 @@ export default function AuthPage({ initialMode = "login" }) {
                         </DialogTrigger>
 
                         <DialogContent
-                          className="border text-white"
-                          style={{
-                            borderColor: "rgba(69, 115, 214, 0.5)",
-                            backgroundColor: "#0e183f",
-                          }}
+                          className="border border-border bg-card text-foreground"
                         >
                           <DialogHeader>
                             <DialogTitle>Reset Password</DialogTitle>
                           </DialogHeader>
 
                           <div className="space-y-3">
-                            <p className="text-sm text-slate-400">
+                            <p className="text-sm text-muted-foreground">
                               Enter your registered email to receive a reset link.
                             </p>
                             <Input
@@ -683,9 +693,10 @@ export default function AuthPage({ initialMode = "login" }) {
                               placeholder="name@example.com"
                               value={forgotEmail}
                               onChange={(e) => setForgotEmail(e.target.value)}
-                              className="h-12 rounded-xl border-0 bg-[#1a254f] text-white placeholder:text-slate-400"
+                              className="h-[52px] rounded-2xl border-0 px-4 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                               style={{
-                                boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                                backgroundColor: "var(--input-bg)",
+                                boxShadow: "inset 0 0 0 1px var(--input-border)",
                               }}
                             />
                           </div>

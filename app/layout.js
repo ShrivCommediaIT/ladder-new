@@ -3,6 +3,7 @@ import './globals.css'
 import { Provider } from "react-redux";
 import { store, persistor } from "@/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
+import { ThemeProvider } from "next-themes";
 import AppInit from '@/components/AppInit';
 import SupportChatBot from '@/components/shared/SupportChatBot';
 import { usePathname } from "next/navigation";
@@ -25,13 +26,15 @@ useEffect(() => {
   return (
     <html lang="en" suppressHydrationWarning>
        <body suppressHydrationWarning>
-         <Provider store={store}>
-           <PersistGate loading={null} persistor={persistor}>
-            <AppInit />
-            {children}
-            {(userType == "admin") && <SupportChatBot />}
-           </PersistGate>
-         </Provider>
+         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+           <Provider store={store}>
+             <PersistGate loading={null} persistor={persistor}>
+              <AppInit />
+              {children}
+              {(userType == "admin") && <SupportChatBot />}
+             </PersistGate>
+           </Provider>
+         </ThemeProvider>
        </body>
      </html>
   );

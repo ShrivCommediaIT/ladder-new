@@ -394,34 +394,29 @@ export default function SubAdminDashboard() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="overflow-hidden rounded-[24px] sm:rounded-[32px] border border-white/10 bg-white/[0.06] p-4 sm:p-7 shadow-[0_25px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+          className="overflow-hidden rounded-[24px] sm:rounded-[32px] border border-border bg-card p-4 sm:p-7 shadow-xl backdrop-blur-2xl"
         >
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl space-y-5">
               <div
-                className="inline-flex w-fit items-center gap-1.5 sm:gap-2 rounded-full border px-3 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] sm:tracking-[0.24em]"
-                style={{
-                  borderColor: "rgba(41, 171, 226, 0.28)",
-                  backgroundColor: "rgba(10, 24, 54, 0.88)",
-                  color: "#7dd3fc",
-                }}
+                className="inline-flex w-fit items-center gap-1.5 sm:gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] sm:tracking-[0.24em] text-primary"
               >
                 <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-primary" />
                 Sports Solutions Pro
               </div>
 
               <div className="space-y-3">
-                <h1 className="text-h1 font-black tracking-tight text-white sm:text-h11">
+                <h1 className="text-h1 font-black tracking-tight text-foreground sm:text-h11">
                   Welcome back, {subAdminFirstName}
                 </h1>
-                <p className="max-w-2xl text-p2 leading-7 text-slate-300">
+                <p className="max-w-2xl text-p2 leading-7 text-muted-foreground">
                   Manage competitions for your section and keep your club's internal ladder system organized from your sub-admin workspace.
                 </p>
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                  <span className="font-medium text-cyan-100/70">Section:</span>
-                  <span className="font-bold capitalize text-cyan-300">{subAdmin?.sport_name || "N/A"}</span>
+                  <span className="font-medium text-muted-foreground">Section:</span>
+                  <span className="font-bold capitalize text-primary">{subAdmin?.sport_name || "N/A"}</span>
               </div>
             </div>
           </div>
@@ -430,13 +425,13 @@ export default function SubAdminDashboard() {
             {overviewCards.map(({ title, value, detail, icon: Icon }, index) => (
               <div
                 key={title}
-                className={`relative overflow-hidden rounded-[22px] sm:rounded-[26px] border border-white/10 bg-[#07152b]/[0.86] p-4 sm:p-5 ${cardToneClasses[index] ? `bg-gradient-to-br ${cardToneClasses[index]}` : ""}`}
+                className={`relative overflow-hidden rounded-[22px] sm:rounded-[26px] border border-border bg-card p-4 sm:p-5 ${cardToneClasses[index] ? `bg-gradient-to-br ${cardToneClasses[index]}` : ""}`}
               >
                 <div className="relative z-10 flex items-start justify-between gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-slate-400">{title}</p>
-                    <p className="text-3xl font-black text-white">{value}</p>
-                    <p className="text-sm text-slate-300">{detail}</p>
+                    <p className="text-sm font-medium text-muted-foreground">{title}</p>
+                    <p className="text-3xl font-black text-foreground">{value}</p>
+                    <p className="text-sm text-muted-foreground">{detail}</p>
                   </div>
                   <div
                     className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-2xl"
@@ -459,18 +454,18 @@ export default function SubAdminDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.05 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
+              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 sm:p-6 backdrop-blur-xl"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
                     Workspace Flow
                   </p>
-                  <h2 className="mt-2 text-h2 font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-foreground">
                     How to get a new competition ready
                   </h2>
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200">
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-600">
                   <FolderKanban className="h-4 w-4" />
                   {activeLadders.length > 0 ? "Section active" : "Fresh setup"}
                 </div>
@@ -480,18 +475,15 @@ export default function SubAdminDashboard() {
                 {startSteps.map(({ icon: Icon, title, text }) => (
                   <div
                     key={title}
-                    className="rounded-[24px] border border-white/10 bg-[#071325]/[0.88] p-5"
+                    className="rounded-[24px] border border-border bg-muted/40 p-5"
                   >
                     <div
-                      className="flex h-12 w-12 items-center justify-center rounded-2xl"
-                      style={{
-                        background: "linear-gradient(135deg, rgba(41,171,226,0.24), rgba(26,58,143,0.42))",
-                      }}
+                      className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10"
                     >
-                      <Icon className="h-5 w-5 text-cyan-200" />
+                      <Icon className="h-5 w-5 text-primary" />
                     </div>
-                    <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{text}</p>
+                    <h3 className="mt-4 text-lg font-semibold text-foreground">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
                   </div>
                 ))}
               </div>
@@ -501,13 +493,13 @@ export default function SubAdminDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.15 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
+              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 px-1">
                 <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                   Solutions Available
                 </p>
-                <h2 className="mt-2 text-h2 font-bold text-white">
+                <h2 className="mt-2 text-h2 font-bold text-foreground">
                   Competition types you can create
                 </h2>
               </div>
@@ -518,13 +510,13 @@ export default function SubAdminDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.2 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
+              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 px-1">
-                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
                   Live Lists
                 </p>
-                <h2 className="mt-2 text-h2 font-bold text-white">
+                <h2 className="mt-2 text-h2 font-bold text-foreground">
                   Manage existing competitions
                 </h2>
               </div>
@@ -540,17 +532,18 @@ export default function SubAdminDashboard() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.45, delay: 0.08 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
+              className="rounded-[24px] sm:rounded-[30px] border border-primary/10 bg-card p-4 sm:p-6 backdrop-blur-xl"
+              style={{ backgroundColor: "color-mix(in srgb, var(--card), var(--primary) 2%)" }}
             >
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary">
                     Create Solution
                   </p>
-                  <h2 className="mt-2 text-h2 font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-foreground">
                     Upload your players and start fast
                   </h2>
-                  <p className="mt-2 text-p2 leading-6 text-slate-300">
+                  <p className="mt-2 text-p2 leading-6 text-muted-foreground">
                     Add the competition name, upload the CSV, then jump straight into the
                     player list editor.
                   </p>
@@ -584,22 +577,22 @@ export default function SubAdminDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.12 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
+              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 sm:p-6 backdrop-blur-xl"
             >
               <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                 Support
               </p>
-              <h2 className="mt-2 text-h2 font-bold text-white">
+              <h2 className="mt-2 text-h2 font-bold text-foreground">
                 Need help with your section?
               </h2>
-              <p className="mt-3 text-p2 leading-6 text-slate-300">
+              <p className="mt-3 text-p2 leading-6 text-muted-foreground">
                 Reach out for help with custom workflows, imports, or competition setup
                 tailored to your sport section.
               </p>
 
               <a
                 href="mailto:support@sportssolutionspro.com"
-                className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/18"
+                className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/20"
               >
                 <Mail className="h-4 w-4" />
                 support@sportssolutionspro.com
@@ -619,13 +612,13 @@ export default function SubAdminDashboard() {
       </div>
 
       <footer className="relative z-10 px-4 pb-8 sm:px-6 lg:px-8">
-        <Card className="mx-auto w-full border border-white/10 bg-black/55 text-white shadow-lg">
+        <Card className="mx-auto w-full border border-border bg-card text-foreground shadow-lg">
           <CardContent className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-300">
+              <p className="text-sm font-medium text-muted-foreground">
                 Sports Solutions Pro Sub-Admin Workspace
               </p>
-              <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Competition setup, ranking control, and player organization for your section.
               </p>
             </div>

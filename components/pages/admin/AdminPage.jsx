@@ -308,27 +308,22 @@ export default function AdminPage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="overflow-hidden rounded-[24px] sm:rounded-[32px] border border-white/10 bg-white/[0.06] p-4 sm:p-7 shadow-[0_25px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl"
+          className="overflow-hidden rounded-[24px] sm:rounded-[32px] border border-border bg-card p-4 sm:p-7 shadow-xl backdrop-blur-2xl"
         >
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl space-y-5">
               <div
-                className="inline-flex w-fit items-center gap-1.5 sm:gap-2 rounded-full border px-3 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] sm:tracking-[0.24em]"
-                style={{
-                  borderColor: "rgba(41, 171, 226, 0.28)",
-                  backgroundColor: "rgba(10, 24, 54, 0.88)",
-                  color: "#7dd3fc",
-                }}
+                className="inline-flex w-fit items-center gap-1.5 sm:gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] sm:tracking-[0.24em] text-primary"
               >
                 <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-cyan-300" />
                 Sports Solutions Pro
               </div>
 
               <div className="space-y-3">
-                <h1 className="text-h1 font-black tracking-tight text-white sm:text-h11">
+                <h1 className="text-h1 font-black tracking-tight text-foreground sm:text-h11">
                   Welcome back Admin Dashboard
                 </h1>
-                <p className="max-w-2xl text-p2 leading-7 text-slate-300">
+                <p className="max-w-2xl text-p2 leading-7 text-muted-foreground">
                   Manage rosters, launch competitions, and keep your club’s internal
                   ladder system organized from one admin workspace.
                 </p>
@@ -339,7 +334,7 @@ export default function AdminPage() {
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/18"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/20"
                     >
                       <CircleHelp className="h-4 w-4" />
                       Quick Guide
@@ -358,7 +353,7 @@ export default function AdminPage() {
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-muted/30 px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-muted/50"
                     >
                       <Layers3 className="h-4 w-4" />
                       Competition Types
@@ -380,13 +375,13 @@ export default function AdminPage() {
             {overviewCards.map(({ title, value, detail, icon: Icon }, index) => (
               <div
                 key={title}
-                className={`relative overflow-hidden rounded-[22px] sm:rounded-[26px] border border-white/10 bg-[#07152b]/[0.86] p-4 sm:p-5 ${cardToneClasses[index] ? `bg-gradient-to-br ${cardToneClasses[index]}` : ""}`}
+                className={`relative overflow-hidden rounded-[22px] sm:rounded-[26px] border border-border bg-card p-4 sm:p-5 ${cardToneClasses[index] ? `bg-gradient-to-br ${cardToneClasses[index]}` : ""}`}
               >
                 <div className="relative z-10 flex items-start justify-between gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-slate-400">{title}</p>
-                    <p className="text-3xl font-black text-white">{value}</p>
-                    <p className="text-sm text-slate-300">{detail}</p>
+                    <p className="text-sm font-medium text-muted-foreground">{title}</p>
+                    <p className="text-3xl font-black text-foreground">{value}</p>
+                    <p className="text-sm text-muted-foreground">{detail}</p>
                   </div>
                   <div
                     className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-2xl"
@@ -409,18 +404,18 @@ export default function AdminPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.05 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
+              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 sm:p-6 backdrop-blur-xl"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
                     Workspace Flow
                   </p>
-                  <h2 className="mt-2 text-h2 font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-foreground">
                     How to get a new club ready
                   </h2>
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200">
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-600">
                   <FolderKanban className="h-4 w-4" />
                   {activeLadders.length > 0 ? "Club already live" : "Fresh setup"}
                 </div>
@@ -430,18 +425,15 @@ export default function AdminPage() {
                 {startSteps.map(({ icon: Icon, title, text }) => (
                   <div
                     key={title}
-                    className="rounded-[24px] border border-white/10 bg-[#071325]/[0.88] p-5"
+                    className="rounded-[24px] border border-border bg-muted/40 p-5"
                   >
                     <div
-                      className="flex h-12 w-12 items-center justify-center rounded-2xl"
-                      style={{
-                        background: "linear-gradient(135deg, rgba(41,171,226,0.24), rgba(26,58,143,0.42))",
-                      }}
+                      className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10"
                     >
-                      <Icon className="h-5 w-5 text-cyan-200" />
+                      <Icon className="h-5 w-5 text-primary" />
                     </div>
-                    <h3 className="mt-4 text-p1 font-semibold text-white">{title}</h3>
-                    <p className="mt-2 text-p3 leading-6 text-slate-300">{text}</p>
+                    <h3 className="mt-4 text-p1 font-semibold text-foreground">{title}</h3>
+                    <p className="mt-2 text-p3 leading-6 text-muted-foreground">{text}</p>
                   </div>
                 ))}
               </div>
@@ -451,14 +443,14 @@ export default function AdminPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.1 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
+              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 flex items-center justify-between gap-3 px-1">
                 <div>
                   <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                     Demo Area
                   </p>
-                  <h2 className="mt-2 text-h2 font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-foreground">
                     Explore ready-made examples
                   </h2>
                 </div>
@@ -473,13 +465,13 @@ export default function AdminPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.15 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
+              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 px-1">
-                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
                   Live Lists
                 </p>
-                <h2 className="mt-2 text-h2 font-bold text-white">
+                <h2 className="mt-2 text-h2 font-bold text-foreground">
                   Manage existing competitions
                 </h2>
               </div>
@@ -492,17 +484,18 @@ export default function AdminPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.45, delay: 0.08 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
+              className="rounded-[24px] sm:rounded-[30px] border border-primary/10 bg-card p-4 sm:p-6 backdrop-blur-xl"
+              style={{ backgroundColor: "color-mix(in srgb, var(--card), var(--primary) 2%)" }}
             >
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary">
                     Create Roster
                   </p>
-                  <h2 className="mt-2 text-h2 font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-foreground">
                     Upload your players and start fast
                   </h2>
-                  <p className="mt-2 text-p2 leading-6 text-slate-300">
+                  <p className="mt-2 text-p2 leading-6 text-muted-foreground">
                     Add the roster name, upload the CSV, then jump straight into the
                     player list editor.
                   </p>
@@ -535,22 +528,22 @@ export default function AdminPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.12 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
+              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 sm:p-6 backdrop-blur-xl"
             >
-              <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+              <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
                 Support
               </p>
-              <h2 className="mt-2 text-h2 font-bold text-white">
+              <h2 className="mt-2 text-h2 font-bold text-foreground">
                 Need a bespoke club setup?
               </h2>
-              <p className="mt-3 text-p2 leading-6 text-slate-300">
+              <p className="mt-3 text-p2 leading-6 text-muted-foreground">
                 Reach out for help with custom workflows, imports, or a competition setup
                 tailored to your club structure.
               </p>
 
               <a
                 href="mailto:support@sportssolutionspro.com"
-                className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/18"
+                className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/20"
               >
                 <Mail className="h-4 w-4" />
                 support@sportssolutionspro.com
@@ -570,13 +563,13 @@ export default function AdminPage() {
       </div>
 
       <footer className="relative z-10 px-4 pb-8 sm:px-6 lg:px-8">
-        <Card className="mx-auto w-full border border-white/10 bg-black/55 text-white shadow-lg">
+        <Card className="mx-auto w-full border border-border bg-card text-foreground shadow-lg">
           <CardContent className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-300">
+              <p className="text-sm font-medium text-muted-foreground">
                 Sports Solutions Pro Admin Workspace
               </p>
-              <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Roster setup, competition control, and player organization in one place.
               </p>
             </div>

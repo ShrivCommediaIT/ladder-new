@@ -111,10 +111,10 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
           ref={printRef}
           className="rounded-2xl backdrop-blur-xl shadow-2xl w-full"
         >
-          <div className="space-y-4 text-white">
+          <div className="space-y-4 text-foreground">
             {/* Header */}
             <div className="flex items-center justify-between px-1 sm:px-2 pt-2">
-              <h3 className="text-base sm:text-lg font-semibold text-cyan-300 flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-semibold text-primary flex items-center gap-2">
                 <ListChecks className="h-4 w-4 sm:h-5 sm:w-5" />
                 Your Competitions
               </h3>
@@ -122,17 +122,17 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
               <Button
                 variant="outline"
                 size="sm"
-                className="cursor-pointer text-teal-400 bg-slate-800 border-teal-400/50 hover:text-white hover:bg-teal-400/10 h-8 sm:h-10 px-4 sm:px-8 text-xs sm:text-sm"
+                className="cursor-pointer text-primary bg-card border-border hover:bg-muted h-8 sm:h-10 px-4 sm:px-8 text-xs sm:text-sm"
                 onClick={() => setSeeAll((prev) => !prev)}
               >
                 {seeAll ? "Show Less" : "See All"}
               </Button>
             </div>
 
-            <Separator className="bg-white/10" />
+            <Separator className="bg-border" />
 
             {loading && (
-              <p className="text-xs sm:text-sm text-white/50 animate-pulse px-2">
+              <p className="text-xs sm:text-sm text-muted-foreground animate-pulse px-2">
                 Loading ladders...
               </p>
             )}
@@ -174,8 +174,8 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                     className={`flex flex-col sm:flex-row sm:items-center justify-between rounded-xl p-3 sm:px-4 sm:py-3 gap-3
                       ${
                         isDemo
-                          ? "bg-yellow-500/10 border border-cyan-400"
-                          : "bg-black/40 border border-white/10"
+                          ? "bg-yellow-500/10 border border-yellow-500/30"
+                          : "bg-muted/30 border border-border"
                       }`}
                   >
                     {/* Left */}
@@ -185,7 +185,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                       </span>
 
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-medium text-white text-sm sm:text-base truncate">
+                        <span className="font-medium text-foreground text-sm sm:text-base truncate">
                           {ladder.name}
                         </span>
 
@@ -235,7 +235,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                         </Button>
                       </AlertDialogTrigger>
 
-                      <AlertDialogContent className="w-[90%] max-w-md bg-[#0b1020] border border-white/10 text-white rounded-lg">
+                      <AlertDialogContent className="w-[90%] max-w-md bg-card border border-border text-foreground rounded-lg">
                         <AlertDialogHeader>
                           <AlertDialogTitle>
                             Delete{" "}

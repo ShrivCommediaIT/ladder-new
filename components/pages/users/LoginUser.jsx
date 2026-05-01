@@ -21,6 +21,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { Eye, EyeOff, ArrowRight, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { format } from "date-fns";
@@ -61,7 +62,7 @@ function TabButton({ active, children, onClick }) {
               boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
             }
           : {
-              color: "rgba(215, 228, 255, 0.76)",
+              color: "var(--muted-foreground)",
             }
       }
     >
@@ -227,6 +228,10 @@ export default function LoginUser({ ladderId, ladderType }) {
     <>
       <ToastContainer />
       <div className="min-h-screen overflow-hidden bg-background">
+        {/* Floating Theme Toggle */}
+        <div className="fixed top-4 right-4 z-[60]">
+          <ThemeToggle />
+        </div>
         <div className="relative min-h-screen">
           <div
             className="absolute inset-0"
@@ -284,8 +289,8 @@ export default function LoginUser({ ladderId, ladderType }) {
                     <h1 className="text-h11 font-bold text-white">
                       Welcome Back,
                     </h1>
-                    <p className="text-p2 text-gray-300">
-                      Join the competition. Track your progress, challenge opponents, and climb the ladder.
+                    <p className="text-p2 text-slate-300">
+                      Manage your sports club with ease. Access ladders, players, and competitions all in one place.
                     </p>
                   </div>
                 </div>
@@ -297,7 +302,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                       <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-green-400 to-blue-500" />
                       <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-purple-400 to-pink-500" />
                     </div>
-                    <p className="text-sm text-gray-300">
+                    <p className="text-sm text-slate-300">
                       Join <span className="font-semibold text-white">50,000+</span> players worldwide
                     </p>
                   </div>
@@ -307,15 +312,16 @@ export default function LoginUser({ ladderId, ladderType }) {
 
             {/* Right Side - Login Card */}
             <div className="flex min-h-screen items-center justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
-              <div className="w-full max-w-[470px] gap-0 overflow-hidden rounded-[32px] border px-0 py-0 shadow-[0_30px_80px_rgba(0,0,0,0.34)]"
+              <Card
+                className="w-full max-w-[470px] gap-0 rounded-[32px] border px-0 py-0 shadow-2xl"
                 style={{
-                  borderColor: "rgba(255, 255, 255, 0.1)",
-                  backgroundColor: "rgba(10, 24, 54, 0.94)",
+                  background: "var(--auth-card-bg)",
+                  borderColor: "var(--auth-card-border)",
+                  boxShadow: "var(--auth-card-shadow)",
                   backdropFilter: "blur(18px)",
                 }}
               >
-                <Card className="border-0 bg-transparent shadow-none">
-                  <CardContent className="px-6 py-6 sm:px-8 sm:py-8">
+                <CardContent className="px-6 py-6 sm:px-8 sm:py-8">
                     {/* Heading */}
                     <div className="flex flex-col items-center gap-4 mb-6">
                       <button
@@ -332,11 +338,11 @@ export default function LoginUser({ ladderId, ladderType }) {
                         />
                       </button>
 
-                      <h2 className="text-h3 font-extrabold text-white text-center">
+                      <h2 className="text-h3 font-extrabold text-foreground text-center">
                         {mode === "login" ? "Player Login" : "Player Register"}
                       </h2>
 
-                      <p className="text-p2 text-slate-300 text-center">
+                      <p className="text-p2 text-muted-foreground text-center">
                         {mode === "login"
                           ? "Please login to your account"
                           : "Create your player account"}
@@ -347,8 +353,8 @@ export default function LoginUser({ ladderId, ladderType }) {
                     <div
                       className="flex rounded-[22px] border p-1.5 mb-8"
                       style={{
-                        borderColor: "rgba(255, 255, 255, 0.08)",
-                        backgroundColor: "rgba(255, 255, 255, 0.043)",
+                        borderColor: "var(--border)",
+                        backgroundColor: "var(--muted)",
                       }}
                     >
                       <TabButton active={mode === "login"} onClick={() => switchMode("login")}>
@@ -361,15 +367,16 @@ export default function LoginUser({ ladderId, ladderType }) {
 
                   {/* Username */}
                   <div className="mb-6">
-                    <Label className="text-p3 block mb-2.5 font-semibold text-slate-200">
+                    <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
                       {mode === "login" ? "Username" : "Name"}
                     </Label>
                     <Input
                       value={mode === "login" ? loginForm.watch("username") : registerForm.watch("name")}
                       onChange={(e) => mode === "login" ? loginForm.setValue("username", e.target.value) : registerForm.setValue("name", e.target.value)}
-                      className="h-[52px] rounded-2xl border-0 bg-[#1a254f] text-white placeholder:text-slate-400 focus-visible:ring-2"
+                      className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                       style={{
-                        boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                        backgroundColor: "var(--input-bg)",
+                        boxShadow: "inset 0 0 0 1px var(--input-border)",
                       }}
                       placeholder={mode === "login" ? "Enter your username" : "Enter your full name"}
                     />
@@ -379,16 +386,17 @@ export default function LoginUser({ ladderId, ladderType }) {
                     <>
                       {/* Date of Birth */}
                       <div className="mb-6">
-                        <Label className="text-p3 block mb-2.5 font-semibold text-slate-200">
+                        <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
                           Date of Birth
                         </Label>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
-                              className="h-[52px] w-full justify-start rounded-2xl border-0 bg-[#1a254f] text-left font-normal text-white placeholder:text-slate-400 focus-visible:ring-2"
+                              className="h-[52px] w-full justify-start rounded-2xl border-0 text-left font-normal text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                               style={{
-                                boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                                backgroundColor: "var(--input-bg)",
+                                boxShadow: "inset 0 0 0 1px var(--input-border)",
                               }}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -417,16 +425,17 @@ export default function LoginUser({ ladderId, ladderType }) {
 
                   {/* Password */}
                   <div className="mb-8 relative">
-                    <Label className="text-p3 block mb-2.5 font-semibold text-slate-200">
+                    <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
                       {mode === "login" ? "PIN" : "Username"}
                     </Label>
 
                     <Input
                       value={mode === "login" ? loginForm.watch("password") : registerForm.watch("username")}
                       onChange={(e) => mode === "login" ? loginForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 4)) : registerForm.setValue("username", e.target.value)}
-                      className="h-[52px] rounded-2xl border-0 bg-[#1a254f] text-white placeholder:text-slate-400 focus-visible:ring-2"
+                      className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                       style={{
-                        boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                        backgroundColor: "var(--input-bg)",
+                        boxShadow: "inset 0 0 0 1px var(--input-border)",
                       }}
                       placeholder={mode === "login" ? "Enter your PIN" : "Choose a username"}
                     />
@@ -435,9 +444,9 @@ export default function LoginUser({ ladderId, ladderType }) {
                       <button
                         type="button"
                         onClick={() => setShowLoginPassword(!showLoginPassword)}
-                        className="absolute right-3 top-9 bg-gray-200 h-6 w-6 rounded-full flex items-center justify-center"
+                        className="absolute right-3 top-9 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
                       >
-                        {showLoginPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        {showLoginPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
                       </button>
                     )}
                   </div>
@@ -454,9 +463,10 @@ export default function LoginUser({ ladderId, ladderType }) {
                           type={showRegisterPassword ? "text" : "password"}
                           value={registerForm.watch("password")}
                           onChange={(e) => registerForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 4))}
-                          className="h-[52px] rounded-2xl border-0 bg-[#1a254f] px-11 text-white placeholder:text-slate-400 focus-visible:ring-2"
+                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                           style={{
-                            boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                            backgroundColor: "var(--input-bg)",
+                            boxShadow: "inset 0 0 0 1px var(--input-border)",
                           }}
                           placeholder="Create a PIN"
                         />
@@ -464,15 +474,15 @@ export default function LoginUser({ ladderId, ladderType }) {
                         <button
                           type="button"
                           onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                          className="absolute right-3 top-9 bg-gray-200 h-6 w-6 rounded-full flex items-center justify-center"
+                          className="absolute right-3 top-9 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
                         >
-                          {showRegisterPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          {showRegisterPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
                         </button>
                       </div>
 
                       {/* Confirm PIN */}
                       <div className="mb-8 relative">
-                        <Label className="text-p3 block mb-2.5 font-semibold text-slate-200">
+                        <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
                           Confirm PIN
                         </Label>
 
@@ -480,9 +490,10 @@ export default function LoginUser({ ladderId, ladderType }) {
                           type={showConfirmPassword ? "text" : "password"}
                           value={registerForm.watch("confirmPassword")}
                           onChange={(e) => registerForm.setValue("confirmPassword", e.target.value.replace(/\D/g, "").slice(0, 4))}
-                          className="h-[52px] rounded-2xl border-0 bg-[#1a254f] px-11 text-white placeholder:text-slate-400 focus-visible:ring-2"
+                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                           style={{
-                            boxShadow: "inset 0 0 0 1px rgba(120, 147, 214, 0.28)",
+                            backgroundColor: "var(--input-bg)",
+                            boxShadow: "inset 0 0 0 1px var(--input-border)",
                           }}
                           placeholder="Confirm your PIN"
                         />
@@ -490,9 +501,9 @@ export default function LoginUser({ ladderId, ladderType }) {
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-9 bg-gray-200 h-6 w-6 rounded-full flex items-center justify-center"
+                          className="absolute right-3 top-9 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
                         >
-                          {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          {showConfirmPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
                         </button>
                       </div>
                     </>
@@ -517,8 +528,6 @@ export default function LoginUser({ ladderId, ladderType }) {
           </div>
         </div>
       </div>
-      </div>
-
     </>
   );
 }

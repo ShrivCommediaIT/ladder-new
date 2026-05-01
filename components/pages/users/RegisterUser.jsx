@@ -13,7 +13,7 @@ import { User, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -61,7 +61,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
     },
   });
 
-  const { register, handleSubmit, setValue, watch, formState } = form;
+  const { register, handleSubmit, setValue, watch, formState, control } = form;
   const { errors } = formState;
 
   /* ✅ SUBMIT */
@@ -115,24 +115,34 @@ export default function RegisterUser({ ladderId, ladderType }) {
     <div className="flex justify-center items-center min-h-screen bg-background px-6">
       <ToastContainer theme="dark" position="top-right" />
 
-      <Card className="w-full max-w-lg py-2 bg-card border border-white/10 rounded-3xl backdrop-blur-xl shadow-2xl">
+      <Card className="w-full max-w-lg py-2 bg-card border border-border rounded-3xl backdrop-blur-xl shadow-2xl">
         <CardContent className="p-8 space-y-6">
           {/* HEADER */}
           <div className="text-center space-y-3">
             <div className="bg-primary/20 p-4 rounded-full inline-block">
               <User className="h-10 w-10 text-primary" />
             </div>
-            <h1 className="text-h3 font-bold text-white">Create Account</h1>
+            <h1 className="text-h3 font-bold text-foreground">Create Account</h1>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* NAME */}
             <div>
-              <Label className="text-p3 text-slate-200 block mb-2.5">Name</Label>
-              <Input
-                placeholder="Enter your name"
-                {...register("name")}
-                className="bg-gray-800 border-gray-700 text-white"
+              <Label className="text-p3 text-foreground block mb-2.5">Name</Label>
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    placeholder="Enter your name"
+                    {...field}
+                    className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                    style={{
+                      backgroundColor: "var(--input-bg)",
+                      boxShadow: "inset 0 0 0 1px var(--input-border)",
+                    }}
+                  />
+                )}
               />
               <p className="text-red-400 text-xs">{errors.name?.message}</p>
             </div>
@@ -140,15 +150,19 @@ export default function RegisterUser({ ladderId, ladderType }) {
             {/* GENDER */}
             {ladderType !== "minileague" && (
               <div>
-                <Label className="text-p3 text-slate-200 block mb-2.5">Gender</Label>
+                <Label className="text-p3 text-foreground block mb-2.5">Gender</Label>
                 <Select
                   value={watch("gender")}
                   onValueChange={(val) => setValue("gender", val)}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-700 text-white w-full">
+                  <SelectTrigger className="h-[52px] rounded-2xl border-0 text-foreground focus-visible:ring-2"
+                    style={{
+                      backgroundColor: "var(--input-bg)",
+                      boxShadow: "inset 0 0 0 1px var(--input-border)",
+                    }}>
                     <SelectValue placeholder="Select Gender" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                  <SelectContent className="bg-card border-border text-foreground">
                     <SelectItem value="male">Male</SelectItem>
                     <SelectItem value="female">Female</SelectItem>
                   </SelectContent>
@@ -179,15 +193,19 @@ export default function RegisterUser({ ladderId, ladderType }) {
 
             {/* PIN */}
             <div>
-              <Label className="text-p3 text-slate-200 block mb-2.5">4 Digit PIN (One that you can easily remember - avoid 1111 and 1234)</Label>
+              <Label className="text-p3 text-foreground block mb-2.5">4 Digit PIN (One that you can easily remember - avoid 1111 and 1234)</Label>
               <div className="relative">
-                <Input
-                  placeholder="Enter a 4 digit PIN"
-                  type={showPassword ? "text" : "password"}
-                  maxLength={4}
-                  inputMode="numeric"
-                  {...register("password")}
-                  className="bg-gray-800 border-gray-700 text-white pr-12"
+                  <Input
+                    placeholder="Enter a 4 digit PIN"
+                    type={showPassword ? "text" : "password"}
+                    maxLength={4}
+                    inputMode="numeric"
+                    {...register("password")}
+                    className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                    style={{
+                      backgroundColor: "var(--input-bg)",
+                      boxShadow: "inset 0 0 0 1px var(--input-border)",
+                    }}
                   onChange={(e) =>
                     setValue(
                       "password",
@@ -208,7 +226,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
 
             {/* CONFIRM PIN */}
             <div>
-              <Label className="text-p3 text-slate-200 block mb-2.5">Confirm PIN</Label>
+              <Label className="text-p3 text-foreground block mb-2.5">Confirm PIN</Label>
               <div className="relative">
                 <Input
                   placeholder="Confirm your 4 digit PIN"
@@ -216,7 +234,11 @@ export default function RegisterUser({ ladderId, ladderType }) {
                   maxLength={4}
                   inputMode="numeric"
                   {...register("confirmPassword")}
-                  className="bg-gray-800 border-gray-700 text-white pr-12"
+                  className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                  style={{
+                    backgroundColor: "var(--input-bg)",
+                    boxShadow: "inset 0 0 0 1px var(--input-border)",
+                  }}
                   onChange={(e) =>
                     setValue(
                       "confirmPassword",
@@ -244,7 +266,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
             </Button>
 
             {/* LOGIN */}
-            <p className="text-center text-sm text-slate-400">
+            <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link
                 href={
