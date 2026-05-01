@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getRequest } from '@/services/apiService';
@@ -56,6 +56,7 @@ export const InvertRanckings = () => {
     const router = useRouter();
     const [order, setOrder] = useState("asc");
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [isInverted, setIsInverted] = useState(false);
 
     const handleInvertRanckings = () => {
         setIsConfirmOpen(true);
@@ -135,8 +136,19 @@ export const InvertRanckings = () => {
             setIsConfirmOpen(false);
         }
     };
+
+    useEffect(() => {
+        // On component mount, read the inverted state from URL and set local order state
+        let Inverted
+        if ((searchParams.get('type') === 'negative'&& searchParams.get('inverted') === '0')) {
+            Inverted = true
+        } else if(searchParams.get('type') !== 'negative'){
+            Inverted = searchParams.get('inverted') === '1';
+        }
+        setIsInverted(Inverted);
+    }, [searchParams]);
     
-    const isInverted = searchParams.get('inverted') === '1';
+    // const isInverted = searchParams.get('inverted') === '1';
 
   return (
     <>
