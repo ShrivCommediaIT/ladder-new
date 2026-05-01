@@ -17,6 +17,7 @@ import { Funnel, X } from "lucide-react";
 import { fetchNegativeLeaderboard, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
+import { convertTimeToSeconds } from "@/helper/helperFunction";
 
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({
@@ -24,6 +25,7 @@ const PlayerCard = ({
   overallRank,
   appliedAge,
   ageRank,
+  isInverted,
   onSkillClick,
   onTargetAchieved,
   currentUser,
@@ -31,44 +33,41 @@ const PlayerCard = ({
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
+  const skillCellClass =
+    "w-[46px] sm:w-[58px] h-6 shrink-0 px-1 flex items-center justify-center text-[9px] sm:text-[10px] rounded";
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
-    const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
-    const skillObj = skills?.find((s) => s.skill_number === skillNumber);
+    const skillNumberKey = String(skillNumber);
+    const scoreObj = scores?.find((s) => String(s.skill_number) === skillNumberKey);
+    const skillObj = skills?.find((s) => String(s.skill_number) === skillNumberKey);
     const witnessBy =
       scoreObj?.witness_by ||
       skillObj?.witness_by ||
       "";
-    const score = scoreObj ? Number(scoreObj.score) : 0; // 🔒 internal logic
-    const bestScore = scoreObj ? Number(scoreObj.best_score) : 0; 
-    const inputScore =
-      scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
-        ? Number(scoreObj.input_score)
-        : null;
 
-    const displayScore = bestScore; // Always show best score
+    const rawNegativeScore = scoreObj?.negative_ladder_score;
+    const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
+
+    const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
+    const rawDisplayScore = rawBestScore || rawNegativeScore || "";
+    const displayScore = rawDisplayScore
+      ? convertTimeToSeconds(rawDisplayScore)
+      : "0";
 
     const target =
       skillObj?.target !== null && skillObj?.target !== undefined
         ? Number(skillObj.target)
         : null;
 
-    const mode = skillObj?.skill_sign || "+";
-
     let isTargetAchieved = false;
 
     if (
       target !== null &&
       target !== 0 &&
-      score !== 0 && // still using real score
+      score !== 0 &&
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      if (mode === "+") {
-        isTargetAchieved = score >= target;
-      } else {
-        // minus mode → target negative stored hota hai
-        isTargetAchieved = score >= Math.abs(target);
-      }
+      isTargetAchieved = isInverted ? score > target : score < target;
     }
 
     return {
@@ -77,7 +76,7 @@ const PlayerCard = ({
       displayScore,
       target,
       isTargetAchieved,
-      input_score: inputScore,
+      input_score: rawBestScore,
     };
   };
 
@@ -165,7 +164,9 @@ useEffect(() => {
 
         {player.skills?.length > 0 ? (
           <>
-            <div className="flex gap-[3px] overflow-y-visible pb-2 mb-1">
+            <div className="-mx-1 overflow-x-auto pb-1 mb-1 px-1 scrollbar-thin">
+              <div className="w-max min-w-full">
+                <div className="flex gap-[3px] overflow-y-visible pb-2">
               {player.skills.map((skill, i) => {
                 const isNegative = skill.skill_sign === "-";
 
@@ -173,7 +174,7 @@ useEffect(() => {
                   <div
                     key={i}
                     onClick={() => onSkillClick(player.id, skill.skill_number)}
-                    className="cursor-pointer min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded bg-white hover:bg-emerald-500 transition-all hover:scale-110 relative"
+                    className={`${skillCellClass} cursor-pointer text-black bg-white relative`}
                     title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
                   >
                     {/* minus sign box ke upar */}
@@ -187,10 +188,10 @@ useEffect(() => {
                   </div>
                 );
               })}
-            </div>
+                </div>
 
             {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
-            <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
+                <div className="flex gap-[3px]">
               {player.skills.map((skill, i) => {
                 const scoreData = getScoreBySkillNumber(
                   player.scores || [],
@@ -200,19 +201,20 @@ useEffect(() => {
                 return (
                   <div
                     key={i}
-                    className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
+                    className={`${skillCellClass} font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
                       ? "bg-green-400 text-black shadow-md font-semibold"
                       : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
                       } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
                     title={`Score: ${scoreData.score} | Target: ${scoreData.target || "N/A"
                       }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
                   >
-                    {Math.abs(scoreData.displayScore || 0)}
+                    {scoreData.displayScore}
                   </div>
                 );
               })}
+                </div>
+              </div>
             </div>
-
 
           </>
         ) : (
@@ -231,11 +233,12 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
+
+  const { data = [], loading,ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const loggedInUser = useSelector((state) => state.user?.user);
-
+  const isInverted = ladderDetails?.inverted
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedUser = sessionStorage.getItem("user") || sessionStorage.getItem("userData");
@@ -264,12 +267,23 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [isRefreshing, setIsRefreshing] = useState(false); // FIXED: UNCOMMENTED
   const [showRemove, setShowRemove] = useState(false);
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const [currentUserId, setCurrentUserId] = useState(null);
   const [dialogMessage, setDialogMessage] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const currentUser = data.find((p) => p.id == currentUserId);
   const myRank = currentUser?.rank;
+
+    const handleTargetAchieved = useCallback(() => {
+      setShowCelebration(true);
+      setTimeout(
+        () => {
+          setShowCelebration(false);
+        },
+        4000 + Math.random() * 1000,
+      );
+    }, []);
 
   // REFRESH KEY TO CONTROL RELOADS (STOPS INFINITE LOOP)
   const refreshKey = useRef(0);
@@ -475,7 +489,9 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
                       overallRank={player.rank || index + 1}
                       appliedAge={appliedAge}
                       ageRank={index + 1}
+                      isInverted={isInverted}
                       onSkillClick={handleSkillClick}
+                      onTargetAchieved={handleTargetAchieved} // No-op since celebration is handled inside PlayerCard
                       isEditable={isEditablePlayer}
                       loggedInUser={loggedInUser}
                     />

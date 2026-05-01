@@ -54,12 +54,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     !isNaN(target) &&
     !isNaN(score)
   ) {
-    if (mode === "+") {
-      isTargetAchieved = score >= target;
-    } else {
-      // SAME as working component
-      isTargetAchieved = score >= Math.abs(target);
-    }
+    isTargetAchieved = isInverted ? score > target : score < target;
   }
 
   return {
@@ -85,6 +80,7 @@ const PlayerCard = ({
   appliedAge,
   ageRank,
   onSkillClick,
+  isInverted,
   isEditable,
   loggedInUser,
 }) => {
@@ -277,7 +273,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [openSort, setOpenSort] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge,ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showRemove, setShowRemove] = useState(false);
   const [playerSearchResetSignal, setPlayerSearchResetSignal] = useState(0);
@@ -291,6 +287,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   // REFRESH KEY TO CONTROL RELOADS (STOPS INFINITE LOOP)
   const refreshKey = useRef(0);
 
+  const isInverted = ladderDetails?.inverted
 
   useEffect(() => {
     if (!ladderId) return;
@@ -541,6 +538,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
                   overallRank={player.rank || index + 1}
                   appliedAge={appliedAge}
                   ageRank={index + 1}
+                  isInverted={isInverted}
                   onSkillClick={handleSkillClick}
                   isEditable={isEditablePlayer}
                   loggedInUser={loggedInUser}
