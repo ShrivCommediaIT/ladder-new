@@ -14,16 +14,10 @@ import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarIcon } from "lucide-react";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { useSearchParams } from "next/navigation";
-import { calculateAge } from "@/lib/utils";
+import { calculateAge, parseDobToDate } from "@/lib/utils";
+import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
 import {
   Select,
   SelectContent,
@@ -60,37 +54,13 @@ const BasicLeaderboardAgeUserEdit = ({
   // Auto-fill strictly from selectedPlayer (id/user_id/name/phone/dob)
   useEffect(() => {
     if (selectedPlayer) {
-      let initialDob = null;
-      if (selectedPlayer.dob) {
-        if (selectedPlayer.dob instanceof Date) {
-          initialDob = selectedPlayer.dob;
-        } else if (typeof selectedPlayer.dob === "string") {
-          if (selectedPlayer.dob.includes("-")) {
-            // Handle YYYY-MM-DD (e.g., 2010-04-07)
-            const parts = selectedPlayer.dob.split("-");
-            if (parts.length === 3) {
-              initialDob = new Date(parts[0], parts[1] - 1, parts[2]);
-            }
-          } else if (selectedPlayer.dob.includes("/")) {
-            // Handle DD/MM/YYYY
-            const parts = selectedPlayer.dob.split("/");
-            if (parts.length === 3) {
-              initialDob = new Date(parts[2], parts[1] - 1, parts[0]);
-            }
-          }
-
-          if (!initialDob) {
-            initialDob = new Date(selectedPlayer.dob);
-          }
-        }
-      }
-
+      const initialDob = parseDobToDate(selectedPlayer.dob);
       setForm({
         id: (selectedPlayer.id ?? selectedPlayer.user_id)?.toString() || "",
         user_id:
           (selectedPlayer.user_id ?? selectedPlayer.id)?.toString() || "",
         name: selectedPlayer.name || "",
-        dob: initialDob && !isNaN(initialDob.getTime()) ? initialDob : null,
+        dob: initialDob,
         phone: selectedPlayer.phone || "",
         gender: selectedPlayer.gender || "male",
       });
@@ -209,33 +179,17 @@ const BasicLeaderboardAgeUserEdit = ({
                 Date of Birth
               </Label>
 
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Input
-                    id="dob"
-                    readOnly
-                    value={form.dob ? format(form.dob, "dd/MM/yyyy") : ""}
-                    placeholder="Enter Date of Birth"
-                    className="text-white text-start px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12 cursor-pointer"
-                  />
-                </PopoverTrigger>
-
-                <PopoverContent className="w-auto p-0 bg-slate-300 border-gray-700">
-                  <Calendar
-                    mode="single"
-                    selected={form.dob}
-                    onSelect={(date) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        dob: date,
-                      }))
-                    }
-                    captionLayout="dropdown"
-                    fromYear={1920}
-                    toYear={new Date().getFullYear()}
-                  />
-                </PopoverContent>
-              </Popover>
+              <DateOfBirthInput
+                id="dob"
+                value={form.dob}
+                onChange={(date) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    dob: date,
+                  }))
+                }
+                className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+              />
             </div>
 
             <div>
