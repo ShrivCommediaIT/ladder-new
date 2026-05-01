@@ -271,6 +271,12 @@ const MinileaguePlayers = ({ ladderId }) => {
           onClearFilters={() => {
             dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
           }}
+          activeFilters={
+            Boolean(searchQuery) ||
+            appliedAge > 0 ||
+            Boolean(appliedGender)
+          }
+          defaultAge={appliedAge}
         />
       </div>
 

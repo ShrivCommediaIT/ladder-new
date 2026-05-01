@@ -187,6 +187,12 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
           onClearFilters={() => {
             dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
           }}
+          activeFilters={
+            Boolean(searchTerm) ||
+            appliedAge > 0 ||
+            Boolean(appliedGender)
+          }
+          defaultAge={appliedAge}
         />
       </div>
 

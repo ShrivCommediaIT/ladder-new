@@ -27,6 +27,7 @@ const PlayerCard = ({
   overallRank,
   appliedAge,
   ageRank,
+  isInverted,
   onSkillClick,
   onTargetAchieved,
   currentUser,
@@ -41,7 +42,7 @@ const PlayerCard = ({
       scoreObj?.witness_by ||
       skillObj?.witness_by ||
       "";
-    const score = scoreObj ? Number(scoreObj.score) : 0; // 🔒 internal logic
+    const score = scoreObj ? Number(scoreObj.best_score) : 0; // 🔒 internal logic
     const bestScore = scoreObj ? Number(scoreObj.best_score) : 0; 
     const inputScore =
       scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
@@ -66,12 +67,7 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      if (mode === "+") {
-        isTargetAchieved = score >= target;
-      } else {
-        // minus mode → target negative stored hota hai
-        isTargetAchieved = score >= Math.abs(target);
-      }
+      isTargetAchieved = isInverted ? score > target : score < target;
     }
 
     return {
@@ -233,9 +229,11 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
+  const { data = [], loading,ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
+  const isInverted = ladderDetails?.inverted == 0;
+
   const currentUser = useSelector((state) => state.user?.user);
 
   // CELEBRATION STATE ONLY
@@ -266,16 +264,6 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           type: "positive",
           sortbyskillnumber: skillNo,
         };
-
-        if (age > 0) {
-          payload.dob = age;
-          payload.age_type = ageType;
-        }
-
-        if (gender) {
-          payload.gender = gender;
-        }
-
         dispatch(fetchPositiveLeaderboard(payload));
       }
     },
@@ -391,6 +379,7 @@ const filteredPlayers = React.useMemo(() => {
                   overallRank={player.rank || index + 1}
                   appliedAge={appliedAge}
                   ageRank={index + 1}
+                  isInverted={isInverted}
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}
                   currentUser={currentUser}

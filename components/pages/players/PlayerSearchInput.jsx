@@ -18,6 +18,7 @@ const PlayerSearchInput = ({
   const [isSubAdminDetails, setIsSubAdminDetails] = useState(null);
   const searchParams = useSearchParams();
   const ladderType = searchParams.get("ladder_type");
+  const type = searchParams.get("type");
   // Clean search value (IGNORE ALL SPACES for backend)
   const cleanSearchValue = useCallback((inputValue) => {
     if (!inputValue) return "";
@@ -99,7 +100,7 @@ const PlayerSearchInput = ({
           </button>
         )}
       </div>
-      {(ladderType == null && isSubAdminDetails !== null) ? <InvertRanckings /> : null}
+      {(ladderType == null && isSubAdminDetails !== null && type !== "minileague") ? <InvertRanckings /> : null}
     </div>
   );
 };

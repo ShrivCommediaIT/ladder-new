@@ -15,10 +15,10 @@ import { X, Trophy, ListOrdered } from "lucide-react";
 
 import PlayerSearchInput from "./PlayerSearchInput";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
-import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
 import { fetchNegativeLeaderboard, setAppliedAge, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
+import { convertTimeToSeconds } from "@/helper/helperFunction";
 
 
 
@@ -28,6 +28,7 @@ const PlayerCard = ({
   overallRank,
   appliedAge,
   ageRank,
+  isInverted,
   onSkillClick,
   onTargetAchieved,
   currentUser,
@@ -35,52 +36,52 @@ const PlayerCard = ({
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
+  const skillCellClass =
+    "w-[46px] sm:w-[58px] h-6 shrink-0 px-1 flex items-center justify-center text-[9px] sm:text-[10px] rounded";
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
-    const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
-    const skillObj = skills?.find((s) => s.skill_number === skillNumber);
+    const skillNumberKey = String(skillNumber);
+    const scoreObj = scores?.find((s) => String(s.skill_number) === skillNumberKey);
+    const skillObj = skills?.find((s) => String(s.skill_number) === skillNumberKey);
+    const witnessBy =
+      scoreObj?.witness_by ||
+      skillObj?.witness_by ||
+      "";
 
-    const score = scoreObj ? Number(scoreObj.score) : 0; // 🔒 internal logic
-    const inputScore =
-      scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
-        ? Number(scoreObj.input_score)
-        : null;
+    const rawNegativeScore = scoreObj?.negative_ladder_bestscore;
+    const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
 
-    const displayScore =
-      inputScore !== null && !isNaN(inputScore) ? inputScore : score;
+    const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
+    const rawDisplayScore = rawBestScore || rawNegativeScore || "";
+    const displayScore = rawDisplayScore
+      ? convertTimeToSeconds(rawDisplayScore)
+      : "0";
 
     const target =
       skillObj?.target !== null && skillObj?.target !== undefined
         ? Number(skillObj.target)
         : null;
 
-    const mode = skillObj?.skill_sign || "+";
-
     let isTargetAchieved = false;
 
     if (
       target !== null &&
       target !== 0 &&
-      score !== 0 && // still using real score
+      score !== 0 &&
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      if (mode === "+") {
-        isTargetAchieved = score >= target;
-      } else {
-        // minus mode → target negative stored hota hai
-        isTargetAchieved = score >= Math.abs(target);
-      }
+      isTargetAchieved = isInverted ? score > target : score < target;
     }
 
     return {
+      witnessBy,
       score,
       displayScore,
       target,
       isTargetAchieved,
-      input_score: inputScore,
+      input_score: rawBestScore,
     };
   };
-
   const achievedTargets =
     player.skills
       ?.map((skill) => {
@@ -94,60 +95,22 @@ const PlayerCard = ({
       .filter(Boolean).length || 0;
 
   //  Trigger celebration when targets achieved
-  React.useEffect(() => {
+useEffect(() => {
     if (achievedTargets > 0) {
       onTargetAchieved(player.name, achievedTargets);
     }
   }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
 
-  const toTotalSeconds = (score) => {
-    if (!score) return 0;
-    const strScore = String(score);
-    
-    if (!strScore.includes(":")) {
-      return Number(strScore) || 0;
-    }
-
-    const parts = strScore.split(":");
-    let hh = 0, mm = 0, secMsStr = "0";
-
-    if (parts.length === 3) {
-      hh = Number(parts[0]);
-      mm = Number(parts[1]);
-      secMsStr = parts[2];
-    } else if (parts.length === 2) {
-      mm = Number(parts[0]);
-      secMsStr = parts[1];
-    } else {
-      secMsStr = parts[0];
-    }
-
-    const [ss, ms = "0"] = secMsStr.split(".");
-
-    const total =
-      hh * 3600 +
-      mm * 60 +
-      Number(ss) +
-      Number(ms.padEnd(2, "0").substring(0, 2)) / 100;
-
-    return total;
-  };
-
 
   return (
-    <Card onClick={() => {
-    const skillNumber = player.skills?.[0]?.skill_number;
-    if (!skillNumber) return;
-    onSkillClick(player.id, skillNumber);
-  }} className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
+    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
       <div className="flex justify-between items-start mb-1 px-1">
         <PlayerStatusToggle player={player} user={false} />
       </div>
-     
-      <div    className="flex-1 min-w-0 curcer-pointer">
+      <div className="flex-1 min-w-0">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10">
+        <div className="flex items-center gap-2 sm:gap-3 mb-2">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
             <Image
               src={playerImageUrl}
               alt={player?.name}
@@ -159,58 +122,104 @@ const PlayerCard = ({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}   
+              {player?.name || "N/A"}
               {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                {player.age}
-              </p>
-            )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">
+                  {player.age}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
             </div>
           </div>
-          <div className="flex shrink-0 items-center justify-end gap-2">
-            {Boolean(appliedAge) && (
-              <div className="flex flex-col items-center">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
-                  {ageRank}
-                </div>
-                <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-0.5 whitespace-nowrap">Age Rank</p>
-              </div>
-            )}
+          <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
             <div className="flex flex-col items-center">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
-                {overallRank}
+              <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm shadow-sm leading-none h-7 sm:h-auto flex items-center">
+                {Math.abs(player.total_point || 0)}
+              </span>
+              <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
+            </div>
+
+            <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
+              {Boolean(appliedAge) && (
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                    {ageRank}
+                  </div>
+                  <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-1 whitespace-nowrap">Age Rank</p>
+                </div>
+              )}
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                  {overallRank}
+                </div>
+                <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
               </div>
-              <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-0.5 whitespace-nowrap">Overall Rank</p>
             </div>
           </div>
         </div>
+
+        {player.skills?.length > 0 ? (
+          <>
+            <div className="-mx-1 overflow-x-auto pb-1 mb-1 px-1 scrollbar-thin">
+              <div className="w-max min-w-full">
+                <div className="flex gap-[3px] overflow-y-visible pb-2">
+              {player.skills.map((skill, i) => {
+                const isNegative = skill.skill_sign === "-";
+
+                return (
+                  <div
+                    key={i}
+                    onClick={() => onSkillClick(player.id, skill.skill_number)}
+                    className={`${skillCellClass} cursor-pointer text-black bg-white hover:bg-emerald-500 relative`}
+                    title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
+                  >
+                    {/* minus sign box ke upar */}
+                    {isNegative && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
+                        −
+                      </span>
+                    )}
+
+                    {skill.skill_number}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
+                <div className="flex gap-[3px]">
+              {player.skills.map((skill, i) => {
+                const scoreData = getScoreBySkillNumber(
+                  player.scores || [],
+                  player.skills || [],
+                  skill.skill_number,
+                );
+                return (
+                  <div
+                    key={i}
+                    className={`${skillCellClass} font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
+                      ? "bg-green-400 text-black shadow-md font-semibold"
+                      : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
+                      } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
+                    title={`Best Score: ${scoreData.displayScore}s | Target: ${scoreData.target || "N/A"
+                      }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
+                  >
+                    {scoreData.displayScore}
+                  </div>
+                );
+              })}
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
+            No skills data
+          </div>
+        )}
       </div>
-        <div  className="flex  justify-between mr-1">
-          <div className="flex flex-col items-center mr-1">
-            <span className={` flex  justify-center  w-20 text-black px-4 py-1 rounded-sm font-semibold border ${
-              player?.skills?.length > 0 &&
-              Number(player.skills[0].target) > 0 &&
-              toTotalSeconds(player?.scores?.[0]?.negative_ladder_score || "0") > 0 &&
-              Number(player.skills[0].target) >= toTotalSeconds(player?.scores?.[0]?.negative_ladder_score || "0")
-                ? "bg-green-500"
-                : "bg-white"
-            } ${
-              player?.skills?.length > 0 && player?.scores?.[0]?.witness_by
-                ? "underline decoration-black decoration-[3px] bg-green-400"
-                : ""
-            }`}>
-              {toTotalSeconds(player && player?.total_point) || 0}
-            </span>
-          </div>
-            {player && player?.skills?.length > 0 ?null : (
-            <div className="h-7 p-3 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
-                No skills data
-            </div>
-            )}  
-        </div>
     </Card>
   );
 };
@@ -220,9 +229,12 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, appliedAge, appliedAgeType, appliedGender } = useSelector(
+  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
+
+  const isInverted = ladderDetails?.inverted == 0;
+
   const currentUser = useSelector((state) => state.user?.user);
 
   // CELEBRATION STATE ONLY
@@ -234,7 +246,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
-
+ const [currentUserId, setCurrentUserId] = useState(null);
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
     setTimeout(
@@ -253,16 +265,6 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           type: "negative",
           sortbyskillnumber: skillNo,
         };
-
-        if (age > 0) {
-          payload.dob = age;
-          payload.age_type = ageType;
-        }
-
-        if (gender) {
-          payload.gender = gender;
-        }
-
         dispatch(fetchNegativeLeaderboard(payload));
       }
     },
@@ -274,6 +276,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
     refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
   };
+  
 
   useEffect(() => {
     if (onPlayerAdded) {
@@ -287,7 +290,23 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     }
   }, [ladderId]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = sessionStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser && parsedUser.id) {
+            setCurrentUserId(Number(parsedUser.id));
+          }
+        } catch (err) {
+          console.error("Failed to parse user from localStorage", err);
+        }
+      }
+    }
+  }, []);
 
+  
   const handleSkillClick = useCallback(
 
     (playerId, skillNumber) => {
@@ -306,7 +325,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       setSelectedSkillActivityId(skillObj.id);
       setOpenEdit(true);
     },
-    [data],
+    [data, currentUserId],
   );
 
   const handleEditClose = useCallback(() => {
@@ -346,7 +365,6 @@ const filteredPlayers = React.useMemo(() => {
       <main className="min-h-screen flex justify-start md:justify-center relative">
         <div className="w-full max-w-2xl px-2 space-y-4">
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
-          
           <LadderLinkPanel ladderId={ladderId} ladderType="negative" />
           {loading && (
             <p className="text-white text-center hidden">Loading...</p>
@@ -362,6 +380,7 @@ const filteredPlayers = React.useMemo(() => {
                   overallRank={player.rank || index + 1}
                   appliedAge={appliedAge}
                   ageRank={index + 1}
+                  isInverted={isInverted}
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}
                   currentUser={currentUser}
@@ -371,12 +390,11 @@ const filteredPlayers = React.useMemo(() => {
           </div>
         </div>
       </main>
-
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardUserEdit
           open={openEdit}
           onClose={handleEditClose}
-          currentId={selectedPlayerId}
+          currentId={selectedPlayerId && selectedPlayerId}
           ladderId={ladderId}
           skillNumber={selectedSkillNumber}
           skillActivityId={selectedSkillActivityId}
