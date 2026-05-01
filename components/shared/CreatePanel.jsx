@@ -24,7 +24,7 @@ const CreatePanel = ({
     <div className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl p-4 sm:p-6 rounded-3xl">
 
       {/* HEADER */}
-      <h3 className="text-lg font-bold text-cyan-400 flex items-center gap-2 mb-4">
+      <h3 className="text-h3 font-bold text-primary flex items-center gap-2 mb-4">
         <Users className="h-5 w-5" />
         {isAdmin ? "Create a Roster" : "Create a Solution"}
       </h3>
@@ -33,7 +33,7 @@ const CreatePanel = ({
 
         {/* NAME */}
         <div>
-          <Label className="text-md text-white">Name :</Label>
+          <Label className="text-p2 text-white">Name :</Label>
 
           <div className="flex gap-2">
             {/* SUBADMIN SPORT NAME */}
@@ -59,7 +59,7 @@ const CreatePanel = ({
         {/* TYPE SELECT (ONLY SUBADMIN) */}
         {!isAdmin && (
           <div>
-            <Label className="text-md text-white">
+            <Label className="text-p2 text-white">
               Choose Type :
             </Label>
 
@@ -97,7 +97,7 @@ const CreatePanel = ({
 
         {/* CSV */}
         <div>
-          <Label className="text-md text-white">Players CSV</Label>
+          <Label className="text-p2 text-white">Players CSV</Label>
 
           <div className="mt-1 mb-3 text-xs text-white/70 bg-black/40 border border-white/10 rounded-lg p-3">
             <p className="font-semibold text-white mb-1">
@@ -109,7 +109,7 @@ const CreatePanel = ({
 
           <label className="group flex flex-col items-center justify-center h-32 rounded-2xl border border-dashed border-white/20 bg-white/5 hover:bg-white/10 transition cursor-pointer relative">
             <div className="pointer-events-none flex flex-col items-center gap-2">
-              <UploadCloud className="w-6 h-6 text-cyan-300" />
+              <UploadCloud className="w-6 h-6 text-primary" />
               <p className="text-xs text-white/70">
                 Click or drag CSV
               </p>
@@ -125,7 +125,7 @@ const CreatePanel = ({
 
           {csvFile && (
             <div className="flex justify-between mt-2 bg-black/30 border border-white/10 px-3 py-2 rounded-xl">
-              <span className="text-[11px] text-cyan-300 truncate">
+              <span className="text-p4 text-primary truncate">
                 {csvFile.name}
               </span>
               <span className="text-[10px] text-green-400 font-semibold">
@@ -139,7 +139,7 @@ const CreatePanel = ({
         <Button
           onClick={handleCreate}
           disabled={!ladderName || !csvFile || loading}
-          className="w-full h-12 rounded-2xl text-base font-bold bg-gray-800 border-t border-b border-cyan-500 shadow-xl active:scale-95"
+          className="w-full h-12 rounded-2xl text-p1 font-bold bg-gray-800 border-t border-b border-primary shadow-xl active:scale-95"
         >
           {loading
             ? "Creating..."

@@ -112,23 +112,23 @@ export default function RegisterUser({ ladderId, ladderType }) {
 
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 px-6">
+    <div className="flex justify-center items-center min-h-screen bg-background px-6">
       <ToastContainer theme="dark" position="top-right" />
 
-      <Card className="w-full max-w-lg py-2 bg-slate-900/80 border border-gray-700 rounded-3xl">
+      <Card className="w-full max-w-lg py-2 bg-card border border-white/10 rounded-3xl backdrop-blur-xl shadow-2xl">
         <CardContent className="p-8 space-y-6">
           {/* HEADER */}
           <div className="text-center space-y-3">
-            <div className="bg-teal-400/20 p-4 rounded-full inline-block">
-              <User className="h-10 w-10 text-teal-400" />
+            <div className="bg-primary/20 p-4 rounded-full inline-block">
+              <User className="h-10 w-10 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold text-teal-400">Create Account</h1>
+            <h1 className="text-h3 font-bold text-white">Create Account</h1>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* NAME */}
             <div>
-              <Label className="text-teal-400 mb-1">Name</Label>
+              <Label className="text-p3 text-slate-200 block mb-2.5">Name</Label>
               <Input
                 placeholder="Enter your name"
                 {...register("name")}
@@ -140,7 +140,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
             {/* GENDER */}
             {ladderType !== "minileague" && (
               <div>
-                <Label className="text-teal-400 mb-1">Gender</Label>
+                <Label className="text-p3 text-slate-200 block mb-2.5">Gender</Label>
                 <Select
                   value={watch("gender")}
                   onValueChange={(val) => setValue("gender", val)}
@@ -158,7 +158,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
 
             {/* DOB PICKER */}
   <div>
-    <Label className="text-teal-400 mb-1">
+    <Label className="text-p3 text-slate-200 block mb-2.5">
       Date of Birth:(for age related solutions)
     </Label>
 
@@ -179,7 +179,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
 
             {/* PIN */}
             <div>
-              <Label className="text-teal-400 mb-1">4 Digit PIN (One that you can easily remember - avoid 1111 and 1234)</Label>
+              <Label className="text-p3 text-slate-200 block mb-2.5">4 Digit PIN (One that you can easily remember - avoid 1111 and 1234)</Label>
               <div className="relative">
                 <Input
                   placeholder="Enter a 4 digit PIN"
@@ -208,7 +208,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
 
             {/* CONFIRM PIN */}
             <div>
-              <Label className="text-teal-400 mb-1">Confirm PIN</Label>
+              <Label className="text-p3 text-slate-200 block mb-2.5">Confirm PIN</Label>
               <div className="relative">
                 <Input
                   placeholder="Confirm your 4 digit PIN"
@@ -238,9 +238,9 @@ export default function RegisterUser({ ladderId, ladderType }) {
             </div>
 
             {/* SUBMIT */}
-            <Button type="submit" disabled={loading} className="w-full bg-teal-800 cursor-pointer hover:bg-teal-900 text-white">
+            <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg transition-all active:scale-95">
               {loading ? "Creating..." : "Create Account"}
-              {!loading && <ArrowRight className="ml-2" />}
+              {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
             </Button>
 
             {/* LOGIN */}
@@ -252,7 +252,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
                     ? `/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`
                     : "/login-user"
                 }
-                className="text-teal-400 font-semibold hover:underline"
+                className="text-primary font-semibold hover:underline"
               >
                 Login Now
               </Link>

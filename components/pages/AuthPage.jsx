@@ -74,7 +74,7 @@ const heroPoints = [
   { icon: Trophy, label: "Run Tournaments" },
 ];
 
-const brandGradient = "linear-gradient(135deg, var(--landing-primary), var(--landing-secondary))";
+const brandGradient = "var(--background-image-gradient-brand)";
 
 function TabButton({ active, children, onClick }) {
   return (
@@ -247,18 +247,18 @@ export default function AuthPage({ initialMode = "login" }) {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden" style={{ backgroundColor: "#050d25" }}>
+    <div className="min-h-screen overflow-hidden bg-background">
       <div className="relative min-h-screen">
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(circle at top left, rgba(41, 171, 226, 0.18), transparent 34%), linear-gradient(180deg, #07112f 0%, #040a1c 100%)",
+              "radial-gradient(circle at top left, rgba(41, 171, 226, 0.18), transparent 34%)",
           }}
         />
 
         <div
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-20"
           style={{
             backgroundImage:
               "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
@@ -278,7 +278,7 @@ export default function AuthPage({ initialMode = "login" }) {
                 sizes="(max-width: 1024px) 100vw, 58vw"
                 className="object-cover object-center"
               />
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,10,28,0.92)_0%,rgba(5,16,40,0.75)_42%,rgba(5,16,40,0.38)_100%)]" />
+              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,17,47,0.92)_0%,rgba(7,17,47,0.75)_42%,rgba(7,17,47,0.38)_100%)]" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(41,171,226,0.2),transparent_36%)]" />
             </div>
 
@@ -288,34 +288,26 @@ export default function AuthPage({ initialMode = "login" }) {
                   className="inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
                   style={{
                     borderColor: "rgba(41, 171, 226, 0.35)",
-                    backgroundColor: "rgba(8, 33, 78, 0.78)",
-                    color: "var(--landing-secondary)",
+                    backgroundColor: "rgba(10, 24, 54, 0.78)",
+                    color: "var(--primary)",
                     boxShadow: "0 0 24px rgba(41, 171, 226, 0.12)",
                   }}
                 >
                   <span
                     className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: "var(--landing-secondary)" }}
+                    style={{ backgroundColor: "var(--primary)" }}
                   />
                   Live Platform
                 </div>
 
                 <div className="space-y-5">
-                  <h1 className="max-w-md text-5xl font-extrabold leading-[0.95] text-white sm:text-6xl">
+                  <h1 className="max-w-md text-h11 font-extrabold leading-[0.95] text-white">
                     Welcome
                     <br />
                     Back,
-                    <br />
-                    <span
-                      className="inline-flex items-end gap-3"
-                      style={{ color: "var(--landing-secondary)" }}
-                    >
-                      Champion
-                      <Trophy className="mb-1 h-10 w-10 text-amber-400" strokeWidth={2.4} />
-                    </span>
                   </h1>
 
-                  <p className="max-w-md text-base leading-8 text-slate-300 sm:text-lg">
+                  <p className="max-w-md text-p2 leading-8 text-slate-300">
                     Manage your internal club competitions with real-time digital scoring,
                     player tracking, bookings, and live leaderboards in one place.
                   </p>
@@ -333,9 +325,9 @@ export default function AuthPage({ initialMode = "login" }) {
                         boxShadow: "0 10px 24px rgba(0, 0, 0, 0.28)",
                       }}
                     >
-                      <Icon className="h-5 w-5" style={{ color: "var(--landing-secondary)" }} />
+                      <Icon className="h-5 w-5" style={{ color: "var(--primary)" }} />
                     </div>
-                    <span className="text-lg font-medium tracking-[0.01em]">{label}</span>
+                    <span className="text-p1 font-medium tracking-[0.01em]">{label}</span>
                   </div>
                 ))}
               </div>
@@ -346,8 +338,8 @@ export default function AuthPage({ initialMode = "login" }) {
             <Card
               className="w-full max-w-[470px] gap-0 overflow-hidden rounded-[32px] border px-0 py-0 shadow-[0_30px_80px_rgba(0,0,0,0.34)]"
               style={{
-                borderColor: "rgba(69, 115, 214, 0.45)",
-                backgroundColor: "rgba(13, 24, 63, 0.94)",
+                borderColor: "rgba(255, 255, 255, 0.1)",
+                backgroundColor: "rgba(10, 24, 54, 0.94)",
                 backdropFilter: "blur(18px)",
               }}
             >
@@ -369,14 +361,6 @@ export default function AuthPage({ initialMode = "login" }) {
                       <p className="text-sm text-slate-400">Admin Dashboard </p>
                     </div>
                   </div>
-
-                  <div className="space-y-2 text-center">
-                    <h2 className="text-3xl font-bold text-white">Sports Admin Dashboard</h2>
-                    <p className="text-sm text-slate-400">
-                      manage your competitions and rosters
-                    </p>
-                  </div>
-
                   <div
                     className="flex rounded-[22px] border p-1.5"
                     style={{
@@ -400,7 +384,7 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-sm font-semibold text-slate-200">
+                              <FormLabel className="text-p3 mb-2.5 block font-semibold text-slate-200">
                                 Email
                               </FormLabel>
                               <FormControl>
@@ -428,7 +412,7 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-sm font-semibold text-slate-200">
+                              <FormLabel className="text-p3 mb-2.5 block font-semibold text-slate-200">
                                 Password
                               </FormLabel>
                               <FormControl>
@@ -487,7 +471,7 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-sm font-semibold text-slate-200">
+                              <FormLabel className="text-p3 font-semibold text-slate-200">
                                 Full Name
                               </FormLabel>
                               <FormControl>
@@ -542,7 +526,7 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-sm font-semibold text-slate-200">
+                              <FormLabel className="text-p3 font-semibold text-slate-200">
                                 Password
                               </FormLabel>
                               <FormControl>
@@ -581,7 +565,7 @@ export default function AuthPage({ initialMode = "login" }) {
                           name="confirmPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-sm font-semibold text-slate-200">
+                              <FormLabel className="text-p3 font-semibold text-slate-200">
                                 Confirm Password
                               </FormLabel>
                               <FormControl>
@@ -639,7 +623,7 @@ export default function AuthPage({ initialMode = "login" }) {
                         className="w-full"
                       >
                         Don&apos;t have an account?{" "}
-                        <span className="font-semibold" style={{ color: "var(--landing-secondary)" }}>
+                        <span className="font-semibold" style={{ color: "var(--primary)" }}>
                           Register here
                         </span>
                       </button>
@@ -650,7 +634,7 @@ export default function AuthPage({ initialMode = "login" }) {
                         className="w-full"
                       >
                         Already have an account?{" "}
-                        <span className="font-semibold" style={{ color: "var(--landing-secondary)" }}>
+                        <span className="font-semibold" style={{ color: "var(--primary)" }}>
                           Login here
                         </span>
                       </button>
@@ -661,7 +645,7 @@ export default function AuthPage({ initialMode = "login" }) {
                       <Link
                         href={clubIdPage}
                         className="font-semibold"
-                        style={{ color: "var(--landing-secondary)" }}
+                        style={{ color: "var(--primary)" }}
                       >
                         Login with ClubID
                       </Link>
@@ -673,7 +657,7 @@ export default function AuthPage({ initialMode = "login" }) {
                           <button
                             type="button"
                             className="w-full font-semibold"
-                            style={{ color: "var(--landing-secondary)" }}
+                            style={{ color: "var(--primary)" }}
                           >
                             Forgot Password
                           </button>

@@ -54,7 +54,7 @@ const startSteps = [
   },
 ];
 
-const brandGradient = "linear-gradient(135deg, #29abe2 0%, #1a3a8f 100%)";
+const brandGradient = "var(--background-image-gradient-brand)";
 
 import LadderList from "../LadderList";
 import LadderInfo from "../LadderInfo";
@@ -375,11 +375,11 @@ export default function SubAdminDashboard() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#07111f] text-white">
+    <div className="relative min-h-screen bg-background text-foreground">
       {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
       <PlayerLevelNavbar activeTab="dashboard" />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,240,255,0.12),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(0,114,255,0.15),transparent_45%),linear-gradient(180deg,#080c14_0%,#04060a_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(41,171,226,0.12),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(26,58,143,0.15),transparent_45%)]" />
       <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:78px_78px]" />
 
       <ToastContainer
@@ -406,25 +406,22 @@ export default function SubAdminDashboard() {
                   color: "#7dd3fc",
                 }}
               >
-                <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-cyan-300" />
+                <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-primary" />
                 Sports Solutions Pro
               </div>
 
               <div className="space-y-3">
-                <h1 className="text-2xl font-black tracking-tight text-white sm:text-5xl">
+                <h1 className="text-h1 font-black tracking-tight text-white sm:text-h11">
                   Welcome back, {subAdminFirstName}
                 </h1>
-                <p className="max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+                <p className="max-w-2xl text-p2 leading-7 text-slate-300">
                   Manage competitions for your section and keep your club's internal ladder system organized from your sub-admin workspace.
                 </p>
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <div className="inline-flex items-center gap-2.5 rounded-2xl border border-cyan-400/30 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 px-4 py-3 text-sm shadow-[0_0_15px_rgba(41,171,226,0.15)] transition-all hover:scale-[1.02]">
-                  <Layers className="h-4 w-4 text-cyan-300" />
                   <span className="font-medium text-cyan-100/70">Section:</span>
                   <span className="font-bold capitalize text-cyan-300">{subAdmin?.sport_name || "N/A"}</span>
-                </div>
               </div>
             </div>
           </div>
@@ -466,10 +463,10 @@ export default function SubAdminDashboard() {
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                     Workspace Flow
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-white">
                     How to get a new competition ready
                   </h2>
                 </div>
@@ -507,10 +504,10 @@ export default function SubAdminDashboard() {
               className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 px-1">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                   Solutions Available
                 </p>
-                <h2 className="mt-2 text-2xl font-bold text-white">
+                <h2 className="mt-2 text-h2 font-bold text-white">
                   Competition types you can create
                 </h2>
               </div>
@@ -524,10 +521,10 @@ export default function SubAdminDashboard() {
               className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 px-1">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                   Live Lists
                 </p>
-                <h2 className="mt-2 text-2xl font-bold text-white">
+                <h2 className="mt-2 text-h2 font-bold text-white">
                   Manage existing competitions
                 </h2>
               </div>
@@ -547,13 +544,13 @@ export default function SubAdminDashboard() {
             >
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                     Create Solution
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-white">
                     Upload your players and start fast
                   </h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                  <p className="mt-2 text-p2 leading-6 text-slate-300">
                     Add the competition name, upload the CSV, then jump straight into the
                     player list editor.
                   </p>
@@ -589,13 +586,13 @@ export default function SubAdminDashboard() {
               transition={{ duration: 0.45, delay: 0.12 }}
               className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+              <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                 Support
               </p>
-              <h2 className="mt-2 text-2xl font-bold text-white">
+              <h2 className="mt-2 text-h2 font-bold text-white">
                 Need help with your section?
               </h2>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
+              <p className="mt-3 text-p2 leading-6 text-slate-300">
                 Reach out for help with custom workflows, imports, or competition setup
                 tailored to your sport section.
               </p>

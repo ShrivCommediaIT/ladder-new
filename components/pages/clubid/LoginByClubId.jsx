@@ -155,18 +155,18 @@ export default function LoginByClubForm() {
   return (
     <>
       <ToastContainer />
-      <div className="min-h-screen overflow-hidden" style={{ backgroundColor: "#050d25" }}>
+      <div className="min-h-screen overflow-hidden bg-background">
         <div className="relative min-h-screen">
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(circle at top left, rgba(41, 171, 226, 0.18), transparent 34%), linear-gradient(180deg, #07112f 0%, #040a1c 100%)",
+                "radial-gradient(circle at top left, rgba(41, 171, 226, 0.18), transparent 34%)",
             }}
           />
 
           <div
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-20"
             style={{
               backgroundImage:
                 "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
@@ -187,7 +187,7 @@ export default function LoginByClubForm() {
                   sizes="(max-width: 1024px) 100vw, 58vw"
                   className="object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,10,28,0.92)_0%,rgba(5,16,40,0.75)_42%,rgba(5,16,40,0.38)_100%)]" />
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,17,47,0.92)_0%,rgba(7,17,47,0.75)_42%,rgba(7,17,47,0.38)_100%)]" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(41,171,226,0.2),transparent_36%)]" />
               </div>
 
@@ -197,23 +197,23 @@ export default function LoginByClubForm() {
                     className="inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
                     style={{
                       borderColor: "rgba(41, 171, 226, 0.35)",
-                      backgroundColor: "rgba(8, 33, 78, 0.78)",
-                      color: "var(--landing-secondary)",
+                      backgroundColor: "rgba(10, 24, 54, 0.78)",
+                      color: "var(--primary)",
                       boxShadow: "0 0 24px rgba(41, 171, 226, 0.12)",
                     }}
                   >
                     <span
                       className="h-2.5 w-2.5 rounded-full"
-                      style={{ backgroundColor: "var(--landing-secondary)" }}
+                      style={{ backgroundColor: "var(--primary)" }}
                     />
                     Live Platform
                   </div>
 
                   <div className="space-y-6">
-                    <h1 className="text-4xl font-bold text-white lg:text-5xl">
-                      Club Management Dashboard
+                    <h1 className="text-h11 font-bold text-white">
+                      Welcome Back,
                     </h1>
-                    <p className="text-lg text-gray-300">
+                    <p className="text-p2 text-gray-300">
                       Manage your sports club with ease. Access ladders, players, and competitions all in one place.
                     </p>
                   </div>
@@ -238,19 +238,19 @@ export default function LoginByClubForm() {
             <div className="flex min-h-screen items-center justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
               <Card className="w-full max-w-md shadow-2xl rounded-3xl bg-gray-900/95 backdrop-blur-md border border-teal-500"
                 style={{
-                  borderColor: "rgba(69, 115, 214, 0.45)",
-                  backgroundColor: "rgba(13, 24, 63, 0.94)",
+                  borderColor: "rgba(255, 255, 255, 0.1)",
+                  backgroundColor: "rgba(10, 24, 54, 0.94)",
                 }}
               >
                 <CardContent>
                   {/* Heading */}
                   <div className="flex flex-col items-center gap-4 mb-6">
 
-                    <h2 className="text-3xl font-extrabold text-white">
+                    <h2 className="text-h3 font-extrabold text-white text-center">
                       Club Access
                     </h2>
 
-                    <p className="text-gray-300 text-center">
+                    <p className="text-p2 text-gray-300 text-center">
                       Enter your Club ID and PIN to access the dashboard
                     </p>
                   </div>
@@ -262,7 +262,7 @@ export default function LoginByClubForm() {
                         name="clubId"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-semibold text-slate-200">
+                            <FormLabel className="text-p3 block mb-2.5 font-semibold text-slate-200">
                               Club ID
                             </FormLabel>
                             <FormControl>
@@ -294,7 +294,7 @@ export default function LoginByClubForm() {
                         name="pin"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-semibold text-slate-200">
+                            <FormLabel className="text-p3 block mb-2.5 font-semibold text-slate-200">
                               4-Digit PIN
                             </FormLabel>
                             <FormControl>
@@ -333,7 +333,7 @@ export default function LoginByClubForm() {
                         name="userType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-semibold text-slate-200">
+                            <FormLabel className="text-p3 block mb-2.5 font-semibold text-slate-200">
                               Login As
                             </FormLabel>
                             <FormControl>
@@ -345,7 +345,7 @@ export default function LoginByClubForm() {
                                   style={
                                     field.value === "admin"
                                       ? {
-                                          background: "linear-gradient(135deg, var(--landing-primary), var(--landing-secondary))",
+                                          background: "var(--background-image-gradient-brand)",
                                           color: "#ffffff",
                                           boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
                                         }
@@ -363,7 +363,7 @@ export default function LoginByClubForm() {
                                   style={
                                     field.value === "sub_admin"
                                       ? {
-                                          background: "linear-gradient(135deg, var(--landing-primary), var(--landing-secondary))",
+                                          background: "var(--background-image-gradient-brand)",
                                           color: "#ffffff",
                                           boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
                                         }
@@ -410,7 +410,7 @@ export default function LoginByClubForm() {
                         disabled={loading}
                         className="h-[52px] w-full rounded-2xl text-base font-bold text-white"
                         style={{
-                          background: "linear-gradient(135deg, var(--landing-primary), var(--landing-secondary))",
+                          background: "var(--background-image-gradient-brand)",
                           boxShadow: "0 16px 34px rgba(41, 171, 226, 0.28)",
                         }}
                       >
@@ -421,12 +421,21 @@ export default function LoginByClubForm() {
                   </Form>
 
                   {/* Register or other link */}
-                  <div className="mt-6 text-center text-sm text-gray-400">
+                  <div className="mt-6 text-center text-p3 text-gray-400">
                     <p>
+                      Already have an account?{" "}
+                      <Link
+                        href={loginPage}
+                        className="text-primary font-semibold hover:underline"
+                      >
+                        Login with admin
+                      </Link>
+                    </p>
+                    <p className="mt-2">
                       Need help?{" "}
                       <Link
                         href={loginPage}
-                        className="text-teal-400 font-semibold hover:underline"
+                        className="text-primary font-semibold hover:underline"
                       >
                         Contact Support
                       </Link>

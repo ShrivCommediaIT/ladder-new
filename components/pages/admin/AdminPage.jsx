@@ -63,7 +63,7 @@ const startSteps = [
   },
 ];
 
-const brandGradient = "linear-gradient(135deg, #00f0ff 0%, #0072ff 100%)";
+const brandGradient = "var(--background-image-gradient-brand)";
 
 export default function AdminPage() {
   const [ladderName, setLadderName] = useState("");
@@ -289,11 +289,11 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#07111f] text-white">
+    <div className="relative min-h-screen bg-background text-foreground">
       {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
       <PlayerLevelNavbar activeTab="dashboard" />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,240,255,0.12),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(0,114,255,0.15),transparent_45%),linear-gradient(180deg,#080c14_0%,#04060a_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(41,171,226,0.12),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(26,58,143,0.15),transparent_45%)]" />
       <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:78px_78px]" />
 
       <ToastContainer
@@ -325,10 +325,10 @@ export default function AdminPage() {
               </div>
 
               <div className="space-y-3">
-                <h1 className="text-2xl font-black tracking-tight text-white sm:text-5xl">
+                <h1 className="text-h1 font-black tracking-tight text-white sm:text-h11">
                   Welcome back Admin Dashboard
                 </h1>
-                <p className="max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+                <p className="max-w-2xl text-p2 leading-7 text-slate-300">
                   Manage rosters, launch competitions, and keep your club’s internal
                   ladder system organized from one admin workspace.
                 </p>
@@ -413,10 +413,10 @@ export default function AdminPage() {
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                     Workspace Flow
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-white">
                     How to get a new club ready
                   </h2>
                 </div>
@@ -440,8 +440,8 @@ export default function AdminPage() {
                     >
                       <Icon className="h-5 w-5 text-cyan-200" />
                     </div>
-                    <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{text}</p>
+                    <h3 className="mt-4 text-p1 font-semibold text-white">{title}</h3>
+                    <p className="mt-2 text-p3 leading-6 text-slate-300">{text}</p>
                   </div>
                 ))}
               </div>
@@ -455,10 +455,10 @@ export default function AdminPage() {
             >
               <div className="mb-4 flex items-center justify-between gap-3 px-1">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                     Demo Area
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-white">
                     Explore ready-made examples
                   </h2>
                 </div>
@@ -476,10 +476,10 @@ export default function AdminPage() {
               className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 px-1">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                   Live Lists
                 </p>
-                <h2 className="mt-2 text-2xl font-bold text-white">
+                <h2 className="mt-2 text-h2 font-bold text-white">
                   Manage existing competitions
                 </h2>
               </div>
@@ -496,13 +496,13 @@ export default function AdminPage() {
             >
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                     Create Roster
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold text-white">
+                  <h2 className="mt-2 text-h2 font-bold text-white">
                     Upload your players and start fast
                   </h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                  <p className="mt-2 text-p2 leading-6 text-slate-300">
                     Add the roster name, upload the CSV, then jump straight into the
                     player list editor.
                   </p>
@@ -537,13 +537,13 @@ export default function AdminPage() {
               transition={{ duration: 0.45, delay: 0.12 }}
               className="rounded-[24px] sm:rounded-[30px] border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-xl"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+              <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                 Support
               </p>
-              <h2 className="mt-2 text-2xl font-bold text-white">
+              <h2 className="mt-2 text-h2 font-bold text-white">
                 Need a bespoke club setup?
               </h2>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
+              <p className="mt-3 text-p2 leading-6 text-slate-300">
                 Reach out for help with custom workflows, imports, or a competition setup
                 tailored to your club structure.
               </p>
