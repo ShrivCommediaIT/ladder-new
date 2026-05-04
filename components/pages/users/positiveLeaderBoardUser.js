@@ -261,7 +261,6 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
         const payload = {
           ladder_id: ladderId,
           type: "positive",
-          sortbyskillnumber: skillNo,
         };
 
         if (age > 0) {

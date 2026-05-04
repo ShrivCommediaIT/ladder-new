@@ -10,7 +10,6 @@ export const fetchNegativeLeaderboard = createAsyncThunk(
     try {
       const res = await getRequest(API_ENDPOINTS.LEADERBOARD, {
         type: "negative",
-        sortbyskillnumber: 0,
         ...payload
       });
 
