@@ -208,7 +208,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                     <Button
                       size="sm"
                       variant="ghost"
-                      className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm
+                      className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm cursor-pointer
                         ${
                           isDemo
                             ? "text-cyan-300 border border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"
@@ -218,7 +218,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                         handleEditClick(ladder.id, ladder.type, ladder.inverted)
                       }
                     >
-                      Edit
+                      Edit 
                     </Button>
 
                     <AlertDialog>

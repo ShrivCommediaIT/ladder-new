@@ -34,7 +34,7 @@ export default function BasicLeaderboardActivityEntryCard({
   const [selectedActivity, setSelectedActivity] = useState(
     initialActivity || 1,
   );
-
+  const [currentScore, setCurrentScore] = useState(0);
   const [value, setValue] = useState("0");
   const [witnessBy, setWitnessBy] = useState("");
   const [skillSign, setSkillSign] = useState("+");
@@ -82,6 +82,7 @@ export default function BasicLeaderboardActivityEntryCard({
             setMinStr(mm);
             setSecStr(ss.padStart(2, "0"));
             setMsStr(ms);
+            setCurrentScore(currentScoreObj?.negative_ladder_bestscore);
           }
         } else {
           setMinStr("00"); setSecStr("00"); setMsStr("00");
@@ -90,6 +91,7 @@ export default function BasicLeaderboardActivityEntryCard({
         const posScore = currentScoreObj?.score;
         if (posScore !== undefined && posScore !== null) {
           setValue(String(posScore));
+          setCurrentScore(posScore);
         } else {
           setValue("0");
         }
@@ -100,6 +102,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
   // Negative best-result editing
   const [editingBest, setEditingBest] = useState(false);
+  const [editingCurrent, setEditingCurrent] = useState(false);
   const [bestMinStr, setBestMinStr] = useState("00");
   const [bestSecStr, setBestSecStr] = useState("00");
   const [bestMsStr, setBestMsStr] = useState("00");
@@ -154,7 +157,7 @@ export default function BasicLeaderboardActivityEntryCard({
         const bestScore = await getRequest("/user/getTopScore", {
           user_id: String(playerId),
           skill_activity_id: String(skillActivityId),
-          score: "0",
+          score: String(currentScore),
         });
 
         if (bestScore?.status === 200 || bestScore?.status === "success") {
@@ -183,7 +186,7 @@ export default function BasicLeaderboardActivityEntryCard({
     };
 
     fetchTopScore();
-  }, [playerId, skillActivityId]);
+  }, [playerId, skillActivityId, currentScore]);
 
   const handleDigit = (d) => {
 
@@ -497,7 +500,7 @@ export default function BasicLeaderboardActivityEntryCard({
         finalScore = "-";
       } else {
         const num = Math.abs(Number(inputScore) || 0);
-        finalScore = skillSign === "-" ? -num : num;
+        finalScore = num;
       }
     }
 
@@ -520,8 +523,26 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
       if (bestScore !== undefined && bestScore !== null) {
-        params.append("best_result", String(bestScore));
+        let bestToSubmit;
+        if (type === "negative" || ladderType === "negative"){
+          const currentSeconds = convertTimeToSeconds(finalScore);
+          const bestSeconds = convertTimeToSeconds(bestScore);
+          console.log("Current seconds:",  Number(currentSeconds), "Best seconds:", Number(bestSeconds));    
+          if (Number(currentSeconds) < (Number(bestSeconds))) {
+            bestToSubmit = String(finalScore) ;
+          } else {
+            bestToSubmit = bestScore;
+          }
+        }else{
+          if (value > bestScore) {
+            bestToSubmit = value;
+          } else {
+            bestToSubmit = bestScore;
+          }
+        }
+        params.append("best_result", String(bestToSubmit));
       }
+      // return
       const skillsPost = await postUrlEncoded(`/${URl}`, params);
 
       if (skillsPost?.status === 200 || skillsPost?.status === "success") {
@@ -585,6 +606,7 @@ export default function BasicLeaderboardActivityEntryCard({
       setTopScore(bestValForNegative);
       setOpenSuccessResult(true);
       setEditingBest(false);
+      setEditingCurrent(false)
       return;
     }
 
@@ -593,22 +615,24 @@ export default function BasicLeaderboardActivityEntryCard({
       return;
     }
 
-    // For skill and positive types, use the edited topScore without fetching
-    if (ladderType === "skill" || ladderType === "positive" || type === "positive") {
-      setOpenSuccessResult(true);
-      return;
-    }
-
-    const bestScore = await getRequest("/user/getTopScore", {
+    const bestScore = await getRequest(API_ENDPOINTS.GET_SKILL_BY_NUMBER, {
       user_id: String(playerId),
       skill_activity_id: String(skillActivityId),
-      score: String(value),
+      score: currentScore,
     });
 
     if (bestScore?.status == 200) {
       setTopScore(bestScore?.data?.[0]?.top_score || 0);
       setOpenSuccessResult(true);
     }
+
+    // For skill and positive types, use the edited topScore without fetching
+    if (ladderType === "skill" || ladderType === "positive" || type === "positive") {
+      setOpenSuccessResult(true);
+      return;
+    }
+
+
   };
 
   return (
@@ -653,6 +677,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 Today's Result
               </label>
               {(type === "negative" || ladderType === "negative") ? (
+                editingCurrent ? (
                 <div className="flex items-center justify-center gap-[2px] mt-1 font-bold text-black bg-white rounded h-8 w-full sm:w-28 focus-within:ring-2 focus-within:ring-sky-500 overflow-hidden border border-gray-300 px-1">
                   <input
                     className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${activeField === "min" ? "text-sky-500" : ""}`}
@@ -684,14 +709,31 @@ export default function BasicLeaderboardActivityEntryCard({
                     placeholder="MS"
                   />
                 </div>
-              ) : (
-                <input
-                  className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
-                  value={value}
-                  onFocus={() => setBestInputFocused(false)}
-                  onChange={(e) => handleInputChange(e)}
-                />
-              )}
+              ) : 
+                (
+                  <div
+                    className="w-full sm:w-28 h-8 flex items-center justify-center rounded text-slate-700 font-bold mt-1 bg-slate-300 cursor-pointer hover:bg-slate-200 text-sm"
+                    onClick={() => {
+                      setEditingCurrent(true);
+                      setBestInputFocused(true);
+                      setBestActiveField("min");
+                      setBestFieldKeystrokes(0);
+                    }}
+                    title="Click to edit best result"
+                  >
+                    {loadingTopScore ? "..." :
+                      convertTimeToSeconds(selectedPlayer?.scores?.[initialActivity - 1]?.negative_ladder_bestscore) || "0"
+                    }
+                  </div>
+                ) )
+                : (
+                  <input
+                    className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
+                    value={value}
+                    onFocus={() => setBestInputFocused(false)}
+                    onChange={(e) => handleInputChange(e)}
+                  />
+                )}
             </div>
 
             <div className="flex-1 sm:flex-none flex flex-col items-center">
@@ -745,9 +787,8 @@ export default function BasicLeaderboardActivityEntryCard({
                     title="Click to edit best result"
                   >
                     {loadingTopScore ? "..." :
-                      convertTimeToSeconds(selectedPlayer?.scores?.[initialActivity - 1]?.negative_ladder_bestscore) || "0"
+                      convertTimeToSeconds(selectedPlayer?.scores?.[initialActivity - 1]?.negative_ladder_score) || "0"
                     }
-                    {console.log("result", convertTimeToSeconds(selectedPlayer?.scores?.[initialActivity - 1]?.negative_ladder_bestscore) || "0")}
                   </div>
                 )
               ) : (

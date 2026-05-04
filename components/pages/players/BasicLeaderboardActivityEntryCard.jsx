@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { getRequest, postUrlEncoded } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ export default function BasicLeaderboardActivityEntryCard({
 }) {
   const [selectedActivity, setSelectedActivity] = useState(initialActivity || 1);
   const [value, setValue] = useState("0");
+  const [currentScore, setCurrentScore] = useState(0);
   const [witnessBy, setWitnessBy] = useState("");
   const [skillSign, setSkillSign] = useState("+");
   const [skillDesc, setSkillDesc] = useState("");
@@ -45,6 +46,7 @@ export default function BasicLeaderboardActivityEntryCard({
   const [bestInputFocused, setBestInputFocused] = useState(false);
   const [loadingTopScore, setLoadingTopScore] = useState(true);
   const [hasEditedToday, setHasEditedToday] = useState(false);
+  const lastTopScoreRequestRef = useRef("");
   // "ok" | "reset" | null
   useEffect(() => {
     if (initialActivity) {
@@ -58,6 +60,8 @@ export default function BasicLeaderboardActivityEntryCard({
       const posScore = currentScoreObj?.score;
       if (posScore !== undefined && posScore !== null) {
         setValue(String(posScore));
+        setCurrentScore(posScore);
+
       } else {
         setValue("0");
       }
@@ -160,9 +164,16 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("user_name", playerName);
 
 
+  console.log("cuurentScore", currentScore)
       
       if (bestScore !== undefined && bestScore !== null) {
-        params.append("best_result", String(bestScore));
+        let bestToSubmit;
+        if (value > bestScore  ){
+          bestToSubmit = value;
+        }else{
+          bestToSubmit = bestScore;
+        }
+        params.append("best_result", String(bestToSubmit));
       }
       const skillsPost = await postUrlEncoded(API_ENDPOINTS.POST_RESULT_SKILLBOARD, params);
       if ((skillsPost.status === 200)) {
@@ -207,7 +218,7 @@ export default function BasicLeaderboardActivityEntryCard({
       return;
     }
 
-    const finalScore = skillSign === "-" ? -num : num;
+    const finalScore =  num;
 
     // ✅ If topScore is 0, send the current value as the best result
     const bestResultToSubmit = (topScore === 0 || topScore === "0") ? finalScore : topScore;
@@ -249,7 +260,10 @@ export default function BasicLeaderboardActivityEntryCard({
   };
 
   useEffect(() => {
-    if (!playerId || !skillActivityId) return;
+    if (!playerId || !skillActivityId || currentScore <= 0) {
+      setLoadingTopScore(false);
+      return;
+    }
 
     const fetchTopScore = async () => {
       setLoadingTopScore(true);
@@ -257,12 +271,13 @@ export default function BasicLeaderboardActivityEntryCard({
         const bestScore = await getRequest(API_ENDPOINTS.GET_TOP_SCORE, {
           user_id: String(playerId),
           skill_activity_id: String(skillActivityId),
-          score: "0",
+          score: String(currentScore),
         });
-        
+
+
         if (bestScore.status === 200) {
-          setTopScore(bestScore?.data?.[0]?.top_score || 0);
-          setTodaysScore(bestScore?.data?.[0]?.current_score || value);
+          setTopScore(bestScore?.data?.[0]?.top_score);
+          setTodaysScore(bestScore?.data?.[0]?.current_score || currentScore);
         }
       } catch (err) {
         console.error("Failed to load initial top score:", err);
@@ -272,7 +287,7 @@ export default function BasicLeaderboardActivityEntryCard({
     };
 
     fetchTopScore();
-  }, [playerId, skillActivityId]);
+  }, [playerId, skillActivityId, currentScore]);
 
   return (
     <>
