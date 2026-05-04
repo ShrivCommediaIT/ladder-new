@@ -155,7 +155,7 @@ const AgeFilter = ({ onSearch, user, resetSignal }) => {
 
           </div>
 
-          <span className="font-semibold text-gray-300">On date? -Adgest Date</span>
+          <span className="font-semibold text-gray-300">On date? Adjust Date</span>
 
           <div className="flex justify-center w-full">
             <input
