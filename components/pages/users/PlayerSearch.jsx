@@ -61,7 +61,7 @@ const PlayerSearch = ({
     activeFilters;
 
   return (
-    <div className="flex items-center gap-2 w-full max-w-md flex-wrap">
+    <div className="flex items-center gap-2 w-full flex-wrap">
 
       {/* 🔍 Search Icon (desktop toggle) */}
       <button
