@@ -28,6 +28,7 @@ const PlayerCard = ({
   isInverted,
   onSkillClick,
   onTargetAchieved,
+  isEditable,
   currentUser,
 }) => {
   const playerImageUrl = player?.image
@@ -173,8 +174,11 @@ useEffect(() => {
                 return (
                   <div
                     key={i}
-                    onClick={() => onSkillClick(player.id, skill.skill_number)}
-                    className={`${skillCellClass} cursor-pointer text-black bg-white hover:bg-emerald-500 relative`}
+                    onClick={() => isEditable && onSkillClick(player.id, skill.skill_number)}
+                    className={`${skillCellClass}  text-black relative ${isEditable
+                      ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
+                      : "cursor-not-allowed bg-white opacity-40 text-gray-500"
+                      }`}
                     title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
                   >
                     {/* minus sign box ke upar */}
