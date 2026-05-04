@@ -115,7 +115,7 @@ const initialState = {
   lastUploadedCSV: null,
   invertRanking: false,
   appliedAge: 0,
-  appliedAgeType: "under",
+  appliedAgeType: "",
   appliedGender: "",
 };
 
@@ -191,6 +191,13 @@ const playersSlice = createSlice({
           image_path: image_path || "",
           ladderDetails: ladderDetails || {},
         };
+
+        const { dob, gender } = action.meta.arg || {};
+        if (!dob && !gender) {
+          state.appliedAge = 0;
+          state.appliedAgeType = "";
+          state.appliedGender = "";
+        }
       })
       .addCase(fetchLeaderboard.rejected, (state, action) => {
         state.loading = false;
