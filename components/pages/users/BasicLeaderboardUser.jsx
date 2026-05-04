@@ -54,7 +54,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     !isNaN(target) &&
     !isNaN(score)
   ) {
-    isTargetAchieved = isInverted ? score > target : score < target;
+    isTargetAchieved = isInverted ? score >= target : score <= target;
   }
 
   return {

@@ -100,7 +100,7 @@ const PlayerSearchInput = ({
           </button>
         )}
       </div>
-      {(ladderType == null && isSubAdminDetails !== null && type !== "minileague") ? <InvertRanckings /> : null}
+      {(ladderType == null && isSubAdminDetails !== null && (type == "positive" || type == "negative" || type == "skill")) ? <InvertRanckings /> : null}
     </div>
   );
 };
