@@ -986,7 +986,6 @@ export default function BasicLeaderboardActivityEntryCard({
 
           {/* Body */}
           <div className="px-5 py-4 space-y-4">
-            <p className="text-sm text-red-600 text-italic text-center font-bold">Keep a note of your best score in the second box. </p>
             {/* Scores Row */}
             <div className="flex items-center justify-between text-lg font-bold">
               <div className="flex items-center gap-2">

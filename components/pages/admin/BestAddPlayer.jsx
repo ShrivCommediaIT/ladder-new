@@ -33,14 +33,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+  format,
+} from "date-fns";
 import { calculateAge } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
 
 export default function BestAddPlayer({ onClose, onSuccessRefresh }) {
   const dispatch = useDispatch();
@@ -230,28 +226,12 @@ const handleSubmit = async () => {
             Date of Birth
           </Label>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start cursor-pointer bg-gray-800/50 border-gray-700 text-white h-10"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dob ? format(dob, "dd/MM/yyyy") : "Select Date of birth"}
-              </Button>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-auto p-0 cursor-pointer bg-slate-300 border-gray-700">
-              <Calendar
-                mode="single"
-                selected={dob}
-                onSelect={setDob}
-                captionLayout="dropdown"
-                fromYear={1920}
-                toYear={new Date().getFullYear()}
-              />
-            </PopoverContent>
-          </Popover>
+          <DateOfBirthInput
+            id="dob"
+            value={dob}
+            onChange={setDob}
+            className="bg-gray-800/50 border-gray-700 text-white h-10"
+          />
         </div>
       </CardContent>
 

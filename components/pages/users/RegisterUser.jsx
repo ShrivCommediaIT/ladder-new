@@ -5,17 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, ArrowRight, Eye, EyeOff, CalendarIcon } from "lucide-react";
+import { User, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 
@@ -31,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
 
 
 
@@ -167,35 +162,17 @@ export default function RegisterUser({ ladderId, ladderType }) {
       Date of Birth:(for age related solutions)
     </Label>
 
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className="w-full justify-start cursor-pointer bg-gray-900 border-gray-700 text-white"
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {watch("dob")
-            ? format(watch("dob"), "dd/MM/yyyy")
-            : "Select Date of birth"}
-        </Button>
-      </PopoverTrigger>
-
-      <PopoverContent className="w-auto p-0 cursor-pointer bg-slate-300 border-gray-700">
-        <Calendar
-          mode="single"
-          selected={watch("dob")}
-          onSelect={(date) =>
-            setValue("dob", date, {
-              shouldValidate: true,
-              shouldDirty: true,
-            })
-          }
-          captionLayout="dropdown"
-          fromYear={1920}
-          toYear={new Date().getFullYear()}
-        />
-      </PopoverContent>
-    </Popover>
+    <DateOfBirthInput
+      id="dob"
+      value={watch("dob")}
+      onChange={(date) =>
+        setValue("dob", date ?? undefined, {
+          shouldValidate: true,
+          shouldDirty: true,
+        })
+      }
+      className="bg-gray-900 border-gray-700 text-white"
+    />
 
     <p className="text-red-400 text-xs">{errors.dob?.message}</p>
   </div>
