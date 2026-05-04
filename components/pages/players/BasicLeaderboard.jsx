@@ -266,15 +266,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         const params = {
           ladder_id: ladderId,
           type: "skill",
-          sortbyskillnumber: skillNo,
         };
-        if (age > 0) {
-          params.dob = age;
-          params.age_type = ageType;
-        }
-        if (gender) {
-          params.gender = gender;
-        }
         dispatch(fetchSkillLeaderboard(params)).finally(() => {
           setIsRefreshing(false);
         });

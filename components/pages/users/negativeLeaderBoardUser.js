@@ -295,7 +295,6 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
         const payload = {
           ladder_id: ladderId,
           type: "negative",
-          sortbyskillnumber: skillNo,
         };
 
         if (age > 0) {
