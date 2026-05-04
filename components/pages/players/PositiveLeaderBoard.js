@@ -25,7 +25,7 @@ import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 const PlayerCard = ({
   player,
   overallRank,
-  appliedAge,
+  showAgeRank,
   ageRank,
   isInverted,
   onSkillClick,
@@ -144,7 +144,7 @@ const PlayerCard = ({
             </div>
 
             <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
-              {Boolean(appliedAge) && (
+              {showAgeRank && (
                 <div className="flex flex-col items-center">
                   <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
                     {ageRank}
@@ -232,6 +232,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const { data = [], loading,ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
+  const showAgeRank = Number(appliedAge) > 0;
   const isInverted = ladderDetails?.inverted == 0;
 
   const currentUser = useSelector((state) => state.user?.user);
@@ -376,7 +377,7 @@ const filteredPlayers = React.useMemo(() => {
                   key={player.id}
                   player={player}
                   overallRank={player.rank || index + 1}
-                  appliedAge={appliedAge}
+                  showAgeRank={showAgeRank}
                   ageRank={index + 1}
                   isInverted={isInverted}
                   onSkillClick={handleSkillClick}
