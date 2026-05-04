@@ -339,18 +339,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
       const payload = {
         ladder_id: ladderId,
         type: "skill",
-        sortbyskillnumber: skillNo,
       };
-
-      if (age > 0) {
-        payload.dob = age;
-        if (ageType) payload.age_type = ageType;
-      }
-
-      if (gender) {
-        payload.gender = gender;
-      }
-
       dispatch(fetchSkillLeaderboard(payload)).finally(() => {
         setIsRefreshing(false);
       });

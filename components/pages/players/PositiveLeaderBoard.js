@@ -262,7 +262,6 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         const payload = {
           ladder_id: ladderId,
           type: "positive",
-          sortbyskillnumber: skillNo,
         };
         dispatch(fetchPositiveLeaderboard(payload));
       }

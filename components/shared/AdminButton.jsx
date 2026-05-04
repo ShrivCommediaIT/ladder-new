@@ -288,7 +288,6 @@ const AdminButton = () => {
     const payload = {
       ladder_id: ladderId,
       type: laddartype,
-      sortbyskillnumber: currentSkillNo,
       dob: ageNum > 0 ? ageNum : undefined,
       gender: gender || undefined,
       ...(ageNum > 0 && ageType ? { age_type: ageType } : {}),

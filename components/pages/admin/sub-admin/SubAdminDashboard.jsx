@@ -44,6 +44,7 @@ export default function SubAdminDashboard() {
   const [csvFile, setCsvFile] = useState(null);
   const [ladderType, setLadderType] = useState("winlose");
   const [duplicateWarning, setDuplicateWarning] = useState(null);
+  const [showDemo, setShowDemo] = useState(true);
 
   const { allLadders } = useSelector((state) => state.fetchLadder);
 
@@ -404,10 +405,23 @@ export default function SubAdminDashboard() {
           <div className="lg:col-span-3 space-y-6">
             {/* LADDER TYPES */}
             <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-5">
+            <div className="flex items-center justify-between px-1 sm:px-2 pt-2 mb-6">
+
               <h3 className="text-lg font-semibold text-cyan-400 flex items-center gap-2 mb-3">
                 <Layers className="h-5 w-5" /> Solutions Available
               </h3>
-              <LadderInfo  ladders={demoLadders} />
+
+               <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowDemo(!showDemo)}
+                className="text-xs border border-cyan-400/50 text-cyan-300 hover:bg-cyan-100 cursor-pointer"
+              >
+                {showDemo ? "Hide" : "Show"}
+              </Button>
+            </div>
+              {showDemo && <LadderInfo  ladders={demoLadders} />}
+
             </div>
 
             {/* LADDER LIST */}

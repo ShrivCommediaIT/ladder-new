@@ -263,7 +263,6 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         const payload = {
           ladder_id: ladderId,
           type: "negative",
-          sortbyskillnumber: skillNo,
         };
         dispatch(fetchNegativeLeaderboard(payload));
       }
