@@ -32,12 +32,14 @@ export const PlayerLists = () => {
   const [loadingMiniLeague, setLoadingMiniLeague] = useState(true);
 
   const globalLoading = loadingPlayers || loadingActivity || loadingMiniLeague;
+  const [bestSearchValue, setBestSearchValue] = useState("");
 
   const searchParams = useSearchParams();
   const ladderId = searchParams.get("ladder_id");
   const ladderType = searchParams.get("ladder_type");
   const type = searchParams.get("type");
   const shouldPrint = searchParams.get("print");
+  const isBestLayout = ["best5", "best3", "winlose"].includes(type || ladderType || "");
 
   // 🔹 Trigger print if query param is present
   useEffect(() => {
@@ -97,12 +99,33 @@ export const PlayerLists = () => {
 
   // ✅ Fixed: Use miniLeague ladder_id as primary source
   const currentLadderId = ladder?.ladder_id || ladderId;
+  const playerEntry = useSelector((state) =>
+    ladderId ? state.player?.players?.[Number(ladderId)] : null,
+  );
+  const currentLadderName =
+    playerEntry?.ladderDetails?.name ||
+    miniLeagueData?.name ||
+    "Football Ladder";
+  const currentPlayerCount = playerEntry?.data?.length || 0;
 
   return (
-    <div className="bg-gray-800 min-h-screen">
+    <div className={isBestLayout ? "ladder-shell min-h-screen" : "bg-gray-800 min-h-screen"}>
       {/* 🔹 Unified Sticky Navbar (Admin & Sub-Admin) */}
-      <PlayerLevelNavbar activeTab="players" />
+      <PlayerLevelNavbar
+        activeTab="players"
+        ladderName={currentLadderName}
+        liveCount={currentPlayerCount}
+        ladderType={type || ladderType}
+        searchValue={bestSearchValue}
+        onSearchChange={setBestSearchValue}
+      />
 
+      {isBestLayout ? (
+        <div className="w-full px-4 pb-6 sm:px-6 lg:px-10">
+          <PlayersLists1 searchValue={bestSearchValue} onSearchChange={setBestSearchValue} />
+        </div>
+      ) : (
+        <>
       {/* 🔹 Main Section */}
       <div className="w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 flex flex-col lg:flex-row gap-6">
         {/* 🔹 Left/Main Column */}
@@ -142,6 +165,8 @@ export const PlayerLists = () => {
         <div className="px-4 py-6 flex justify-center items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-purple-600 border-solid" />
         </div>
+      )}
+        </>
       )}
     </div>
   );

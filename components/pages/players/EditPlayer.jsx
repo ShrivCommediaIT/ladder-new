@@ -31,6 +31,7 @@ export const EditPlayer = ({
   onClose = () => {},
   currentId = null,
   setLoading = () => {},
+  initialTab = "result",
 }) => {
   const dispatch = useDispatch();
 
@@ -91,7 +92,13 @@ export const EditPlayer = ({
     }
   }, [result, moveError, dispatch, ladder_id]);
 
-  const [selectedTab, setSelectedTab] = useState("result");
+  const [selectedTab, setSelectedTab] = useState(initialTab);
+
+  useEffect(() => {
+    if (open) {
+      setSelectedTab(initialTab || "result");
+    }
+  }, [initialTab, open]);
 
   const tabs = [
     { value: "result", label: "Result" },

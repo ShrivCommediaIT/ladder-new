@@ -117,22 +117,22 @@ const LadderRulesCard = ({ ladderIdProp }) => {
 
   if (loading) {
     return (
-      <div className="space-y-4 w-full p-6 rounded-3xl bg-white/5 border border-white/10 shadow-xl">
-        <h2 className="text-xl font-semibold text-blue-400">Ladder Rules</h2>
-        <Skeleton className="h-10 w-full bg-gray-700" />
-        <Skeleton className="h-24 w-full bg-gray-800" />
+      <div className="space-y-4 w-full">
+        <h2 className="text-h5 font-semibold text-primary">Ladder Rules</h2>
+        <Skeleton className="h-10 w-full rounded-xl bg-muted" />
+        <Skeleton className="h-24 w-full rounded-2xl bg-muted" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 w-full px-6">
+    <div className="space-y-4 w-full">
       {rulesList.map((rule, idx) => {
         const isCurrentEditing = isEditing === rule.id;
         const isOpen = openRuleIds.includes(rule.id);
 
         return (
-          <div key={rule.id} className="space-y-3 pb-6 rounded-xl transition-all duration-300">
+          <div key={rule.id} className="space-y-3 rounded-2xl border border-border/70 bg-card/70 p-3 shadow-sm transition-all duration-300">
             {isCurrentEditing ? (
               <>
                 <EditDiscountToken 
@@ -147,7 +147,7 @@ const LadderRulesCard = ({ ladderIdProp }) => {
                 <div className="flex flex-col sm:flex-row justify-end gap-3 w-full pt-2">
                   <Button
                     onClick={() => handleSave(rule.id)}
-                    className="bg-amber-500 text-gray-900 font-bold hover:bg-amber-600 w-full sm:w-auto flex items-center gap-2"
+                    className="w-full sm:w-auto flex items-center gap-2 bg-primary text-primary-foreground font-bold hover:bg-brand-hover"
                   >
                     <Save size={18} /> Save
                   </Button>
@@ -155,7 +155,7 @@ const LadderRulesCard = ({ ladderIdProp }) => {
                   <Button
                     variant="ghost"
                     onClick={handleCancel}
-                    className="bg-gray-700 text-gray-300 font-semibold hover:bg-gray-600 w-full sm:w-auto flex items-center gap-2"
+                    className="w-full sm:w-auto flex items-center gap-2 border border-border bg-card text-foreground font-semibold hover:bg-muted"
                   >
                     <X size={18} /> Cancel
                   </Button>
@@ -164,40 +164,42 @@ const LadderRulesCard = ({ ladderIdProp }) => {
             ) : (
               <>
                 <div
-                  className="text-white bg-gradient-to-r from-[#154052] to-blue-900 rounded-lg text-xl sm:text-2xl p-4 flex items-center justify-between cursor-pointer shadow-xl"
+                  className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/15 via-secondary/20 to-primary/10 px-4 py-4 text-foreground shadow-sm"
                   onClick={() => toggleRule(rule.id)}
                 >
-                  <span>{rule.title || "Ladder Rules"}</span>
+                  <div className="flex items-center justify-between gap-3 cursor-pointer">
+                  <span className="text-h5 font-semibold">{rule.title || "Ladder Rules"}</span>
                   <div className="flex">
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="text-amber-400 cursor-pointer"
+                    className="cursor-pointer text-primary hover:bg-primary/10 hover:text-primary"
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditTitleId(rule.id);
                       setTempTitle(rule.title || "");
                     }}
                   >
-                    <Pen size={24} />
+                    <Pen size={20} />
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-amber-400 cursor-pointer">
-                    {isOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+                  <Button variant="ghost" size="icon" className="cursor-pointer text-primary hover:bg-primary/10 hover:text-primary">
+                    {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </Button>
+                  </div>
                   </div>
                 </div>
 
                 {isOpen && (
                   <div className="pt-2">
                     <div
-                      className="mt-2 bg-gray-900/70 p-6 text-gray-200 rounded-xl text-base sm:text-lg max-h-[380px] overflow-y-auto border border-gray-800 space-y-3 leading-relaxed"
+                      className="mt-2 max-h-[380px] overflow-y-auto rounded-2xl border border-border bg-background/70 p-5 text-sm sm:text-base text-foreground space-y-3 leading-relaxed shadow-inner"
                       dangerouslySetInnerHTML={{
                         __html: rule.rules || "No rules available.",
                       }}
                     />
                     <div className="flex flex-col sm:flex-row mt-4 justify-end gap-3 w-full">
                       <Button
-                        className="bg-blue-900 text-white hover:bg-blue-950 w-full sm:w-auto flex items-center gap-2"
+                        className="w-full sm:w-auto flex items-center gap-2 bg-primary text-primary-foreground hover:bg-brand-hover"
                         onClick={() => setIsEditing(rule.id)}
                       >
                         <Edit size={18} /> Edit Info
@@ -212,7 +214,7 @@ const LadderRulesCard = ({ ladderIdProp }) => {
       })}
 
       <Dialog open={editTitleId !== null} onOpenChange={(open) => !open && setEditTitleId(null)}>
-        <DialogContent className="sm:max-w-[425px] bg-gray-900 border-gray-800 text-white">
+        <DialogContent className="sm:max-w-[425px] border border-border bg-card text-card-foreground">
           <DialogHeader>
             <DialogTitle>Edit Title</DialogTitle>
           </DialogHeader>
@@ -221,14 +223,14 @@ const LadderRulesCard = ({ ladderIdProp }) => {
               value={tempTitle}
               onChange={(e) => setTempTitle(e.target.value)}
               placeholder="Enter Title"
-              className="bg-gray-800 border-gray-700 text-white focus:ring-amber-500"
+              className="border-border bg-background text-foreground focus-visible:ring-primary"
             />
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setEditTitleId(null)} className="text-gray-300 hover:bg-gray-800 hover:text-white">
+            <Button variant="ghost" onClick={() => setEditTitleId(null)} className="text-muted-foreground hover:bg-muted hover:text-foreground">
               Cancel
             </Button>
-            <Button onClick={handleSaveTitle} className="bg-blue-900 hover:bg-blue-950 text-white font-bold">
+            <Button onClick={handleSaveTitle} className="bg-primary hover:bg-brand-hover text-primary-foreground font-bold">
               Save
             </Button>
           </DialogFooter>

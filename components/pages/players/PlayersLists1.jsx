@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { useSelector } from "react-redux";
 import { useSearchParams } from "next/navigation";
 
 import MinileaguePlayers from "./MinileaguePlayers";
@@ -10,7 +9,7 @@ import RosterLeaderboard from "../roster/RosterLeaderboard";
 import PositiveLeaderboard from "./PositiveLeaderBoard";
 import NegativeLeaderboard from "./negativeLeaderboard";
 
-const PlayersLists1 = () => {
+const PlayersLists1 = ({ searchValue = "", onSearchChange }) => {
   const searchParams = useSearchParams();
   const ladderId = searchParams.get("ladder_id");
 
@@ -26,7 +25,7 @@ const PlayersLists1 = () => {
 
   // best5 best3 winlose
   if (ladderType && ["best5", "best3", "winlose"].includes(ladderType)) {
-    return <Best5Players ladderId={ladderId} />;
+    return <Best5Players ladderId={ladderId} searchValue={searchValue} onSearchChange={onSearchChange} />;
   }
 
   if (ladderType === "roster") {
