@@ -49,7 +49,7 @@ const EditPlayerDetails = ({
     name: "",
     dob: null,
     phone: "",
-    gender: "male",
+    gender: "",
   });
 
   const [showSkeleton, setShowSkeleton] = useState(false);
@@ -66,7 +66,7 @@ const EditPlayerDetails = ({
         dob: parsedDob,
         name: selectedPlayer.name || "",
         phone: selectedPlayer.phone || "",
-        gender: selectedPlayer.gender || "male",
+        gender: selectedPlayer.gender || "",
       });
     } else if (userId) {
       setForm((prev) => ({
@@ -221,6 +221,7 @@ const EditPlayerDetails = ({
             <div className="w-full">
               <Label className="text-gray-300 font-semibold py-2 text-lg">Gender</Label>
               <Select
+                key={form.gender}
                 value={form.gender}
                 onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
               >

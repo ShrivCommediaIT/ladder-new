@@ -253,6 +253,21 @@ const AdminButton = () => {
   const handleClearAll = () => {
     setIsSorted(false);
     setCurrentSkillNo(0);
+    const clearedFilter = { age: 0, ageType: "", gender: "" };
+
+    if (isSkill) {
+      dispatch(setSkillAgeFilter(clearedFilter));
+    } else if (isPositive) {
+      dispatch(setPositiveAgeFilter(clearedFilter));
+    } else if (isNegative) {
+      dispatch(setNegativeAgeFilter(clearedFilter));
+    } else {
+      dispatch(setAgeFilter(clearedFilter));
+      setLocalAge(0);
+      setLocalAgeType("");
+      setLocalGender("");
+    }
+
     setAgeFilterResetSignal((prev) => prev + 1);
     // Refresh with cleared filters
     if (ladderId) {
@@ -288,7 +303,6 @@ const AdminButton = () => {
     const payload = {
       ladder_id: ladderId,
       type: laddartype,
-      sortbyskillnumber: currentSkillNo,
       dob: ageNum > 0 ? ageNum : undefined,
       gender: gender || undefined,
       ...(ageNum > 0 && ageType ? { age_type: ageType } : {}),

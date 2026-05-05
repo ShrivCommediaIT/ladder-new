@@ -24,10 +24,11 @@ import LadderLinkPanel from "../players/LadderLinkPanel";
 const PlayerCard = ({
   player,
   overallRank,
-  appliedAge,
+  showAgeRank,
   ageRank,
   onSkillClick,
   onTargetAchieved,
+  isEditable,
   currentUser,
   isInverted,
 }) => {
@@ -66,7 +67,7 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-     isTargetAchieved = isInverted ? score > target : score < target;
+     isTargetAchieved = isInverted ? score >= target : score <= target;
     }
 
     return {
@@ -129,6 +130,11 @@ const PlayerCard = ({
                   {player.age}
                 </p>
               )}
+              {player.gender && (
+                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                    {player.gender?"M":"F"}
+                  </p>
+                )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -143,7 +149,7 @@ const PlayerCard = ({
             </div>
 
             <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
-              {Boolean(appliedAge) && (
+              {showAgeRank && (
                 <div className="flex flex-col items-center">
                   <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
                     {ageRank}
@@ -162,32 +168,34 @@ const PlayerCard = ({
         </div>
 
         {player.skills?.length > 0 ? (
-          <>
-            <div className="flex gap-[3px] overflow-y-visible pb-2 mb-1">
+                 <>
+            <div className="flex gap-[3px] overflow-y-visible pb-1 mb-1">
               {player.skills.map((skill, i) => {
-                const isNegative = skill.skill_sign === "-";
 
                 return (
                   <div
                     key={i}
-                    onClick={() => onSkillClick(player.id, skill.skill_number)}
-                    className="cursor-pointer min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded bg-white hover:bg-emerald-500 transition-all hover:scale-110 relative"
-                    title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
+                    onClick={() =>
+                      isEditable && onSkillClick(player.id, skill.skill_number)
+                    }
+                    className={`relative min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded transition-all ${isEditable
+                      ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
+                      : "cursor-not-allowed bg-white opacity-40 text-gray-500"
+                      }`}
+                    title={
+                      isEditable
+                        ? `Edit Skill ${skill.skill_number}: ${skill.skill_description}`
+                        : "Only own skills can be edited"
+                    }
                   >
-                    {/* minus sign box ke upar */}
-                    {isNegative && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
-                        −
-                      </span>
-                    )}
-
+                    {/* Minus sign above number */}
+                   
                     {skill.skill_number}
                   </div>
                 );
               })}
             </div>
 
-            {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
             <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
               {player.skills.map((skill, i) => {
                 const scoreData = getScoreBySkillNumber(
@@ -195,14 +203,15 @@ const PlayerCard = ({
                   player.skills || [],
                   skill.skill_number,
                 );
+
                 return (
                   <div
                     key={i}
-                    className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
+                    className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm transition-all duration-200 ${scoreData.isTargetAchieved
                       ? "bg-green-400 text-black shadow-md font-semibold"
                       : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
                       } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
-                    title={`Score: ${scoreData.score} | Target: ${scoreData.target || "N/A"
+                    title={`Score: ${scoreData.score || 0} | Target: ${scoreData.target || "N/A"
                       }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
                   >
                     {Math.abs(scoreData.displayScore || 0)}
@@ -211,7 +220,16 @@ const PlayerCard = ({
               })}
             </div>
 
-
+            <div className="flex gap-[3px] overflow-x-auto pb-1">
+              {player.skills.map((skill, i) => (
+                <div
+                  key={i}
+                  className="min-w-[24px] h-6 flex items-center justify-center rounded font-bold text-[10px] bg-blue-200 text-black shadow-sm border border-gray-200"
+                >
+                  {getRankBySkillNumber(player.ranks || [], skill.skill_number)}
+                </div>
+              ))}
+            </div>
           </>
         ) : (
           <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
@@ -231,6 +249,7 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
   const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
+  const showAgeRank = Number(appliedAge) > 0;
   const isInverted = ladderDetails?.inverted == 0;;
   const currentUser = useSelector((state) => state.user?.user);
 
@@ -261,7 +280,6 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
         const payload = {
           ladder_id: ladderId,
           type: "positive",
-          sortbyskillnumber: skillNo,
         };
 
         if (age > 0) {
@@ -407,19 +425,23 @@ const filteredPlayers = useMemo(() => {
             {filteredPlayers.length === 0 ? (
               <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
             ) : (
-              filteredPlayers.map((player, index) => (
+              filteredPlayers.map((player, index) => {
+                  const isEditablePlayer = player.id === currentUserId;
+                return (
                 <PlayerCard
                   key={player.id}
                   player={player}
                   overallRank={player.rank || index + 1}
-                  appliedAge={appliedAge}
+                  showAgeRank={showAgeRank}
                   ageRank={index + 1}
                   isInverted={isInverted}
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}
                   currentUser={currentUser}
-                />
-              ))
+                  isEditable={isEditablePlayer}
+                />)
+                }
+              )
             )}
           </div>
         </div>

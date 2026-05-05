@@ -10,7 +10,6 @@ export const fetchNegativeLeaderboard = createAsyncThunk(
     try {
       const res = await getRequest(API_ENDPOINTS.LEADERBOARD, {
         type: "negative",
-        sortbyskillnumber: 0,
         ...payload
       });
 
@@ -73,6 +72,13 @@ const negativeLeaderboardSlice = createSlice({
         state.data = action.payload.data;
         state.gradebars = action.payload.gradebars;
         state.ladderDetails = action.payload.ladderDetails;
+
+        const { dob, gender } = action.meta.arg || {};
+        if (!dob && !gender) {
+          state.appliedAge = 0;
+          state.appliedAgeType = "";
+          state.appliedGender = "";
+        }
       })
       .addCase(fetchNegativeLeaderboard.rejected, (state, action) => {
         state.loading = false;

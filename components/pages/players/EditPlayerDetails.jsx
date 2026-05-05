@@ -57,7 +57,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
     name: "",
     dob:null,
     phone: "",
-    gender: "male",
+    gender: "",
   });
 
   const [showSkeleton, setShowSkeleton] = useState(false);
@@ -106,7 +106,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
         dob: parsedDob,
         name: selectedPlayer.name || "",
         phone: selectedPlayer.phone || "",
-        gender: selectedPlayer.gender || "male",
+        gender: selectedPlayer.gender || "",
       });
     }
     
@@ -205,7 +205,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
             transition={{ duration: 0.5 }}
             className="text-2xl font-bold text-center bg-gradient-to-r from-blue-100 to-cyan-300 text-transparent bg-clip-text mb-4"
           >
-            Edit Player Details
+            Edit Player Details 
           </motion.h2>
 
           {showSkeleton ? (
@@ -276,6 +276,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
               { ladderType !== "minileague" && <motion.div whileHover={{ scale: 1.02 }} className="space-y-2 w-full">
                 <Label className="text-blue-200 font-semibold">Gender</Label>
                 <Select
+                  key={form.gender}
                   value={form.gender}
                   onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
                   disabled={isReadOnly}

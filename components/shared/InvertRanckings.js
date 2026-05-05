@@ -20,7 +20,7 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowDownUp } from 'lucide-react';
+import { ArrowBigUp, ArrowDownUp } from 'lucide-react';
 
 /**
  * Normalizes common URL type variations to the canonical strings 
@@ -183,7 +183,7 @@ export const InvertRanckings = () => {
         }`}
         title="Invert Rank"
     >   <span className="text-white text-sm">{isInverted?"Inverted Rank": "Invert Rank"}</span>
-        <ArrowDownUp className={`text-white transition-transform duration-300 ${order === "desc" ? "rotate-180" : ""}`} />
+        <ArrowBigUp  className={`text-white transition-transform duration-300 ${isInverted === true ? "rotate-180" : ""}`} />
     </div>
     </>
   );

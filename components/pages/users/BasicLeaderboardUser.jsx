@@ -24,7 +24,30 @@ import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
-const getScoreBySkillNumber = (scores, skills, skillNumber) => {
+
+
+
+const getRankBySkillNumber = (ranks, skillNumber) => {
+  const rankObj = ranks.find((r) => r.skill_number === skillNumber);
+  return rankObj ? rankObj.rank : "-";
+};
+
+/* ---------------- PLAYER CARD ---------------- */
+const PlayerCard = ({
+  player,
+  overallRank,
+  appliedAge,
+  ageRank,
+  onSkillClick,
+  isInverted,
+  isEditable,
+  loggedInUser,
+}) => {
+  const playerImageUrl = player?.image
+    ? `${IMAGE_BASE_URL}/${player.image}`
+    : Logo;
+
+    const getScoreBySkillNumber = (scores, skills, skillNumber) => {
   const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
   const skillObj = skills?.find((s) => s.skill_number === skillNumber);
 
@@ -54,7 +77,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     !isNaN(target) &&
     !isNaN(score)
   ) {
-    isTargetAchieved = isInverted ? score > target : score < target;
+    isTargetAchieved = isInverted ? score >= target : score <= target;
   }
 
   return {
@@ -66,27 +89,6 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     input_score: inputScore,
   };
 };
-
-
-const getRankBySkillNumber = (ranks, skillNumber) => {
-  const rankObj = ranks.find((r) => r.skill_number === skillNumber);
-  return rankObj ? rankObj.rank : "-";
-};
-
-/* ---------------- PLAYER CARD ---------------- */
-const PlayerCard = ({
-  player,
-  overallRank,
-  appliedAge,
-  ageRank,
-  onSkillClick,
-  isInverted,
-  isEditable,
-  loggedInUser,
-}) => {
-  const playerImageUrl = player?.image
-    ? `${IMAGE_BASE_URL}/${player.image}`
-    : Logo;
 
   return (
     <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative gap-0 p-4">
@@ -117,6 +119,11 @@ const PlayerCard = ({
                   {player.age}
                 </p>
               )}
+              {player.gender && (
+                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                    {player.gender?"M":"F"}
+                  </p>
+                )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -153,7 +160,6 @@ const PlayerCard = ({
           <>
             <div className="flex gap-[3px] overflow-y-visible pb-1 mb-1">
               {player.skills.map((skill, i) => {
-                const isNegative = skill.skill_sign === "-";
 
                 return (
                   <div
@@ -172,11 +178,7 @@ const PlayerCard = ({
                     }
                   >
                     {/* Minus sign above number */}
-                    {isNegative && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
-                        −
-                      </span>
-                    )}
+                   
                     {skill.skill_number}
                   </div>
                 );
@@ -339,18 +341,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
       const payload = {
         ladder_id: ladderId,
         type: "skill",
-        sortbyskillnumber: skillNo,
       };
-
-      if (age > 0) {
-        payload.dob = age;
-        if (ageType) payload.age_type = ageType;
-      }
-
-      if (gender) {
-        payload.gender = gender;
-      }
-
       dispatch(fetchSkillLeaderboard(payload)).finally(() => {
         setIsRefreshing(false);
       });

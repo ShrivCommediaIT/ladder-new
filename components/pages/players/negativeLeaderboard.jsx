@@ -26,7 +26,7 @@ import { convertTimeToSeconds } from "@/helper/helperFunction";
 const PlayerCard = ({
   player,
   overallRank,
-  appliedAge,
+  showAgeRank,
   ageRank,
   isInverted,
   onSkillClick,
@@ -70,7 +70,7 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      isTargetAchieved = isInverted ? score > target : score < target;
+      isTargetAchieved = isInverted ? score >= target : score <= target;
     }
 
     return {
@@ -124,10 +124,15 @@ useEffect(() => {
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
               {player?.name || "N/A"}
               {player.age && (
-                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-3">
                   {player.age}
                 </p>
               )}
+              {player.gender && (
+                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                    {player.gender?"M":"F"}
+                  </p>
+                )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -142,7 +147,7 @@ useEffect(() => {
             </div>
 
             <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
-              {Boolean(appliedAge) && (
+              {showAgeRank && (
                 <div className="flex flex-col items-center">
                   <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
                     {ageRank}
@@ -232,6 +237,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
+  const showAgeRank = Number(appliedAge) > 0;
 
   const isInverted = ladderDetails?.inverted == 0;
 
@@ -263,7 +269,6 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         const payload = {
           ladder_id: ladderId,
           type: "negative",
-          sortbyskillnumber: skillNo,
         };
         dispatch(fetchNegativeLeaderboard(payload));
       }
@@ -378,7 +383,7 @@ const filteredPlayers = React.useMemo(() => {
                   key={player.id}
                   player={player}
                   overallRank={player.rank || index + 1}
-                  appliedAge={appliedAge}
+                  showAgeRank={showAgeRank}
                   ageRank={index + 1}
                   isInverted={isInverted}
                   onSkillClick={handleSkillClick}

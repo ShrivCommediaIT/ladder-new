@@ -71,6 +71,7 @@ export default function SubAdminDashboard() {
   const [csvFile, setCsvFile] = useState(null);
   const [ladderType, setLadderType] = useState("winlose");
   const [duplicateWarning, setDuplicateWarning] = useState(null);
+  const [showDemo, setShowDemo] = useState(true);
 
 
 
@@ -243,19 +244,19 @@ export default function SubAdminDashboard() {
       return;
     }
 
-    const cleanName = ladderName.trim();
+    let cleanName = subAdmin?.sport_name + " " + ladderName.trim();
 
     if (!subAdmin?.id || !cleanName || !csvFile) {
       toast.warn("Please enter solution name, upload CSV, and ensure login.");
       return;
     }
 
-    // duplicate name check (frontend)
     if (ladderExists(cleanName)) {
-      toast.error("Solution name already exists — choose another");
+      toast.error(`${cleanName} name already exists — choose another`);
       return;
     }
-    console.log("ladderType:", ladderType);
+    cleanName =  ladderName.trim();
+
     try {
       // CREATE LADDER
       const firstnameCapitalized = subAdmin.sport_name.charAt(0).toUpperCase() + subAdmin.sport_name.slice(1)
@@ -366,16 +367,16 @@ export default function SubAdminDashboard() {
     }
   };
 
-  const ladderExists = (name) => {
-    if (!allLadders) return false;
-
-    const newName = name.trim().toLowerCase();
-
-    return allLadders.some((l) => l.name?.trim().toLowerCase() === newName);
+    const ladderExists = (name) => {
+    if (!allLadders || !Array.isArray(allLadders)) return false;
+    const laddarNames = allLadders.map((l) => l.name?.trim().toLowerCase());
+    const cleanName = name.trim().toLowerCase();
+    const nameExists = laddarNames.includes(cleanName);
+    return nameExists;
   };
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen bg-background text-foreground mt-10">
       {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
       <PlayerLevelNavbar activeTab="dashboard" />
 
@@ -611,7 +612,7 @@ export default function SubAdminDashboard() {
         </div>
       </div>
 
-      <footer className="relative z-10 px-4 pb-8 sm:px-6 lg:px-8">
+      <footer className="relative z-10 px-4 pb-8 sm:px-6 lg:px-8 mt-10">
         <Card className="mx-auto w-full border border-border bg-card text-foreground shadow-lg">
           <CardContent className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>

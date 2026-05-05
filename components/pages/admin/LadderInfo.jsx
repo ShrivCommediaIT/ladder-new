@@ -22,8 +22,8 @@ export default function LadderInfo({ ladders }) {
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
-  const handleEditClick = (ladderId, ladderType) => {
-    router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}`);
+  const handleEditClick = (ladderId, ladderType, inverted) => {
+    router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}&inverted=${inverted}`);
   };
 
   useEffect(() => {
@@ -74,10 +74,12 @@ export default function LadderInfo({ ladders }) {
               transition={{ delay: index * 0.1 }}
               className="
                 group flex items-center justify-between 
-                rounded-xl border border-border bg-muted/20 
-                px-3 py-3 hover:bg-muted transition shadow-sm
+                rounded-xl border border-white/10 bg-black/30 
+                px-3 py-3 hover:bg-white/10 hover:shadow-lg 
+                hover:shadow-cyan-500/10 transition
+                cursor-pointer
               "
-              onClick={() => handleEditClick(ladder.id, ladder.type)}
+              onClick={() => handleEditClick(ladder.id, ladder.type, ladder.inverted)}
             >
               <div className="flex items-center gap-2 text-foreground">
                 <span className="text-sm sm:text-base font-medium">
