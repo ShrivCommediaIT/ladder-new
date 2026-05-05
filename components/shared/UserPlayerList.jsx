@@ -62,8 +62,8 @@ const UserPlayerList = () => {
 
   const filteredPlayers = searchQuery
     ? playerList.filter((player) =>
-        player.name?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      player.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : playerList;
 
   const uniqueFilteredPlayers = Array.from(
@@ -176,17 +176,15 @@ const UserPlayerList = () => {
                             setIsOpen(true);
                           }}
                           className={`flex flex-col gap-2 items-center rounded-md shadow-md py-3 px-4 transition-all
-                            ${
-                              player.player_status === 1
-                                ? "bg-green-300"
-                                : isActive
+                            ${player.player_status === 1
+                              ? "bg-green-300"
+                              : isActive
                                 ? "bg-yellow-300"
                                 : "bg-blue-100 dark:bg-gray-800"
                             }
-                            ${
-                              isAllowed && canEdit
-                                ? "cursor-pointer hover:scale-[1.01]"
-                                : "cursor-not-allowed opacity-40 grayscale"
+                            ${isAllowed && canEdit
+                              ? "cursor-pointer hover:scale-[1.01]"
+                              : "cursor-not-allowed opacity-40 grayscale"
                             }`}
                         >
                           <div className="flex items-center w-full gap-3">
@@ -202,12 +200,17 @@ const UserPlayerList = () => {
                             />
                             <div className="flex-1 min-w-0">
                               <div className="text-gray-900 flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-                                {player?.name || "N/A"}   
+                                {player?.name || "N/A"}
                                 {player.age && (
-                                <p className="text-gray-700 border border-gray-700 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                                  {player.age}
-                                </p>
-                              )}
+                                  <p className="text-gray-700 border border-gray-700 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
+                                    {player.age}
+                                  </p>
+                                )}
+                                {player.gender && (
+                                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                                    {player.gender ? "M" : "F"}
+                                  </p>
+                                )}
                               </div>
                               <div className="text-gray-600 text-xs truncate">
                                 {player?.phone || "N/A"}

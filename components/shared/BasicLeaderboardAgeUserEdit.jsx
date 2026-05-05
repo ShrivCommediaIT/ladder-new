@@ -46,11 +46,11 @@ const BasicLeaderboardAgeUserEdit = ({
     name: "",
     dob: null,
     phone: "",
-    gender: "male",
+    gender: "",
   });
 
   const [showSkeleton, setShowSkeleton] = useState(false);
-
+  console.log("Selected Player in Edit Form:", selectedPlayer);
   // Auto-fill strictly from selectedPlayer (id/user_id/name/phone/dob)
   useEffect(() => {
     if (selectedPlayer) {
@@ -62,8 +62,10 @@ const BasicLeaderboardAgeUserEdit = ({
         name: selectedPlayer.name || "",
         dob: initialDob,
         phone: selectedPlayer.phone || "",
-        gender: selectedPlayer.gender || "male",
+        gender: selectedPlayer.gender || "",
       });
+  console.log("Selected Player in Edit Form:", selectedPlayer.gender);
+
     } else if (userId) {
       // Fallback if somehow selectedPlayer missing
       setForm({
@@ -129,6 +131,10 @@ const BasicLeaderboardAgeUserEdit = ({
     }
   }, [successMessage, error, dispatch, ladderId, onClose]);
 
+
+      console.log("Selected Player in Edit Form:==>1", form);
+
+
   return (
     <Card className="max-w-full mx-auto mt-6 shadow-xl rounded-2xl bg-gray-800 border border-gray-600">
       <CardContent className="p-6 space-y-4">
@@ -188,7 +194,7 @@ const BasicLeaderboardAgeUserEdit = ({
                     dob: date,
                   }))
                 }
-                className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                className="text-white px-4 bg-white border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
               />
             </div>
 
@@ -213,6 +219,7 @@ const BasicLeaderboardAgeUserEdit = ({
             <div className="w-full">
               <Label className="text-gray-300 font-semibold py-2 text-lg">Gender</Label>
               <Select
+                key={form.gender}
                 value={form.gender}
                 onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
               >
