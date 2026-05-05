@@ -172,19 +172,17 @@ export default function SubAdminDashboard() {
       return;
     }
 
-    const cleanName = ladderName.trim();
+    const cleanName = subAdmin?.sport_name + " " + ladderName.trim();
 
     if (!subAdmin?.id || !cleanName || !csvFile) {
       toast.warn("Please enter solution name, upload CSV, and ensure login.");
       return;
     }
 
-    // duplicate name check (frontend)
     if (ladderExists(cleanName)) {
-      toast.error("Solution name already exists — choose another");
+      toast.error(`${cleanName} name already exists — choose another`);
       return;
     }
-    console.log("ladderType:", ladderType);
     try {
       // CREATE LADDER
       const firstnameCapitalized = subAdmin.sport_name.charAt(0).toUpperCase() + subAdmin.sport_name.slice(1)
@@ -295,12 +293,12 @@ export default function SubAdminDashboard() {
     }
   };
 
-  const ladderExists = (name) => {
-    if (!allLadders) return false;
-
-    const newName = name.trim().toLowerCase();
-
-    return allLadders.some((l) => l.name?.trim().toLowerCase() === newName);
+    const ladderExists = (name) => {
+    if (!allLadders || !Array.isArray(allLadders)) return false;
+    const laddarNames = allLadders.map((l) => l.name?.trim().toLowerCase());
+    const cleanName = name.trim().toLowerCase();
+    const nameExists = laddarNames.includes(cleanName);
+    return nameExists;
   };
 
   return (
