@@ -164,7 +164,7 @@ const handleCreateRoster = async () => {
 
   // ✅ duplicate ladder name check
   if (ladderExists(cleanName)) {
-    toast.error("Roster name already exists — choose another");
+    toast.error(`${cleanName} name already exists — choose another`);
     return;
   }
 

@@ -225,6 +225,11 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
                           {player.age}
                         </p>
                       )}
+                      {player.gender && (
+                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                    {player.gender?"M":"F"}
+                  </p>
+                )}
                     </div>
                     <div className="text-[#d4e5e8] text-xs truncate">
                       {player?.phone || "N/A"}
