@@ -54,16 +54,16 @@ const ResetPassword = ({ param }) => {
   }, [success, error, dispatch]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-100">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <ToastContainer />
-      <Card className="w-[380px] shadow-lg rounded-2xl">
+      <Card className="w-[380px] rounded-2xl border border-border bg-card shadow-lg">
         <CardContent className="p-6 space-y-4">
-          <h2 className="text-2xl font-bold text-blue-600 text-center mb-4">
+          <h2 className="mb-4 text-center text-2xl font-bold text-primary">
             Reset Password
           </h2>
 
           <div>
-            <Label htmlFor="email" className="text-blue-600 font-semibold">
+            <Label htmlFor="email" className="font-semibold text-primary">
               Email
             </Label>
             <Input
@@ -76,7 +76,7 @@ const ResetPassword = ({ param }) => {
           </div>
 
           <div>
-            <Label htmlFor="newPassword" className="text-blue-600 font-semibold">
+            <Label htmlFor="newPassword" className="font-semibold text-primary">
               New Password
             </Label>
             <Input
@@ -89,7 +89,11 @@ const ResetPassword = ({ param }) => {
           </div>
 
           <Button
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:opacity-90 font-semibold"
+            className="w-full font-semibold text-white hover:opacity-90"
+            style={{
+              background: "var(--background-image-gradient-brand)",
+              boxShadow: "var(--brand-button-shadow)",
+            }}
             onClick={handleReset}
             disabled={loading}
           >

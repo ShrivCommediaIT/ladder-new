@@ -76,6 +76,8 @@ const heroPoints = [
 ];
 
 const brandGradient = "var(--background-image-gradient-brand)";
+const brandButtonShadow = "var(--brand-button-shadow)";
+const brandTabShadow = "var(--brand-tab-shadow)";
 
 function TabButton({ active, children, onClick }) {
   return (
@@ -88,7 +90,7 @@ function TabButton({ active, children, onClick }) {
           ? {
               background: brandGradient,
               color: "#ffffff",
-              boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
+              boxShadow: brandTabShadow,
             }
           : {
               color: "var(--muted-foreground)",
@@ -257,8 +259,7 @@ export default function AuthPage({ initialMode = "login" }) {
         <div
           className="absolute inset-0"
           style={{
-            background:
-              "radial-gradient(circle at top left, rgba(41, 171, 226, 0.18), transparent 34%)",
+            background: "var(--page-glow-top-left)",
           }}
         />
 
@@ -266,10 +267,10 @@ export default function AuthPage({ initialMode = "login" }) {
           className="absolute inset-0 opacity-20"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-            backgroundSize: "72px 72px",
-            maskImage: "linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.45))",
-          }}
+              "var(--page-grid-overlay)",
+              backgroundSize: "72px 72px",
+              maskImage: "linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.45))",
+            }}
         />
 
         <div className="relative z-10 grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
@@ -283,8 +284,8 @@ export default function AuthPage({ initialMode = "login" }) {
                 sizes="(max-width: 1024px) 100vw, 58vw"
                 className="object-cover object-center"
               />
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,17,47,0.92)_0%,rgba(7,17,47,0.75)_42%,rgba(7,17,47,0.38)_100%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(41,171,226,0.2),transparent_36%)]" />
+              <div className="absolute inset-0" style={{ background: "var(--hero-image-overlay)" }} />
+              <div className="absolute inset-0" style={{ background: "var(--hero-image-glow)" }} />
             </div>
 
             <div className="relative z-10 flex h-full max-w-xl flex-col justify-between">
@@ -292,10 +293,10 @@ export default function AuthPage({ initialMode = "login" }) {
                 <div
                   className="inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
                   style={{
-                    borderColor: "rgba(41, 171, 226, 0.35)",
-                    backgroundColor: "rgba(10, 24, 54, 0.78)",
+                    borderColor: "var(--brand-badge-border)",
+                    backgroundColor: "var(--brand-badge-bg)",
                     color: "var(--primary)",
-                    boxShadow: "0 0 24px rgba(41, 171, 226, 0.12)",
+                    boxShadow: "var(--brand-badge-shadow)",
                   }}
                 >
                   <span
@@ -325,9 +326,9 @@ export default function AuthPage({ initialMode = "login" }) {
                     <div
                       className="flex h-11 w-11 items-center justify-center rounded-2xl border"
                       style={{
-                        borderColor: "rgba(41, 171, 226, 0.3)",
-                        backgroundColor: "rgba(9, 28, 66, 0.72)",
-                        boxShadow: "0 10px 24px rgba(0, 0, 0, 0.28)",
+                        borderColor: "var(--brand-badge-border)",
+                        backgroundColor: "var(--brand-icon-surface)",
+                        boxShadow: "var(--brand-icon-shadow)",
                       }}
                     >
                       <Icon className="h-5 w-5" style={{ color: "var(--primary)" }} />
@@ -356,7 +357,7 @@ export default function AuthPage({ initialMode = "login" }) {
                       className="flex h-14 w-14 items-center justify-center rounded-2xl"
                       style={{
                         background: brandGradient,
-                        boxShadow: "0 12px 28px rgba(41, 171, 226, 0.28)",
+                        boxShadow: "var(--brand-card-shadow)",
                       }}
                     >
                       <ShieldCheck className="h-7 w-7 text-white" />
@@ -460,7 +461,7 @@ export default function AuthPage({ initialMode = "login" }) {
                           className="h-[52px] w-full rounded-2xl text-base font-bold text-white"
                           style={{
                             background: brandGradient,
-                            boxShadow: "0 16px 34px rgba(41, 171, 226, 0.28)",
+                            boxShadow: brandButtonShadow,
                           }}
                         >
                           {loading ? "Logging in..." : "Login"}
@@ -619,7 +620,7 @@ export default function AuthPage({ initialMode = "login" }) {
                           className="h-[52px] w-full rounded-2xl text-base font-bold text-white"
                           style={{
                             background: brandGradient,
-                            boxShadow: "0 16px 34px rgba(41, 171, 226, 0.28)",
+                            boxShadow: brandButtonShadow,
                           }}
                         >
                           {registerLoading ? "Creating account..." : "Register"}

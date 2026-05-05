@@ -33,24 +33,24 @@ export default function CreateClubSetup() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-[#07111f] text-white">
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-background text-foreground">
       {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
       <PlayerLevelNavbar activeTab="dashboard" />
 
       {/* Glow effects */}
-      <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-blue-600/30 blur-3xl" />
-      <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-purple-600/30 blur-3xl" />
+      <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
+      <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-secondary/20 blur-3xl" />
 
       <div className="w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 pt-10 pb-8 relative z-10 flex flex-col items-center gap-6">
         {/* Tabs with Popover for Mobile & Desktop Click */}
-        <div className="flex items-center gap-3 bg-white/10 backdrop-blur px-2 py-2 rounded-2xl border border-white/10">
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card/80 px-2 py-2 backdrop-blur">
           <button
             onClick={() => setActiveTab("master")}
             className={`px-6 py-2 rounded-xl text-sm font-semibold transition
               ${
                 activeTab === "master"
-                  ? "bg-white text-black shadow"
-                  : "text-white hover:bg-white/10"
+                  ? "bg-primary text-white shadow"
+                  : "text-foreground hover:bg-muted"
               }`}
           >
             Master Admin
@@ -61,8 +61,8 @@ export default function CreateClubSetup() {
             className={`px-6 py-2 rounded-xl text-sm font-semibold transition
               ${
                 activeTab === "admin"
-                  ? "bg-white text-black shadow"
-                  : "text-white hover:bg-white/10"
+                  ? "bg-primary text-white shadow"
+                  : "text-foreground hover:bg-muted"
               }`}
           >
             Section Admin
@@ -71,38 +71,38 @@ export default function CreateClubSetup() {
           {/* --- INFO POPOVER START --- */}
           <Popover>
             <PopoverTrigger asChild>
-              <button className="grid place-items-center h-8 w-8 rounded-full cursor-pointer bg-white/10 text-cyan-300 hover:scale-110 transition outline-none">
+              <button className="grid place-items-center h-8 w-8 rounded-full cursor-pointer bg-primary/10 text-primary hover:scale-110 transition outline-none">
                 <Info className="w-4 h-4" />
               </button>
             </PopoverTrigger>
             <PopoverContent
               side="top"
               align="center"
-              className="w-[90vw] sm:w-96 bg-[#1A1A42] border-slate-700 text-slate-100 p-5 rounded-2xl shadow-2xl z-50 backdrop-blur-md"
+              className="z-50 w-[90vw] rounded-2xl border border-border bg-card p-5 text-foreground shadow-2xl backdrop-blur-md sm:w-96"
             >
               <div className="space-y-3">
-                <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                  <p className="font-bold text-cyan-400 text-xs tracking-wider uppercase">
+                <div className="flex items-center justify-between border-b border-border pb-2">
+                  <p className="text-xs font-bold uppercase tracking-wider text-primary">
                     Very Important
                   </p>
                 </div>
                 
                 <div className="space-y-3">
-                  <p className="text-[13px] leading-relaxed text-slate-200">
+                  <p className="text-[13px] leading-relaxed text-muted-foreground">
                     Subadmin access allows administrators from different
                     sporting sections to independently create solutions that
                     relate to their sections effectively creating a separate
                     working subadmin area.
                   </p>
                   
-                  <p className="text-[13px] leading-relaxed text-slate-300 italic">
+                  <p className="text-[13px] italic leading-relaxed text-muted-foreground">
                     All solutions from all sections will be automatically
                     visible in the main admin dashboard and appear automatically
                     in the APP.
                   </p>
 
-                  <div className="bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/20">
-                    <p className="text-[13px] leading-relaxed text-cyan-200 font-medium">
+                  <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                    <p className="text-[13px] font-medium leading-relaxed text-primary">
                       Create Subadmin Pins and inform administrators from different sections of their access pins.
                     </p>
                   </div>
@@ -120,15 +120,11 @@ export default function CreateClubSetup() {
       </div>
 
       {/* BOTTOM FIXED CREATE BUTTON */}
-      <div className="fixed bottom-0 left-0 w-full flex items-center justify-center z-20 p-4 bg-gradient-to-t from-black/60 to-transparent backdrop-blur">
+      <div className="fixed bottom-0 left-0 z-20 flex w-full items-center justify-center bg-gradient-to-t from-background via-background/70 to-transparent p-4 backdrop-blur">
         <button
           onClick={handleCreate}
-          className="w-full sm:w-xl py-2 rounded-md text-md font-bold cursor-pointer text-white
-          bg-teal-800
-          shadow-xl shadow-teal-500/30
-          transform transition-all duration-300
-          hover:scale-[1.02] hover:shadow-teal-500/50
-          active:scale-95 animate-pulse"
+          className="w-full cursor-pointer rounded-md bg-primary py-2 text-md font-bold text-white shadow-xl transition-all duration-300 hover:scale-[1.02] hover:bg-[var(--brand-hover)] active:scale-95 sm:w-xl"
+          style={{ boxShadow: "var(--brand-button-shadow)" }}
         >
           Go to Dashboard
         </button>

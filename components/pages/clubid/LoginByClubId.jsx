@@ -69,6 +69,8 @@ export default function LoginByClubForm() {
   });
 
   const { setValue } = form;
+  const brandButtonShadow = "var(--brand-button-shadow)";
+  const brandTabShadow = "var(--brand-tab-shadow)";
 
   useEffect(() => {
     const saved = sessionStorage.getItem("userData");
@@ -165,8 +167,7 @@ export default function LoginByClubForm() {
           <div
             className="absolute inset-0"
             style={{
-              background:
-                "radial-gradient(circle at top left, rgba(41, 171, 226, 0.18), transparent 34%)",
+              background: "var(--page-glow-top-left)",
             }}
           />
 
@@ -174,7 +175,7 @@ export default function LoginByClubForm() {
             className="absolute inset-0 opacity-20"
             style={{
               backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+                "var(--page-grid-overlay)",
               backgroundSize: "72px 72px",
               maskImage: "linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.45))",
             }}
@@ -191,8 +192,8 @@ export default function LoginByClubForm() {
                   sizes="(max-width: 1024px) 100vw, 58vw"
                   className="object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,17,47,0.92)_0%,rgba(7,17,47,0.75)_42%,rgba(7,17,47,0.38)_100%)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(41,171,226,0.2),transparent_36%)]" />
+                <div className="absolute inset-0" style={{ background: "var(--hero-image-overlay)" }} />
+                <div className="absolute inset-0" style={{ background: "var(--hero-image-glow)" }} />
               </div>
 
               <div className="relative z-10 flex h-full max-w-xl flex-col justify-between">
@@ -200,10 +201,10 @@ export default function LoginByClubForm() {
                   <div
                     className="inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
                     style={{
-                      borderColor: "rgba(41, 171, 226, 0.35)",
-                      backgroundColor: "rgba(10, 24, 54, 0.78)",
+                      borderColor: "var(--brand-badge-border)",
+                      backgroundColor: "var(--brand-badge-bg)",
                       color: "var(--primary)",
-                      boxShadow: "0 0 24px rgba(41, 171, 226, 0.12)",
+                      boxShadow: "var(--brand-badge-shadow)",
                     }}
                   >
                     <span
@@ -224,9 +225,18 @@ export default function LoginByClubForm() {
                   <div className="space-y-4 pb-2 lg:pb-10">
                     <div className="flex items-center gap-3">
                       <div className="flex -space-x-2">
-                        <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-blue-400 to-purple-500" />
-                        <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-green-400 to-blue-500" />
-                        <div className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-br from-purple-400 to-pink-500" />
+                        <div
+                          className="h-8 w-8 rounded-full border-2 border-white"
+                          style={{ background: "linear-gradient(135deg, var(--primary), var(--secondary))" }}
+                        />
+                        <div
+                          className="h-8 w-8 rounded-full border-2 border-white"
+                          style={{ background: "linear-gradient(135deg, var(--accent-theme), var(--primary))" }}
+                        />
+                        <div
+                          className="h-8 w-8 rounded-full border-2 border-white"
+                          style={{ background: "linear-gradient(135deg, var(--secondary), var(--accent-theme))" }}
+                        />
                       </div>
                       <p className="text-sm text-slate-300">
                         Join <span className="font-semibold text-white">10,000+</span> clubs
@@ -256,7 +266,7 @@ export default function LoginByClubForm() {
                         className="flex h-14 w-14 items-center justify-center rounded-2xl"
                         style={{
                           background: "var(--background-image-gradient-brand)",
-                          boxShadow: "0 12px 28px rgba(41, 171, 226, 0.28)",
+                          boxShadow: "var(--brand-card-shadow)",
                         }}
                       >
                         <ShieldCheck className="h-7 w-7 text-white" />
@@ -373,10 +383,10 @@ export default function LoginByClubForm() {
                                     style={
                                       field.value === "admin"
                                         ? {
-                                            background: "var(--background-image-gradient-brand)",
-                                            color: "#ffffff",
-                                            boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
-                                          }
+                          background: "var(--background-image-gradient-brand)",
+                          color: "#ffffff",
+                          boxShadow: brandTabShadow,
+                        }
                                         : {
                                             color: "var(--muted-foreground)",
                                           }
@@ -391,10 +401,10 @@ export default function LoginByClubForm() {
                                     style={
                                       field.value === "sub_admin"
                                         ? {
-                                            background: "var(--background-image-gradient-brand)",
-                                            color: "#ffffff",
-                                            boxShadow: "0 10px 30px rgba(41, 171, 226, 0.26)",
-                                          }
+                          background: "var(--background-image-gradient-brand)",
+                          color: "#ffffff",
+                          boxShadow: brandTabShadow,
+                        }
                                         : {
                                             color: "var(--muted-foreground)",
                                           }
@@ -441,7 +451,7 @@ export default function LoginByClubForm() {
                           className="h-[56px] w-full rounded-2xl text-base font-bold text-white transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
                           style={{
                             background: "var(--background-image-gradient-brand)",
-                            boxShadow: "0 16px 34px rgba(41, 171, 226, 0.28)",
+                            boxShadow: brandButtonShadow,
                           }}
                         >
                           {loading ? (

@@ -26,7 +26,7 @@ useEffect(() => {
   return (
     <html lang="en" suppressHydrationWarning>
        <body suppressHydrationWarning>
-         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
            <Provider store={store}>
              <PersistGate loading={null} persistor={persistor}>
               <AppInit />

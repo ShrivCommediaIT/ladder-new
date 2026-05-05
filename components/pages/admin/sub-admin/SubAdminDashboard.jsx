@@ -30,10 +30,10 @@ import Link from "next/link";
 import { Layers, Users, UploadCloud, ListChecks, Play, ShieldCheck, Sparkles, Target, FolderKanban, ArrowRight, Mail, Plus } from "lucide-react";
 
 const cardToneClasses = [
-  "from-cyan-500/[0.22] via-cyan-500/[0.06] to-transparent",
-  "from-blue-500/[0.18] via-blue-500/[0.06] to-transparent",
-  "from-emerald-500/[0.18] via-emerald-500/[0.06] to-transparent",
-  "from-fuchsia-500/[0.18] via-fuchsia-500/[0.06] to-transparent",
+  "from-primary/20 via-primary/5 to-transparent",
+  "from-secondary/18 via-secondary/5 to-transparent",
+  "from-accent/24 via-accent/8 to-transparent",
+  "from-primary/14 via-secondary/10 to-transparent",
 ];
 
 const startSteps = [
@@ -379,8 +379,8 @@ export default function SubAdminDashboard() {
       {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
       <PlayerLevelNavbar activeTab="dashboard" />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(41,171,226,0.12),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(26,58,143,0.15),transparent_45%)]" />
-      <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:78px_78px]" />
+      <div className="absolute inset-0" style={{ background: "var(--page-glow-corners)" }} />
+      <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "var(--page-grid-overlay)", backgroundSize: "78px 78px" }} />
 
       <ToastContainer
         position="top-right"
@@ -437,7 +437,7 @@ export default function SubAdminDashboard() {
                     className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-2xl"
                     style={{
                       background: brandGradient,
-                      boxShadow: "0 14px 28px rgba(41, 171, 226, 0.22)",
+                      boxShadow: "var(--brand-card-shadow)",
                     }}
                   >
                     <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
@@ -465,7 +465,7 @@ export default function SubAdminDashboard() {
                     How to get a new competition ready
                   </h2>
                 </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-600">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
                   <FolderKanban className="h-4 w-4" />
                   {activeLadders.length > 0 ? "Section active" : "Fresh setup"}
                 </div>
@@ -496,7 +496,7 @@ export default function SubAdminDashboard() {
               className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 px-1">
-                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
                   Solutions Available
                 </p>
                 <h2 className="mt-2 text-h2 font-bold text-foreground">
@@ -552,7 +552,7 @@ export default function SubAdminDashboard() {
                   className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-2xl"
                   style={{
                     background: brandGradient,
-                    boxShadow: "0 14px 28px rgba(41, 171, 226, 0.22)",
+                    boxShadow: "var(--brand-card-shadow)",
                   }}
                 >
                   <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
@@ -579,7 +579,7 @@ export default function SubAdminDashboard() {
               transition={{ duration: 0.45, delay: 0.12 }}
               className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 sm:p-6 backdrop-blur-xl"
             >
-              <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+              <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
                 Support
               </p>
               <h2 className="mt-2 text-h2 font-bold text-foreground">
@@ -622,7 +622,7 @@ export default function SubAdminDashboard() {
                 Competition setup, ranking control, and player organization for your section.
               </p>
             </div>
-            <p className="text-sm text-cyan-300">
+            <p className="text-sm text-primary">
               {activeLadders.length > 0
                 ? `${activeLadders.length} competition${activeLadders.length === 1 ? "" : "s"} currently available`
                 : "No competitions created yet"}
