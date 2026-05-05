@@ -172,7 +172,7 @@ export default function SubAdminDashboard() {
       return;
     }
 
-    const cleanName = subAdmin?.sport_name + " " + ladderName.trim();
+    let cleanName = subAdmin?.sport_name + " " + ladderName.trim();
 
     if (!subAdmin?.id || !cleanName || !csvFile) {
       toast.warn("Please enter solution name, upload CSV, and ensure login.");
@@ -183,6 +183,8 @@ export default function SubAdminDashboard() {
       toast.error(`${cleanName} name already exists — choose another`);
       return;
     }
+    cleanName =  ladderName.trim();
+
     try {
       // CREATE LADDER
       const firstnameCapitalized = subAdmin.sport_name.charAt(0).toUpperCase() + subAdmin.sport_name.slice(1)
