@@ -426,22 +426,22 @@ const AdminButton = () => {
 
         {/* SKILL SPECIFIC BUTTONS */}
         {(isSkill || isPositive || isNegative) && <>
-            {!isSorted ? (
+            {!isSorted && (
               <Button
                 onClick={handleSortBySkill}
                 className="bg-[#163344] border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
               >
                 <Funnel size={20} /> SORT
               </Button>
-            ) : (
-              <Button
+            ) }
+          </>}
+
+          {isSorted && !isMiniLeague && <Button
                 onClick={handleClearAll}
                 className="bg-red-600 hover:bg-red-700 border border-white/20 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight transition-all active:scale-95"
               >
                 <XCircle size={20} /> CLEAR ALL
-              </Button>
-            )}
-          </>}
+              </Button>}
 
         {/* AGE FILTER BUTTON */}
 
