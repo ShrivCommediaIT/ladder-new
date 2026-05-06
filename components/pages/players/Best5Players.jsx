@@ -21,10 +21,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import BestOfControlsSection from "./bestof/BestOfControlsSection";
+import ControlsSection from "../../shared/ControlsSection";
 import BestOfPlayerListSection from "./bestof/BestOfPlayerListSection";
-import BestOfInfoSection from "./bestof/BestOfInfoSection";
-import { formatLadderType } from "./bestof/bestOfUtils";
+import InfoSection from "../../shared/InfoSection";
+import { formatLadderType } from "../../shared/ladderUtils";
 
 const MOBILE_SECTIONS = [
   { id: "toolbar", label: "Tools" },
@@ -72,11 +72,10 @@ const FilterDialog = ({
                   key={item.value}
                   type="button"
                   onClick={() => setGender((current) => (current === item.value ? "" : item.value))}
-                  className={`rounded-lg border px-4 py-2 text-sm ${
-                    gender === item.value
-                      ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)]"
-                      : "border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
-                  }`}
+                  className={`rounded-lg border px-4 py-2 text-sm ${gender === item.value
+                    ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)]"
+                    : "border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
+                    }`}
                 >
                   {item.label}
                 </button>
@@ -95,11 +94,10 @@ const FilterDialog = ({
                   key={item.value}
                   type="button"
                   onClick={() => setAgeType((current) => (current === item.value ? "" : item.value))}
-                  className={`rounded-lg border px-4 py-2 text-sm ${
-                    ageType === item.value
-                      ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)]"
-                      : "border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
-                  }`}
+                  className={`rounded-lg border px-4 py-2 text-sm ${ageType === item.value
+                    ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)]"
+                    : "border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
+                    }`}
                 >
                   {item.label}
                 </button>
@@ -412,7 +410,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
       <div className="px-4 py-6 sm:px-6 lg:px-8">
-        <BestOfControlsSection
+        <ControlsSection
           mobileSection={mobileSection}
           setMobileSection={setMobileSection}
           mobileSections={MOBILE_SECTIONS}
@@ -455,7 +453,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
             />
           </div>
 
-          <BestOfInfoSection
+          <InfoSection
             mobileSection={mobileSection}
             ladderType={ladderType}
             user={user}

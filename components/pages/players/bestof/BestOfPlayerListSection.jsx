@@ -12,7 +12,7 @@ import {
   getPhoneText,
   getPlayerImageUrl,
   getPlayerInitials,
-} from "./bestOfUtils";
+} from "../../../shared/ladderUtils";
 
 const SectionBadge = ({ count }) => (
   <span className="rounded bg-white/5 px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
@@ -56,9 +56,8 @@ const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
       }
       onOpenPlayer(player, "result");
     }}
-    className={`group flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-4 py-4 transition hover:border-[var(--best-board-border-strong)] ${
-      canEdit ? "cursor-pointer" : "cursor-not-allowed"
-    }`}
+    className={`group flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-4 py-4 transition hover:border-[var(--best-board-border-strong)] ${canEdit ? "cursor-pointer" : "cursor-not-allowed"
+      }`}
   >
     <div className="flex min-w-0 items-center gap-3">
       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-sm font-semibold text-[var(--best-board-muted)]">

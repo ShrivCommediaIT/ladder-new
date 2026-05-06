@@ -20,9 +20,9 @@ import {
 import AdminEditPhone from "@/components/shared/AdminEditPhone";
 import LadderRulesCard from "@/components/pages/players/LadderRulesCard";
 import { ArrowDownUp, Copy, Filter, Plus, RotateCcw, X } from "lucide-react";
-import { formatLadderType } from "./bestOfUtils";
+import { formatLadderType } from "./ladderUtils";
 
-export default function BestOfInfoSection({
+export default function InfoSection({
   mobileSection,
   ladderType,
   user,
@@ -118,13 +118,6 @@ export default function BestOfInfoSection({
             </div>
           </div>
 
-          <div className="best-board-card rounded-xl p-4">
-            <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Members & Local Services</p>
-            <p className="text-sm leading-6 text-[var(--best-board-muted)]">
-              Manage member access, local service integrations, discount tokens, and club information from this shared side panel.
-            </p>
-          </div>
-
           <div className="rounded-2xl border border-primary/20 bg-card/95 p-4 shadow-lg">
             <div className="mb-4 rounded-xl border border-primary/15 bg-gradient-to-r from-primary/12 via-secondary/12 to-primary/8 px-4 py-3">
               <p className="text-[11px] uppercase tracking-[0.28em] text-primary/80">
@@ -149,11 +142,10 @@ export default function BestOfInfoSection({
                 activityItems.slice(0, 5).map((activity) => (
                   <div key={activity.id} className="flex items-start gap-3 border-b border-white/5 pb-3 last:border-b-0 last:pb-0">
                     <span
-                      className={`mt-1 block h-2.5 w-2.5 rounded-full ${
-                        activity?.progress?.toLowerCase() === "down"
-                          ? "bg-[var(--best-board-danger)]"
-                          : "bg-emerald-400"
-                      }`}
+                      className={`mt-1 block h-2.5 w-2.5 rounded-full ${activity?.progress?.toLowerCase() === "down"
+                        ? "bg-[var(--best-board-danger)]"
+                        : "bg-emerald-400"
+                        }`}
                     />
                     <p className="flex-1 text-sm text-white/90">{activity.message}</p>
                     <button type="button" onClick={() => handleDeleteActivity(activity.id)} className="text-[var(--best-board-danger)]">
@@ -164,7 +156,15 @@ export default function BestOfInfoSection({
               )}
             </div>
           </div>
+
+          <div className="best-board-card rounded-xl p-4">
+            <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Members & Local Services</p>
+            <p className="text-sm leading-6 text-[var(--best-board-muted)]">
+              Manage member access, local service integrations, discount tokens, and club information from this shared side panel.
+            </p>
+          </div>
         </div>
+
       </aside>
 
       <Dialog open={contactOpen} onOpenChange={setContactOpen}>

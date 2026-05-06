@@ -26,7 +26,7 @@ const ActionButton = ({ icon: Icon, children, active = false, ...props }) => (
   </button>
 );
 
-export default function BestOfControlsSection({
+export default function ControlsSection({
   mobileSection,
   setMobileSection,
   mobileSections,
