@@ -406,7 +406,7 @@ const AdminButton = () => {
           <DialogTrigger asChild>
             <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
               <PlusCircle size={20} />
-              ADD/REMOVE/MOVE
+              {isRoster ? "ADD / REMOVE" :"ADD/REMOVE/MOVE"}
             </Button>
           </DialogTrigger>
 
