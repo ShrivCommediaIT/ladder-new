@@ -92,6 +92,20 @@ export const EditPlayer = ({
   }, [result, moveError, dispatch, ladder_id]);
 
   const [selectedTab, setSelectedTab] = useState("result");
+  const [mobileTab, setMobileTab] = useState(""); // empty = shows placeholder
+
+  // Reset tabs to initial state every time the modal opens
+  useEffect(() => {
+    if (open) {
+      setSelectedTab("result");
+      setMobileTab("");
+    }
+  }, [open]);
+
+  const handleMobileTabChange = (val) => {
+    setMobileTab(val);
+    setSelectedTab(val);
+  };
 
   const tabs = [
     { value: "result", label: "Result" },
@@ -139,9 +153,9 @@ export const EditPlayer = ({
 
             {/* MOBILE DROPDOWN */}
             <div className="sm:hidden mb-2">
-              <Select value={selectedTab} onValueChange={setSelectedTab}>
+              <Select value={mobileTab} onValueChange={handleMobileTabChange}>
                 <SelectTrigger className="w-full bg-gray-800 text-white">
-                  <SelectValue />
+                  <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 text-white">
                   {tabs.map((tab) => (
@@ -154,7 +168,7 @@ export const EditPlayer = ({
             </div>
 
             {/* TAB CONTENT */}
-            <div className="mt-2 p-4 border border-gray-700 rounded-xl">
+            <div className={`mt-2 p-4 border border-gray-700 rounded-xl ${!mobileTab ? "hidden sm:block" : ""}`}>
               <TabsContent value="result">
                 <MoveNumberInput
                   onClose={onClose}

@@ -76,6 +76,20 @@ export const BasicLeaderboardUserEdit = ({
   }, [type, ladderType, playersSkills, playersPositive, playersNegative, playerId]);
 
   const [selectedTab, setSelectedTab] = useState("activity");
+  const [mobileTab, setMobileTab] = useState(""); // empty = shows placeholder
+
+  const handleMobileTabChange = (val) => {
+    setMobileTab(val);
+    setSelectedTab(val);
+  };
+
+  // Reset to initial state every time the modal opens
+  useEffect(() => {
+    if (open) {
+      setSelectedTab("activity");
+      setMobileTab("");
+    }
+  }, [open]);
 
   const tabs = [
     { value: "activity", label: "Activity No." },
@@ -121,13 +135,10 @@ export const BasicLeaderboardUserEdit = ({
 
             {/* MOBILE DROPDOWN */}
             <div className="sm:hidden mb-4">
-              <Select value={selectedTab} onValueChange={setSelectedTab}>
+              <Select value={mobileTab} onValueChange={handleMobileTabChange}>
                 <SelectTrigger className="w-full bg-gray-800 text-white">
-                  <SelectValue>
-                    {tabs.find((t) => t.value === selectedTab)?.label}
-                  </SelectValue>
+                  <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
-
                 <SelectContent className="bg-gray-800 text-white">
                   {tabs.map((tab) => (
                     <SelectItem key={tab.value} value={tab.value}>
@@ -138,46 +149,49 @@ export const BasicLeaderboardUserEdit = ({
               </Select>
             </div>
 
-            {/* ACTIVITY TAB - PASS onClose */}
-            <TabsContent value="activity">
-              <div className="max-h-[70vh] overflow-auto">
-                <BasicLeaderboardUserActivityEntryCard
-                  ladderId={ladder_id}
-                  skillNumber={skillNumber}
-                  playerId={playerId}
-                  skillActivityId={skillActivityId}
-                  onClose={handleChildClose}
-                  initialActivity={skillNumber}
-                  playerName={selectedPlayer?.name || "Player"}
-                  selectedPlayer={selectedPlayer}
-                />
-              </div>
-            </TabsContent>
-
-            {/* IMAGE UPLOAD TAB */}
-            <TabsContent value="load">
-              <PlayerImage
-                userId={playerId}
-                ladderId={ladder_id}
-                onClose={handleChildClose} // ✅ PASS HERE TOO
-              />
-            </TabsContent>
-
-            <TabsContent value="edit">
-              {showEditSkeleton ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-10 w-full bg-white/10" />
-                  <Skeleton className="h-10 w-full bg-white/10" />
+            {/* TAB CONTENT — hidden on mobile until a type is selected */}
+            <div className={!mobileTab ? "hidden sm:block" : ""}>
+              {/* ACTIVITY TAB */}
+              <TabsContent value="activity">
+                <div className="max-h-[70vh] overflow-auto">
+                  <BasicLeaderboardUserActivityEntryCard
+                    ladderId={ladder_id}
+                    skillNumber={skillNumber}
+                    playerId={playerId}
+                    skillActivityId={skillActivityId}
+                    onClose={handleChildClose}
+                    initialActivity={skillNumber}
+                    playerName={selectedPlayer?.name || "Player"}
+                    selectedPlayer={selectedPlayer}
+                  />
                 </div>
-              ) : (
-                <BasicLeaderboardAgeUserEdit
-                  selectedPlayer={selectedPlayer}
-                  userId={selectedPlayer?.id}      
+              </TabsContent>
+
+              {/* IMAGE UPLOAD TAB */}
+              <TabsContent value="load">
+                <PlayerImage
+                  userId={playerId}
                   ladderId={ladder_id}
-                  onClose={onClose}
+                  onClose={handleChildClose}
                 />
-              )}
-            </TabsContent>
+              </TabsContent>
+
+              <TabsContent value="edit">
+                {showEditSkeleton ? (
+                  <div className="space-y-3">
+                    <Skeleton className="h-10 w-full bg-white/10" />
+                    <Skeleton className="h-10 w-full bg-white/10" />
+                  </div>
+                ) : (
+                  <BasicLeaderboardAgeUserEdit
+                    selectedPlayer={selectedPlayer}
+                    userId={selectedPlayer?.id}
+                    ladderId={ladder_id}
+                    onClose={onClose}
+                  />
+                )}
+              </TabsContent>
+            </div>
           </Tabs>
         </motion.div>
       </DialogContent>

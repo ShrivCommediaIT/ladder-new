@@ -80,6 +80,12 @@ export const EditPlayer = ({
   const image = useSelector((s) => s?.profileImage) || {};
 
   const [activeTab, setActiveTab] = useState("");
+  const [mobileTab, setMobileTab] = useState(""); // empty = shows "Select Type" placeholder
+
+  const handleMobileTabChange = (val) => {
+    setMobileTab(val);
+    setActiveTab(val);
+  };
   const [challengedPlayer, setChallengedPlayer] = useState("");
   const [showEditSkeleton, setShowEditSkeleton] = useState(false);
 
@@ -156,7 +162,17 @@ export const EditPlayer = ({
       ? allTabs.filter((t) => t.value === "edit" || t.value === "load")
       : allTabs;
 
+  // Reset on modal open
   useEffect(() => {
+    if (open) {
+      setMobileTab("");
+      setActiveTab(tabs[0]?.value || "");
+    }
+  }, [open]);
+
+  // Also reset mobile when ladderType changes (tabs list changes)
+  useEffect(() => {
+    setMobileTab("");
     if (tabs.length > 0) {
       setActiveTab(tabs[0].value);
     }
@@ -193,15 +209,12 @@ export const EditPlayer = ({
               </TabsList>
             </div>
 
+            {/* MOBILE DROPDOWN */}
             <div className="sm:hidden mb-4">
-              <Select
-                value={activeTab}
-                onValueChange={(val) => setActiveTab(val)}
-              >
+              <Select value={mobileTab} onValueChange={handleMobileTabChange}>
                 <SelectTrigger className="w-full bg-gray-800 text-white">
-                  <SelectValue placeholder="Select" />
+                  <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
-
                 <SelectContent className="bg-gray-800 text-white">
                   {tabs.map((tab) => (
                     <SelectItem key={tab.value} value={tab.value}>
@@ -212,8 +225,9 @@ export const EditPlayer = ({
               </Select>
             </div>
 
-            {/* CONTENT */}
+            {/* CONTENT — hidden on mobile until a type is selected */}
             <motion.div
+              className={!mobileTab ? "hidden sm:block" : ""}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
