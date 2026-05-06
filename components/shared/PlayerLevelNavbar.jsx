@@ -181,10 +181,10 @@ const PlayerLevelNavbar = ({
                   {resolvedType === "best3" ? "B3" : resolvedType === "winlose" ? "W/L" : "B5"}
                 </div>
                 <div className="min-w-0">
-                  <h1 className="truncate text-2xl font-extrabold tracking-[0.08em] text-white">
+                  <h1 className="truncate text-shadow-muted text-p4 md:text-h5 font-extrabold tracking-[0.08em] text-white">
                     {resolvedTypeLabel ? `${resolvedLadderName} ` : resolvedLadderName}
                   </h1>
-                  <p className="mt-1 truncate text-xs font-medium uppercase tracking-[0.28em] text-primary">
+                  <p className="mt-1 truncate text-h7 md:text-p3 font-medium uppercase tracking-[0.28em] text-primary">
                     {`Live Rankings · ${resolvedPlayerCount} players`}
                   </p>
                 </div>

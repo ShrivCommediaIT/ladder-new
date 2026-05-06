@@ -65,8 +65,7 @@ const PlayerCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       onClick={() => onClick()}
-      className={`flex flex-col mb-3 rounded-lg shadow transition-all relative overflow-hidden ${
-        isCurrentUser
+      className={`flex flex-col mb-3 rounded-lg shadow transition-all relative overflow-hidden ${isCurrentUser
           ? "cursor-pointer hover:bg-[#143238]"
           : "opacity-60 cursor-not-allowed"
         }`}
@@ -99,7 +98,7 @@ const PlayerCard = ({
                 )}
                 {player.gender && (
                   <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
+                    {player.gender == "male" ? "M" : "F"}
                   </p>
                 )}
               </div>
@@ -136,8 +135,8 @@ const PlayerCard = ({
                   <div
                     key={r}
                     className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${found
-                        ? "bg-white text-[#092733] border-[#7ea1af]"
-                        : "bg-[#7ea1af] bg-opacity-50 border-[#528189] text-xs"
+                      ? "bg-white text-[#092733] border-[#7ea1af]"
+                      : "bg-[#7ea1af] bg-opacity-50 border-[#528189] text-xs"
                       }`}
                   >
                     {found ? found.point : ""}
@@ -266,9 +265,9 @@ const MinileaguePlayers = ({ ladderId }) => {
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
-        <PlayerSearch 
-          searchTerm={searchQuery} 
-          setSearchTerm={setSearchQuery} 
+        <PlayerSearch
+          searchTerm={searchQuery}
+          setSearchTerm={setSearchQuery}
           onAgeSearch={(age, ageType, gender) => {
             const ageNum = age ? Number(age) : "";
             dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
