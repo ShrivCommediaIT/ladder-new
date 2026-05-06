@@ -47,48 +47,48 @@ const PlayerCard = ({
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
-    const getScoreBySkillNumber = (scores, skills, skillNumber) => {
-  const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
-  const skillObj = skills?.find((s) => s.skill_number === skillNumber);
+  const getScoreBySkillNumber = (scores, skills, skillNumber) => {
+    const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
+    const skillObj = skills?.find((s) => s.skill_number === skillNumber);
 
-  const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
-  const score = scoreObj ? Number(scoreObj.best_score) : 0;
-  const bestScore = scoreObj ? Number(scoreObj.best_score) : 0; 
-  const inputScore =
-    scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
-      ? Number(scoreObj.input_score)
-      : null;
+    const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
+    const score = scoreObj ? Number(scoreObj.best_score) : 0;
+    const bestScore = scoreObj ? Number(scoreObj.best_score) : 0;
+    const inputScore =
+      scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
+        ? Number(scoreObj.input_score)
+        : null;
 
-  const displayScore = bestScore; 
+    const displayScore = bestScore;
 
-  const target =
-    skillObj?.target !== null && skillObj?.target !== undefined
-      ? Number(skillObj.target)
-      : null;
+    const target =
+      skillObj?.target !== null && skillObj?.target !== undefined
+        ? Number(skillObj.target)
+        : null;
 
-  const mode = skillObj?.skill_sign || "+";
+    const mode = skillObj?.skill_sign || "+";
 
-  let isTargetAchieved = false;
+    let isTargetAchieved = false;
 
-  if (
-    target !== null &&
-    target !== 0 &&
-    score !== 0 &&
-    !isNaN(target) &&
-    !isNaN(score)
-  ) {
-    isTargetAchieved = isInverted ? score >= target : score <= target;
-  }
+    if (
+      target !== null &&
+      target !== 0 &&
+      score !== 0 &&
+      !isNaN(target) &&
+      !isNaN(score)
+    ) {
+      isTargetAchieved = isInverted ? score >= target : score <= target;
+    }
 
-  return {
-    witnessBy,
-    score,
-    displayScore,
-    target,
-    isTargetAchieved,
-    input_score: inputScore,
+    return {
+      witnessBy,
+      score,
+      displayScore,
+      target,
+      isTargetAchieved,
+      input_score: inputScore,
+    };
   };
-};
 
   return (
     <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative gap-0 p-4">
@@ -120,10 +120,10 @@ const PlayerCard = ({
                 </p>
               )}
               {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
-                  </p>
-                )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                  {player.gender == "male" ? "M" : "F"}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -178,7 +178,7 @@ const PlayerCard = ({
                     }
                   >
                     {/* Minus sign above number */}
-                   
+
                     {skill.skill_number}
                   </div>
                 );
@@ -275,7 +275,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [openSort, setOpenSort] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const { appliedAge,ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge, ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showRemove, setShowRemove] = useState(false);
   const [playerSearchResetSignal, setPlayerSearchResetSignal] = useState(0);

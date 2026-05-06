@@ -79,7 +79,7 @@ const PlayerCard = ({
                 )}
                 {player.gender && (
                   <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
+                    {player.gender == "male" ? "M" : "F"}
                   </p>
                 )}
               </div>
@@ -321,9 +321,9 @@ const Best5Players = () => {
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 
 
-        <div className="flex flex-col gap-2">
-            <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
-          </div>
+      <div className="flex flex-col gap-2">
+        <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+      </div>
 
 
       {/* Ladder link + search */}

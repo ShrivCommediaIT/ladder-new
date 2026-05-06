@@ -42,11 +42,10 @@ const PlayerCard = ({
         if (!canEdit) return onSelect("toastWarning");
         onSelect("select", player);
       }}
-      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans ${
-        isAllowed && canEdit
+      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans ${isAllowed && canEdit
           ? "cursor-pointer hover:bg-[#143238]"
           : "opacity-70 cursor-not-allowed"
-      }`}
+        }`}
       style={{
         background: "#223848",
         border: "2px solid #4eb0a2",
@@ -59,17 +58,17 @@ const PlayerCard = ({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}   
+              {player?.name || "N/A"}
               {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                {player.age}
-              </p>
-            )}
-            {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
-                  </p>
-                )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
+                  {player.age}
+                </p>
+              )}
+              {player.gender && (
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                  {player.gender == "male" ? "M" : "F"}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -153,8 +152,8 @@ const Minileague = () => {
 
   const filteredPlayers = searchQuery
     ? playerList.filter((p) =>
-        p.name?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      p.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : playerList;
 
   const uniquePlayers = Array.from(
@@ -229,9 +228,9 @@ const Minileague = () => {
           <LadderLinkPanel ladderId={ladderId} />
         )}
         <div className="w-full">
-          <PlayerSearch 
-            searchTerm={searchQuery} 
-            setSearchTerm={setSearchQuery} 
+          <PlayerSearch
+            searchTerm={searchQuery}
+            setSearchTerm={setSearchQuery}
             onAgeSearch={(age, ageType, gender) => {
               const ageNum = age ? Number(age) : "";
               setAppliedAge(ageNum);

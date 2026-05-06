@@ -48,11 +48,10 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       onClick={onClick}
-      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans sm:px-4 sm:py-3 ${
-        isAllowed && canEdit
+      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans sm:px-4 sm:py-3 ${isAllowed && canEdit
           ? "cursor-pointer hover:bg-[#143238]"
           : "opacity-70 cursor-not-allowed"
-      }`}
+        }`}
       style={{
         background: "#223848",
         border: "2px solid #4eb0a2",
@@ -70,17 +69,17 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
           {/* NAME + PHONE */}
           <div className="flex-1 min-w-0 overflow-hidden">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate max-w-[160px] sm:max-w-[240px]">
-              {player?.name || "N/A"}   
+              {player?.name || "N/A"}
               {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                {player.age}
-              </p>
-            )}
-            {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
-                  </p>
-                )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
+                  {player.age}
+                </p>
+              )}
+              {player.gender && (
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                  {player.gender == "male" ? "M" : "F"}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -116,11 +115,10 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
               return (
                 <div
                   key={r}
-                  className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${
-                    found
+                  className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${found
                       ? "bg-white text-[#092733] border-[#7ea1af]"
                       : "bg-[#7ea1af] bg-opacity-50 border-[#528189] text-xs"
-                  }`}
+                    }`}
                 >
                   {found ? found.point : ""}
                 </div>
@@ -247,8 +245,8 @@ export default function DummyPlayerList({ ladderId }) {
   const finalSections = sectionedPlayers.map((sec) => {
     const filteredPlayers = searchTerm
       ? (sec?.users_record || []).filter((p) =>
-          p?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        p?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
       : sec?.users_record || [];
 
     const blankCount = Math.max(0, totalSlots - filteredPlayers.length);
@@ -305,8 +303,8 @@ export default function DummyPlayerList({ ladderId }) {
             <div className="space-y-3">
               {section.players.map((player, pidx) => {
                 const globalIndex = idx * totalSlots + pidx;
-                const canEdit = user?.user_type?.toLowerCase() === "admin" || 
-                                String(user?.id) === String(player.id || player.user_id);
+                const canEdit = user?.user_type?.toLowerCase() === "admin" ||
+                  String(user?.id) === String(player.id || player.user_id);
                 const isAllowed = globalIndex < allowedUsers || canEdit;
 
                 return (
@@ -341,22 +339,22 @@ export default function DummyPlayerList({ ladderId }) {
             setIsModalOpen(false);
             setSelectedPlayerId(null);
           }}
-          setLoading={() => {}}
+          setLoading={() => { }}
         />
       )}
 
       <div className="flex justify-center items-center">
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md w-[80vw]">
-          <DialogHeader>
-            <DialogTitle>Notice</DialogTitle>
-          </DialogHeader>
-          <p className="py-2 text-gray-800">{dialogMessage}</p>
-          <DialogFooter>
-            <Button onClick={() => setIsDialogOpen(false)}>OK</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-md w-[80vw]">
+            <DialogHeader>
+              <DialogTitle>Notice</DialogTitle>
+            </DialogHeader>
+            <p className="py-2 text-gray-800">{dialogMessage}</p>
+            <DialogFooter>
+              <Button onClick={() => setIsDialogOpen(false)}>OK</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

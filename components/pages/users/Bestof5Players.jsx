@@ -159,13 +159,13 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
 
       {/* SEARCH */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
-        <PlayerSearch 
-          searchTerm={searchTerm} 
-          setSearchTerm={setSearchTerm} 
+        <PlayerSearch
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
           onAgeSearch={(age, ageType, gender) => {
             const ageNum = age ? Number(age) : "";
             dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-          }} 
+          }}
           onClearFilters={() => {
             dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
           }}
@@ -226,10 +226,10 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
                         </p>
                       )}
                       {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
-                  </p>
-                )}
+                        <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                          {player.gender == "male" ? "M" : "F"}
+                        </p>
+                      )}
                     </div>
                     <div className="text-[#d4e5e8] text-xs truncate">
                       {player?.phone || "N/A"}

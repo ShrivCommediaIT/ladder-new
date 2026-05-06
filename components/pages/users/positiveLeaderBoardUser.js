@@ -67,7 +67,7 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-     isTargetAchieved = isInverted ? score >= target : score <= target;
+      isTargetAchieved = isInverted ? score >= target : score <= target;
     }
 
     return {
@@ -131,10 +131,10 @@ const PlayerCard = ({
                 </p>
               )}
               {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
-                  </p>
-                )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                  {player.gender == "male" ? "M" : "F"}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -168,7 +168,7 @@ const PlayerCard = ({
         </div>
 
         {player.skills?.length > 0 ? (
-                 <>
+          <>
             <div className="flex gap-[3px] overflow-y-visible pb-1 mb-1">
               {player.skills.map((skill, i) => {
 
@@ -189,7 +189,7 @@ const PlayerCard = ({
                     }
                   >
                     {/* Minus sign above number */}
-                   
+
                     {skill.skill_number}
                   </div>
                 );
@@ -242,7 +242,7 @@ const PlayerCard = ({
 };
 
 /* ---------------- MAIN COMPONENT ---------------- */
-const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
+const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
@@ -351,7 +351,7 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
     }
   }, []);
 
-  
+
   const handleSkillClick = useCallback(
 
     (playerId, skillNumber) => {
@@ -363,7 +363,7 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
       const skillObj = player.skills.find(
         (s) => s.skill_number === skillNumber,
       );
-      
+
       if (!skillObj) return;
       setSelectedPlayerId(playerId);
       setSelectedSkillNumber(skillNumber);
@@ -381,27 +381,27 @@ const PositiveLeaderboardUser =({ ladderId: propLadderId, onPlayerAdded }) => {
     refreshLeaderboard();
   }, [refreshLeaderboard]);
 
-const filteredPlayers = useMemo(() => {
-  const q = searchQuery.trim().toLowerCase();
-  if (!q) return data;
+  const filteredPlayers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return data;
 
-  const clean = (name = "") =>
-    name.replace(/\s+/g, "").toLowerCase();
+    const clean = (name = "") =>
+      name.replace(/\s+/g, "").toLowerCase();
 
-  const startsWith = data
-    .filter((p) => clean(p.name).startsWith(q))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    const startsWith = data
+      .filter((p) => clean(p.name).startsWith(q))
+      .sort((a, b) => a.name.localeCompare(b.name));
 
-  const contains = data
-    .filter(
-      (p) =>
-        !clean(p.name).startsWith(q) &&
-        clean(p.name).includes(q)
-    )
-    .sort((a, b) => a.name.localeCompare(b.name));
+    const contains = data
+      .filter(
+        (p) =>
+          !clean(p.name).startsWith(q) &&
+          clean(p.name).includes(q)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
 
-  return [...startsWith, ...contains];
-}, [data, searchQuery]);
+    return [...startsWith, ...contains];
+  }, [data, searchQuery]);
 
 
   const playerData = data; // use data from selector
@@ -426,21 +426,21 @@ const filteredPlayers = useMemo(() => {
               <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
             ) : (
               filteredPlayers.map((player, index) => {
-                  const isEditablePlayer = player.id === currentUserId;
+                const isEditablePlayer = player.id === currentUserId;
                 return (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  overallRank={player.rank || index + 1}
-                  showAgeRank={showAgeRank}
-                  ageRank={index + 1}
-                  isInverted={isInverted}
-                  onSkillClick={handleSkillClick}
-                  onTargetAchieved={handleTargetAchieved}
-                  currentUser={currentUser}
-                  isEditable={isEditablePlayer}
-                />)
-                }
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    overallRank={player.rank || index + 1}
+                    showAgeRank={showAgeRank}
+                    ageRank={index + 1}
+                    isInverted={isInverted}
+                    onSkillClick={handleSkillClick}
+                    onTargetAchieved={handleTargetAchieved}
+                    currentUser={currentUser}
+                    isEditable={isEditablePlayer}
+                  />)
+              }
               )
             )}
           </div>

@@ -94,7 +94,7 @@ const PlayerCard = ({
       .filter(Boolean).length || 0;
 
   //  Trigger celebration when targets achieved
-useEffect(() => {
+  useEffect(() => {
     if (achievedTargets > 0) {
       onTargetAchieved(player.name, achievedTargets);
     }
@@ -132,10 +132,10 @@ useEffect(() => {
                 </p>
               )}
               {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
-                  </p>
-                )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                  {player.gender == "male" ? "M" : "F"}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -173,54 +173,54 @@ useEffect(() => {
             <div className="-mx-1 overflow-x-auto pb-1 mb-1 px-1 scrollbar-thin">
               <div className="w-max min-w-full">
                 <div className="flex gap-[3px] overflow-y-visible pb-2">
-              {player.skills.map((skill, i) => {
-                const isNegative = skill.skill_sign === "-";
+                  {player.skills.map((skill, i) => {
+                    const isNegative = skill.skill_sign === "-";
 
-                return (
-                  <div
-                    key={i}
-                    onClick={() => isEditable && onSkillClick(player.id, skill.skill_number)}
-                    className={`${skillCellClass}  text-black relative ${isEditable
-                      ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
-                      : "cursor-not-allowed bg-white opacity-40 text-gray-500"
-                      }`}
-                    title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
-                  >
-                    {/* minus sign box ke upar */}
-                    {isNegative && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
-                        −
-                      </span>
-                    )}
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => isEditable && onSkillClick(player.id, skill.skill_number)}
+                        className={`${skillCellClass}  text-black relative ${isEditable
+                          ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
+                          : "cursor-not-allowed bg-white opacity-40 text-gray-500"
+                          }`}
+                        title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
+                      >
+                        {/* minus sign box ke upar */}
+                        {isNegative && (
+                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
+                            −
+                          </span>
+                        )}
 
-                    {skill.skill_number}
-                  </div>
-                );
-              })}
+                        {skill.skill_number}
+                      </div>
+                    );
+                  })}
                 </div>
 
-            {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
+                {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
                 <div className="flex gap-[3px]">
-              {player.skills.map((skill, i) => {
-                const scoreData = getScoreBySkillNumber(
-                  player.scores || [],
-                  player.skills || [],
-                  skill.skill_number,
-                );
-                return (
-                  <div
-                    key={i}
-                    className={`${skillCellClass} font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
-                      ? "bg-green-400 text-black shadow-md font-semibold"
-                      : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
-                      } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
-                    title={`Score: ${scoreData.score} | Target: ${scoreData.target || "N/A"
-                      }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
-                  >
-                    {scoreData.displayScore}
-                  </div>
-                );
-              })}
+                  {player.skills.map((skill, i) => {
+                    const scoreData = getScoreBySkillNumber(
+                      player.scores || [],
+                      player.skills || [],
+                      skill.skill_number,
+                    );
+                    return (
+                      <div
+                        key={i}
+                        className={`${skillCellClass} font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
+                          ? "bg-green-400 text-black shadow-md font-semibold"
+                          : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
+                          } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
+                        title={`Score: ${scoreData.score} | Target: ${scoreData.target || "N/A"
+                          }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
+                      >
+                        {scoreData.displayScore}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -243,7 +243,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
 
-  const { data = [], loading,ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
+  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const showAgeRank = Number(appliedAge) > 0;
@@ -285,15 +285,15 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const currentUser = data.find((p) => p.id == currentUserId);
   const myRank = currentUser?.rank;
 
-    const handleTargetAchieved = useCallback(() => {
-      setShowCelebration(true);
-      setTimeout(
-        () => {
-          setShowCelebration(false);
-        },
-        4000 + Math.random() * 1000,
-      );
-    }, []);
+  const handleTargetAchieved = useCallback(() => {
+    setShowCelebration(true);
+    setTimeout(
+      () => {
+        setShowCelebration(false);
+      },
+      4000 + Math.random() * 1000,
+    );
+  }, []);
 
   // REFRESH KEY TO CONTROL RELOADS (STOPS INFINITE LOOP)
   const refreshKey = useRef(0);
