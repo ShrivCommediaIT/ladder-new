@@ -81,49 +81,51 @@ export default function AccessCodeParts() {
     fetchSavedClub();
   }, [drawerForm]);
 
-const handleSubmit = async (values) => {
-  if (!userId) return toast.error("User not logged in");
+  const handleSubmit = async (values) => {
+    if (!userId) return toast.error("User not logged in");
 
-  setLoading(true);
-  setErrorMessage("");
+    setLoading(true);
+    setErrorMessage("");
 
-  try {
-    const payload = {
-      user_id: userId,
-      login_id: values.part1.toUpperCase(),
-      password: values.part2,
-      user_type: "admin",
-    };
+    try {
+      const payload = {
+        user_id: userId,
+        login_id: values.part1.toUpperCase(),
+        password: values.part2,
+        user_type: "admin",
+      };
 
-    const res = await postRequest("/app/user/create", payload);
+      const res = await postRequest("/app/user/create", payload);
+      console.log("payload2", res);
 
-    // Club ID already exist case
-    if (res?.status === 400) {
-      toast.error("Club ID already exists");
-      return;
+      // Club ID already exist case
+      if (res?.status != 200) {
+        setErrorMessage(res.error_message)
+        toast.error(res.error_message);
+        return;
+      }
+
+      // Other errors
+      if (res?.status === false) {
+        setErrorMessage(res?.message || "Action failed");
+        return;
+      }
+
+      // Success case
+      setSavedData({
+        clubId: values.part1,
+        clubPin: values.part2,
+      });
+
+      setSuccessDialog(true);
+      form.reset();
+
+    } catch (err) {
+      setErrorMessage("Server error occurred");
+    } finally {
+      setLoading(false);
     }
-
-    // Other errors
-    if (res?.status === false) {
-      setErrorMessage(res?.message || "Action failed");
-      return;
-    }
-
-    // Success case
-    setSavedData({
-      clubId: values.part1,
-      clubPin: values.part2,
-    });
-
-    setSuccessDialog(true);
-    form.reset();
-
-  } catch (err) {
-    setErrorMessage("Server error occurred");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleDrawerSubmit = (values) => {
     setPendingUpdateValues(values);
