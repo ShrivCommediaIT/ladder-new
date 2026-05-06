@@ -71,81 +71,80 @@ const PlayerCard = ({
       </div>
 
       <div className="flex items-center justify-between px-2 py-2 ">
-      <div className="flex-1 min-w-0">
-        <div className="flex w-full items-center mb-2">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#48aaa8] border-2 border-white text-lg font-bold text-white mr-2">
-            {rank}
-          </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex w-full items-center mb-2">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#48aaa8] border-2 border-white text-lg font-bold text-white mr-2">
+              {rank}
+            </div>
 
-          <div className="flex-1 min-w-0">
-            <div className="text-white flex items-center gap-2 text-sm font-semibold truncate">
-              {player?.name || "N/A"}   
-              {player.age && (
-              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                {player.age}
-              </p>
-            )}
-            {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
+            <div className="flex-1 min-w-0">
+              <div className="text-white flex items-center gap-2 text-sm font-semibold truncate">
+                {player?.name || "N/A"}
+                {player.age && (
+                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
+                    {player.age}
                   </p>
                 )}
+                {player.gender && (
+                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                    {player.gender == "male" ? "M" : "F"}
+                  </p>
+                )}
+              </div>
+              <div className="text-[#d4e5e8] text-xs truncate">
+                {player?.phone || "N/A"}
+              </div>
             </div>
-            <div className="text-[#d4e5e8] text-xs truncate">
-              {player?.phone || "N/A"}
+
+            <div className="ml-2 w-14 text-center">
+              <span className="bg-[#1b4542] text-[#fdf7c3] px-3 py-1 rounded-full font-extrabold text-lg border border-white">
+                {player?.total_point || 0}
+              </span>
             </div>
           </div>
 
-          <div className="ml-2 w-14 text-center">
-            <span className="bg-[#1b4542] text-[#fdf7c3] px-3 py-1 rounded-full font-extrabold text-lg border border-white">
-              {player?.total_point || 0}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex gap-1 mb-1 overflow-x-auto">
-          {currentSectionRanks.map((r) => (
-            <div
-              key={r}
-              className="w-7 h-6 flex items-center justify-center text-xs text-white rounded bg-[#28495e] border border-[#4eb0a2]"
-            >
-              {r}
-            </div>
-          ))}
-        </div>
-
-        <div className="flex gap-1 overflow-x-auto">
-          {currentSectionRanks.map((r) => {
-            const found = player.result_details?.find(
-              (i) => Number(i.rank) === Number(r)
-            );
-            return (
+          <div className="flex gap-1 mb-1 overflow-x-auto">
+            {currentSectionRanks.map((r) => (
               <div
                 key={r}
-                className={`w-7 h-7 flex items-center justify-center rounded font-bold border ${
-                  found
-                    ? "bg-white text-black border-[#7ea1af]"
-                    : "bg-[#7ea1af]/50 border-[#528189]"
-                }`}
+                className="w-7 h-6 flex items-center justify-center text-xs text-white rounded bg-[#28495e] border border-[#4eb0a2]"
               >
-                {found?.point || ""}
+                {r}
               </div>
-            );
-          })}
-        </div>
-      </div>
+            ))}
+          </div>
 
-      <div className="ml-3 w-20 h-20">
-        <Image
-          src={playerImageUrl}
-          alt={player?.name}
-          width={80}
-          height={80}
-          className="object-cover rounded"
-          unoptimized
-        />
-      </div>
+          <div className="flex gap-1 overflow-x-auto">
+            {currentSectionRanks.map((r) => {
+              const found = player.result_details?.find(
+                (i) => Number(i.rank) === Number(r)
+              );
+              return (
+                <div
+                  key={r}
+                  className={`w-7 h-7 flex items-center justify-center rounded font-bold border ${found
+                      ? "bg-white text-black border-[#7ea1af]"
+                      : "bg-[#7ea1af]/50 border-[#528189]"
+                    }`}
+                >
+                  {found?.point || ""}
+                </div>
+              );
+            })}
+          </div>
         </div>
+
+        <div className="ml-3 w-20 h-20">
+          <Image
+            src={playerImageUrl}
+            alt={player?.name}
+            width={80}
+            height={80}
+            className="object-cover rounded"
+            unoptimized
+          />
+        </div>
+      </div>
     </div>
   );
 };
@@ -237,82 +236,82 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
 
 
 
-// Trust server-side ordering from API
-const processedSections = sectionedPlayers;
+  // Trust server-side ordering from API
+  const processedSections = sectionedPlayers;
 
 
   const searchPlayers = React.useMemo(() => {
-  const q = searchQuery.trim().toLowerCase();
-  if (!q) return [];
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
 
-  const list = [];
+    const list = [];
 
-  processedSections.forEach((sec, sidx) => {
-    (sec?.users_record || []).forEach((p) => {
-      if (p?.name?.toLowerCase().includes(q)) {
-        list.push({ ...p, sectionIndex: sidx });
+    processedSections.forEach((sec, sidx) => {
+      (sec?.users_record || []).forEach((p) => {
+        if (p?.name?.toLowerCase().includes(q)) {
+          list.push({ ...p, sectionIndex: sidx });
+        }
+      });
+    });
+
+    return list; // order same as API
+  }, [processedSections, searchQuery]);
+
+
+  const finalSections = React.useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+
+    //  NORMAL MODE — unchanged
+    if (!q) {
+      return processedSections.map((sec) => ({
+        label: sec?.section,
+        players: sec?.users_record || [],
+        blankCount: Math.max(
+          0,
+          sectionSize - (sec?.users_record?.length || 0)
+        ),
+      }));
+    }
+
+    // SEARCH MODE
+    const sections = [];
+
+    processedSections.forEach((sec) => {
+      const allPlayers = sec?.users_record || [];
+
+      const startsWith = allPlayers
+        .filter((p) =>
+          p?.name?.toLowerCase().startsWith(q)
+        )
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      const contains = allPlayers
+        .filter(
+          (p) =>
+            !p?.name?.toLowerCase().startsWith(q) &&
+            p?.name?.toLowerCase().includes(q)
+        )
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      const players = [...startsWith, ...contains];
+
+      if (players.length > 0) {
+        sections.push({
+          label: sec?.section,
+          players,
+          blankCount: 0,
+        });
       }
     });
-  });
 
-  return list; // order same as API
-}, [processedSections, searchQuery]);
-
-
-const finalSections = React.useMemo(() => {
-  const q = searchQuery.trim().toLowerCase();
-
-  //  NORMAL MODE — unchanged
-  if (!q) {
-    return processedSections.map((sec) => ({
-      label: sec?.section,
-      players: sec?.users_record || [],
-      blankCount: Math.max(
-        0,
-        sectionSize - (sec?.users_record?.length || 0)
-      ),
-    }));
-  }
-
-  // SEARCH MODE
-  const sections = [];
-
-  processedSections.forEach((sec) => {
-    const allPlayers = sec?.users_record || [];
-
-    const startsWith = allPlayers
-      .filter((p) =>
-        p?.name?.toLowerCase().startsWith(q)
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    const contains = allPlayers
-      .filter(
-        (p) =>
-          !p?.name?.toLowerCase().startsWith(q) &&
-          p?.name?.toLowerCase().includes(q)
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    const players = [...startsWith, ...contains];
-
-    if (players.length > 0) {
-      sections.push({
-        label: sec?.section,
-        players,
-        blankCount: 0,
-      });
-    }
-  });
-
-  return sections;
-}, [processedSections, searchQuery, sectionSize]);
+    return sections;
+  }, [processedSections, searchQuery, sectionSize]);
 
 
   return (
     <div className="space-y-6">
-     <div className="flex flex-col gap-2">
-          <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+      <div className="flex flex-col gap-2">
+        <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
       </div>
       <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />
       <ToastContainer />

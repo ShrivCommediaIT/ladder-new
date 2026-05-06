@@ -95,7 +95,7 @@ const PlayerCard = ({
       .filter(Boolean).length || 0;
 
   //  Trigger celebration when targets achieved
-useEffect(() => {
+  useEffect(() => {
     if (achievedTargets > 0) {
       onTargetAchieved(player.name, achievedTargets);
     }
@@ -129,10 +129,10 @@ useEffect(() => {
                 </p>
               )}
               {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender?"M":"F"}
-                  </p>
-                )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                  {player.gender == "male" ? "M" : "F"}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -170,51 +170,51 @@ useEffect(() => {
             <div className="-mx-1 overflow-x-auto pb-1 mb-1 px-1 scrollbar-thin">
               <div className="w-max min-w-full">
                 <div className="flex gap-[3px] overflow-y-visible pb-2">
-              {player.skills.map((skill, i) => {
-                const isNegative = skill.skill_sign === "-";
+                  {player.skills.map((skill, i) => {
+                    const isNegative = skill.skill_sign === "-";
 
-                return (
-                  <div
-                    key={i}
-                    onClick={() => onSkillClick(player.id, skill.skill_number)}
-                    className={`${skillCellClass} cursor-pointer text-black bg-white hover:bg-emerald-500 relative`}
-                    title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
-                  >
-                    {/* minus sign box ke upar */}
-                    {isNegative && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
-                        −
-                      </span>
-                    )}
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => onSkillClick(player.id, skill.skill_number)}
+                        className={`${skillCellClass} cursor-pointer text-black bg-white hover:bg-emerald-500 relative`}
+                        title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
+                      >
+                        {/* minus sign box ke upar */}
+                        {isNegative && (
+                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
+                            −
+                          </span>
+                        )}
 
-                    {skill.skill_number}
-                  </div>
-                );
-              })}
-            </div>
+                        {skill.skill_number}
+                      </div>
+                    );
+                  })}
+                </div>
 
-            {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
+                {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
                 <div className="flex gap-[3px]">
-              {player.skills.map((skill, i) => {
-                const scoreData = getScoreBySkillNumber(
-                  player.scores || [],
-                  player.skills || [],
-                  skill.skill_number,
-                );
-                return (
-                  <div
-                    key={i}
-                    className={`${skillCellClass} font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
-                      ? "bg-green-400 text-black shadow-md font-semibold"
-                      : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
-                      } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
-                    title={`Best Score: ${scoreData.displayScore}s | Target: ${scoreData.target || "N/A"
-                      }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
-                  >
-                    {scoreData.displayScore}
-                  </div>
-                );
-              })}
+                  {player.skills.map((skill, i) => {
+                    const scoreData = getScoreBySkillNumber(
+                      player.scores || [],
+                      player.skills || [],
+                      skill.skill_number,
+                    );
+                    return (
+                      <div
+                        key={i}
+                        className={`${skillCellClass} font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
+                          ? "bg-green-400 text-black shadow-md font-semibold"
+                          : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
+                          } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
+                        title={`Best Score: ${scoreData.displayScore}s | Target: ${scoreData.target || "N/A"
+                          }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
+                      >
+                        {scoreData.displayScore}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -252,7 +252,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
- const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
     setTimeout(
@@ -281,7 +281,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
     refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
   };
-  
+
 
   useEffect(() => {
     if (onPlayerAdded) {
@@ -311,7 +311,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     }
   }, []);
 
-  
+
   const handleSkillClick = useCallback(
 
     (playerId, skillNumber) => {
@@ -323,7 +323,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       const skillObj = player.skills.find(
         (s) => s.skill_number === skillNumber,
       );
-      
+
       if (!skillObj) return;
       setSelectedPlayerId(playerId);
       setSelectedSkillNumber(skillNumber);
@@ -341,27 +341,27 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     refreshLeaderboard();
   }, [refreshLeaderboard]);
 
-const filteredPlayers = React.useMemo(() => {
-  const q = searchQuery.trim().toLowerCase();
-  if (!q) return data;
+  const filteredPlayers = React.useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return data;
 
-  const clean = (name = "") =>
-    name.replace(/\s+/g, "").toLowerCase();
+    const clean = (name = "") =>
+      name.replace(/\s+/g, "").toLowerCase();
 
-  const startsWith = data
-    .filter((p) => clean(p.name).startsWith(q))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    const startsWith = data
+      .filter((p) => clean(p.name).startsWith(q))
+      .sort((a, b) => a.name.localeCompare(b.name));
 
-  const contains = data
-    .filter(
-      (p) =>
-        !clean(p.name).startsWith(q) &&
-        clean(p.name).includes(q)
-    )
-    .sort((a, b) => a.name.localeCompare(b.name));
+    const contains = data
+      .filter(
+        (p) =>
+          !clean(p.name).startsWith(q) &&
+          clean(p.name).includes(q)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
 
-  return [...startsWith, ...contains];
-}, [data, searchQuery]);
+    return [...startsWith, ...contains];
+  }, [data, searchQuery]);
 
 
   const playerData = data; // use data from selector

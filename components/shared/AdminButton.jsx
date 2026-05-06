@@ -138,7 +138,7 @@ const AdminButton = () => {
     }
   };
 
-  const refreshSkillLeaderboard = (skillNo = 0, ageOverride) => {
+  const refreshSkillLeaderboard = (skillNo = 0) => {
     if (!ladderId) return;
 
     let laddartype;
@@ -164,6 +164,7 @@ const AdminButton = () => {
     const payload = {
       ladder_id: ladderId,
       type: laddartype,
+      sortbyskillnumber: skillNo
     };
 
     
@@ -271,8 +272,8 @@ const AdminButton = () => {
     setAgeFilterResetSignal((prev) => prev + 1);
     // Refresh with cleared filters
     if (ladderId) {
-      if (isSkill || isPositive || isNegative || ladderType === "best5" || ladderType === "best3" || ladderType === "winlose" || isMiniLeague) {
-        refreshSkillLeaderboard(0, 0); // Pass 0 to clear age override
+      if (isSkill || isPositive || isNegative ) {
+        refreshSkillLeaderboard(0); // Pass 0 to clear age override
       } else {
         const payload = { ladder_id: ladderId, type: ladderType };
         // No age/gender filters for cleared state
@@ -424,7 +425,7 @@ const AdminButton = () => {
         </Dialog>
 
         {/* SKILL SPECIFIC BUTTONS */}
-          <>
+        {(isSkill || isPositive || isNegative) && <>
             {!isSorted ? (
               <Button
                 onClick={handleSortBySkill}
@@ -440,13 +441,13 @@ const AdminButton = () => {
                 <XCircle size={20} /> CLEAR ALL
               </Button>
             )}
-          </>
+          </>}
 
         {/* AGE FILTER BUTTON */}
 
-        <div className="h-16 w-full">
+        {!isMiniLeague && <div className="h-16 w-full">
           <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} />
-        </div>
+        </div>}
 
 
         {/* SINGLE DIALOG */}

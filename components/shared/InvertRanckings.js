@@ -182,7 +182,7 @@ export const InvertRanckings = () => {
             : 'border-white/10 bg-zinc-900/70 from-gray-900 to-cyan-900'
         }`}
         title="Invert Rank"
-    >   <span className="text-white text-sm">{isInverted?"Inverted Rank": "Invert Rank"}</span>
+    >   <span className="text-white text-sm"> Invert Rankings</span>
         <ArrowBigUp  className={`text-white transition-transform duration-300 ${isInverted === true ? "rotate-180" : ""}`} />
     </div>
     </>
