@@ -44,7 +44,7 @@ export default function SubAdminDashboard() {
   const [csvFile, setCsvFile] = useState(null);
   const [ladderType, setLadderType] = useState("winlose");
   const [duplicateWarning, setDuplicateWarning] = useState(null);
-  const [showDemo, setShowDemo] = useState(true);
+  const [showDemo, setShowDemo] = useState(false);
 
   const { allLadders } = useSelector((state) => state.fetchLadder);
 

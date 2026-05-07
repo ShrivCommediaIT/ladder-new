@@ -37,7 +37,7 @@ const DemoLadder = ({ userId }) => {
   const router = useRouter();
   const printRef = useRef(null);
 
-  const [showDemo, setShowDemo] = useState(true);
+  const [showDemo, setShowDemo] = useState(false);
 
   const { allLadders, loading, error } = useSelector(
     (state) => state.fetchLadder

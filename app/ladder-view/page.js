@@ -31,13 +31,13 @@ export default function LadderView() {
   
   // ✅ Select correct component based on ladder type
   const getPlayersComponent = () => {
-    if (ladderType === "minileague") {
-      return <DummyMinileaguePlayerList ladderId={ladderId} />;
-    }
+    // if (ladderType === "minileague") {
+    //   return <DummyMinileaguePlayerList ladderId={ladderId} />;
+    // }
 
-    if (ladderType === "skill") {
-      return <DummyBasicLeaderBoard ladderId={ladderId} />
-    }
+    // if (ladderType === "skill") {
+    //   return <DummyBasicLeaderBoard ladderId={ladderId} />
+    // }
 
     return <DummyPlayerList ladderId={ladderId} />;
   };
