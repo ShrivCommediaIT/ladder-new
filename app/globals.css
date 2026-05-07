@@ -178,20 +178,21 @@ body {
   --ladder-chip-text: #0f3e63;
   --ladder-chip-border: rgb(var(--brand-primary-rgb) / 0.18);
   --ladder-player-hover: rgb(var(--brand-primary-rgb) / 0.08);
-  --best-board-bg: #0b1020;
-  --best-board-surface: #171b2a;
-  --best-board-surface-soft: #1d2233;
-  --best-board-surface-strong: #1b2140;
-  --best-board-border: #2a3146;
-  --best-board-border-strong: #305fb3;
-  --best-board-text: #f5f7ff;
-  --best-board-muted: #7f8dad;
-  --best-board-accent: #4f46e5;
-  --best-board-accent-soft: #1d2556;
-  --best-board-success: #22c55e;
-  --best-board-danger: #ef4444;
-  --best-board-highlight: #7fb2ff;
-  --best-board-highlight-soft: #9fc2ff;
+  --best-board-bg: linear-gradient(180deg, #f7fbff 0%, #edf4ff 100%);
+  --best-board-surface: rgb(255 255 255 / 0.9);
+  --best-board-surface-soft: #edf5ff;
+  --best-board-surface-strong: #ddeaff;
+  --best-board-border: rgb(var(--brand-primary-rgb) / 0.14);
+  --best-board-border-strong: rgb(var(--brand-deep-rgb) / 0.26);
+  --best-board-text: #13263b;
+  --best-board-muted: #587188;
+  --best-board-accent: #2563eb;
+  --best-board-accent-soft: rgb(var(--brand-primary-rgb) / 0.12);
+  --best-board-success: #16a34a;
+  --best-board-danger: #dc2626;
+  --best-board-warning: #fde68a;
+  --best-board-highlight: #1d4ed8;
+  --best-board-highlight-soft: #1e40af;
 }
 
 .dark {
@@ -309,6 +310,7 @@ body {
   --best-board-accent-soft: #1d2556;
   --best-board-success: #22c55e;
   --best-board-danger: #ef4444;
+  --best-board-warning: #fde68a;
   --best-board-highlight: #7fb2ff;
   --best-board-highlight-soft: #9fc2ff;
 }
@@ -615,6 +617,42 @@ body {
   background: var(--best-board-accent-soft);
   border: 1px solid var(--best-board-border-strong);
   color: var(--best-board-highlight-soft);
+}
+
+.best-board-page .text-white {
+  color: var(--best-board-text) !important;
+}
+
+.best-board-page .text-gray-300,
+.best-board-page .text-gray-400,
+.best-board-page .text-gray-500 {
+  color: var(--best-board-muted) !important;
+}
+
+.best-board-page .border-white {
+  border-color: var(--best-board-border) !important;
+}
+
+.best-board-page .bg-white {
+  background: var(--best-board-surface-strong) !important;
+  color: var(--best-board-text) !important;
+}
+
+.best-board-page .bg-gray-200,
+.best-board-page .bg-gray-800 {
+  background: var(--best-board-surface-soft) !important;
+}
+
+.best-board-page .bg-yellow-200 {
+  background: var(--best-board-warning) !important;
+}
+
+.best-board-page .bg-blue-200 {
+  background: rgb(var(--brand-primary-rgb) / 0.18) !important;
+}
+
+.best-board-page .bg-emerald-400 {
+  background: rgb(34 197 94 / 0.2) !important;
 }
 
 @keyframes explode {

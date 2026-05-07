@@ -28,6 +28,12 @@ import { postWithParams } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import PlayerSearchInput from "./PlayerSearchInput";
+import ControlsSection from "@/components/shared/ControlsSection";
+import InfoSection from "@/components/shared/InfoSection";
+import LadderPageLayout from "@/components/shared/LadderPageLayout";
+import { fetchUserActivity } from "@/redux/slices/activitySlice";
+import { getRequest } from "@/services/apiService";
+import { Plus, RotateCcw } from "lucide-react";
 
 /* ================= Player Card ================= */
 const PlayerCard = ({
@@ -43,7 +49,7 @@ const PlayerCard = ({
     return (
       <div
         className="flex items-center justify-center min-h-[18vh] px-2 py-2 mb-3 rounded-lg shadow"
-        style={{ background: "#223848", border: "2px dashed #4eb0a2" }}
+        style={{ background: "var(--best-board-surface)", border: "2px dashed var(--best-board-border-strong)" }}
       />
     );
   }
@@ -63,8 +69,8 @@ const PlayerCard = ({
   return (
     <div
       onClick={() => onEdit(player)}
-      className=" hover:bg-[#143238] transition-allmb-3 rounded-lg shadow cursor-pointer mb-3"
-      style={{ background: "#223848", border: "2px solid #4eb0a2" }}
+      className="mb-3 cursor-pointer rounded-lg shadow transition-all hover:bg-[var(--best-board-surface-soft)]"
+      style={{ background: "var(--best-board-surface)", border: "2px solid var(--best-board-border-strong)" }}
     >
       <div className="flex justify-between items-start mb-1 px-1 mt-1">
         <PlayerStatusToggle player={player} user={false} />
@@ -159,6 +165,7 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
   const ladderType = ladderTypeParam || parentLadderType || "minileague";
 
   const user = useSelector((state) => state.user?.user);
+  const activityState = useSelector((state) => state.activity);
   const { data: sectionedPlayers, appliedAge, appliedAgeType, appliedGender } =
     useSelector((state) => state.minileague || {});
 
@@ -167,6 +174,14 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
   const [selectedPlayerLocal, setSelectedPlayerLocal] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const isRefreshingRef = useRef(false);
+  const [mobileSection, setMobileSection] = useState("players");
+  const [contactOpen, setContactOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [addRemoveOpen, setAddRemoveOpen] = useState(false);
+  const inviteUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`
+      : "";
 
   // Section Size / Flexibility
   const [sectionSize, setSectionSize] = useState(7);
@@ -195,7 +210,10 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
       payload.gender = appliedGender;
     }
     try {
-      await dispatch(fetchMiniLeague(payload));
+      await Promise.all([
+        dispatch(fetchMiniLeague(payload)),
+        dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })),
+      ]);
     } finally {
       setLoadingPlayers(false);
       isRefreshingRef.current = false;
@@ -307,9 +325,94 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
     return sections;
   }, [processedSections, searchQuery, sectionSize]);
 
+  const handleDeleteActivity = useCallback(
+    async (id) => {
+      try {
+        await getRequest(API_ENDPOINTS.ACTIVITY_DELETE, { id });
+        dispatch(fetchUserActivity({ ladder_id: Number(ladderId) }));
+      } catch (error) {
+        console.error("Failed to delete activity", error);
+      }
+    },
+    [dispatch, ladderId],
+  );
+
+  const handleResetBoard = useCallback(
+    async () => {
+      try {
+        await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
+        setResetOpen(false);
+        refreshLeaderboard();
+      } catch (error) {
+        console.error("Failed to reset leaderboard", error);
+      }
+    },
+    [ladderId, refreshLeaderboard],
+  );
+
+  const activityItems = activityState?.data?.data || [];
+  const quickActions = [
+    { id: "reset", label: "Zero All", icon: RotateCcw, onClick: () => setResetOpen(true) },
+    { id: "add-remove", label: "Add / Move", icon: Plus, onClick: () => setAddRemoveOpen(true) },
+  ];
+
 
   return (
-    <div className="space-y-6">
+    <LadderPageLayout
+      className="space-y-6"
+      controls={
+        <ControlsSection
+          mobileSection={mobileSection}
+          setMobileSection={setMobileSection}
+          mobileSections={[
+            { id: "toolbar", label: "Tools" },
+            { id: "players", label: "Players" },
+            { id: "info", label: "Info" },
+          ]}
+          resetOpen={resetOpen}
+          setResetOpen={setResetOpen}
+          addRemoveOpen={addRemoveOpen}
+          setAddRemoveOpen={setAddRemoveOpen}
+          refreshLeaderboard={refreshLeaderboard}
+          ladderId={ladderId}
+          sortMode="rank"
+          setSortMode={() => {}}
+          sortOpen={false}
+          setSortOpen={() => {}}
+          filterOpen={false}
+          setFilterOpen={() => {}}
+          appliedAge={0}
+          appliedGender=""
+          groupSize={1}
+          showSort={false}
+          showFilter={false}
+          showSectionSize={false}
+          resetLabel="Zero All"
+          addRemoveLabel="Add / Move"
+        />
+      }
+      sidebar={
+        <InfoSection
+          mobileSection={mobileSection}
+          ladderType={ladderType}
+          user={user}
+          inviteUrl={inviteUrl}
+          setContactOpen={setContactOpen}
+          setResetOpen={setResetOpen}
+          setAddRemoveOpen={setAddRemoveOpen}
+          setSortOpen={() => {}}
+          setFilterOpen={() => {}}
+          activityItems={activityItems}
+          handleDeleteActivity={handleDeleteActivity}
+          contactOpen={contactOpen}
+          resetOpen={resetOpen}
+          handleResetBoard={handleResetBoard}
+          resetDescription="This will reset the current minileague data."
+          quickActions={quickActions}
+        />
+      }
+    >
+        <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
       <div className="flex flex-col gap-2">
         <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
       </div>
@@ -325,7 +428,7 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
       ) : (
         finalSections.map((section, idx) => (
           <div key={idx}>
-            <div className="bg-[#143238] text-white px-3 py-2 rounded mb-2 font-bold flex justify-between items-center">
+            <div className="mb-2 flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] px-3 py-2 font-bold text-[var(--best-board-text)]">
               <span>{section.label}</span>
 
               {user?.user_type === "admin" && (
@@ -367,6 +470,7 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
           </div>
         ))
       )}
+        </div>
 
       <MinileagueEditPlayer
         open={isOpen}
@@ -422,7 +526,7 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </LadderPageLayout>
   );
 };
 

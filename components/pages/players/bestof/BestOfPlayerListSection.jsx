@@ -66,7 +66,7 @@ const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
       <PlayerAvatar player={player} rank={rank} />
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-h5 font-semibold text-white">{player?.name || "N/A"}</p>
+          <p className="truncate text-h5 font-semibold text-[var(--best-board-text)]">{player?.name || "N/A"}</p>
           {player?.age ? (
             <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)]">
               {player.age}
@@ -144,7 +144,7 @@ export default function BestOfPlayerListSection({
                           if (e.key === "Enter") handleUpdateSection();
                           if (e.key === "Escape") setEditIndex(null);
                         }}
-                        className="w-44 rounded border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-2 py-1 text-sm tracking-normal text-white outline-none"
+                        className="w-44 rounded border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-2 py-1 text-sm tracking-normal text-[var(--best-board-text)] outline-none"
                         autoFocus
                       />
                     ) : (

@@ -47,6 +47,7 @@ import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlic
 import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import AgeFilter from "./AgeFilter";
+import QuickActionsCard from "./QuickActionsCard";
 
 const AdminButton = () => {
   const router = useRouter();
@@ -336,118 +337,150 @@ const AdminButton = () => {
   };
 
   const handleUpgrade = () => router.push(paymentPage);
+  const quickActionButtonClass =
+    "best-board-card-soft rounded-lg h-16 w-full border border-[var(--best-board-border)] px-4 text-white shadow-none transition hover:-translate-y-0.5 hover:bg-[var(--best-board-surface)] flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight";
+  const quickActionDangerButtonClass =
+    "rounded-lg h-16 w-full border border-[color:color-mix(in_srgb,var(--best-board-danger)_35%,transparent)] bg-[color:color-mix(in_srgb,var(--best-board-danger)_16%,transparent)] px-4 text-white shadow-none transition hover:-translate-y-0.5 hover:bg-[color:color-mix(in_srgb,var(--best-board-danger)_24%,transparent)] flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight";
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-3 py-4 md:px-7 md:py-7 rounded-2xl">
-        {/* MINI LEAGUE BUTTONS */}
-        {isMiniLeague && (
-          <>
+      <QuickActionsCard title="Quick Actions">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {/* MINI LEAGUE BUTTONS */}
+          {isMiniLeague && (
+            <>
+              <Button
+                onClick={() => {
+                  setConfirmType("zero");
+                  setConfirmOpen(true);
+                }}
+                disabled={zeroLoading}
+                className={quickActionButtonClass}
+              >
+                <Zap size={20} /> {zeroLoading ? "RESETTING..." : "ZERO ALL"}
+              </Button>
+
+              <Button
+                onClick={() => {
+                  setConfirmType("update");
+                  setConfirmOpen(true);
+                }}
+                disabled={updateLoading}
+                className={quickActionButtonClass}
+              >
+                <RotateCw size={20} /> {updateLoading ? "UPDATING..." : "UPDATE"}
+              </Button>
+            </>
+          )}
+
+          {/* SKILL LADDER RESET */}
+          {(isSkill || isPositive || isNegative) && (
             <Button
               onClick={() => {
-                setConfirmType("zero");
+                setConfirmType("reset_skill");
                 setConfirmOpen(true);
               }}
-              disabled={zeroLoading}
-              className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold rounded-xl py-8 w-full shadow-lg"
+              disabled={resetLoading}
+              className={quickActionButtonClass}
             >
-              <Zap size={20} /> {zeroLoading ? "RESETTING..." : "ZERO ALL"}
+              <XCircle size={20} /> {resetLoading ? "RESETTING..." : "RESET"}
             </Button>
+          )}
 
+          {!isMiniLeague && !isSkill && !isRoster && !isPositive && !isNegative && (
             <Button
               onClick={() => {
-                setConfirmType("update");
+                if (isDemoLadder) {
+                  toast.warning("Disabled for Demo Purposes");
+                  return;
+                }
+                setConfirmType("reset");
                 setConfirmOpen(true);
               }}
-              disabled={updateLoading}
-              className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold rounded-xl py-8 w-full shadow-lg"
+              disabled={resetLoading}
+              className={quickActionButtonClass}
             >
-              <RotateCw size={20} /> {updateLoading ? "UPDATING..." : "UPDATE"}
+              <RefreshCw size={20} />
+              {resetLoading ? "RESETTING..." : "RESET"}
             </Button>
-          </>
-        )}
+          )}
 
-        {/* SKILL LADDER RESET */}
-        {(isSkill || isPositive || isNegative) && (
-          <Button
-            onClick={() => {
-              setConfirmType("reset_skill");
-              setConfirmOpen(true);
-            }}
-            disabled={resetLoading}
-            className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
+          <Dialog
+            open={openAddPlayerDialog}
+            onOpenChange={setOpenAddPlayerDialog}
           >
-            <XCircle size={20} /> {resetLoading ? "RESETTING..." : "RESET"}
-          </Button>
-        )}
+            <DialogTrigger asChild>
+              <Button className={quickActionButtonClass}>
+                <PlusCircle size={20} />
+                {isRoster ? "ADD / REMOVE" : "ADD/REMOVE/MOVE"}
+              </Button>
+            </DialogTrigger>
 
-        {!isMiniLeague && !isSkill && !isRoster && !isPositive && !isNegative && (
-          <Button
-            onClick={() => {
-              if (isDemoLadder) {
-                toast.warning("Disabled for Demo Purposes");
-                return;
-              }
-              setConfirmType("reset");
-              setConfirmOpen(true);
-            }}
-            disabled={resetLoading}
-            className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
-          >
-            <RefreshCw size={20} />
-            {resetLoading ? "RESETTING..." : "RESET"}
-          </Button>
-        )}
+            <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="sr-only">
+                  Manage Players
+                </DialogTitle>
+              </DialogHeader>
 
-        <Dialog
-          open={openAddPlayerDialog}
-          onOpenChange={setOpenAddPlayerDialog}
-        >
-          <DialogTrigger asChild>
-            <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
-              <PlusCircle size={20} />
-              {isRoster ? "ADD / REMOVE" :"ADD/REMOVE/MOVE"}
+              <AddRemoveBox
+                ladderId={ladderId}
+                onSuccessRefresh={refreshLeaderboard}
+              />
+            </DialogContent>
+          </Dialog>
+
+          {/* SKILL SPECIFIC BUTTONS */}
+          {(isSkill || isPositive || isNegative) && (
+            <>
+              {!isSorted && (
+                <Button
+                  onClick={handleSortBySkill}
+                  className={quickActionButtonClass}
+                >
+                  <Funnel size={20} /> SORT
+                </Button>
+              )}
+            </>
+          )}
+
+          {isSorted && !isMiniLeague && (
+            <Button
+              onClick={handleClearAll}
+              className={quickActionDangerButtonClass}
+            >
+              <XCircle size={20} /> CLEAR ALL
             </Button>
-          </DialogTrigger>
+          )}
 
-          <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="sr-only">
-                Manage Players
-              </DialogTitle>
-            </DialogHeader>
+          {/* AGE FILTER BUTTON */}
+          {!isMiniLeague && (
+            <div className="h-16 w-full">
+              <AgeFilter
+                onSearch={handleAgeSearch}
+                user={false}
+                resetSignal={ageFilterResetSignal}
+              />
+            </div>
+          )}
 
-            <AddRemoveBox
-              ladderId={ladderId}
-              onSuccessRefresh={refreshLeaderboard}
-            />
-          </DialogContent>
-        </Dialog>
-
-        {/* SKILL SPECIFIC BUTTONS */}
-        {(isSkill || isPositive || isNegative) && <>
-            {!isSorted ? (
-              <Button
-                onClick={handleSortBySkill}
-                className="bg-[#163344] border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
-              >
-                <Funnel size={20} /> SORT
-              </Button>
-            ) : (
-              <Button
-                onClick={handleClearAll}
-                className="bg-red-600 hover:bg-red-700 border border-white/20 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight transition-all active:scale-95"
-              >
-                <XCircle size={20} /> CLEAR ALL
-              </Button>
-            )}
-          </>}
-
-        {/* AGE FILTER BUTTON */}
-
-        {!isMiniLeague && <div className="h-16 w-full">
-          <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} />
-        </div>}
+          <Dialog open={openSkillDialog} onOpenChange={setOpenSkillDialog}>
+            <DialogTrigger asChild>
+              {(isSkill || isPositive || isNegative) && (
+                <Button className={quickActionButtonClass}>
+                  <Zap size={20} /> SETUP
+                </Button>
+              )}
+            </DialogTrigger>
+            <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+              <BasicLeaderboardSetUpSkill
+                onClose={() => setOpenSkillDialog(false)}
+                onSkillsUpdated={refreshSkillLeaderboard}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </QuickActionsCard>
 
 
         {/* SINGLE DIALOG */}
@@ -473,23 +506,6 @@ const AdminButton = () => {
           </DialogContent>
         </Dialog>
 
-        {/* SET UP SKILL */}
-        <Dialog open={openSkillDialog} onOpenChange={setOpenSkillDialog}>
-          <DialogTrigger asChild>
-            {(isSkill || isPositive || isNegative) && (
-              <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
-                <Zap size={20} /> SETUP
-              </Button>
-            )}
-          </DialogTrigger>
-          <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
-            <BasicLeaderboardSetUpSkill
-              onClose={() => setOpenSkillDialog(false)}
-              onSkillsUpdated={refreshSkillLeaderboard}
-            />
-          </DialogContent>
-        </Dialog>
-
         {/* {!isRoster && (
           <Button
             onClick={handleUpgrade}
@@ -508,7 +524,6 @@ const AdminButton = () => {
             </span>
           </Button>
         )} */}
-      </div>
 
       {/* CONFIRM DIALOG */}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>

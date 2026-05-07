@@ -1,5 +1,5 @@
 "use client";
-import { IMAGE_BASE_URL } from "@/constants/api";
+import { API_ENDPOINTS, IMAGE_BASE_URL } from "@/constants/api";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
@@ -11,13 +11,18 @@ import { BasicLeaderboardEdit } from "./BasicLeaderboardEdit";
 import LadderLinkPanel from "./LadderLinkPanel";
 import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { Button } from "@/components/ui/button";
-import { X, Trophy, ListOrdered } from "lucide-react";
+import { ArrowDownUp, Filter, Plus, RotateCcw, X, Trophy, ListOrdered } from "lucide-react";
 
 import PlayerSearchInput from "./PlayerSearchInput";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
 import { fetchPositiveLeaderboard, setAppliedAge, setAgeFilter } from "@/redux/slices/positiveLeaderBoardSlice";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
+import ControlsSection from "@/components/shared/ControlsSection";
+import InfoSection from "@/components/shared/InfoSection";
+import LadderPageLayout from "@/components/shared/LadderPageLayout";
+import { fetchUserActivity } from "@/redux/slices/activitySlice";
+import { getRequest } from "@/services/apiService";
 
 
 
@@ -105,7 +110,7 @@ const PlayerCard = ({
   };
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
+    <Card className="best-board-card w-full rounded-2xl border border-[var(--best-board-border-strong)] bg-[var(--best-board-surface)] p-2 shadow-lg sm:p-3 relative">
       <div className="flex justify-between items-start mb-1 px-1">
         <PlayerStatusToggle player={player} user={false} />
       </div>
@@ -241,6 +246,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const isInverted = ladderDetails?.inverted == 0;
 
   const currentUser = useSelector((state) => state.user?.user);
+  const activityState = useSelector((state) => state.activity);
 
   // CELEBRATION STATE ONLY
   const [showCelebration, setShowCelebration] = useState(false);
@@ -252,6 +258,16 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [mobileSection, setMobileSection] = useState("players");
+  const [contactOpen, setContactOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [addRemoveOpen, setAddRemoveOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
+  const [sortMode, setSortMode] = useState("rank");
+  const inviteUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=positive`
+      : "";
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
     setTimeout(
@@ -269,7 +285,10 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           ladder_id: ladderId,
           type: "positive",
         };
-        dispatch(fetchPositiveLeaderboard(payload));
+        Promise.all([
+          dispatch(fetchPositiveLeaderboard(payload)),
+          dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })),
+        ]);
       }
     },
     [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
@@ -342,58 +361,139 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
   const filteredPlayers = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return data;
-
     const clean = (name = "") =>
       name.replace(/\s+/g, "").toLowerCase();
+    const baseList = !q
+      ? data
+      : [
+        ...data
+          .filter((p) => clean(p.name).startsWith(q))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+        ...data
+          .filter((p) => !clean(p.name).startsWith(q) && clean(p.name).includes(q))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      ];
 
-    const startsWith = data
-      .filter((p) => clean(p.name).startsWith(q))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return [...baseList].sort((a, b) => {
+      if (sortMode === "name") {
+        return (a?.name || "").localeCompare(b?.name || "");
+      }
+      return Number(a?.rank || 0) - Number(b?.rank || 0);
+    });
+  }, [data, searchQuery, sortMode]);
 
-    const contains = data
-      .filter(
-        (p) =>
-          !clean(p.name).startsWith(q) &&
-          clean(p.name).includes(q)
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
+  const handleDeleteActivity = useCallback(
+    async (id) => {
+      try {
+        await getRequest(API_ENDPOINTS.ACTIVITY_DELETE, { id });
+        dispatch(fetchUserActivity({ ladder_id: Number(ladderId) }));
+      } catch (error) {
+        console.error("Failed to delete activity", error);
+      }
+    },
+    [dispatch, ladderId],
+  );
 
-    return [...startsWith, ...contains];
-  }, [data, searchQuery]);
+  const handleResetBoard = useCallback(
+    async () => {
+      try {
+        await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
+        setResetOpen(false);
+        refreshLeaderboard();
+      } catch (error) {
+        console.error("Failed to reset leaderboard", error);
+      }
+    },
+    [ladderId, refreshLeaderboard],
+  );
 
 
-  const playerData = data; // use data from selector
+  const activityItems = activityState?.data?.data || [];
+  const quickActions = [
+    { id: "reset", label: "Reset", icon: RotateCcw, onClick: () => setResetOpen(true) },
+    { id: "add-remove", label: "Add / Remove", icon: Plus, onClick: () => setAddRemoveOpen(true) },
+    { id: "filter", label: "Filter", icon: Filter, onClick: handleAgeSearch, hidden: true },
+    { id: "sort", label: "Sort", icon: ArrowDownUp, onClick: () => setSortOpen(true) },
+  ];
   return (
     <>
-      <main className="min-h-screen flex justify-start md:justify-center relative">
-        <div className="w-full max-w-2xl px-2 space-y-4">
-          <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
-          <LadderLinkPanel ladderId={ladderId} ladderType="positive" />
-          {loading && (
-            <p className="text-white text-center hidden">Loading...</p>
-          )}
-          <div className="space-y-2 mt-2">
-            {filteredPlayers.length === 0 ? (
-              <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
-            ) : (
-              filteredPlayers.map((player, index) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  overallRank={player.rank || index + 1}
-                  showAgeRank={showAgeRank}
-                  ageRank={index + 1}
-                  isInverted={isInverted}
-                  onSkillClick={handleSkillClick}
-                  onTargetAchieved={handleTargetAchieved}
-                  currentUser={currentUser}
-                />
-              ))
+      <LadderPageLayout
+        controls={
+          <ControlsSection
+            mobileSection={mobileSection}
+            setMobileSection={setMobileSection}
+            mobileSections={[
+              { id: "toolbar", label: "Tools" },
+              { id: "players", label: "Players" },
+              { id: "info", label: "Info" },
+            ]}
+            resetOpen={resetOpen}
+            setResetOpen={setResetOpen}
+            addRemoveOpen={addRemoveOpen}
+            setAddRemoveOpen={setAddRemoveOpen}
+            refreshLeaderboard={refreshLeaderboard}
+            ladderId={ladderId}
+            sortMode={sortMode}
+            setSortMode={setSortMode}
+            sortOpen={sortOpen}
+            setSortOpen={setSortOpen}
+            filterOpen={false}
+            setFilterOpen={() => {}}
+            appliedAge={0}
+            appliedGender=""
+            groupSize={1}
+            showFilter={false}
+            showSectionSize={false}
+          />
+        }
+        sidebar={
+          <InfoSection
+            mobileSection={mobileSection}
+            ladderType="positive"
+            user={currentUser}
+            inviteUrl={inviteUrl}
+            setContactOpen={setContactOpen}
+            setResetOpen={setResetOpen}
+            setAddRemoveOpen={setAddRemoveOpen}
+            setSortOpen={setSortOpen}
+            setFilterOpen={() => {}}
+            activityItems={activityItems}
+            handleDeleteActivity={handleDeleteActivity}
+            contactOpen={contactOpen}
+            resetOpen={resetOpen}
+            handleResetBoard={handleResetBoard}
+            resetDescription="This will reset the current positive ladder data."
+            quickActions={quickActions}
+          />
+        }
+      >
+          <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
+            <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+            <LadderLinkPanel ladderId={ladderId} ladderType="positive" />
+            {loading && (
+              <p className="hidden text-center text-white">Loading...</p>
             )}
+            <div className="mt-2 space-y-2">
+              {filteredPlayers.length === 0 ? (
+                <div className="best-board-card rounded-xl px-6 py-10 text-center font-bold text-[var(--best-board-muted)]">No players found</div>
+              ) : (
+                filteredPlayers.map((player, index) => (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    overallRank={player.rank || index + 1}
+                    showAgeRank={showAgeRank}
+                    ageRank={index + 1}
+                    isInverted={isInverted}
+                    onSkillClick={handleSkillClick}
+                    onTargetAchieved={handleTargetAchieved}
+                    currentUser={currentUser}
+                  />
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+      </LadderPageLayout>
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardUserEdit
           open={openEdit}

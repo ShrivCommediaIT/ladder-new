@@ -24,7 +24,8 @@ import {
 import ControlsSection from "../../shared/ControlsSection";
 import BestOfPlayerListSection from "./bestof/BestOfPlayerListSection";
 import InfoSection from "../../shared/InfoSection";
-import { formatLadderType } from "../../shared/ladderUtils";
+import LadderPageLayout from "../../shared/LadderPageLayout";
+import { ArrowDownUp, Filter, Plus, RotateCcw } from "lucide-react";
 
 const MOBILE_SECTIONS = [
   { id: "toolbar", label: "Tools" },
@@ -405,11 +406,48 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
       : "";
 
   const activityItems = activityState?.data?.data || [];
-  return (
-    <div className="best-board-page min-h-screen" key={refreshKey}>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+  const quickActions = useMemo(() => {
+    const isMiniLeague = ladderType === "minileague";
+    const isSkillBoard = ["skill", "positive", "negative"].includes(ladderType);
+    const isRoster = ladderType === "roster";
+    const isBestOfBoard = ["best5", "best3", "winlose", "bestof5", "bestof3"].includes(ladderType);
 
-      <div className="px-4 py-6 sm:px-6 lg:px-8">
+    return [
+      {
+        id: "reset",
+        label: isMiniLeague ? "Zero All" : "Reset",
+        icon: RotateCcw,
+        onClick: () => setResetOpen(true),
+        hidden: isRoster,
+      },
+      {
+        id: "add-remove",
+        label: isRoster ? "Add / Remove" : "Add / Move",
+        icon: Plus,
+        onClick: () => setAddRemoveOpen(true),
+      },
+      {
+        id: "sort",
+        label: isSkillBoard ? "Skill Sort" : "Sort",
+        icon: ArrowDownUp,
+        onClick: () => setSortOpen(true),
+        hidden: isMiniLeague || isRoster,
+      },
+      {
+        id: "filter",
+        label: "Filter",
+        icon: Filter,
+        onClick: () => setFilterOpen(true),
+        hidden: isMiniLeague || (!isBestOfBoard && !isSkillBoard && !isRoster),
+        tone: appliedAge || appliedGender ? "accent" : "default",
+      },
+    ];
+  }, [appliedAge, appliedGender, ladderType]);
+
+  return (
+    <LadderPageLayout
+      key={refreshKey}
+      controls={
         <ControlsSection
           mobileSection={mobileSection}
           setMobileSection={setMobileSection}
@@ -431,46 +469,45 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
           groupSize={groupSize}
           onPresetChange={handlePresetChange}
         />
-
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_360px] xl:grid-cols-[minmax(0,0.86fr)_400px]">
-          <div className="min-w-0">
-            <BestOfPlayerListSection
-              mobileSection={mobileSection}
-              loadingPlayers={loadingPlayers}
-              reduxLoading={reduxLoading}
-              grades={grades}
-              refreshKey={refreshKey}
-              editIndex={editIndex}
-              newName={newName}
-              setNewName={setNewName}
-              setEditIndex={setEditIndex}
-              setEditGradebarId={setEditGradebarId}
-              handleUpdateSection={handleUpdateSection}
-              user={user}
-              groupSize={groupSize}
-              onOpenPlayer={openPlayerModal}
-              onChallenge={handleChallenge}
-            />
-          </div>
-
-          <InfoSection
-            mobileSection={mobileSection}
-            ladderType={ladderType}
-            user={user}
-            inviteUrl={inviteUrl}
-            setContactOpen={setContactOpen}
-            setResetOpen={setResetOpen}
-            setAddRemoveOpen={setAddRemoveOpen}
-            setSortOpen={setSortOpen}
-            setFilterOpen={setFilterOpen}
-            activityItems={activityItems}
-            handleDeleteActivity={handleDeleteActivity}
-            contactOpen={contactOpen}
-            resetOpen={resetOpen}
-            handleResetBoard={handleResetBoard}
-          />
-        </div>
-      </div>
+      }
+      sidebar={
+        <InfoSection
+          mobileSection={mobileSection}
+          ladderType={ladderType}
+          user={user}
+          inviteUrl={inviteUrl}
+          setContactOpen={setContactOpen}
+          setResetOpen={setResetOpen}
+          setAddRemoveOpen={setAddRemoveOpen}
+          setSortOpen={setSortOpen}
+          setFilterOpen={setFilterOpen}
+          activityItems={activityItems}
+          handleDeleteActivity={handleDeleteActivity}
+          contactOpen={contactOpen}
+          resetOpen={resetOpen}
+          handleResetBoard={handleResetBoard}
+          quickActions={quickActions}
+        />
+      }
+    >
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      <BestOfPlayerListSection
+        mobileSection={mobileSection}
+        loadingPlayers={loadingPlayers}
+        reduxLoading={reduxLoading}
+        grades={grades}
+        refreshKey={refreshKey}
+        editIndex={editIndex}
+        newName={newName}
+        setNewName={setNewName}
+        setEditIndex={setEditIndex}
+        setEditGradebarId={setEditGradebarId}
+        handleUpdateSection={handleUpdateSection}
+        user={user}
+        groupSize={groupSize}
+        onOpenPlayer={openPlayerModal}
+        onChallenge={handleChallenge}
+      />
 
       <FilterDialog
         open={filterOpen}
@@ -490,7 +527,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
           initialTab={modalTab}
         />
       ) : null}
-    </div>
+    </LadderPageLayout>
   );
 };
 

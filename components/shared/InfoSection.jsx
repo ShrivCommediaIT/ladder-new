@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/dialog";
 import AdminEditPhone from "@/components/shared/AdminEditPhone";
 import LadderRulesCard from "@/components/pages/players/LadderRulesCard";
-import { ArrowDownUp, Copy, Filter, Plus, RotateCcw, X } from "lucide-react";
+import QuickActionsCard from "@/components/shared/QuickActionsCard";
+import { Copy, X } from "lucide-react";
 import { formatLadderType } from "./ladderUtils";
 
 export default function InfoSection({
@@ -37,16 +38,18 @@ export default function InfoSection({
   contactOpen,
   resetOpen,
   handleResetBoard,
+  quickActions = [],
+  resetDescription = "This will reset the current ladder data.",
 }) {
   return (
     <>
-      <aside className={`${mobileSection === "info" ? "block" : "hidden"} lg:block lg:self-start`}>
-        <div className="space-y-4 lg:sticky lg:top-[5.2rem]">
+      <aside className={`${mobileSection === "info" ? "block" : "hidden"} lg:sticky lg:top-[5.2rem] lg:block lg:self-start`}>
+        <div className="space-y-4">
           <div className="best-board-card rounded-xl p-4">
             <div className="mb-2 flex items-start justify-between">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Ladder Type</p>
-                <p className="mt-1 text-2xl font-semibold text-white">{formatLadderType(ladderType)}</p>
+                <p className="mt-1 text-2xl font-semibold text-[var(--best-board-text)]">{formatLadderType(ladderType)}</p>
               </div>
               <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
                 Active
@@ -69,11 +72,11 @@ export default function InfoSection({
             <div className="space-y-3">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--best-board-muted)]">Name</p>
-                <p className="mt-1 text-xl font-semibold text-white">{user?.name || "Admin"}</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)]">{user?.name || "Admin"}</p>
               </div>
               <div>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--best-board-muted)]">Phone</p>
-                <p className="mt-1 text-xl font-semibold text-white">{user?.phone || "N/A"}</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)]">{user?.phone || "N/A"}</p>
               </div>
             </div>
           </div>
@@ -96,27 +99,7 @@ export default function InfoSection({
             </button>
           </div>
 
-          <div className="best-board-card rounded-xl p-4">
-            <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Quick Actions</p>
-            <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => setResetOpen(true)} className="best-board-card-soft rounded-lg p-4 text-center">
-                <RotateCcw className="mx-auto mb-2 h-4 w-4" />
-                <p className="text-xs uppercase tracking-[0.22em] text-[var(--best-board-muted)]">Reset</p>
-              </button>
-              <button type="button" onClick={() => setAddRemoveOpen(true)} className="best-board-card-soft rounded-lg p-4 text-center">
-                <Plus className="mx-auto mb-2 h-4 w-4" />
-                <p className="text-xs uppercase tracking-[0.22em] text-[var(--best-board-muted)]">Add</p>
-              </button>
-              <button type="button" onClick={() => setSortOpen(true)} className="best-board-card-soft rounded-lg p-4 text-center">
-                <ArrowDownUp className="mx-auto mb-2 h-4 w-4" />
-                <p className="text-xs uppercase tracking-[0.22em] text-[var(--best-board-muted)]">Sort</p>
-              </button>
-              <button type="button" onClick={() => setFilterOpen(true)} className="best-board-card-soft rounded-lg p-4 text-center">
-                <Filter className="mx-auto mb-2 h-4 w-4" />
-                <p className="text-xs uppercase tracking-[0.22em] text-[var(--best-board-muted)]">Filter</p>
-              </button>
-            </div>
-          </div>
+          <QuickActionsCard actions={quickActions} />
 
           <div className="rounded-2xl border border-primary/20 bg-card/95 p-4 shadow-lg">
             <div className="mb-4 rounded-xl border border-primary/15 bg-gradient-to-r from-primary/12 via-secondary/12 to-primary/8 px-4 py-3">
@@ -147,7 +130,7 @@ export default function InfoSection({
                         : "bg-emerald-400"
                         }`}
                     />
-                    <p className="flex-1 text-sm text-white/90">{activity.message}</p>
+                    <p className="flex-1 text-sm text-[var(--best-board-text)]">{activity.message}</p>
                     <button type="button" onClick={() => handleDeleteActivity(activity.id)} className="text-[var(--best-board-danger)]">
                       <X className="h-4 w-4" />
                     </button>
@@ -181,7 +164,7 @@ export default function InfoSection({
           <AlertDialogHeader>
             <AlertDialogTitle>Reset leaderboard?</AlertDialogTitle>
             <AlertDialogDescription className="text-[var(--best-board-muted)]">
-              This will reset the current best-of ladder data.
+              {resetDescription}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

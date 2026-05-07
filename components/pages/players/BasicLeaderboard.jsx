@@ -1,5 +1,5 @@
 "use client";
-import { IMAGE_BASE_URL } from "@/constants/api";
+import { API_ENDPOINTS, IMAGE_BASE_URL } from "@/constants/api";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
@@ -12,6 +12,12 @@ import LadderLinkPanel from "./LadderLinkPanel";
 import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import PlayerSearchInput from "./PlayerSearchInput";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
+import ControlsSection from "@/components/shared/ControlsSection";
+import InfoSection from "@/components/shared/InfoSection";
+import LadderPageLayout from "@/components/shared/LadderPageLayout";
+import { fetchUserActivity } from "@/redux/slices/activitySlice";
+import { getRequest } from "@/services/apiService";
+import { ArrowDownUp, Plus, RotateCcw } from "lucide-react";
 
 
 
@@ -98,7 +104,7 @@ const PlayerCard = ({
   };
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
+    <Card className="best-board-card w-full rounded-2xl border border-[var(--best-board-border-strong)] bg-[var(--best-board-surface)] p-2 shadow-lg sm:p-3 relative">
       <div className="flex justify-between items-start mb-1 px-1">
         <PlayerStatusToggle player={player} user={false} />
       </div>
@@ -135,7 +141,7 @@ const PlayerCard = ({
           </div>
           <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
             <div className="flex flex-col items-center">
-              <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm shadow-sm leading-none h-7 sm:h-auto flex items-center">
+              <span className="flex h-7 items-center rounded-sm border border-[var(--best-board-border)] bg-[var(--best-board-warning)] px-3 py-0.5 text-xs font-bold leading-none text-black shadow-sm sm:h-auto sm:px-4 sm:py-1 sm:text-sm">
                 {Math.abs(player.total_point || 0)}
               </span>
               <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
@@ -144,14 +150,14 @@ const PlayerCard = ({
             <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
               {showAgeRank && (
                 <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[var(--best-board-success)] text-xs font-bold text-black shadow-sm sm:h-9 sm:w-9 sm:text-sm">
                     {ageRank}
                   </div>
                   <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-1 whitespace-nowrap">Age Rank</p>
                 </div>
               )}
               <div className="flex flex-col items-center">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[var(--best-board-accent)] text-xs font-bold text-black shadow-sm sm:h-9 sm:w-9 sm:text-sm">
                   {overallRank}
                 </div>
                 <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
@@ -241,6 +247,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     (state) => state.skillLeaderboard || {},
   );
   const currentUser = useSelector((state) => state.user?.user);
+  const activityState = useSelector((state) => state.activity);
 
   // CELEBRATION STATE ONLY
   const [showCelebration, setShowCelebration] = useState(false);
@@ -254,7 +261,17 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const { appliedAge,ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const showAgeRank = Number(appliedAge) > 0;
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [mobileSection, setMobileSection] = useState("players");
+  const [contactOpen, setContactOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [addRemoveOpen, setAddRemoveOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
+  const [sortMode, setSortMode] = useState("rank");
   const isInverted = ladderDetails?.inverted == 0;
+  const inviteUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=skill`
+      : "";
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
     setTimeout(
@@ -273,7 +290,10 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           ladder_id: ladderId,
           type: "skill",
         };
-        dispatch(fetchSkillLeaderboard(params)).finally(() => {
+        Promise.all([
+          dispatch(fetchSkillLeaderboard(params)),
+          dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })),
+        ]).finally(() => {
           setIsRefreshing(false);
         });
       }
@@ -291,6 +311,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   useEffect(() => {
     if (ladderId) {
       dispatch(fetchSkillLeaderboard({ ladder_id: ladderId, type: "skill" }));
+      dispatch(fetchUserActivity({ ladder_id: Number(ladderId) }));
     }
   }, [dispatch, ladderId]);
 
@@ -323,25 +344,59 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
   const filteredPlayers = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return data;
+    const clean = (name = "") => name.replace(/\s+/g, "").toLowerCase();
+    const baseList = !q ? data : [
+      ...data
+        .filter((p) => clean(p.name).startsWith(q))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+      ...data
+        .filter(
+          (p) =>
+            !clean(p.name).startsWith(q) &&
+            clean(p.name).includes(q)
+        )
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    ];
 
-    const clean = (name = "") =>
-      name.replace(/\s+/g, "").toLowerCase();
+    return [...baseList].sort((a, b) => {
+      if (sortMode === "name") {
+        return (a?.name || "").localeCompare(b?.name || "");
+      }
+      return Number(a?.rank || 0) - Number(b?.rank || 0);
+    });
+  }, [data, searchQuery, sortMode]);
 
-    const startsWith = data
-      .filter((p) => clean(p.name).startsWith(q))
-      .sort((a, b) => a.name.localeCompare(b.name));
+  const handleDeleteActivity = useCallback(
+    async (id) => {
+      try {
+        await getRequest(API_ENDPOINTS.ACTIVITY_DELETE, { id });
+        dispatch(fetchUserActivity({ ladder_id: Number(ladderId) }));
+      } catch (error) {
+        console.error("Failed to delete activity", error);
+      }
+    },
+    [dispatch, ladderId],
+  );
 
-    const contains = data
-      .filter(
-        (p) =>
-          !clean(p.name).startsWith(q) &&
-          clean(p.name).includes(q)
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
+  const handleResetBoard = useCallback(
+    async () => {
+      try {
+        await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
+        setResetOpen(false);
+        refreshLeaderboard();
+      } catch (error) {
+        console.error("Failed to reset leaderboard", error);
+      }
+    },
+    [ladderId, refreshLeaderboard],
+  );
 
-    return [...startsWith, ...contains];
-  }, [data, searchQuery]);
+  const activityItems = activityState?.data?.data || [];
+  const quickActions = [
+    { id: "reset", label: "Reset", icon: RotateCcw, onClick: () => setResetOpen(true) },
+    { id: "add-remove", label: "Add / Remove", icon: Plus, onClick: () => setAddRemoveOpen(true) },
+    { id: "sort", label: "Sort", icon: ArrowDownUp, onClick: () => setSortOpen(true) },
+  ];
 
 
   // Server now handles ordering via orderBy parameter in the API call
@@ -349,19 +404,67 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
   return (
     <>
-
-      <main className="min-h-screen flex justify-center lg:justify-start relative">
-        <div className="w-full max-w-2xl px-2 space-y-4">
+      <LadderPageLayout
+        controls={
+          <ControlsSection
+            mobileSection={mobileSection}
+            setMobileSection={setMobileSection}
+            mobileSections={[
+              { id: "toolbar", label: "Tools" },
+              { id: "players", label: "Players" },
+              { id: "info", label: "Info" },
+            ]}
+            resetOpen={resetOpen}
+            setResetOpen={setResetOpen}
+            addRemoveOpen={addRemoveOpen}
+            setAddRemoveOpen={setAddRemoveOpen}
+            refreshLeaderboard={refreshLeaderboard}
+            ladderId={ladderId}
+            sortMode={sortMode}
+            setSortMode={setSortMode}
+            sortOpen={sortOpen}
+            setSortOpen={setSortOpen}
+            filterOpen={false}
+            setFilterOpen={() => {}}
+            appliedAge={0}
+            appliedGender=""
+            groupSize={1}
+            showFilter={false}
+            showSectionSize={false}
+          />
+        }
+        sidebar={
+          <InfoSection
+            mobileSection={mobileSection}
+            ladderType="skill"
+            user={currentUser}
+            inviteUrl={inviteUrl}
+            setContactOpen={setContactOpen}
+            setResetOpen={setResetOpen}
+            setAddRemoveOpen={setAddRemoveOpen}
+            setSortOpen={setSortOpen}
+            setFilterOpen={() => {}}
+            activityItems={activityItems}
+            handleDeleteActivity={handleDeleteActivity}
+            contactOpen={contactOpen}
+            resetOpen={resetOpen}
+            handleResetBoard={handleResetBoard}
+            resetDescription="This will reset the current skill ladder data."
+            quickActions={quickActions}
+          />
+        }
+      >
+        <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
           <div className="flex flex-col gap-2">
             <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           </div>
           <LadderLinkPanel ladderId={ladderId} ladderType="skill" />
           {(loading || isRefreshing) && (
-            <p className="text-white text-center text-xs opacity-70">Updating list...</p>
+            <p className="text-center text-xs opacity-70 text-[var(--best-board-muted)]">Updating list...</p>
           )}
-          <div className="space-y-2 mt-2">
+          <div className="mt-2 space-y-2">
             {processedPlayers.length === 0 ? (
-              <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+              <div className="best-board-card rounded-xl px-6 py-10 text-center font-bold text-[var(--best-board-muted)]">No players found</div>
             ) : (
               processedPlayers.map((player, index) => (
                 <PlayerCard
@@ -379,7 +482,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
             )}
           </div>
         </div>
-      </main>
+      </LadderPageLayout>
 
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardEdit

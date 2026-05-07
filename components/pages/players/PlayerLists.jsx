@@ -18,6 +18,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import MusicDownloadList from "./MusicDownloadList";
 import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
+import { Card, CardContent } from "@/components/ui/card";
+import { formatLadderType } from "@/components/shared/ladderUtils";
 
 export const PlayerLists = () => {
   const dispatch = useDispatch();
@@ -39,7 +41,7 @@ export const PlayerLists = () => {
   const ladderType = searchParams.get("ladder_type");
   const type = searchParams.get("type");
   const shouldPrint = searchParams.get("print");
-  const isBestLayout = ["best5", "best3", "winlose"].includes(type || ladderType || "");
+  const isBestLayout = ["best5", "best3", "winlose", "skill", "positive", "negative", "minileague", "roster"].includes(type || ladderType || "");
 
   // 🔹 Trigger print if query param is present
   useEffect(() => {
@@ -107,6 +109,7 @@ export const PlayerLists = () => {
     miniLeagueData?.name ||
     "Football Ladder";
   const currentPlayerCount = playerEntry?.data?.length || 0;
+  const resolvedLadderType = type || ladderType || "ladder";
 
   return (
     <div className={isBestLayout ? "ladder-shell min-h-screen" : "bg-gray-800 min-h-screen"}>
@@ -168,6 +171,26 @@ export const PlayerLists = () => {
       )}
         </>
       )}
+
+      <footer className="relative z-10 mt-10 px-4 pb-8 sm:px-6 lg:px-8">
+        <Card className="mx-auto w-full border border-border bg-card text-foreground shadow-lg">
+          <CardContent className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Sports Solutions Pro {formatLadderType(resolvedLadderType)} Ladder
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Rankings, activity, and player management in one shared ladder view.
+              </p>
+            </div>
+            <p className="text-sm text-primary">
+              {currentPlayerCount > 0
+                ? `${currentPlayerCount} player${currentPlayerCount === 1 ? "" : "s"} on this ladder`
+                : "Player list updates live as members join"}
+            </p>
+          </CardContent>
+        </Card>
+      </footer>
     </div>
   );
 };
