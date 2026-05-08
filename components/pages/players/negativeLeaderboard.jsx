@@ -33,6 +33,7 @@ const PlayerCard = ({
   onTargetAchieved,
   currentUser,
 }) => {
+
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
@@ -47,11 +48,11 @@ const PlayerCard = ({
       skillObj?.witness_by ||
       "";
 
-    const rawNegativeScore = scoreObj?.negative_ladder_bestscore;
+    const rawNegativeScore = scoreObj?.negative_ladder_score;
     const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
 
     const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
-    const rawDisplayScore = rawBestScore || rawNegativeScore || "";
+    const rawDisplayScore = rawBestScore
     const displayScore = rawDisplayScore
       ? convertTimeToSeconds(rawDisplayScore)
       : "0";
@@ -70,7 +71,8 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      isTargetAchieved = isInverted ? score >= target : score <= target;
+      console.log("Setting isInverted to 11:", isInverted);
+      isTargetAchieved = isInverted ? score <= target : score >= target;
     }
 
     return {
@@ -239,7 +241,8 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   );
   const showAgeRank = Number(appliedAge) > 0;
 
-  const isInverted = ladderDetails?.inverted == 0;
+  const isInvertedNum = ladderDetails?.inverted == 0;
+
 
   const currentUser = useSelector((state) => state.user?.user);
 
@@ -253,6 +256,8 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [isInverted, setIsInverted] = useState(false);
+
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
     setTimeout(
@@ -261,6 +266,22 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       },
       4000 + Math.random() * 1000,
     );
+  }, []);
+
+
+
+  useEffect(() => {
+    // On component mount, read the inverted state from URL and set local order state
+    let Inverted
+    if ((searchParams.get('type') === 'negative' && searchParams.get('inverted') === '0')) {
+      Inverted = true
+      console.log("Setting isInverted to:", true);
+    } else if (searchParams.get('type') !== 'negative') {
+      Inverted = searchParams.get('inverted') === '1';
+      console.log("Setting isInverted to:", false);
+
+    }
+    setIsInverted(Inverted);
   }, []);
 
   const refreshLeaderboard = useCallback(

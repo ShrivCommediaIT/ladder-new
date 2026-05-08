@@ -19,7 +19,7 @@ export default function LadderView() {
   const [showLadder, setShowLadder] = useState(true);
   const searchParams = useSearchParams();
   const ladderId = searchParams.get("ladder_id");
-
+const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
   // ✅ Detect ladder type from Redux store
   const ladderDetails = useSelector((state) => {
     // Check both player and minileague slices
@@ -27,7 +27,7 @@ export default function LadderView() {
            state.minileague?.ladderDetails || {};
   });
   
-  const ladderType = ladderDetails?.type || ladderId || "winlose";
+  // const ladderType = ladderDetails?.type || ladderId || "winlose";
   
   // ✅ Select correct component based on ladder type
   const getPlayersComponent = () => {

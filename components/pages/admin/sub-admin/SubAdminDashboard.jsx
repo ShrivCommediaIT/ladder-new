@@ -367,7 +367,7 @@ export default function SubAdminDashboard() {
         <div className="hidden sm:flex justify-between items-center mb-6">
           <div className="flex gap-2 items-center">
             <h1 className="text-2xl font-extrabold bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text">
-              Sub-admin Dashboard
+              Section Admin Dashboard
             </h1>
 
             <div className="flex items-center gap-2 animate-fade-in">

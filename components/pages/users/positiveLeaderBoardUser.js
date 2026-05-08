@@ -214,7 +214,7 @@ const PlayerCard = ({
                     title={`Score: ${scoreData.score || 0} | Target: ${scoreData.target || "N/A"
                       }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
                   >
-                    {Math.abs(scoreData.displayScore || 0)}
+                    {Math.abs(scoreData.displayScore || 0).toFixed(2)}
                   </div>
                 );
               })}
@@ -252,6 +252,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const showAgeRank = Number(appliedAge) > 0;
   const isInverted = ladderDetails?.inverted == 0;;
   const currentUser = useSelector((state) => state.user?.user);
+  const myRank = currentUser?.rank;
 
   // CELEBRATION STATE ONLY
   const [showCelebration, setShowCelebration] = useState(false);
@@ -262,6 +263,12 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSorted, setIsSorted] = useState(false);
+  const [openSort, setOpenSort] = useState(false);
+  const [showRemove, setShowRemove] = useState(false);
+  const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
   const [currentUserId, setCurrentUserId] = useState(null);
   const handleTargetAchieved = useCallback(() => {
@@ -290,8 +297,10 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
         if (gender) {
           payload.gender = gender;
         }
-
-        dispatch(fetchPositiveLeaderboard(payload));
+        dispatch(fetchPositiveLeaderboard(payload)).finally(() => {
+          setIsRefreshing(false);
+        });
+        // dispatch(fetchPositiveLeaderboard(payload));
       }
     },
     [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
@@ -304,6 +313,8 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
     if (isClearing) {
       setIsSorted(false);
       setSelectedPositiveFilter(0);
+      setSelectedSkillFilter(0);
+
     } else {
       setIsSorted(true);
     }
@@ -315,8 +326,44 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const handleClearFilters = useCallback(() => {
     setSearchQuery("");
     setIsSorted(false);
+    setSelectedSkillFilter(0);
     setSelectedPositiveFilter(0);
   }, []);
+
+  const handleSortBySkill = useCallback(() => {
+    setOpenSort(true);
+  }, []);
+
+  const handleSelfRemove = useCallback(() => {
+    setShowRemove(true);
+  }, []);
+
+    const handleRemoveClose = useCallback(() => {
+    setShowRemove(false);
+  }, []);
+
+    const handleRemoveSuccess = useCallback(() => {
+    setShowRemove(false);
+    refreshLeaderboard(selectedSkillFilter);
+  }, [refreshLeaderboard, selectedSkillFilter]);
+
+
+    const handleSkillsUpdated = useCallback(
+      (skillNo) => {
+        setOpenSort(false);
+        setIsSorted(true);
+        refreshLeaderboard(skillNo);
+      },
+      [refreshLeaderboard],
+    );
+
+
+      const handleClearAll = useCallback(() => {
+        setIsSorted(false);
+        setSelectedSkillFilter(0);
+        dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+        refreshLeaderboard(0, 0, "under", "");
+      }, [refreshLeaderboard, dispatch]);
 
   const hasFiltersApplied =
     Boolean(searchQuery) ||
@@ -417,6 +464,45 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
             activeFilters={hasFiltersApplied}
             defaultAge={appliedAge}
           />
+
+          <div className="flex-1 w-full min-w-0">
+
+
+            {/* Buttons */}
+            <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0">
+              {!isSorted ? (
+                <Button
+                  onClick={handleSortBySkill}
+                  disabled={isRefreshing}
+                  className="bg-[#005F5A] text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
+                >
+                  <Funnel size={16} />
+                  Sort by Skill
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleClearAll}
+                  disabled={isRefreshing}
+                  className="bg-red-600 text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
+                >
+                  <Funnel size={16} />
+                  Clear All
+                </Button>
+              )}
+
+              {currentUserId && (
+                <Button
+                  onClick={handleSelfRemove}
+                  disabled={isRefreshing}
+                  className="bg-gradient-to-r from-red-500 to-red-500 hover:from-orange-600 hover:to-red-600 
+                                 text-white font-bold rounded-md px-4 py-2 flex items-center gap-2 shadow-lg"
+                >
+                  <X size={16} className="w-4 h-4" />
+                  Click here to leave this solution
+                </Button>
+              )}
+            </div>
+          </div>
           <LadderLinkPanel ladderId={ladderId} ladderType="positive" />
           {loading && (
             <p className="text-white text-center hidden">Loading...</p>
@@ -456,6 +542,30 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
           skillActivityId={selectedSkillActivityId}
         />
       )}
+
+      <Dialog open={openSort} onOpenChange={setOpenSort}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
+          <BasicLeaderboardShort
+            ladderId={ladderId}
+            onClose={() => {
+              setOpenSort(false);
+              setIsSorted(false);
+            }}
+            onSkillsUpdated={handleSkillsUpdated}
+          />
+        </DialogContent>
+      </Dialog>
+
+            <Dialog open={showRemove} onOpenChange={setShowRemove}>
+              <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
+                <BasicLeaderboardUserRemove
+                  ladderId={ladderId}
+                  myRank={myRank}
+                  onClose={handleRemoveClose}
+                  onSuccessRefresh={handleRemoveSuccess}
+                />
+              </DialogContent>
+            </Dialog>
     </>
   );
 };

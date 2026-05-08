@@ -457,7 +457,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
                     className="bg-[#005F5A] text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
                   >
                     <Funnel size={16} />
-                    Sort Performance
+                    Sort by Skill
                   </Button>
                 ) : (
                   <Button

@@ -84,7 +84,7 @@ const RedeemModal = ({ open, onClose, player, history, loading }) => {
                                             </span>
                                             </div>
                                             
-                                            <span>totals {item.total_token}</span>
+                                            <span>totals 1</span>
                                         </div>
                                         <div className="text-gray-400">{item.ladder_name}</div>
                                     </div>
