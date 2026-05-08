@@ -250,15 +250,15 @@ export default function BasicLeaderboardSetUpSkill({
           {/* FIXED: Single line header with proper alignment */}
           <div className="sm:px-2 px-8 py-1  border-b border-white/10">
             <div className="flex items-end gap-2 text-white text-xs font-medium ">
-              {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : (type === "negative" || ladderType === "negative") ? <div className="w-20 flex items-center">Activity No.</div> : null}
+              {( type !== "negative" ) ? <div className="w-20 flex items-center">Skill No.</div> : (type === "negative") ? <div className="w-20 flex items-center">Activity No.</div> : null}
               <div className="w-[120px]">Target</div>
-              <div className="w-[200px]">{(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? "Skill Name" : "Activity"}</div>
-              {(type !== "negative" && ladderType !== "negative") && <div className="w-[120px] translate">Units Of Measurement</div>}
+              <div className="w-[200px]">{(type !== "positive" && type !== "negative" ) ? "Skill Name" : "Activity"}</div>
+              {(type !== "negative" ) && <div className="w-[120px] translate">Units Of Measurement</div>}
             </div>
           </div>
 
           <div className="max-h-[25vh] overflow-y-auto py-2 space-y-1.5">
-            {(type !== "negative" && ladderType !== "negative") ?
+            {(type !== "negative" ) ?
               rows.map((row) => (
                 <div key={row.id} className="flex items-start ">
                   {/* Skill No. + +/- */}
@@ -274,7 +274,7 @@ export default function BasicLeaderboardSetUpSkill({
 
                         if (newTarget !== "" && !isNaN(newTarget)) {
                           const num = Math.abs(Number(newTarget));
-                          newTarget = val === "minus" ? -num : num;
+                          newTarget =  num;
                         }
 
                         updateRow(row.id, { mode: val, target: newTarget });
