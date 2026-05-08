@@ -43,7 +43,7 @@ const LeaderBoard = () => {
 
       {/* 📋 Player Cards */}
       <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {!loading && (playersData || []).length === 0 ? (
+        {!loading && playersData?.length < 1 ? (
           <div className="text-center py-10 text-gray-400 font-bold col-span-full">No players found</div>
         ) : (
           (playersData || []).map((player, index) => {
