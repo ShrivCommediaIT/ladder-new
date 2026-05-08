@@ -214,7 +214,7 @@ const PlayerCard = ({
                     title={`Score: ${scoreData.score || 0} | Target: ${scoreData.target || "N/A"
                       }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
                   >
-                    {Math.abs(scoreData.displayScore || 0)}
+                    {Math.abs(scoreData.displayScore || 0).toFixed(2)}
                   </div>
                 );
               })}

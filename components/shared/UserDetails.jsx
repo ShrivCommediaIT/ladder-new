@@ -142,7 +142,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
               <span className="text-sm font-semibold text-zinc-100 capitalize dark:text-zinc-200">
                 {finalUser?.name || "Guest"}
               </span>
-              <span className="text-xs text-zinc-300">{finalUser?.user_type === "sub_admin"?"Sub Admin":"Admin"}</span>
+              <span className="text-xs text-zinc-300">{finalUser?.user_type === "sub_admin"?"Section Admin":"Admin"}</span>
             </div>
             <IoIosArrowDown size={18} className="text-zinc-600" />
           </div>
