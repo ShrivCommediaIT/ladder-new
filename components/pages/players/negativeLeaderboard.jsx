@@ -32,6 +32,7 @@ const PlayerCard = ({
   onSkillClick,
   onTargetAchieved,
   currentUser,
+  appliedWitnessBy,
 }) => {
 
   const playerImageUrl = player?.image
@@ -103,6 +104,10 @@ const PlayerCard = ({
     }
   }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
 
+  const skillsToRender = appliedWitnessBy === 1
+    ? (player.skills || []).filter(skill => player.scores?.some(s => Number(s.skill_number) === Number(skill.skill_number)))
+    : (player.skills || []);
+
 
   return (
     <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative">
@@ -167,12 +172,12 @@ const PlayerCard = ({
           </div>
         </div>
 
-        {player.skills?.length > 0 ? (
+        {skillsToRender.length > 0 ? (
           <>
             <div className="-mx-1 overflow-x-auto pb-1 mb-1 px-1 scrollbar-thin">
               <div className="w-max min-w-full">
                 <div className="flex gap-[3px] overflow-y-visible pb-2">
-                  {player.skills.map((skill, i) => {
+                  {skillsToRender.map((skill, i) => {
                     const isNegative = skill.skill_sign === "-";
 
                     return (
@@ -197,7 +202,7 @@ const PlayerCard = ({
 
                 {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
                 <div className="flex gap-[3px]">
-                  {player.skills.map((skill, i) => {
+                  {skillsToRender.map((skill, i) => {
                     const scoreData = getScoreBySkillNumber(
                       player.scores || [],
                       player.skills || [],
@@ -236,7 +241,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
+  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedWitnessBy } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const showAgeRank = Number(appliedAge) > 0;
@@ -410,6 +415,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}
                   currentUser={currentUser}
+                  appliedWitnessBy={appliedWitnessBy}
                 />
               ))
             )}
