@@ -341,6 +341,10 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
       const payload = {
         ladder_id: ladderId,
         type: "skill",
+        sortbyskillnumber :skillNo,
+        age: age,
+        age_type: ageType,
+        gender: gender,
       };
       dispatch(fetchSkillLeaderboard(payload)).finally(() => {
         setIsRefreshing(false);
@@ -392,6 +396,8 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
       setOpenSort(false);
       setIsSorted(true);
       setSelectedSkillFilter(skillNo);
+      console.log("setSelectedSkillFilter", skillNo);
+      
       refreshLeaderboard(skillNo);
     },
     [refreshLeaderboard],
