@@ -50,7 +50,7 @@ const PlayerCard = ({
       "";
 
     const rawNegativeScore = scoreObj?.negative_ladder_score;
-    const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
+    const score = scoreObj && Number(convertTimeToSeconds(rawNegativeScore)) 
 
     const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
     const rawDisplayScore = rawBestScore
