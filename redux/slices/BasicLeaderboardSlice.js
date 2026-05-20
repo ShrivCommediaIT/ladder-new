@@ -48,6 +48,7 @@ const skillLeaderboardSlice = createSlice({
     appliedAge: 0,
     appliedAgeType: "",
     appliedGender: "",
+    appliedWitnessBy: 0,
     error: null,
   },
   reducers: {
@@ -69,6 +70,7 @@ const skillLeaderboardSlice = createSlice({
         state.data = action.payload.data;
         state.gradebars = action.payload.gradebars;
         state.ladderDetails = action.payload.ladderDetails;
+        state.appliedWitnessBy = action.meta.arg?.witness_by || 0;
 
         const { dob, gender } = action.meta.arg || {};
         if (!dob && !gender) {
