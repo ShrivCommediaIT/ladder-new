@@ -7,12 +7,15 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import { InvertRanckings } from "@/components/shared/InvertRanckings";
+import { useSearchParams } from "next/navigation";
 
 const LadderLinkPanel = ({ ladderId, ladderType }) => {
   const [copied, setCopied] = useState(false);
   const [loginUrl, setLoginUrl] = useState("");
   const [isDemo, setIsDemo] = useState(false);
-
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type");
   // 🔹 API Function
   const fetchLadderDetails = async () => {
     try {
@@ -61,31 +64,34 @@ const LadderLinkPanel = ({ ladderId, ladderType }) => {
   if (!loginUrl) return null;
 
   return (
-    <div className="w-full backdrop-blur-sm ">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full text-white bg-gradient-to-r from-gray-900 to-cyan-900 p-1 shadow-lg border border-teal-600 rounded-md">
-          <div className="flex flex-col sm:flex-row px-2 items-center rounded w-full py-3">
-            <span className="sm:text-sm text-center sm:text-left font-semibold px-2">
-              URL :
-            </span>
+    <div className="flex gap-5">
+      <div className="w-full backdrop-blur-sm ">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full text-white bg-gradient-to-r from-gray-900 to-cyan-900 p-1 shadow-lg border border-teal-600 rounded-md">
+            <div className="flex flex-col sm:flex-row px-2 items-center rounded w-full py-3">
+              <span className="sm:text-sm text-center sm:text-left font-semibold px-2">
+                URL :
+              </span>
 
-            <input
-              type="text"
-              value={loginUrl}
-              readOnly
-              className="text-sm py-2 rounded-md flex-1 font-semibold outline-none"
-            />
+              <input
+                type="text"
+                value={loginUrl}
+                readOnly
+                className="text-sm py-2 rounded-md flex-1 font-semibold outline-none"
+              />
 
-            <Button
-              onClick={handleCopy}
-              className="sm:ml-2 text-gray-200 px-4 py-2 border border-gray-100 shadow-md flex items-center gap-1 text-sm font-medium cursor-pointer"
-            >
-              {copied ? "Copied!" : "Copy"}
-              <Copy size={14} />
-            </Button>
+              <Button
+                onClick={handleCopy}
+                className="sm:ml-2 text-gray-200 px-4 py-2 border border-gray-100 shadow-md flex items-center gap-1 text-sm font-medium cursor-pointer"
+              >
+                {copied ? "Copied!" : "Copy"}
+                <Copy size={14} />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+      {(type == "positive" || type == "negative" || type == "skill") ? <InvertRanckings /> : null}
     </div>
   );
 };
