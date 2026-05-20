@@ -48,8 +48,7 @@ const BasicLeaderboardShort = ({
       return;
     }
     
-    console.log('Submit clicked - calling onSkillsUpdated');  
-    onSkillsUpdated(skillNumber); // ✅ This triggers refresh + close in parent
+    onSkillsUpdated(skillNumber); 
   };
 
   return (

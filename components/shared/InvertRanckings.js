@@ -58,6 +58,8 @@ export const InvertRanckings = () => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isInverted, setIsInverted] = useState(false);
 
+    const type = searchParams.get('type')
+
     const handleInvertRanckings = () => {
         setIsConfirmOpen(true);
     };
@@ -140,10 +142,10 @@ export const InvertRanckings = () => {
     useEffect(() => {
         // On component mount, read the inverted state from URL and set local order state
         let Inverted
-        if ((searchParams.get('type') === 'negative'&& searchParams.get('inverted') === '0')) {
+        if ((type === 'negative'&& searchParams.get('inverted') === '0')) {
             Inverted = true
-        } else if(searchParams.get('type') !== 'negative'){
-            Inverted = searchParams.get('inverted') === '1';
+        } else if(type !== 'negative'){
+            Inverted = searchParams.get('inverted') === '0';
         }
         setIsInverted(Inverted);
     }, [searchParams]);
@@ -177,7 +179,7 @@ export const InvertRanckings = () => {
     <div 
         onClick={handleInvertRanckings} 
         className={`border backdrop-blur-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 p-2 rounded-md cursor-pointer flex items-center justify-center bg-gradient-to-r ${
-            isInverted 
+            isInverted && type === 'negative'
             ? 'border-green-500/50 from-green-900/80 to-emerald-900/80' 
             : 'border-white/10 bg-zinc-900/70 from-gray-900 to-cyan-900'
         }`}
