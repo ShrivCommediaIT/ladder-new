@@ -95,6 +95,7 @@ const AdminButton = () => {
   const [localAgeType, setLocalAgeType] = useState("under");
   const [localGender, setLocalGender] = useState("");
   const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
+  const [witnessBy, setWitnessBy] = useState(0);
 
   const { appliedAge: skillAppliedAge, appliedAgeType: skillAppliedAgeType, appliedGender: skillAppliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const { appliedAge: positiveAppliedAge, appliedAgeType: positiveAppliedAgeType, appliedGender: positiveAppliedGender } = useSelector((state) => state.positiveLeaderBoard || {});
@@ -127,8 +128,8 @@ const AdminButton = () => {
 
         dispatch(fetchLeaderboard(payload));
         if (isRoster) {
-          dispatch(fetchRosterLeaderboard({ 
-            ladder_id: ladderId, 
+          dispatch(fetchRosterLeaderboard({
+            ladder_id: ladderId,
             dob: appliedAge > 0 ? appliedAge : undefined,
             age_type: appliedAge > 0 && appliedAgeType ? appliedAgeType : undefined,
             gender: appliedGender || undefined,
@@ -138,7 +139,7 @@ const AdminButton = () => {
     }
   };
 
-  const refreshSkillLeaderboard = (skillNo = 0) => {
+  const refreshSkillLeaderboard = (skillNo = 0, witnessByOverride) => {
     if (!ladderId) return;
 
     let laddartype;
@@ -161,13 +162,16 @@ const AdminButton = () => {
       fetchSliceLeaderboard = fetchSkillLeaderboard;
     }
 
+    // Use explicit override if provided, otherwise use current state
+    const effectiveWitnessBy = witnessByOverride !== undefined ? witnessByOverride : witnessBy;
+
     const payload = {
       ladder_id: ladderId,
       type: laddartype,
-      sortbyskillnumber: skillNo
+      sortbyskillnumber: skillNo,
+      ...(effectiveWitnessBy === 1 ? { witness_by: 1 } : {}),
     };
 
-    
     dispatch(fetchSliceLeaderboard(payload));
 
     if (laddartype === "minileague") {
@@ -254,6 +258,7 @@ const AdminButton = () => {
   const handleClearAll = () => {
     setIsSorted(false);
     setCurrentSkillNo(0);
+    setWitnessBy(0);
     const clearedFilter = { age: 0, ageType: "", gender: "" };
 
     if (isSkill) {
@@ -270,13 +275,12 @@ const AdminButton = () => {
     }
 
     setAgeFilterResetSignal((prev) => prev + 1);
-    // Refresh with cleared filters
+    // Refresh with cleared filters (witness_by: 0 = no witness filter)
     if (ladderId) {
-      if (isSkill || isPositive || isNegative ) {
-        refreshSkillLeaderboard(0); // Pass 0 to clear age override
+      if (isSkill || isPositive || isNegative) {
+        refreshSkillLeaderboard(0, 0); // Pass 0 to clear age + witness overrides
       } else {
-        const payload = { ladder_id: ladderId, type: ladderType };
-        // No age/gender filters for cleared state
+        const payload = { ladder_id: ladderId, type: ladderType, witness_by: 0 };
         dispatch(fetchLeaderboard(payload));
         if (isRoster) {
           dispatch(fetchRosterLeaderboard({ ladder_id: ladderId }));
@@ -286,6 +290,13 @@ const AdminButton = () => {
   };
 
   const handleAgeSearch = (age, ageType, gender) => {
+    // Clear Witness filter
+    setWitnessBy(0);
+
+    // Clear Sort filter
+    setIsSorted(false);
+    setCurrentSkillNo(0);
+
     const ageNum = age ? Number(age) : "";
     const filter = { age: ageNum, ageType, gender };
 
@@ -307,10 +318,11 @@ const AdminButton = () => {
       dob: ageNum > 0 ? ageNum : undefined,
       gender: gender || undefined,
       ...(ageNum > 0 && ageType ? { age_type: ageType } : {}),
+      witness_by: 0, // Ensure witness_by is explicitly 0 in age search
     };
 
     let fetchSliceLeaderboard;
-   
+
     if (laddartype === "positive") {
       fetchSliceLeaderboard = fetchPositiveLeaderboard;
     } else if (laddartype === "negative") {
@@ -331,8 +343,6 @@ const AdminButton = () => {
         gender: gender || undefined,
       }));
     }
-
-    setIsSorted(true);
   };
 
   const handleUpgrade = () => router.push(paymentPage);
@@ -406,7 +416,7 @@ const AdminButton = () => {
           <DialogTrigger asChild>
             <Button className="bg-[#163344] bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight">
               <PlusCircle size={20} />
-              {isRoster ? "ADD / REMOVE" :"ADD/REMOVE/MOVE"}
+              {isRoster ? "ADD / REMOVE" : "ADD/REMOVE/MOVE"}
             </Button>
           </DialogTrigger>
 
@@ -425,28 +435,30 @@ const AdminButton = () => {
         </Dialog>
 
         {/* SKILL SPECIFIC BUTTONS */}
-        {(isSkill || isPositive || isNegative) && <>
-            {!isSorted && (
-              <Button
-                onClick={handleSortBySkill}
-                className="bg-[#163344] border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight"
-              >
-                <Funnel size={20} /> SORT
-              </Button>
-            ) }
-          </>}
+        {(isSkill || isPositive || isNegative) && (
+          <Button
+            onClick={handleSortBySkill}
+            className={`${
+              isSorted
+                ? "bg-green-600 hover:bg-green-700 border-green-400"
+                : "bg-[#163344] hover:bg-[#1e4a63] border-gray-400"
+            } border text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight transition-all active:scale-95`}
+          >
+            <Funnel size={20} /> {isSorted ? "✓ SORTED" : "SORT"}
+          </Button>
+        )}
 
-          {isSorted && !isMiniLeague && <Button
-                onClick={handleClearAll}
-                className="bg-red-600 hover:bg-red-700 border border-white/20 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight transition-all active:scale-95"
-              >
-                <XCircle size={20} /> CLEAR ALL
-              </Button>}
+        {(isSorted || witnessBy === 1 || hasFiltersApplied()) && !isMiniLeague && <Button
+          onClick={handleClearAll}
+          className="bg-red-600 hover:bg-red-700 border border-white/20 text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight transition-all active:scale-95"
+        >
+          <XCircle size={20} /> CLEAR ALL
+        </Button>}
 
         {/* AGE FILTER BUTTON */}
 
         {!isMiniLeague && <div className="h-16 w-full">
-          <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} />
+          <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFiltersApplied()} />
         </div>}
 
 
@@ -464,7 +476,27 @@ const AdminButton = () => {
               }}
               onSkillsUpdated={(skillNo) => {
                 setCurrentSkillNo(skillNo);
-                refreshSkillLeaderboard(skillNo);
+
+                // Clear Age Filter when sorting
+                const clearedFilter = { age: 0, ageType: "", gender: "" };
+                if (isSkill) {
+                  dispatch(setSkillAgeFilter(clearedFilter));
+                } else if (isPositive) {
+                  dispatch(setPositiveAgeFilter(clearedFilter));
+                } else if (isNegative) {
+                  dispatch(setNegativeAgeFilter(clearedFilter));
+                } else {
+                  dispatch(setAgeFilter(clearedFilter));
+                  setLocalAge(0);
+                  setLocalAgeType("");
+                  setLocalGender("");
+                }
+                setAgeFilterResetSignal((prev) => prev + 1);
+
+                // Clear Witness filter when sorting
+                setWitnessBy(0);
+
+                refreshSkillLeaderboard(skillNo, 0);
                 setIsSorted(true);
                 setOpenSkillShortDialog(false);
                 toast.success(`Sorted by Skill ${skillNo}!`);
@@ -489,6 +521,47 @@ const AdminButton = () => {
             />
           </DialogContent>
         </Dialog>
+
+        {/* WITNESSED ONLY FILTER */}
+        {(isSkill || isPositive || isNegative) && (
+          <Button
+            onClick={() => {
+              const newWitnessBy = witnessBy === 1 ? 0 : 1;
+              setWitnessBy(newWitnessBy);
+
+              if (newWitnessBy === 1) {
+                // Clear Age Filter when witnessed is enabled
+                const clearedFilter = { age: 0, ageType: "", gender: "" };
+                if (isSkill) {
+                  dispatch(setSkillAgeFilter(clearedFilter));
+                } else if (isPositive) {
+                  dispatch(setPositiveAgeFilter(clearedFilter));
+                } else if (isNegative) {
+                  dispatch(setNegativeAgeFilter(clearedFilter));
+                } else {
+                  dispatch(setAgeFilter(clearedFilter));
+                  setLocalAge(0);
+                  setLocalAgeType("");
+                  setLocalGender("");
+                }
+                setAgeFilterResetSignal((prev) => prev + 1);
+
+                // Clear Sort filter when witnessed is enabled
+                setIsSorted(false);
+                setCurrentSkillNo(0);
+              }
+
+              refreshSkillLeaderboard(0, newWitnessBy);
+            }}
+            className={`${
+              witnessBy === 1
+                ? "bg-green-600 hover:bg-green-700 border-green-400"
+                : "bg-[#163344] hover:bg-[#1e4a63] border-gray-400"
+            } bg-[length:200%_100%] animate-gradient-x border text-white font-bold uppercase rounded-xl py-3 px-4 h-16 w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight transition-all active:scale-95`}
+          >
+            {witnessBy === 1 ? "✓ WITNESSED" : "WITNESSED ONLY"}
+          </Button>
+        )}
 
         {/* {!isRoster && (
           <Button

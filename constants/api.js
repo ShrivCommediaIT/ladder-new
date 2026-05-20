@@ -70,6 +70,7 @@ export const API_ENDPOINTS = {
   GET_TOP_SCORE:           "/user/getTopScore",
   RESET_SKILLBOARD:        "/user/resetSkillboard",
   ADD_USER_SKILLBOARD:     "/user/adduserskillboard",
+  DELETE_SKILL_SETUP:      "/user/DeleteskillSetup",
 
   // ── Activity & Challenge ──────────────────────
   ACTIVITY:               "/user/activity",

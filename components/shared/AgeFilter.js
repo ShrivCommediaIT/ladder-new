@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { calculateAge } from "@/lib/utils";
 
-const AgeFilter = ({ onSearch, user, resetSignal }) => {
+const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
   const [open, setOpen] = useState(false);
   const [dobInput, setDobInput] = useState("");
   const [calculatedAge, setCalculatedAge] = useState("");
@@ -90,8 +90,14 @@ const AgeFilter = ({ onSearch, user, resetSignal }) => {
       }}
     >
       <DialogTrigger asChild>
-        <Button className={`${user ? "bg-blue-500" : "bg-[#163344]"}  bg-[length:200%_100%] animate-gradient-x border border-gray-400 text-white font-bold uppercase rounded-xl py-3 px-4 h-full w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight`}>
-          AGE/GENDER FILTER
+        <Button className={`${
+          isActive
+            ? "bg-green-600 hover:bg-green-700 border-green-400"
+            : user
+            ? "bg-blue-500 hover:bg-blue-600 border-gray-400"
+            : "bg-[#163344] hover:bg-[#1e4a63] border-gray-400"
+        } bg-[length:200%_100%] animate-gradient-x border text-white font-bold uppercase rounded-xl py-3 px-4 h-full w-full shadow-lg flex flex-col items-center justify-center gap-1 text-[10px] leading-tight transition-all active:scale-95`}>
+          {isActive ? "✓ AGE/GENDER" : "AGE/GENDER FILTER"}
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-[#163344] text-white border border-[#2dd4bf] rounded-xl max-w-sm flex flex-col items-center p-6">
