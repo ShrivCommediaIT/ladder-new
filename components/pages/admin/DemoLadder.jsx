@@ -105,12 +105,6 @@ const DemoLadder = ({ userId }) => {
 
             <Separator className="bg-white/10" />
 
-            {loading && (
-              <p className="text-xs sm:text-sm text-white/50 animate-pulse px-2">
-                Loading ladders...
-              </p>
-            )}
-
             {error && (
               <p className="text-xs sm:text-sm text-red-400 px-2">
                 Error: {error}
