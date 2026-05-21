@@ -50,7 +50,7 @@ const PlayerCard = ({
       "";
 
     const rawNegativeScore = scoreObj?.negative_ladder_score;
-    const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
+    const score = scoreObj && Number(convertTimeToSeconds(rawNegativeScore)) 
 
     const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
     const rawDisplayScore = rawBestScore
@@ -73,7 +73,7 @@ const PlayerCard = ({
       !isNaN(score)
     ) {
       console.log("Setting isInverted to 11:", isInverted);
-      isTargetAchieved = isInverted ? score <= target : score >= target;
+      isTargetAchieved = isInverted ? score >= target : score <= target;
     }
 
     return {
@@ -246,7 +246,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   );
   const showAgeRank = Number(appliedAge) > 0;
 
-  const isInvertedNum = ladderDetails?.inverted == 0;
+  const isInverted = ladderDetails?.inverted == 0;
 
 
   const currentUser = useSelector((state) => state.user?.user);
@@ -261,7 +261,6 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
   const [currentUserId, setCurrentUserId] = useState(null);
-  const [isInverted, setIsInverted] = useState(false);
 
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
@@ -271,22 +270,6 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       },
       4000 + Math.random() * 1000,
     );
-  }, []);
-
-
-
-  useEffect(() => {
-    // On component mount, read the inverted state from URL and set local order state
-    let Inverted
-    if ((searchParams.get('type') === 'negative' && searchParams.get('inverted') === '0')) {
-      Inverted = true
-      console.log("Setting isInverted to:", true);
-    } else if (searchParams.get('type') !== 'negative') {
-      Inverted = searchParams.get('inverted') === '1';
-      console.log("Setting isInverted to:", false);
-
-    }
-    setIsInverted(Inverted);
   }, []);
 
   const refreshLeaderboard = useCallback(

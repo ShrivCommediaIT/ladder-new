@@ -64,7 +64,6 @@ const LadderLinkPanel = ({ ladderId, ladderType }) => {
   if (!loginUrl) return null;
 
   return (
-    <div className="flex gap-5">
       <div className="w-full backdrop-blur-sm ">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full text-white bg-gradient-to-r from-gray-900 to-cyan-900 p-1 shadow-lg border border-teal-600 rounded-md">
@@ -91,8 +90,6 @@ const LadderLinkPanel = ({ ladderId, ladderType }) => {
           </div>
         </div>
       </div>
-      {(type == "positive" || type == "negative" || type == "skill") ? <InvertRanckings /> : null}
-    </div>
   );
 };
 

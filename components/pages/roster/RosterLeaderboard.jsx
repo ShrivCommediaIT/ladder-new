@@ -119,6 +119,11 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
                     {player.age}
                   </div>
                 )}
+                {player.gender && (
+                  <p className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit ml-1">
+                    {player.gender == "male" ?"M":"F"}
+                  </p>
+                )}
               </div>
               <div className="text-gray-300 text-[10px] truncate flex items-center gap-1.5">
                 <span>{player?.phone ?? "N/A"}</span>
