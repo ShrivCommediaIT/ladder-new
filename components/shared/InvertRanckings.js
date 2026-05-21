@@ -59,6 +59,7 @@ export const InvertRanckings = () => {
     const [isInverted, setIsInverted] = useState(false);
 
     const type = searchParams.get('type')
+    const inverType = searchParams.get('inverted')
 
     const handleInvertRanckings = () => {
         setIsConfirmOpen(true);
@@ -82,7 +83,7 @@ export const InvertRanckings = () => {
             });
 
             // 2. Update URL with inverted param
-            const currentInverted = searchParams.get('inverted') === '1';
+            const currentInverted = inverType === '1';
             const nextInverted = currentInverted ? '0' : '1';
             const queryParams = new URLSearchParams(searchParams.toString());
             queryParams.set('inverted', nextInverted);
@@ -111,25 +112,14 @@ export const InvertRanckings = () => {
             // 5. Dispatch to the specific slice that the page component is actually listening to
             switch (canonicalType) {
                 case "negative":
-                    dispatch(fetchNegativeLeaderboard(params));
+                   await dispatch(fetchNegativeLeaderboard(params));
                     break;
                 case "positive":
-                    dispatch(fetchPositiveLeaderboard(params));
-                    break;
-                case "minileague":
-                    dispatch(fetchMiniLeague(params));
-                    break;
-                case "roster":
-                    dispatch(fetchRosterLeaderboard(params));
-                    break;
-                case "winlose":
-                case "best3":
-                case "best5":
-                    dispatch(fetchLeaderboard(params));
+                   await dispatch(fetchPositiveLeaderboard(params));
                     break;
                 case "skill":
                 default:
-                    dispatch(fetchSkillLeaderboard(params));
+                   await dispatch(fetchSkillLeaderboard(params));
                     break;
             }
         } catch (error) {
@@ -142,15 +132,15 @@ export const InvertRanckings = () => {
     useEffect(() => {
         // On component mount, read the inverted state from URL and set local order state
         let Inverted
-        if ((type === 'negative'&& searchParams.get('inverted') === '0')) {
+        if ((type === 'negative'&& inverType === '0')) {
             Inverted = true
         } else if(type !== 'negative'){
-            Inverted = searchParams.get('inverted') === '0';
+            Inverted = inverType === '0';
         }
         setIsInverted(Inverted);
     }, [searchParams]);
     
-    // const isInverted = searchParams.get('inverted') === '1';
+    // const isInverted = inverType === '1';
 
   return (
     <>

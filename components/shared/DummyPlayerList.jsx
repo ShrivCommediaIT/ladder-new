@@ -119,7 +119,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
 /* ─────────────────────────────────────────────
    3. SKILL / POSITIVE / NEGATIVE CARD
 ───────────────────────────────────────────── */
-const SkillPlayerCard = ({ player, rank, showRanks = true }) => {
+const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false }) => {
   const src = player?.image ? `${IMAGE_BASE_URL}/${player.image}` : Logo;
 
   const getScore = (scores, skills, skillNumber, isInverted) => {
@@ -129,7 +129,11 @@ const SkillPlayerCard = ({ player, rank, showRanks = true }) => {
     const target = skillObj?.target != null ? Number(skillObj.target) : null;
     let isTargetAchieved = false;
     if (target && target !== 0 && score !== 0 && !isNaN(target) && !isNaN(score)) {
-      isTargetAchieved = isInverted ? score >= target : score <= target;
+      if (isNegative) {
+        isTargetAchieved = isInverted ? score >= target : score <= target;
+      } else {
+        isTargetAchieved = isInverted ? score <= target : score >= target;
+      }
     }
     return { score: Math.abs(score), isTargetAchieved };
   };
@@ -478,7 +482,7 @@ export default function DummyPlayerList({ ladderId }) {
         ) : (
           <div className="px-4 space-y-2">
             {filtered.map((player, idx) => (
-              <SkillPlayerCard key={player.id || idx} player={{...player, isInverted: displayLadderDetails?.inverted == 0}} rank={player.rank || idx + 1} showRanks={false} />
+              <SkillPlayerCard key={player.id || idx} player={{...player, isInverted: displayLadderDetails?.inverted == 0}} rank={player.rank || idx + 1} showRanks={false} isNegative={true} />
             ))}
           </div>
         )}
