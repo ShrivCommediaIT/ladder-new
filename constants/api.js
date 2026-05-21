@@ -56,6 +56,7 @@ export const API_ENDPOINTS = {
   RESULT_MINILEAGUE:      "/user/resultpostminileague/save",
   MOVE_TO_MINILEAGUE:     "/user/move_to_minileague",
   SAVE_PERFORMANCE_RESULT: "/user/savePerformanceResult",
+  GET_PERFORMANCE_RESULT_LIST: "/user/getPerformanceResultList",
 
   // ── Mini League ──────────────────────────────
   UPDATE_MINILEAGUE:               "/user/update/minileague",
