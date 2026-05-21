@@ -107,7 +107,10 @@ export default function SubmitPerformancePage() {
         [name]: null
       }));
     }
-  };
+  };  
+
+
+  
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
