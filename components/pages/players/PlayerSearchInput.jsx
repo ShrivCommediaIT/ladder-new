@@ -19,6 +19,8 @@ const PlayerSearchInput = ({
   const searchParams = useSearchParams();
   const ladderType = searchParams.get("ladder_type");
   const type = searchParams.get("type");
+  const demo = searchParams.get("demo");
+  
   // Clean search value (IGNORE ALL SPACES for backend)
   const cleanSearchValue = useCallback((inputValue) => {
     if (!inputValue) return "";
@@ -100,7 +102,7 @@ const PlayerSearchInput = ({
           </button>
         )}
       </div>
-      {(ladderType == null && (isSubAdminDetails !== null || true) && (type == "positive" || type == "negative" || type == "skill")) ? <InvertRanckings /> : null}
+      {(ladderType == null && (isSubAdminDetails !== null || demo == "true") && (type == "positive" || type == "negative" || type == "skill")) ? <InvertRanckings /> : null}
     </div>
   );
 };
