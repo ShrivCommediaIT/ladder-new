@@ -112,14 +112,14 @@ export const InvertRanckings = () => {
             // 5. Dispatch to the specific slice that the page component is actually listening to
             switch (canonicalType) {
                 case "negative":
-                    dispatch(fetchNegativeLeaderboard(params));
+                   await dispatch(fetchNegativeLeaderboard(params));
                     break;
                 case "positive":
-                    dispatch(fetchPositiveLeaderboard(params));
+                   await dispatch(fetchPositiveLeaderboard(params));
                     break;
                 case "skill":
                 default:
-                    dispatch(fetchSkillLeaderboard(params));
+                   await dispatch(fetchSkillLeaderboard(params));
                     break;
             }
         } catch (error) {

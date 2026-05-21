@@ -15,7 +15,7 @@ import { Funnel, X } from "lucide-react";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
-const getScoreBySkillNumber = (scores, skills, skillNumber) => {
+const getScoreBySkillNumber = (scores, skills, skillNumber, isInverted) => {
   const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
   const skillObj = skills?.find((s) => s.skill_number === skillNumber);
 
@@ -35,7 +35,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     !isNaN(target) &&
     !isNaN(score)
   ) {
-   isTargetAchieved = isInverted ? score >= target : score <= target;
+   isTargetAchieved = isInverted ? score <= target : score >= target;
   }
 
   return {
@@ -129,7 +129,8 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable,isInverted }
                 const scoreData = getScoreBySkillNumber(
                   player.scores || [],
                   player.skills || [],
-                  skill.skill_number
+                  skill.skill_number,
+                  isInverted
                 );
 
                 return (
