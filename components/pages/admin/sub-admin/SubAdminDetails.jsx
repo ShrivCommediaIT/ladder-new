@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { clubIdPage } from "@/helper/RouteName";
+import { clubIdPage, submitPerformancePage } from "@/helper/RouteName";
 
 const SubAdminDetails = () => {
 
@@ -198,6 +198,14 @@ const SubAdminDetails = () => {
             <UserCircle2 className="w-4 h-4" />
             {user.name}
           </DropdownMenuLabel>
+
+          <DropdownMenuItem
+            onClick={() => router.push(submitPerformancePage)}
+            className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          >
+            <HelpCircle className="mr-2 h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+            Submit to Talent Board
+          </DropdownMenuItem>
 
           <DropdownMenuItem
             onClick={() => window.open("/q-a", "_blank")}

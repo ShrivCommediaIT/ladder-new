@@ -55,6 +55,7 @@ export default function SubmitPerformancePage() {
     aditional_notes: "",
   });
 
+  const [errors, setErrors] = useState({});
   const [evidenceFile, setEvidenceFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -84,6 +85,28 @@ export default function SubmitPerformancePage() {
       ...prev,
       [name]: value
     }));
+    
+    // Clear field-specific error as the user types
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: null
+      }));
+    }
+  };
+
+  const handleSelectChange = (name, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: null
+      }));
+    }
   };
 
   const handleFileChange = (e) => {
@@ -128,29 +151,104 @@ export default function SubmitPerformancePage() {
     setEvidenceFile(null);
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // 1. Required standard fields
+    if (!formData.sport) {
+      newErrors.sport = "Sport is required";
+    }
+    if (formData.sport === "Other" && !formData.customSport.trim()) {
+      newErrors.customSport = "Please enter custom sport name";
+    }
+
+    if (!formData.activity.trim()) {
+      newErrors.activity = "Activity/Event/Test is required";
+    }
+
+    if (!formData.result.trim()) {
+      newErrors.result = "Result is required";
+    }
+
+    if (!formData.unit) {
+      newErrors.unit = "Unit is required";
+    }
+    if (formData.unit === "Other" && !formData.customUnit.trim()) {
+      newErrors.customUnit = "Please enter custom unit";
+    }
+
+    if (!formData.full_name.trim()) {
+      newErrors.full_name = "Athlete name is required";
+    }
+
+    // 2. Age validation
+    const ageInt = parseInt(formData.age, 10);
+    if (!formData.age) {
+      newErrors.age = "Age is required";
+    } else if (isNaN(ageInt) || ageInt < 1 || ageInt > 120) {
+      newErrors.age = "Please enter a valid age between 1 and 120";
+    }
+
+    // 3. Date of performance check
+    if (!formData.date_of_performance) {
+      newErrors.date_of_performance = "Date of performance is required";
+    } else {
+      const perfDate = new Date(formData.date_of_performance);
+      const today = new Date();
+      if (perfDate > today) {
+        newErrors.date_of_performance = "Date cannot be in the future";
+      }
+    }
+
+    // 4. Dropdowns
+    if (!formData.gender) {
+      newErrors.gender = "Gender is required";
+    }
+    if (!formData.country) {
+      newErrors.country = "Country is required";
+    }
+
+    // 5. Coach details
+    if (!formData.coach_name.trim()) {
+      newErrors.coach_name = "Coach/Submitter name is required";
+    }
+
+    // 6. Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = "Email address is required";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // 7. Video URL validation
+    if (formData.video_link.trim()) {
+      try {
+        new URL(formData.video_link.trim());
+      } catch (_) {
+        newErrors.video_link = "Please enter a valid URL (including http:// or https://)";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Required fields check
-    const requiredFields = [
-      "sport", "activity", "result", "unit", 
-      "full_name", "age", "date_of_performance", 
-      "gender", "country", "coach_name", "email"
-    ];
-
-    const missing = requiredFields.filter(f => !formData[f]);
-    if (missing.length > 0) {
-      toast.error("Please fill in all required fields marked with *");
-      return;
-    }
-
-    if (formData.sport === "Other" && !formData.customSport.trim()) {
-      toast.error("Please enter custom sport name");
-      return;
-    }
-
-    if (formData.unit === "Other" && !formData.customUnit.trim()) {
-      toast.error("Please enter custom unit");
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields and fix validation errors");
+      
+      // Scroll to the first element with an error
+      setTimeout(() => {
+        const firstErrorKey = Object.keys(errors)[0];
+        const element = document.getElementsByName(firstErrorKey)[0];
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          element.focus();
+        }
+      }, 100);
       return;
     }
 
@@ -206,6 +304,7 @@ export default function SubmitPerformancePage() {
           aditional_notes: "",
         }));
         setEvidenceFile(null);
+        setErrors({});
       } else {
         toast.error(response?.message || response?.error_message || "Failed to submit performance result.");
       }
@@ -282,9 +381,10 @@ export default function SubmitPerformancePage() {
                 <select
                   name="sport"
                   value={formData.sport}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all cursor-pointer text-sm"
+                  onChange={(e) => handleSelectChange("sport", e.target.value)}
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.sport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
                   <option value="" className="bg-[#0c1224] text-zinc-400">Select Sport</option>
                   {sportsList.map(sport => (
@@ -293,6 +393,12 @@ export default function SubmitPerformancePage() {
                     </option>
                   ))}
                 </select>
+                {errors.sport && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.sport}
+                  </p>
+                )}
               </div>
 
               {/* CUSTOM SPORT IF OTHER */}
@@ -307,9 +413,16 @@ export default function SubmitPerformancePage() {
                     value={formData.customSport}
                     onChange={handleInputChange}
                     placeholder="Enter custom sport"
-                    required
-                    className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                    className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                      errors.customSport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                   />
+                  {errors.customSport && (
+                    <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      {errors.customSport}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -324,9 +437,16 @@ export default function SubmitPerformancePage() {
                   value={formData.activity}
                   onChange={handleInputChange}
                   placeholder="Select or enter activity"
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.activity ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
+                {errors.activity && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.activity}
+                  </p>
+                )}
               </div>
 
               {/* RESULT */}
@@ -340,9 +460,16 @@ export default function SubmitPerformancePage() {
                   value={formData.result}
                   onChange={handleInputChange}
                   placeholder="Enter result (e.g. 40)"
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.result ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
+                {errors.result && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.result}
+                  </p>
+                )}
               </div>
 
               {/* UNIT */}
@@ -353,9 +480,10 @@ export default function SubmitPerformancePage() {
                 <select
                   name="unit"
                   value={formData.unit}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all cursor-pointer text-sm"
+                  onChange={(e) => handleSelectChange("unit", e.target.value)}
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.unit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
                   <option value="" className="bg-[#0c1224] text-zinc-400">Select unit</option>
                   {unitsList.map(unit => (
@@ -364,6 +492,12 @@ export default function SubmitPerformancePage() {
                     </option>
                   ))}
                 </select>
+                {errors.unit && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.unit}
+                  </p>
+                )}
               </div>
 
               {/* CUSTOM UNIT IF OTHER */}
@@ -378,9 +512,16 @@ export default function SubmitPerformancePage() {
                     value={formData.customUnit}
                     onChange={handleInputChange}
                     placeholder="Enter custom unit"
-                    required
-                    className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                    className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                      errors.customUnit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                   />
+                  {errors.customUnit && (
+                    <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      {errors.customUnit}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -395,9 +536,16 @@ export default function SubmitPerformancePage() {
                   value={formData.full_name}
                   onChange={handleInputChange}
                   placeholder="Enter athlete full name"
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.full_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
+                {errors.full_name && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.full_name}
+                  </p>
+                )}
               </div>
 
               {/* AGE */}
@@ -411,11 +559,18 @@ export default function SubmitPerformancePage() {
                   value={formData.age}
                   onChange={handleInputChange}
                   placeholder="Enter age"
-                  required
                   min="1"
                   max="120"
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.age ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
+                {errors.age && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.age}
+                  </p>
+                )}
               </div>
 
               {/* DATE OF PERFORMANCE */}
@@ -428,9 +583,16 @@ export default function SubmitPerformancePage() {
                   name="date_of_performance"
                   value={formData.date_of_performance}
                   onChange={handleInputChange}
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm scheme-dark"
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.date_of_performance ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm scheme-dark`}
                 />
+                {errors.date_of_performance && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.date_of_performance}
+                  </p>
+                )}
               </div>
 
               {/* GENDER */}
@@ -441,15 +603,22 @@ export default function SubmitPerformancePage() {
                 <select
                   name="gender"
                   value={formData.gender}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all cursor-pointer text-sm"
+                  onChange={(e) => handleSelectChange("gender", e.target.value)}
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.gender ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
                   <option value="" className="bg-[#0c1224] text-zinc-400">Select gender</option>
                   <option value="male" className="bg-[#0c1224] text-white">Male</option>
                   <option value="female" className="bg-[#0c1224] text-white">Female</option>
                   <option value="other" className="bg-[#0c1224] text-white">Other</option>
                 </select>
+                {errors.gender && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.gender}
+                  </p>
+                )}
               </div>
 
               {/* COUNTRY */}
@@ -460,9 +629,10 @@ export default function SubmitPerformancePage() {
                 <select
                   name="country"
                   value={formData.country}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all cursor-pointer text-sm"
+                  onChange={(e) => handleSelectChange("country", e.target.value)}
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.country ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
                   <option value="" className="bg-[#0c1224] text-zinc-400">Select country</option>
                   {countries.map(country => (
@@ -471,6 +641,12 @@ export default function SubmitPerformancePage() {
                     </option>
                   ))}
                 </select>
+                {errors.country && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.country}
+                  </p>
+                )}
               </div>
 
               {/* CLUB / TEAM */}
@@ -499,9 +675,16 @@ export default function SubmitPerformancePage() {
                   value={formData.coach_name}
                   onChange={handleInputChange}
                   placeholder="Enter your full name"
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.coach_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
+                {errors.coach_name && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.coach_name}
+                  </p>
+                )}
               </div>
 
               {/* EMAIL ADDRESS */}
@@ -515,9 +698,16 @@ export default function SubmitPerformancePage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Enter your email"
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.email ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
+                {errors.email && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.email}
+                  </p>
+                )}
               </div>
 
               {/* VENUE / LOCATION */}
@@ -561,8 +751,16 @@ export default function SubmitPerformancePage() {
                   value={formData.video_link}
                   onChange={handleInputChange}
                   placeholder="Enter video link URL"
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
+                    errors.video_link ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
+                {errors.video_link && (
+                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {errors.video_link}
+                  </p>
+                )}
               </div>
 
               {/* ADDITIONAL NOTES */}
