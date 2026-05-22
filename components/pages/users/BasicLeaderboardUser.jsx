@@ -21,6 +21,7 @@ import BasicLeaderboardPrintSkillsSheet from "../admin/BasicLeaderboardPrintSkil
 import BasicLeaderboardActivityEntryCard from "../players/BasicLeaderboardActivityEntryCard";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
+import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -481,45 +482,19 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-wrap justify-between w-full sm:flex-nowrap gap-2 mt-3 sm:mt-0">
-              {(!isSorted && appliedAge === 0) ? (
-                <Button
-                  onClick={handleSortBySkill}
-                  disabled={isRefreshing}
-                  className="bg-[#005F5A] text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
-                >
-                  <Funnel size={16} />
-                  Sort by Activity
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleClearAll}
-                  disabled={isRefreshing}
-                  className="bg-red-600 text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
-                >
-                  <Funnel size={16} />
-                  Clear All
-                </Button>
-              )}
-
-              {currentUserId && (
-                <Button
-                  onClick={handleSelfRemove}
-                  disabled={isRefreshing}
-                  className="bg-gradient-to-r from-red-500 to-red-500 hover:from-orange-600 hover:to-red-600 
-                       text-white font-bold rounded-md px-4 py-2 flex items-center gap-2 shadow-lg"
-                >
-                  <X size={16} className="w-4 h-4" />
-                  Click here to leave this solution
-                </Button>
-              )}
-
-              <BasicLeaderboardPrintSkillsSheet
-                skills={safeSkillsForPrint}
-                ladderId={ladderId}
-                className="hidden"
-              />
-            </div>
+            <LeaderboardActionButtons
+              isSorted={isSorted}
+              appliedAge={appliedAge}
+              isRefreshing={isRefreshing}
+              handleSortBySkill={handleSortBySkill}
+              handleClearAll={handleClearAll}
+              currentUserId={currentUserId}
+              handleSelfRemove={handleSelfRemove}
+              showPrint={true}
+              skills={safeSkillsForPrint}
+              ladderId={ladderId}
+              sortByText="Activity"
+            />
           </div>
 
           {/* Player Cards */}

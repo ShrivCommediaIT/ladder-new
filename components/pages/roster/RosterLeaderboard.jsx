@@ -260,13 +260,14 @@ const RosterLeaderboard = () => {
     try {
       const admin = JSON.parse(sessionStorage.getItem("adminDetails"));
 
-      const data = await getRequest("/user/tokenHistory", {
+      const res = await getRequest("/user/tokenHistory", {
         user_id: player.name,
         admin_id: admin.id
       });
 
-      if (data.status === true) {
-        setHistoryData(data.data || []);
+      if (res.status === true) {
+        setHistoryData(res.data || []);
+        
       } else {
         setHistoryData([]);
       }
@@ -331,8 +332,12 @@ const RosterLeaderboard = () => {
         open={redeemOpen}
         onClose={() => setRedeemOpen(false)}
         player={selectedPlayer}
-        history={historyData}
+        data={historyData}
         loading={loadingHistory}
+        onRedeemSuccess={() => {
+          handleRedeemClick(selectedPlayer);
+          loadRoster();
+        }}
       />
 
       {/* Edit Player Modal */}

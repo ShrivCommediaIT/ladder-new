@@ -111,4 +111,5 @@ export const API_ENDPOINTS = {
 
   // ── Other ─────────────────────────────────────
   INVERTER:               "/user/inverter",
+  REDEEM_TOKENS:          "/user/redeemTokens",
 };

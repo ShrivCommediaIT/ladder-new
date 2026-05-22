@@ -593,12 +593,7 @@ export default function PerformanceDatabase() {
                   placeholder="Min"
                   value={minResult}
                   max={maxResult !== "" ? maxResult : undefined}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    // Prevent min from exceeding current max
-                    if (maxResult !== "" && parseFloat(val) > parseFloat(maxResult)) return;
-                    setMinResult(val);
-                  }}
+                  onChange={(e) => setMinResult(e.target.value)}
                   className="w-full h-11 px-3 rounded-xl bg-[#05070f] border border-[#212946] text-white placeholder-zinc-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 focus:outline-none transition-all text-sm font-medium"
                 />
                 <span className="text-xs text-zinc-400 font-bold uppercase">to</span>
@@ -607,12 +602,7 @@ export default function PerformanceDatabase() {
                   placeholder="Max"
                   value={maxResult}
                   min={minResult !== "" ? minResult : undefined}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    // Prevent max from being less than current min
-                    if (minResult !== "" && parseFloat(val) < parseFloat(minResult)) return;
-                    setMaxResult(val);
-                  }}
+                  onChange={(e) => setMaxResult(e.target.value)}
                   className="w-full h-11 px-3 rounded-xl bg-[#05070f] border border-[#212946] text-white placeholder-zinc-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 focus:outline-none transition-all text-sm font-medium"
                 />
               </div>
