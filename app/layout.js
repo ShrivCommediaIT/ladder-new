@@ -29,7 +29,7 @@ useEffect(() => {
            <PersistGate loading={null} persistor={persistor}>
             <AppInit />
             {children}
-            {(userType == "admin") && <SupportChatBot />}
+            {userType && <SupportChatBot />}
            </PersistGate>
          </Provider>
        </body>
