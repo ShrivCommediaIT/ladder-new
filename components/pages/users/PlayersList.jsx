@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
+import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
+import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
 
 export default function PlayersList({ ladderId: propLadderId, ladderType: propLadderType }) {
   const dispatch = useDispatch();
@@ -82,6 +84,10 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+  const [showRemove, setShowRemove] = useState(false);
+
+  const currentUser = players.find((p) => Number(p.id) === Number(loggedInUserId));
+  const myRank = currentUser?.rank || "-";
 
   /* ------------------ FETCH DATA ------------------ */
 
@@ -103,6 +109,19 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       setCacheBuster(Date.now());
     }
   }, [dispatch, ladderId, ladderType, appliedAge, appliedAgeType, appliedGender]);
+
+  const handleSelfRemove = useCallback(() => {
+    setShowRemove(true);
+  }, []);
+
+  const handleRemoveClose = useCallback(() => {
+    setShowRemove(false);
+  }, []);
+
+  const handleRemoveSuccess = useCallback(() => {
+    setShowRemove(false);
+    refreshData();
+  }, [refreshData]);
 
   useEffect(() => {
     refreshData();
@@ -193,6 +212,15 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
             Boolean(appliedGender)
           }
           defaultAge={appliedAge}
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="px-4 mt-2">
+        <LeaderboardActionButtons
+          onlyLeave={true}
+          currentUserId={loggedInUserId}
+          handleSelfRemove={handleSelfRemove}
         />
       </div>
 
@@ -310,6 +338,17 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
           <DialogFooter>
             <Button onClick={() => setIsDialogOpen(false)}>OK</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showRemove} onOpenChange={setShowRemove}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
+          <BasicLeaderboardUserRemove
+            ladderId={ladderId}
+            myRank={myRank}
+            onClose={handleRemoveClose}
+            onSuccessRefresh={handleRemoveSuccess}
+          />
         </DialogContent>
       </Dialog>
     </div>

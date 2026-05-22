@@ -12,28 +12,44 @@ const HELP_DESK_ENDPOINT = "/user/helpDesk";
 // ✅ PROJECT KNOWLEDGE BASE
 const KNOWLEDGE_BASE = [
   {
-    keywords: ["what", "project", "ladder", "about", "this app"],
-    answer: "SSP OS is a performance management platform. It allows clubs to track player rankings across different competition formats like Win/Lose, Skills, and Multi-league structures.",
+    keywords: ["hi", "hello", "hey", "hola", "greetings", "good morning", "good afternoon", "good evening"],
+    answer: "👋 Hello! I'm the Sports Solutions Pro (SSP) AI Assistant.\n\nHow can I help you today? Feel free to ask me anything about the project or select one of the quick topics below! You can ask about:\n• What is Sports Solutions Pro?\n• How does the platform work?\n• What are Skills Boards?\n• How do Participation Tokens work?\n• ...or type 'support' to contact human support!",
+  },
+  {
+    keywords: ["what is ssp", "sports solutions pro", "about ssp", "define ssp", "what is sports solutions pro", "project", "this app"],
+    answer: "Sports Solutions Pro (SSP) is a modern sports participation and engagement platform designed to help clubs increase activity, motivation, communication, and member involvement.\n\nUnlike traditional club management software, SSP is not focused on bookings or payments. Instead, it focuses on:\n• Increasing participation\n• Keeping members active\n• Creating continuous internal competitions\n• Rewarding activity\n• Improving communication\n• Building stronger club communities\n• Giving sponsors meaningful visibility\n\nSSP works across multiple sports including racket sports, fitness clubs, schools, universities and multi-sport organisations.",
+  },
+  {
+    keywords: ["how does ssp work", "how does it work", "how ssp works", "process", "workflow", "system"],
+    answer: "SSP works through a combination of competitive activities, challenge systems, rankings, and participation rewards.\n\n1. **Clubs Create Internal Competitions**: Section administrators create competitions for their own sports section using the SSP dashboard. These include digital ladders, mini leagues / box leagues, leaderboards, skills & performance challenge boards, and activity tracking systems.\n\n2. **Players Use the SSP App**: Players use the app to view competitions, upload scores/results, track rankings, monitor progress, and earn participation rewards.\n\nThe system is designed to be player-driven with minimal admin workload.",
+  },
+  {
+    keywords: ["explain ssp to my sports club", "explain ssp to my club", "club explanation", "pitch ssp", "pitch to club", "introduce ssp", "simple explanation"],
+    answer: "Here’s a simple explanation you can share with your sports club:\n\n“SSP is a sports participation platform that helps clubs create more activity, more engagement and more competition for every member — not just the top players.\n\nIt combines ladders, mini leagues, leaderboards, challenge boards and participation rewards into one easy-to-use system.\n\nMembers use the SSP app to join competitions, post results, track rankings and earn participation tokens simply by taking part.\n\nSSP helps clubs increase playing frequency, improve member retention, motivate juniors and casual players, strengthen communication and create more value for sponsors.\n\nIt is designed to make sport more active, more rewarding and more connected.”",
+  },
+  {
+    keywords: ["what are ssp skills boards", "skills board", "performance challenge", "fitness challenge", "customise skill", "technical skill", "skill targets", "drill"],
+    answer: "The SSP Skills & Performance Challenge Boards allow coaches, trainers, and clubs to create up to 12 fully customisable skill or fitness challenges for players to complete (e.g. fitness targets, technical drills, speed challenges, endurance tests, sport-specific exercises).\n\nPlayers can:\n• Upload their own results\n• Compare rankings\n• Track improvement\n• Compete against themselves and others\n• Work toward achievement targets\n\nSpecial features include:\n• Individual activity rankings & combined rankings\n• Green target indicators when goals are achieved\n• Witnessed result verification\n• Printable challenge sheets for training sessions\n\nThe boards reward improvement and participation, not just winning matches.",
+  },
+  {
+    keywords: ["how can ssp increase participation", "increase participation", "participation rate", "more active", "increase engagement", "motivate players", "retention"],
+    answer: "SSP increases participation at all levels of a club by:\n\n1. **Giving Every Member Something to Compete In**: Providing ladders, mini leagues, skills boards, fitness challenges, and leaderboards so juniors, beginners, casual players, and competitive athletes can all play.\n2. **Rewarding Participation (Not Just Winning)**: Players earn Participation Tokens simply for taking part, recognizing casual, junior, and social members alike.\n3. **Increasing Regular Engagement**: Live updates and rankings keep players checking the app regularly, leading to more play and higher retention.\n4. **Making Competitions Personal**: Instant filtering by age, gender, or ability groups makes competitions feel highly relevant and motivating.",
+  },
+  {
+    keywords: ["how does the ssp rewards system work", "token system", "how do tokens work", "participation tokens", "rewards system", "redeem", "discount", "points", "sponsor"],
+    answer: "In SSP, Participation Tokens are digital reward points earned by players simply for taking part in recorded activities (ladder matches, mini league matches, leaderboards, skills sessions, etc.).\n\n**How Players Redeem Tokens**:\n1. Log into the SSP app and open the club roster.\n2. View token totals. If they have at least 20 tokens, they can click the redeem link.\n3. The link takes them directly to the sponsor’s e-commerce website where **20 tokens = a 20% discount** on goods and services from SSP sponsors.\n\nThis system motivates participation, rewards activity, supports sponsors, and encourages club-wide involvement!",
+  },
+  {
+    keywords: ["why ssp is different", "why is ssp different", "ssp vs traditional", "why choose ssp", "different from others", "unique", "difference"],
+    answer: "SSP creates a brand-new category of sports software: **Participation-Driven Club Competition**.\n\nInstead of only managing members or recording results, SSP is designed to:\n• Keep players active\n• Increase engagement\n• Create continuous motivation\n• Reward participation\n• Build stronger club communities\n\nIn simple terms: **SSP turns passive club members into active competitors — every week, at every level.**",
   },
   {
     keywords: ["leaderboard", "ranking", "rank", "points", "standing"],
     answer: "Rankings are determined by performance in matches or skill activities. Admins can configure 'OrderBy' parameters to sort by highest or lowest scores. Check your dashboard to see your current standing!",
   },
   {
-    keywords: ["skill", "activity", "target", "green bubble"],
-    answer: "Skill ladders track specific metrics (e.g., speed, accuracy). If you reach the 'Target' set by the admin, your row highlights in green! These activities contribute to your total leaderboard points.",
-  },
-  {
-    keywords: ["leaderboard (time)", "time", "speed", "scoring type", "less is better"],
-    answer: "We support both standard Leaderboards (calculated where more points are better) and 'Leaderboard (Time)' formats (where lower times or scores are better, similar to racing or golf). admins can specify this per ladder.",
-  },
-  {
     keywords: ["minileague", "section", "move player"],
     answer: "A Minileague typically groups 7-10 players. Admins can move players up or down between minileagues based on their performance using the 'Move Player' tools.",
-  },
-  {
-    keywords: ["admin", "sub-admin", "manager", "permission"],
-    answer: "Master Admins control everything. Sub-admins (Section Managers) can manage specific ladders or minileagues they've been assigned to. They can edit player scores and move ranks.",
   },
   {
     keywords: ["password", "reset", "login", "account", "security"],
@@ -50,10 +66,10 @@ const KNOWLEDGE_BASE = [
 ];
 
 const QUICK_OPTIONS = [
-  { id: "about", label: "What is this project?", keywords: ["what"] },
-  { id: "ranking", label: "How are ranks calculated?", keywords: ["leaderboard"] },
-  { id: "skills", label: "What are Skill Targets?", keywords: ["skill"] },
-  { id: "support", label: "Talk to Human Support", keywords: ["support"] },
+  { id: "what_is_ssp", label: "What is Sports Solutions Pro?", keywords: ["what is ssp"] },
+  { id: "how_works", label: "How does SSP work?", keywords: ["how does ssp work"] },
+  { id: "skills_board", label: "What are Skills Boards?", keywords: ["what are ssp skills boards"] },
+  { id: "rewards", label: "How do Participation Tokens work?", keywords: ["how does the ssp rewards system work"] },
 ];
 
 export default function SupportChatBot() {
@@ -85,6 +101,16 @@ export default function SupportChatBot() {
       inputRef.current.focus();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleOpenChat = () => {
+      setIsOpen(true);
+    };
+    window.addEventListener("open-ssp-chatbot", handleOpenChat);
+    return () => {
+      window.removeEventListener("open-ssp-chatbot", handleOpenChat);
+    };
+  }, []);
 
   const addMessage = (text, sender) => {
     const newMessage = {
@@ -120,12 +146,6 @@ export default function SupportChatBot() {
 
         if (kbMatch && !isSupportRequest) {
             addMessage(kbMatch.answer, "bot");
-            
-            setIsTyping(true);
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            setIsTyping(false);
-            
-            addMessage("Did that clarify your query? Below are some other things I can explain, or you can send a message directly to our support team.", "bot");
             setStep("kb_active");
             return;
         }
@@ -266,7 +286,7 @@ export default function SupportChatBot() {
                         </div>
                     )}
                     <div className="space-y-1">
-                        <div className={`p-4 rounded-2xl text-[13px] leading-relaxed tracking-wide ${
+                        <div className={`p-4 rounded-2xl text-[13px] leading-relaxed tracking-wide whitespace-pre-wrap ${
                           msg.sender === "bot" 
                             ? "bg-slate-900/80 text-slate-200 rounded-tl-none border border-slate-800 shadow-xl" 
                             : "bg-indigo-600 text-white rounded-tr-none border border-indigo-500 shadow-indigo-600/30"

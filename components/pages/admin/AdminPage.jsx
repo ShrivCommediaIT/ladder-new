@@ -33,6 +33,7 @@ import AdminImportantInfo from "./info/AdminImportantInfo";
 import AdminHideShowInfo from "./info/AdminHideShowInfo";
 import DemoLadder from "./DemoLadder";
 import CreatePanel from "@/components/shared/CreatePanel";
+import BespokeFooter from "@/components/shared/BespokeFooter";
 
 export default function AdminPage() {
   const [ladderName, setLadderName] = useState("");
@@ -405,25 +406,7 @@ const handleCreateRoster = async () => {
         </div>
       </div>
 
-      <footer className="w-full bg-black/80 text-white p-6 sm:p-10">
-        <Card className="bg-gray-900/90 border border-white/10 shadow-lg">
-          <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
-            {/* Left Section */}
-            <div className="text-center sm:text-left">
-              <p className="text-sm text-gray-300 sm:text-base font-medium">
-                For any bespoke needs
-              </p>
-              <a
-                href="mailto:support@sportssolutionspro.com"
-                className="mt-1 inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors text-sm sm:text-base font-semibold"
-              >
-                support@sportssolutionspro.com
-              </a>
-            </div>
-
-          </CardContent>
-        </Card>
-      </footer>
+      <BespokeFooter />
 
       {duplicateWarning && (
         <Alert className="mt-4 border-red-500/40 bg-red-500/10">

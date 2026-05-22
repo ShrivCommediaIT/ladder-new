@@ -329,8 +329,12 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
         open={redeemOpen}
         onClose={() => setRedeemOpen(false)}
         player={selectedPlayer}
-        history={historyData}
+        data={historyData}
         loading={loadingHistory}
+        onRedeemSuccess={() => {
+          handleRedeemClick(selectedPlayer);
+          loadData();
+        }}
       />
 
       <EditPlayer
