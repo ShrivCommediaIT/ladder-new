@@ -239,7 +239,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
+  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedWitnessBy } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const showAgeRank = Number(appliedAge) > 0;
@@ -489,6 +489,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
                     onSkillClick={handleSkillClick}
                     onTargetAchieved={handleTargetAchieved}
                     currentUser={currentUser}
+                    appliedWitnessBy={appliedWitnessBy}
                   />
                 ))
               )}

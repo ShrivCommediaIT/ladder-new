@@ -121,6 +121,11 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, loggedInUserId }
                     {player.age}
                   </div>
                 )}
+                 {player.gender && (
+                  <p className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit ml-1">
+                    {player.gender == "male" ?"M":"F"}
+                  </p>
+                )}
               </div>
               <div className="text-gray-300 text-[10px] truncate">
                 {player?.phone ?? "N/A"}
@@ -324,8 +329,12 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
         open={redeemOpen}
         onClose={() => setRedeemOpen(false)}
         player={selectedPlayer}
-        history={historyData}
+        data={historyData}
         loading={loadingHistory}
+        onRedeemSuccess={() => {
+          handleRedeemClick(selectedPlayer);
+          loadData();
+        }}
       />
 
       <EditPlayer

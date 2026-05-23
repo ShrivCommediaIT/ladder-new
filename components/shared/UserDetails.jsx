@@ -8,8 +8,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import Logo from "@/public/logo.jpg";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
-import { clubIdPage } from "@/helper/RouteName";
-import { subAdminPage } from "@/helper/RouteName";
+import { clubIdPage, subAdminPage, submitPerformancePage } from "@/helper/RouteName";
 
 import {
   DropdownMenu,
@@ -142,7 +141,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
               <span className="text-sm font-semibold text-zinc-100 capitalize dark:text-zinc-200">
                 {finalUser?.name || "Guest"}
               </span>
-              <span className="text-xs text-zinc-300">{finalUser?.user_type === "sub_admin"?"Sub Admin":"Admin"}</span>
+              <span className="text-xs text-zinc-300">{finalUser?.user_type === "sub_admin"?"Section Admin":"Admin"}</span>
             </div>
             <IoIosArrowDown size={18} className="text-zinc-600" />
           </div>
@@ -164,6 +163,13 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
               >
                 <Shield className="mr-2 h-4 w-4 text-blue-600" />
                 Sub-Admin Dashboard
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push(submitPerformancePage)}
+                className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                <HelpCircle className="mr-2 h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+                Submit to Talent Board
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => window.open("/q-a", "_blank")}
@@ -191,6 +197,14 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
               >
                 <Shield className="mr-2 h-4 w-4 text-blue-600" />
                 Generate Club ID and Section Administrators
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => router.push(submitPerformancePage)}
+                className="cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/30"
+              >
+                <Key className="mr-2 h-4 w-4 text-green-600" />
+                Submit to Talent Board
               </DropdownMenuItem>
 
               <DropdownMenuItem

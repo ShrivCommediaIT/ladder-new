@@ -29,6 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import PerformanceDatabase from "@/components/shared/PerformanceDatabase";
 
 export default function PlanHeading() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -519,6 +520,10 @@ export default function PlanHeading() {
           </Button>
         </div>
       </section>
+
+      <div className="relative z-10 border-y border-border bg-background">
+        <PerformanceDatabase />
+      </div>
 
       <footer
         id="contact"

@@ -58,6 +58,9 @@ export const InvertRanckings = () => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isInverted, setIsInverted] = useState(false);
 
+    const type = searchParams.get('type')
+    const inverType = searchParams.get('inverted')
+
     const handleInvertRanckings = () => {
         setIsConfirmOpen(true);
     };
@@ -80,7 +83,7 @@ export const InvertRanckings = () => {
             });
 
             // 2. Update URL with inverted param
-            const currentInverted = searchParams.get('inverted') === '1';
+            const currentInverted = inverType === '1';
             const nextInverted = currentInverted ? '0' : '1';
             const queryParams = new URLSearchParams(searchParams.toString());
             queryParams.set('inverted', nextInverted);
@@ -109,25 +112,14 @@ export const InvertRanckings = () => {
             // 5. Dispatch to the specific slice that the page component is actually listening to
             switch (canonicalType) {
                 case "negative":
-                    dispatch(fetchNegativeLeaderboard(params));
+                   await dispatch(fetchNegativeLeaderboard(params));
                     break;
                 case "positive":
-                    dispatch(fetchPositiveLeaderboard(params));
-                    break;
-                case "minileague":
-                    dispatch(fetchMiniLeague(params));
-                    break;
-                case "roster":
-                    dispatch(fetchRosterLeaderboard(params));
-                    break;
-                case "winlose":
-                case "best3":
-                case "best5":
-                    dispatch(fetchLeaderboard(params));
+                   await dispatch(fetchPositiveLeaderboard(params));
                     break;
                 case "skill":
                 default:
-                    dispatch(fetchSkillLeaderboard(params));
+                   await dispatch(fetchSkillLeaderboard(params));
                     break;
             }
         } catch (error) {
@@ -140,15 +132,15 @@ export const InvertRanckings = () => {
     useEffect(() => {
         // On component mount, read the inverted state from URL and set local order state
         let Inverted
-        if ((searchParams.get('type') === 'negative'&& searchParams.get('inverted') === '0')) {
+        if ((type === 'negative'&& inverType === '0')) {
             Inverted = true
-        } else if(searchParams.get('type') !== 'negative'){
-            Inverted = searchParams.get('inverted') === '1';
+        } else if(type !== 'negative'){
+            Inverted = inverType === '0';
         }
         setIsInverted(Inverted);
     }, [searchParams]);
     
-    // const isInverted = searchParams.get('inverted') === '1';
+    // const isInverted = inverType === '1';
 
   return (
     <>
@@ -177,7 +169,7 @@ export const InvertRanckings = () => {
     <div 
         onClick={handleInvertRanckings} 
         className={`border backdrop-blur-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 p-2 rounded-md cursor-pointer flex items-center justify-center bg-gradient-to-r ${
-            isInverted 
+            isInverted && type === 'negative'
             ? 'border-green-500/50 from-green-900/80 to-emerald-900/80' 
             : 'border-white/10 bg-zinc-900/70 from-gray-900 to-cyan-900'
         }`}

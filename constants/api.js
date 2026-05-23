@@ -55,6 +55,8 @@ export const API_ENDPOINTS = {
   RESULT_BESTOF5:         "/user/resultforbestof5/save",
   RESULT_MINILEAGUE:      "/user/resultpostminileague/save",
   MOVE_TO_MINILEAGUE:     "/user/move_to_minileague",
+  SAVE_PERFORMANCE_RESULT: "/user/savePerformanceResult",
+  GET_PERFORMANCE_RESULT_LIST: "/user/getPerformanceResultList",
 
   // ── Mini League ──────────────────────────────
   UPDATE_MINILEAGUE:               "/user/update/minileague",
@@ -70,6 +72,7 @@ export const API_ENDPOINTS = {
   GET_TOP_SCORE:           "/user/getTopScore",
   RESET_SKILLBOARD:        "/user/resetSkillboard",
   ADD_USER_SKILLBOARD:     "/user/adduserskillboard",
+  DELETE_SKILL_SETUP:      "/user/DeleteskillSetup",
 
   // ── Activity & Challenge ──────────────────────
   ACTIVITY:               "/user/activity",
@@ -108,4 +111,5 @@ export const API_ENDPOINTS = {
 
   // ── Other ─────────────────────────────────────
   INVERTER:               "/user/inverter",
+  REDEEM_TOKENS:          "/user/redeemTokens",
 };

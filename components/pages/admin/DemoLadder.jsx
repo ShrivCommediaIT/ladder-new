@@ -36,7 +36,7 @@ const DemoLadder = ({ userId }) => {
   const router = useRouter();
   const printRef = useRef(null);
 
-  const [showDemo, setShowDemo] = useState(true);
+  const [showDemo, setShowDemo] = useState(false);
 
   const { allLadders, loading, error } = useSelector(
     (state) => state.fetchLadder
@@ -109,12 +109,6 @@ const DemoLadder = ({ userId }) => {
             </div>
 
             <Separator className="bg-white/10" />
-
-            {loading && (
-              <p className="text-xs sm:text-sm text-white/50 animate-pulse px-2">
-                Loading ladders...
-              </p>
-            )}
 
             {error && (
               <p className="text-xs sm:text-sm text-red-400 px-2">

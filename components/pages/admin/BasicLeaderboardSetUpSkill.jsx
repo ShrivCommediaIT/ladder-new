@@ -19,6 +19,7 @@ import BasicLeaderboardPrintSkillsSheet from "./BasicLeaderboardPrintSkillsSheet
 import { Printer, CheckCircle, TriangleAlert } from "lucide-react";
 import { getRequest, postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import { FaTrash } from "react-icons/fa6";
 const initialRows = Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
   description: "",
@@ -36,13 +37,13 @@ const TargetTimerInput = ({ value, onChange }) => {
     const totalSeconds = Math.floor(num);
     const mPart = Math.floor(totalSeconds / 60);
     const sPart = totalSeconds % 60;
-    
+
     const parts = String(num).split(".");
     let msPart = "00";
     if (parts.length > 1) {
       msPart = parts[1].padEnd(2, "0").substring(0, 2);
     }
-    
+
     return {
       m: String(mPart).padStart(2, "0"),
       s: String(sPart).padStart(2, "0"),
@@ -94,6 +95,9 @@ export default function BasicLeaderboardSetUpSkill({
   const [openSuccess, setOpenSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [rowIdToDelete, setRowIdToDelete] = useState(null);
 
   const [openValidation, setOpenValidation] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
@@ -111,39 +115,46 @@ export default function BasicLeaderboardSetUpSkill({
     }
   };
 
-  useEffect(() => {
+  const fetchSkillSetup = async () => {
     if (!ladderId) return;
+    try {
+      setLoading(true);
+      const res = await getRequest(API_ENDPOINTS.GET_SKILL_SETUP, { ladder_id: ladderId });
 
-    const fetchSkillSetup = async () => {
-      try {
-        setLoading(true);
-        const res = await getRequest(API_ENDPOINTS.GET_SKILL_SETUP, { ladder_id: ladderId });
+      const apiSkills = res?.data || [];
 
-        const apiSkills = res?.data || [];
+      setRows((prevRows) =>
+        prevRows.map((row) => {
+          const found = apiSkills.find(
+            (s) => Number(s.skill_number) === row.id,
+          );
+          return found
+            ? {
+              ...row,
+              dbId: found.id,
+              description: String(found.skill_description || ""),
+              target: String(found.target || ""),
+              unit: String(found.unit || ""),
+              mode: found.skill_sign === "-" ? "minus" : "plus",
+            }
+            : {
+              ...row,
+              dbId: undefined,
+              description: "",
+              target: "",
+              unit: "",
+              mode: "plus",
+            };
+        }),
+      );
+    } catch (error) {
+      console.error("Failed to fetch skill setup", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        setRows((prevRows) =>
-          prevRows.map((row) => {
-            const found = apiSkills.find(
-              (s) => Number(s.skill_number) === row.id,
-            );
-            return found
-              ? {
-                ...row,
-                description: String(found.skill_description || ""),
-                target: String(found.target || ""),
-                unit: String(found.unit || ""),
-                mode: found.skill_sign === "-" ? "minus" : "plus",
-              }
-              : row;
-          }),
-        );
-      } catch (error) {
-        console.error("Failed to fetch skill setup", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+  useEffect(() => {
     fetchSkillSetup();
   }, [ladderId]);
 
@@ -225,6 +236,50 @@ export default function BasicLeaderboardSetUpSkill({
     mode: row.mode,
   }));
 
+
+  const handleDelete = async (rowId) => {
+    const rowObj = rows.find((r) => r.id === rowId);
+    if (!rowObj) return;
+
+    const resetRow = () => {
+      setRows((prevRows) =>
+        prevRows.map((r) =>
+          r.id === rowId
+            ? { id: r.id, description: "", target: "", mode: "plus", unit: "", dbId: undefined }
+            : r
+        )
+      );
+    };
+
+    if (rowObj.dbId) {
+      setDeletingId(rowId);
+      try {
+        await getRequest(API_ENDPOINTS.DELETE_SKILL_SETUP, { activity_id: rowObj.dbId });
+        resetRow();
+        toast.success("Skill setup deleted successfully");
+        onSkillsUpdated();
+        onClose();
+      } catch (err) {
+        toast.error(
+          "Failed to delete skill setup: " +
+          (err?.response?.data?.message || err.message),
+        );
+      } finally {
+        setDeletingId(null);
+      }
+    } else {
+      resetRow();
+      toast.success("Row cleared");
+    }
+  };
+
+  const handleDeleteClick = (rowId) => {
+    setRowIdToDelete(rowId);
+    setDeleteConfirmOpen(true);
+  };
+
+
+
   return (
     <>
       <main className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
@@ -250,38 +305,25 @@ export default function BasicLeaderboardSetUpSkill({
           {/* FIXED: Single line header with proper alignment */}
           <div className="sm:px-2 px-8 py-1  border-b border-white/10">
             <div className="flex items-end gap-2 text-white text-xs font-medium ">
-              {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : (type === "negative" || ladderType === "negative") ? <div className="w-20 flex items-center">Activity No.</div> : null}
+              {(type !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : (type === "negative") ? <div className="w-20 flex items-center">Activity No.</div> : null}
               <div className="w-[120px]">Target</div>
-              <div className="w-[200px]">{(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ? "Skill Name" : "Activity"}</div>
-              {(type !== "negative" && ladderType !== "negative") && <div className="w-[120px] translate">Units Of Measurement</div>}
+              <div className="w-[200px]">{(type !== "positive" && type !== "negative") ? "Skill Name" : "Activity"}</div>
+              {(type !== "negative") && <div className="w-[120px] translate">Units Of Measurement</div>}
             </div>
           </div>
 
-          <div className="max-h-[25vh] overflow-y-auto py-2 space-y-1.5">
-            {(type !== "negative" && ladderType !== "negative") ?
+          <div className="max-h-[25vh] overflow-auto py-2 space-y-1.5">
+            {(type !== "negative") ?
               rows.map((row) => (
                 <div key={row.id} className="flex items-start ">
+
                   {/* Skill No. + +/- */}
                   <div className="flex flex-col w-20 pt-1">
+
                     <div className="bg-white text-black font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
                       {row.id}
                     </div>
-                    <RadioGroup
-                      value={row.mode}
-                      // onValueChange={(val) => updateRow(row.id, { mode: val })}
-                      onValueChange={(val) => {
-                        let newTarget = row.target;
 
-                        if (newTarget !== "" && !isNaN(newTarget)) {
-                          const num = Math.abs(Number(newTarget));
-                          newTarget = val === "minus" ? -num : num;
-                        }
-
-                        updateRow(row.id, { mode: val, target: newTarget });
-                      }}
-                      className="flex gap-1 justify-center"
-                    >
-                    </RadioGroup>
                   </div>
 
                   <div className="flex gap-2 w-[250px] items-start flex-1">
@@ -326,6 +368,20 @@ export default function BasicLeaderboardSetUpSkill({
                       className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
                     />
                   </div>
+                  {Boolean(row.dbId) && (
+                    <button
+                      className="ml-2 flex items-center justify-center align-items-center rounded-full text-red-400 text-xl shadow hover:scale-105 hover:bg-gradient-to-br cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-gray-900"
+                      title="Delete Activity"
+                      onClick={() => handleDeleteClick(row.id)}
+                      disabled={deletingId === row.id}
+                    >
+                      {deletingId === row.id ? (
+                        <span className="animate-spin text-sm text-red-400">⌛</span>
+                      ) : (
+                        <FaTrash size={14} />
+                      )}
+                    </button>
+                  )}
                 </div>
               )) :
               rows.map((row) => (
@@ -365,15 +421,31 @@ export default function BasicLeaderboardSetUpSkill({
                         className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
                       />)}
                   </div>
+                  {Boolean(row.dbId) && (
+                    <button
+                      className="ml-2 flex items-center justify-center align-items-center rounded-full text-red-400 text-xl shadow hover:scale-105 hover:bg-gradient-to-br cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-gray-900"
+                      title="Delete Activity"
+                      onClick={() => handleDeleteClick(row.id)}
+                      disabled={deletingId === row.id}
+                    >
+                      {deletingId === row.id ? (
+                        <span className="animate-spin text-sm text-red-400">⌛</span>
+                      ) : (
+                        <FaTrash size={14} />
+                      )}
+                    </button>
+                  )}
                 </div>
               ))
             }
+
           </div>
 
+
           <div className={`bg-[#14283a] flex ${type === "positive" ||
-                  type === "negative" ||
-                  ladderType === "positive" ||
-                  ladderType === "negative"?"justify-end" : "justify-between"}   items-center w-full px-8 py-3 border-t border-white/20`}>
+            type === "negative" ||
+            ladderType === "positive" ||
+            ladderType === "negative" ? "justify-end" : "justify-between"}   items-center w-full px-8 py-3 border-t border-white/20`}>
             {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ?
               <div className="flex items-center justify-end mx-4">
                 <BasicLeaderboardPrintSkillsSheet
@@ -389,11 +461,13 @@ export default function BasicLeaderboardSetUpSkill({
                 onClick={handleSetUpSkills}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white w-full max-w-xs cursor-pointer"
               >
-                {saving ? "Saving..." :  (type === "skill") ? "Update Skills" : "Update"}
+                {saving ? "Saving..." : (type === "skill") ? "Update Skills" : "Update"}
               </Button>
             </div>
           </div>
+
         </Card>
+
       </main>
 
       <Dialog open={openValidation} onOpenChange={setOpenValidation}>
@@ -465,6 +539,47 @@ export default function BasicLeaderboardSetUpSkill({
               className="bg-emerald-500 hover:bg-emerald-600 text-white"
             >
               OK
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-sm bg-[#0f2433] border border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-red-500 flex items-center gap-2">
+              <TriangleAlert className="w-6 h-6" />
+              Confirm Deletion
+            </DialogTitle>
+            <DialogDescription className="text-slate-300">
+              Are you sure you want to delete this activity/skill setup? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setDeleteConfirmOpen(false);
+                setRowIdToDelete(null);
+              }}
+              className="bg-transparent border border-slate-600 text-white hover:bg-slate-800"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                if (rowIdToDelete) {
+                  handleDelete(rowIdToDelete);
+                }
+                setDeleteConfirmOpen(false);
+                setRowIdToDelete(null);
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
             </Button>
           </div>
         </DialogContent>

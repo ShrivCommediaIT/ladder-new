@@ -18,6 +18,7 @@ import { fetchNegativeLeaderboard, setAgeFilter } from "@/redux/slices/negativeL
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import { convertTimeToSeconds } from "@/helper/helperFunction";
+import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({
@@ -305,6 +306,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
         const payload = {
           ladder_id: ladderId,
           type: "negative",
+          sortbyskillnumber: skillNo,
         };
 
         if (age > 0) {
@@ -366,6 +368,8 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
     (skillNo) => {
       setOpenSort(false);
       setIsSorted(true);
+      setSelectedPositiveFilter(skillNo);
+      setSelectedSkillFilter(skillNo);
       refreshLeaderboard(skillNo);
     },
     [refreshLeaderboard],
@@ -378,6 +382,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const handleClearAll = useCallback(() => {
     setIsSorted(false);
     setSelectedSkillFilter(0);
+    setSelectedPositiveFilter(0);
     dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
     refreshLeaderboard(0, 0, "under", "");
   }, [refreshLeaderboard, dispatch]);
@@ -449,39 +454,18 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
 
 
               {/* Buttons */}
-              <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0">
-                {!isSorted ? (
-                  <Button
-                    onClick={handleSortBySkill}
-                    disabled={isRefreshing}
-                    className="bg-[#005F5A] text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
-                  >
-                    <Funnel size={16} />
-                    Sort Performance
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleClearAll}
-                    disabled={isRefreshing}
-                    className="bg-red-600 text-white font-bold rounded-md px-4 py-2 flex items-center gap-2"
-                  >
-                    <Funnel size={16} />
-                    Clear All
-                  </Button>
-                )}
-
-                {currentUserId && (
-                  <Button
-                    onClick={handleSelfRemove}
-                    disabled={isRefreshing}
-                    className="bg-gradient-to-r from-red-500 to-red-500 hover:from-orange-600 hover:to-red-600 
-                       text-white font-bold rounded-md px-4 py-2 flex items-center gap-2 shadow-lg"
-                  >
-                    <X size={16} className="w-4 h-4" />
-                    Click here to leave this solution
-                  </Button>
-                )}
-              </div>
+              <LeaderboardActionButtons
+                isSorted={isSorted}
+                appliedAge={appliedAge}
+                isRefreshing={isRefreshing}
+                handleSortBySkill={handleSortBySkill}
+                handleClearAll={handleClearAll}
+                currentUserId={currentUserId}
+                handleSelfRemove={handleSelfRemove}
+                showPrint={false}
+                sortByText="Skill"
+                className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0"
+              />
             </div>
 
             {/* Player Cards */}

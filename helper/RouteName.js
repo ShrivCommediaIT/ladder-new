@@ -8,3 +8,4 @@ export const clubIdPage = "/clubid-page"
 export const createClubId = "/create-club-setup"
 
 export const subAdminPage = "/admin-page/sub-admin-page"
+export const submitPerformancePage = "/submit-performance"

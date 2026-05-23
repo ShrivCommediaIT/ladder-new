@@ -433,18 +433,16 @@ const AdminButton = () => {
           {/* SKILL SPECIFIC BUTTONS */}
           {(isSkill || isPositive || isNegative) && (
             <>
-              {!isSorted && (
-                <Button
-                  onClick={handleSortBySkill}
-                  className={quickActionButtonClass}
-                >
-                  <Funnel size={20} /> SORT
-                </Button>
-              )}
+              <Button
+                onClick={handleSortBySkill}
+                className={quickActionButtonClass}
+              >
+                <Funnel size={20} /> {isSorted ? "SORTED" : "SORT"}
+              </Button>
             </>
           )}
 
-          {isSorted && !isMiniLeague && (
+          {(isSorted || witnessBy === 1 || hasFiltersApplied()) && !isMiniLeague && (
             <Button
               onClick={handleClearAll}
               className={quickActionDangerButtonClass}
@@ -460,6 +458,7 @@ const AdminButton = () => {
                 onSearch={handleAgeSearch}
                 user={false}
                 resetSignal={ageFilterResetSignal}
+                isActive={hasFiltersApplied()}
               />
             </div>
           )}
@@ -479,6 +478,43 @@ const AdminButton = () => {
               />
             </DialogContent>
           </Dialog>
+
+          {(isSkill || isPositive || isNegative) && (
+            <Button
+              onClick={() => {
+                const newWitnessBy = witnessBy === 1 ? 0 : 1;
+                setWitnessBy(newWitnessBy);
+
+                if (newWitnessBy === 1) {
+                  const clearedFilter = { age: 0, ageType: "", gender: "" };
+                  if (isSkill) {
+                    dispatch(setSkillAgeFilter(clearedFilter));
+                  } else if (isPositive) {
+                    dispatch(setPositiveAgeFilter(clearedFilter));
+                  } else if (isNegative) {
+                    dispatch(setNegativeAgeFilter(clearedFilter));
+                  } else {
+                    dispatch(setAgeFilter(clearedFilter));
+                    setLocalAge(0);
+                    setLocalAgeType("");
+                    setLocalGender("");
+                  }
+                  setAgeFilterResetSignal((prev) => prev + 1);
+                  setIsSorted(false);
+                  setCurrentSkillNo(0);
+                }
+
+                refreshSkillLeaderboard(0, newWitnessBy);
+              }}
+              className={
+                witnessBy === 1
+                  ? "rounded-lg h-16 w-full border border-emerald-300/50 bg-emerald-500/25 px-4 text-white shadow-none transition hover:-translate-y-0.5 hover:bg-emerald-500/35 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight"
+                  : quickActionButtonClass
+              }
+            >
+              {witnessBy === 1 ? "WITNESSED" : "WITNESSED ONLY"}
+            </Button>
+          )}
         </div>
       </QuickActionsCard>
 
@@ -497,7 +533,24 @@ const AdminButton = () => {
               }}
               onSkillsUpdated={(skillNo) => {
                 setCurrentSkillNo(skillNo);
-                refreshSkillLeaderboard(skillNo);
+
+                const clearedFilter = { age: 0, ageType: "", gender: "" };
+                if (isSkill) {
+                  dispatch(setSkillAgeFilter(clearedFilter));
+                } else if (isPositive) {
+                  dispatch(setPositiveAgeFilter(clearedFilter));
+                } else if (isNegative) {
+                  dispatch(setNegativeAgeFilter(clearedFilter));
+                } else {
+                  dispatch(setAgeFilter(clearedFilter));
+                  setLocalAge(0);
+                  setLocalAgeType("");
+                  setLocalGender("");
+                }
+                setAgeFilterResetSignal((prev) => prev + 1);
+                setWitnessBy(0);
+
+                refreshSkillLeaderboard(skillNo, 0);
                 setIsSorted(true);
                 setOpenSkillShortDialog(false);
                 toast.success(`Sorted by Skill ${skillNo}!`);

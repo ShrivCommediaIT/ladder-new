@@ -252,6 +252,11 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
                     {player.age}
                   </div>
                 )}
+                {player.gender && (
+                  <p className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit ml-1">
+                    {player.gender == "male" ?"M":"F"}
+                  </p>
+                )}
               </div>
               <div className="text-gray-300 text-[10px] truncate flex items-center gap-1.5">
                 <span>{player?.phone ?? "N/A"}</span>
@@ -415,13 +420,14 @@ const RosterLeaderboard = () => {
     try {
       const admin = JSON.parse(sessionStorage.getItem("adminDetails"));
 
-      const data = await getRequest("/user/tokenHistory", {
+      const res = await getRequest("/user/tokenHistory", {
         user_id: player.name,
         admin_id: admin.id
       });
 
-      if (data.status === true) {
-        setHistoryData(data.data || []);
+      if (res.status === true) {
+        setHistoryData(res.data || []);
+        
       } else {
         setHistoryData([]);
       }
@@ -578,8 +584,12 @@ const RosterLeaderboard = () => {
         open={redeemOpen}
         onClose={() => setRedeemOpen(false)}
         player={selectedPlayer}
-        history={historyData}
+        data={historyData}
         loading={loadingHistory}
+        onRedeemSuccess={() => {
+          handleRedeemClick(selectedPlayer);
+          loadRoster();
+        }}
       />
 
       {/* Edit Player Modal */}

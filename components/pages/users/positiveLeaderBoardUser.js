@@ -18,6 +18,7 @@ import { fetchPositiveLeaderboard, setAgeFilter } from "@/redux/slices/positiveL
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import LadderLinkPanel from "../players/LadderLinkPanel";
+import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 
 
 /* ---------------- PLAYER CARD ---------------- */
@@ -67,7 +68,7 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      isTargetAchieved = isInverted ? score >= target : score <= target;
+      isTargetAchieved = isInverted ? score <= target : score >= target;
     }
 
     return {
@@ -214,7 +215,7 @@ const PlayerCard = ({
                     title={`Score: ${scoreData.score || 0} | Target: ${scoreData.target || "N/A"
                       }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
                   >
-                    {Math.abs(scoreData.displayScore || 0)}
+                    {Math.abs(scoreData.displayScore || 0).toFixed(2)}
                   </div>
                 );
               })}
@@ -252,6 +253,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const showAgeRank = Number(appliedAge) > 0;
   const isInverted = ladderDetails?.inverted == 0;;
   const currentUser = useSelector((state) => state.user?.user);
+  const myRank = currentUser?.rank;
 
   // CELEBRATION STATE ONLY
   const [showCelebration, setShowCelebration] = useState(false);
@@ -262,6 +264,12 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSorted, setIsSorted] = useState(false);
+  const [openSort, setOpenSort] = useState(false);
+  const [showRemove, setShowRemove] = useState(false);
+  const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
   const [currentUserId, setCurrentUserId] = useState(null);
   const handleTargetAchieved = useCallback(() => {
@@ -280,6 +288,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
         const payload = {
           ladder_id: ladderId,
           type: "positive",
+          sortbyskillnumber: skillNo,
         };
 
         if (age > 0) {
@@ -290,8 +299,10 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
         if (gender) {
           payload.gender = gender;
         }
-
-        dispatch(fetchPositiveLeaderboard(payload));
+        dispatch(fetchPositiveLeaderboard(payload)).finally(() => {
+          setIsRefreshing(false);
+        });
+        // dispatch(fetchPositiveLeaderboard(payload));
       }
     },
     [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
@@ -304,6 +315,8 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
     if (isClearing) {
       setIsSorted(false);
       setSelectedPositiveFilter(0);
+      setSelectedSkillFilter(0);
+
     } else {
       setIsSorted(true);
     }
@@ -315,8 +328,47 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const handleClearFilters = useCallback(() => {
     setSearchQuery("");
     setIsSorted(false);
+    setSelectedSkillFilter(0);
     setSelectedPositiveFilter(0);
   }, []);
+
+  const handleSortBySkill = useCallback(() => {
+    setOpenSort(true);
+  }, []);
+
+  const handleSelfRemove = useCallback(() => {
+    setShowRemove(true);
+  }, []);
+
+    const handleRemoveClose = useCallback(() => {
+    setShowRemove(false);
+  }, []);
+
+    const handleRemoveSuccess = useCallback(() => {
+    setShowRemove(false);
+    refreshLeaderboard(selectedSkillFilter);
+  }, [refreshLeaderboard, selectedSkillFilter]);
+
+
+    const handleSkillsUpdated = useCallback(
+      (skillNo) => {
+        setOpenSort(false);
+        setIsSorted(true);
+        setSelectedPositiveFilter(skillNo);
+        setSelectedSkillFilter(skillNo);
+        refreshLeaderboard(skillNo);
+      },
+      [refreshLeaderboard],
+    );
+
+
+      const handleClearAll = useCallback(() => {
+        setIsSorted(false);
+        setSelectedSkillFilter(0);
+        setSelectedPositiveFilter(0);
+        dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+        refreshLeaderboard(0, 0, "under", "");
+      }, [refreshLeaderboard, dispatch]);
 
   const hasFiltersApplied =
     Boolean(searchQuery) ||
@@ -417,6 +469,24 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
             activeFilters={hasFiltersApplied}
             defaultAge={appliedAge}
           />
+
+          <div className="flex-1 w-full min-w-0">
+
+
+            {/* Buttons */}
+            <LeaderboardActionButtons
+              isSorted={isSorted}
+              appliedAge={appliedAge}
+              isRefreshing={isRefreshing}
+              handleSortBySkill={handleSortBySkill}
+              handleClearAll={handleClearAll}
+              currentUserId={currentUserId}
+              handleSelfRemove={handleSelfRemove}
+              showPrint={false}
+              sortByText="Skill"
+              className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0"
+            />
+          </div>
           <LadderLinkPanel ladderId={ladderId} ladderType="positive" />
           {loading && (
             <p className="text-white text-center hidden">Loading...</p>
@@ -456,6 +526,30 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
           skillActivityId={selectedSkillActivityId}
         />
       )}
+
+      <Dialog open={openSort} onOpenChange={setOpenSort}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
+          <BasicLeaderboardShort
+            ladderId={ladderId}
+            onClose={() => {
+              setOpenSort(false);
+              setIsSorted(false);
+            }}
+            onSkillsUpdated={handleSkillsUpdated}
+          />
+        </DialogContent>
+      </Dialog>
+
+            <Dialog open={showRemove} onOpenChange={setShowRemove}>
+              <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
+                <BasicLeaderboardUserRemove
+                  ladderId={ladderId}
+                  myRank={myRank}
+                  onClose={handleRemoveClose}
+                  onSuccessRefresh={handleRemoveSuccess}
+                />
+              </DialogContent>
+            </Dialog>
     </>
   );
 };

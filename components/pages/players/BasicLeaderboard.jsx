@@ -31,6 +31,7 @@ const PlayerCard = ({
   onTargetAchieved,
   currentUser,
   isInverted,
+  appliedWitnessBy,
 }) => {
   const playerImageUrl = player?.image
     ? `${IMAGE_BASE_URL}/${player.image}`
@@ -66,7 +67,7 @@ const PlayerCard = ({
       !isNaN(target) &&
       !isNaN(score)
     ) {
-      isTargetAchieved = isInverted ? score >= target : score <= target;
+      isTargetAchieved = isInverted ? score <= target : score >= target;
     }
 
     return {
@@ -102,6 +103,10 @@ const PlayerCard = ({
     const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
     return rankObj ? rankObj.rank : "-";
   };
+
+  const skillsToRender = appliedWitnessBy === 1
+    ? (player.skills || []).filter(skill => player.scores?.some(s => Number(s.skill_number) === Number(skill.skill_number)))
+    : (player.skills || []);
 
   return (
     <Card className="best-board-card w-full rounded-2xl border border-[var(--best-board-border-strong)] bg-[var(--best-board-surface)] p-2 shadow-lg sm:p-3 relative">
@@ -166,10 +171,10 @@ const PlayerCard = ({
           </div>
         </div>
 
-        {player.skills?.length > 0 ? (
+        {skillsToRender.length > 0 ? (
           <>
             <div className="flex gap-[3px] overflow-y-visible pb-2 mb-1">
-              {player.skills.map((skill, i) => {
+              {skillsToRender.map((skill, i) => {
                 const isNegative = skill.skill_sign === "-";
 
                 return (
@@ -194,7 +199,7 @@ const PlayerCard = ({
 
             {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
             <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
-              {player.skills.map((skill, i) => {
+              {skillsToRender.map((skill, i) => {
                 const scoreData = getScoreBySkillNumber(
                   player.scores || [],
                   player.skills || [],
@@ -218,7 +223,7 @@ const PlayerCard = ({
 
             {/* Ranks */}
             <div className="flex gap-[3px] overflow-x-auto pb-1">
-              {player.skills.map((skill, i) => (
+              {skillsToRender.map((skill, i) => (
                 <div
                   key={i}
                   className="min-w-[24px] h-6 flex items-center justify-center rounded font-bold text-[10px] bg-blue-200 text-black shadow-sm border border-gray-200"
@@ -243,7 +248,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading } = useSelector(
+  const { data = [], loading, appliedWitnessBy } = useSelector(
     (state) => state.skillLeaderboard || {},
   );
   const currentUser = useSelector((state) => state.user?.user);
@@ -477,6 +482,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
                   onTargetAchieved={handleTargetAchieved}
                   currentUser={currentUser}
                   isInverted={isInverted}
+                  appliedWitnessBy={appliedWitnessBy}
                 />
               ))
             )}
