@@ -18,7 +18,6 @@ import { uploadCSV } from "@/redux/slices/leaderboardSlice";
 import { setLadderId } from "@/redux/slices/userSlice";
 import { fetchLadders } from "@/redux/slices/fetchLadderSlice";
 
-import { Card, CardContent } from "@/components/ui/card";
 
 // ⭐ MiniLeague Imports
 import { importMiniLeague } from "@/redux/slices/minileagueSlice";
@@ -65,6 +64,7 @@ import { motion } from "framer-motion";
 import { importSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { importRoster } from "@/redux/slices/rosterSlice";
 import CreatePanel from "@/components/shared/CreatePanel";
+import BespokeFooter from "@/components/shared/BespokeFooter";
 
 export default function SubAdminDashboard() {
   const [ladderName, setLadderName] = useState("");
@@ -612,25 +612,9 @@ export default function SubAdminDashboard() {
         </div>
       </div>
 
-      <footer className="relative z-10 px-4 pb-8 sm:px-6 lg:px-8 mt-10">
-        <Card className="mx-auto w-full border border-border bg-card text-foreground shadow-lg">
-          <CardContent className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Sports Solutions Pro Sub-Admin Workspace
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Competition setup, ranking control, and player organization for your section.
-              </p>
-            </div>
-            <p className="text-sm text-primary">
-              {activeLadders.length > 0
-                ? `${activeLadders.length} competition${activeLadders.length === 1 ? "" : "s"} currently available`
-                : "No competitions created yet"}
-            </p>
-          </CardContent>
-        </Card>
-      </footer>
+      <div className="relative z-10 mt-10">
+        <BespokeFooter />
+      </div>
     </div>
   );
 }

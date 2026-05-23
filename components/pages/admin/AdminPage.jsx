@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card, CardContent } from "@/components/ui/card";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -32,6 +31,7 @@ import DemoLadder from "./DemoLadder";
 import CreatePanel from "@/components/shared/CreatePanel";
 import AdminImportantInfo from "./info/AdminImportantInfo";
 import AdminHideShowInfo from "./info/AdminHideShowInfo";
+import BespokeFooter from "@/components/shared/BespokeFooter";
 import {
   Popover,
   PopoverContent,
@@ -562,25 +562,9 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <footer className="relative z-10 px-4 pb-8 sm:px-6 lg:px-8 mt-10">
-        <Card className="mx-auto w-full border border-border bg-card text-foreground shadow-lg">
-          <CardContent className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Sports Solutions Pro Admin Workspace
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Roster setup, competition control, and player organization in one place.
-              </p>
-            </div>
-            <p className="text-sm text-primary">
-              {activeLadders.length > 0
-                ? `${activeLadders.length} competition${activeLadders.length === 1 ? "" : "s"} currently available`
-                : "No competitions created yet"}
-            </p>
-          </CardContent>
-        </Card>
-      </footer>
+      <div className="relative z-10 mt-10">
+        <BespokeFooter />
+      </div>
     </div>
   );
 }

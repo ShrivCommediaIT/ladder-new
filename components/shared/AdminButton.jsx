@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
@@ -28,9 +30,12 @@ import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { clearActivityState } from "@/redux/slices/activitySlice";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
-import { fetchSkillLeaderboard, setAppliedAge as setSkillAppliedAge, setAgeFilter as setSkillAgeFilter } from "@/redux/slices/BasicLeaderboardSlice";
-import { setAppliedAge as setPositiveAppliedAge, setAgeFilter as setPositiveAgeFilter } from "@/redux/slices/positiveLeaderBoardSlice";
-import { setAppliedAge as setNegativeAppliedAge, setAgeFilter as setNegativeAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
+import {
+  fetchSkillLeaderboard,
+  setAgeFilter as setSkillAgeFilter,
+} from "@/redux/slices/BasicLeaderboardSlice";
+import { setAgeFilter as setPositiveAgeFilter } from "@/redux/slices/positiveLeaderBoardSlice";
+import { setAgeFilter as setNegativeAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
 import { paymentPage } from "@/helper/RouteName";
 import {
@@ -64,13 +69,11 @@ const AdminButton = () => {
   const miniLeagueLadderType = useSelector(
     (state) => state.minileague?.ladderDetails?.type,
   );
-
   const demoLadder = useSelector(
     (state) => state.player?.players?.[ladderId]?.ladderDetails.created_by,
   );
 
   const isDemoLadder = demoLadder?.toLowerCase() === "demo";
-
   const ladderType = typeFromParams || playerLadderType || miniLeagueLadderType;
 
   const isMiniLeague = ladderType === "minileague";
@@ -83,11 +86,9 @@ const AdminButton = () => {
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
   const [openSkillDialog, setOpenSkillDialog] = useState(false);
   const [openSkillShortDialog, setOpenSkillShortDialog] = useState(false);
-
   const [zeroLoading, setZeroLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
-
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmType, setConfirmType] = useState("");
   const [isSorted, setIsSorted] = useState(false);
@@ -96,50 +97,109 @@ const AdminButton = () => {
   const [localAgeType, setLocalAgeType] = useState("under");
   const [localGender, setLocalGender] = useState("");
   const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
+  const [witnessBy, setWitnessBy] = useState(0);
 
-  const { appliedAge: skillAppliedAge, appliedAgeType: skillAppliedAgeType, appliedGender: skillAppliedGender } = useSelector((state) => state.skillLeaderboard || {});
-  const { appliedAge: positiveAppliedAge, appliedAgeType: positiveAppliedAgeType, appliedGender: positiveAppliedGender } = useSelector((state) => state.positiveLeaderBoard || {});
-  const { appliedAge: negativeAppliedAge, appliedAgeType: negativeAppliedAgeType, appliedGender: negativeAppliedGender } = useSelector((state) => state.negativeLeaderBoard || {});
+  const {
+    appliedAge: skillAppliedAge,
+    appliedAgeType: skillAppliedAgeType,
+    appliedGender: skillAppliedGender,
+  } = useSelector((state) => state.skillLeaderboard || {});
+  const {
+    appliedAge: positiveAppliedAge,
+    appliedAgeType: positiveAppliedAgeType,
+    appliedGender: positiveAppliedGender,
+  } = useSelector((state) => state.positiveLeaderBoard || {});
+  const {
+    appliedAge: negativeAppliedAge,
+    appliedAgeType: negativeAppliedAgeType,
+    appliedGender: negativeAppliedGender,
+  } = useSelector((state) => state.negativeLeaderBoard || {});
 
-  const appliedAge = isSkill ? skillAppliedAge : isPositive ? positiveAppliedAge : isNegative ? negativeAppliedAge : localAge;
-  const appliedAgeType = isSkill ? skillAppliedAgeType : isPositive ? positiveAppliedAgeType : isNegative ? negativeAppliedAgeType : localAgeType;
-  const appliedGender = isSkill ? skillAppliedGender : isPositive ? positiveAppliedGender : isNegative ? negativeAppliedGender : localGender;
+  const appliedAge = isSkill
+    ? skillAppliedAge
+    : isPositive
+      ? positiveAppliedAge
+      : isNegative
+        ? negativeAppliedAge
+        : localAge;
+  const appliedAgeType = isSkill
+    ? skillAppliedAgeType
+    : isPositive
+      ? positiveAppliedAgeType
+      : isNegative
+        ? negativeAppliedAgeType
+        : localAgeType;
+  const appliedGender = isSkill
+    ? skillAppliedGender
+    : isPositive
+      ? positiveAppliedGender
+      : isNegative
+        ? negativeAppliedGender
+        : localGender;
 
-  // Check if any filters are applied
   const hasFiltersApplied = () => {
-    const age = isSkill ? skillAppliedAge : isPositive ? positiveAppliedAge : isNegative ? negativeAppliedAge : localAge;
-    const ageType = isSkill ? skillAppliedAgeType : isPositive ? positiveAppliedAgeType : isNegative ? negativeAppliedAgeType : localAgeType;
-    const gender = isSkill ? skillAppliedGender : isPositive ? positiveAppliedGender : isNegative ? negativeAppliedGender : localGender;
+    const age = isSkill
+      ? skillAppliedAge
+      : isPositive
+        ? positiveAppliedAge
+        : isNegative
+          ? negativeAppliedAge
+          : localAge;
+    const ageType = isSkill
+      ? skillAppliedAgeType
+      : isPositive
+        ? positiveAppliedAgeType
+        : isNegative
+          ? negativeAppliedAgeType
+          : localAgeType;
+    const gender = isSkill
+      ? skillAppliedGender
+      : isPositive
+        ? positiveAppliedGender
+        : isNegative
+          ? negativeAppliedGender
+          : localGender;
 
     return (age && age !== "" && age !== 0) || (ageType && ageType !== "under") || (gender && gender !== "");
   };
 
   const refreshLeaderboard = () => {
-    if (ladderId) {
-      if (isSkill || isPositive || isNegative || ladderType === "best5" || ladderType === "best3" || ladderType === "winlose" || isMiniLeague) {
-        refreshSkillLeaderboard();
-      } else {
-        const payload = { ladder_id: ladderId, type: ladderType };
-        if (appliedAge > 0) {
-          payload.dob = appliedAge;
-          if (appliedAgeType) payload.age_type = appliedAgeType;
-        }
-        if (appliedGender) payload.gender = appliedGender;
+    if (!ladderId) return;
 
-        dispatch(fetchLeaderboard(payload));
-        if (isRoster) {
-          dispatch(fetchRosterLeaderboard({ 
-            ladder_id: ladderId, 
-            dob: appliedAge > 0 ? appliedAge : undefined,
-            age_type: appliedAge > 0 && appliedAgeType ? appliedAgeType : undefined,
-            gender: appliedGender || undefined,
-          }));
-        }
-      }
+    if (
+      isSkill ||
+      isPositive ||
+      isNegative ||
+      ladderType === "best5" ||
+      ladderType === "best3" ||
+      ladderType === "winlose" ||
+      isMiniLeague
+    ) {
+      refreshSkillLeaderboard();
+      return;
+    }
+
+    const payload = { ladder_id: ladderId, type: ladderType };
+    if (appliedAge > 0) {
+      payload.dob = appliedAge;
+      if (appliedAgeType) payload.age_type = appliedAgeType;
+    }
+    if (appliedGender) payload.gender = appliedGender;
+
+    dispatch(fetchLeaderboard(payload));
+    if (isRoster) {
+      dispatch(
+        fetchRosterLeaderboard({
+          ladder_id: ladderId,
+          dob: appliedAge > 0 ? appliedAge : undefined,
+          age_type: appliedAge > 0 && appliedAgeType ? appliedAgeType : undefined,
+          gender: appliedGender || undefined,
+        }),
+      );
     }
   };
 
-  const refreshSkillLeaderboard = (skillNo = 0) => {
+  const refreshSkillLeaderboard = (skillNo = 0, witnessByOverride) => {
     if (!ladderId) return;
 
     let laddartype;
@@ -162,13 +222,16 @@ const AdminButton = () => {
       fetchSliceLeaderboard = fetchSkillLeaderboard;
     }
 
+    const effectiveWitnessBy =
+      witnessByOverride !== undefined ? witnessByOverride : witnessBy;
+
     const payload = {
       ladder_id: ladderId,
       type: laddartype,
-      sortbyskillnumber: skillNo
+      sortbyskillnumber: skillNo,
+      ...(effectiveWitnessBy === 1 ? { witness_by: 1 } : {}),
     };
 
-    
     dispatch(fetchSliceLeaderboard(payload));
 
     if (laddartype === "minileague") {
@@ -199,7 +262,9 @@ const AdminButton = () => {
   const handleUpdate = async () => {
     setUpdateLoading(true);
     try {
-      const res = await getRequest(API_ENDPOINTS.UPDATE_MINILEAGUE, { ladder_id: ladderId });
+      const res = await getRequest(API_ENDPOINTS.UPDATE_MINILEAGUE, {
+        ladder_id: ladderId,
+      });
       if (res?.status === 200) {
         toast.success("Mini League updated successfully!");
         refreshLeaderboard();
@@ -255,6 +320,7 @@ const AdminButton = () => {
   const handleClearAll = () => {
     setIsSorted(false);
     setCurrentSkillNo(0);
+    setWitnessBy(0);
     const clearedFilter = { age: 0, ageType: "", gender: "" };
 
     if (isSkill) {
@@ -271,13 +337,12 @@ const AdminButton = () => {
     }
 
     setAgeFilterResetSignal((prev) => prev + 1);
-    // Refresh with cleared filters
+
     if (ladderId) {
-      if (isSkill || isPositive || isNegative ) {
-        refreshSkillLeaderboard(0); // Pass 0 to clear age override
+      if (isSkill || isPositive || isNegative) {
+        refreshSkillLeaderboard(0, 0);
       } else {
-        const payload = { ladder_id: ladderId, type: ladderType };
-        // No age/gender filters for cleared state
+        const payload = { ladder_id: ladderId, type: ladderType, witness_by: 0 };
         dispatch(fetchLeaderboard(payload));
         if (isRoster) {
           dispatch(fetchRosterLeaderboard({ ladder_id: ladderId }));
@@ -287,6 +352,10 @@ const AdminButton = () => {
   };
 
   const handleAgeSearch = (age, ageType, gender) => {
+    setWitnessBy(0);
+    setIsSorted(false);
+    setCurrentSkillNo(0);
+
     const ageNum = age ? Number(age) : "";
     const filter = { age: ageNum, ageType, gender };
 
@@ -300,7 +369,14 @@ const AdminButton = () => {
       setLocalGender(gender);
     }
 
-    const laddartype = typeFromParams === "positive" ? "positive" : (typeFromParams === "negative" ? "negative" : (isSkill ? "skill" : ladderType));
+    const laddartype =
+      typeFromParams === "positive"
+        ? "positive"
+        : typeFromParams === "negative"
+          ? "negative"
+          : isSkill
+            ? "skill"
+            : ladderType;
 
     const payload = {
       ladder_id: ladderId,
@@ -308,15 +384,23 @@ const AdminButton = () => {
       dob: ageNum > 0 ? ageNum : undefined,
       gender: gender || undefined,
       ...(ageNum > 0 && ageType ? { age_type: ageType } : {}),
+      witness_by: 0,
     };
 
     let fetchSliceLeaderboard;
-   
+
     if (laddartype === "positive") {
       fetchSliceLeaderboard = fetchPositiveLeaderboard;
     } else if (laddartype === "negative") {
       fetchSliceLeaderboard = fetchNegativeLeaderboard;
-    } else if (laddartype === "best5" || laddartype === "best3" || laddartype === "winlose" || laddartype === "bestof5" || laddartype === "bestof3" || laddartype === "roster") {
+    } else if (
+      laddartype === "best5" ||
+      laddartype === "best3" ||
+      laddartype === "winlose" ||
+      laddartype === "bestof5" ||
+      laddartype === "bestof3" ||
+      laddartype === "roster"
+    ) {
       fetchSliceLeaderboard = fetchLeaderboard;
     } else {
       fetchSliceLeaderboard = fetchSkillLeaderboard;
@@ -325,28 +409,36 @@ const AdminButton = () => {
     dispatch(fetchSliceLeaderboard(payload));
 
     if (isRoster) {
-      dispatch(fetchRosterLeaderboard({
-        ladder_id: ladderId,
-        dob: ageNum > 0 ? ageNum : undefined,
-        age_type: ageNum > 0 && ageType ? ageType : undefined,
-        gender: gender || undefined,
-      }));
+      dispatch(
+        fetchRosterLeaderboard({
+          ladder_id: ladderId,
+          dob: ageNum > 0 ? ageNum : undefined,
+          age_type: ageNum > 0 && ageType ? ageType : undefined,
+          gender: gender || undefined,
+        }),
+      );
     }
-
-    setIsSorted(true);
   };
 
   const handleUpgrade = () => router.push(paymentPage);
+
   const quickActionButtonClass =
-    "best-board-card-soft rounded-lg h-16 w-full border border-[var(--best-board-border)] px-4 text-white shadow-none transition hover:-translate-y-0.5 hover:bg-[var(--best-board-surface)] flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight";
+    "best-board-card-soft h-16 w-full rounded-xl border border-[var(--best-board-border)] px-4 text-[var(--best-board-text)] shadow-none transition hover:-translate-y-0.5 hover:bg-[var(--best-board-surface)] flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight";
+  const quickActionActiveButtonClass =
+    "h-16 w-full rounded-xl border border-emerald-500/45 bg-emerald-500/12 px-4 text-[var(--best-board-text)] shadow-none transition hover:-translate-y-0.5 hover:bg-emerald-500/18 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight";
   const quickActionDangerButtonClass =
-    "rounded-lg h-16 w-full border border-[color:color-mix(in_srgb,var(--best-board-danger)_35%,transparent)] bg-[color:color-mix(in_srgb,var(--best-board-danger)_16%,transparent)] px-4 text-white shadow-none transition hover:-translate-y-0.5 hover:bg-[color:color-mix(in_srgb,var(--best-board-danger)_24%,transparent)] flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight";
+    "h-16 w-full rounded-xl border border-[color:color-mix(in_srgb,var(--best-board-danger)_35%,transparent)] bg-[color:color-mix(in_srgb,var(--best-board-danger)_14%,transparent)] px-4 text-[var(--best-board-text)] shadow-none transition hover:-translate-y-0.5 hover:bg-[color:color-mix(in_srgb,var(--best-board-danger)_22%,transparent)] flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight";
+  const themedDialogContentClass =
+    "best-board-card border-[var(--best-board-border)] text-[var(--best-board-text)] sm:max-w-2xl";
+  const themedUploadDialogClass =
+    "best-board-card border-[var(--best-board-border)] text-[var(--best-board-text)] sm:max-w-xl";
+  const themedAlertDialogClass =
+    "best-board-card border-[var(--best-board-border)] text-[var(--best-board-text)]";
 
   return (
     <>
       <QuickActionsCard title="Quick Actions">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {/* MINI LEAGUE BUTTONS */}
           {isMiniLeague && (
             <>
               <Button
@@ -373,7 +465,6 @@ const AdminButton = () => {
             </>
           )}
 
-          {/* SKILL LADDER RESET */}
           {(isSkill || isPositive || isNegative) && (
             <Button
               onClick={() => {
@@ -416,13 +507,10 @@ const AdminButton = () => {
               </Button>
             </DialogTrigger>
 
-            <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className={`${themedDialogContentClass} max-h-[90vh] overflow-y-auto`}>
               <DialogHeader>
-                <DialogTitle className="sr-only">
-                  Manage Players
-                </DialogTitle>
+                <DialogTitle className="sr-only">Manage Players</DialogTitle>
               </DialogHeader>
-
               <AddRemoveBox
                 ladderId={ladderId}
                 onSuccessRefresh={refreshLeaderboard}
@@ -430,16 +518,13 @@ const AdminButton = () => {
             </DialogContent>
           </Dialog>
 
-          {/* SKILL SPECIFIC BUTTONS */}
           {(isSkill || isPositive || isNegative) && (
-            <>
-              <Button
-                onClick={handleSortBySkill}
-                className={quickActionButtonClass}
-              >
-                <Funnel size={20} /> {isSorted ? "SORTED" : "SORT"}
-              </Button>
-            </>
+            <Button
+              onClick={handleSortBySkill}
+              className={isSorted ? quickActionActiveButtonClass : quickActionButtonClass}
+            >
+              <Funnel size={20} /> {isSorted ? "SORTED" : "SORT"}
+            </Button>
           )}
 
           {(isSorted || witnessBy === 1 || hasFiltersApplied()) && !isMiniLeague && (
@@ -451,7 +536,6 @@ const AdminButton = () => {
             </Button>
           )}
 
-          {/* AGE FILTER BUTTON */}
           {!isMiniLeague && (
             <div className="h-16 w-full">
               <AgeFilter
@@ -462,6 +546,43 @@ const AdminButton = () => {
               />
             </div>
           )}
+
+          <Dialog
+            open={openSkillShortDialog}
+            onOpenChange={setOpenSkillShortDialog}
+          >
+            <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+              <BasicLeaderboardShort
+                ladderId={ladderId}
+                onClose={() => {
+                  setOpenSkillShortDialog(false);
+                  setIsSorted(false);
+                }}
+                onSkillsUpdated={(skillNo) => {
+                  setCurrentSkillNo(skillNo);
+                  const clearedFilter = { age: 0, ageType: "", gender: "" };
+                  if (isSkill) {
+                    dispatch(setSkillAgeFilter(clearedFilter));
+                  } else if (isPositive) {
+                    dispatch(setPositiveAgeFilter(clearedFilter));
+                  } else if (isNegative) {
+                    dispatch(setNegativeAgeFilter(clearedFilter));
+                  } else {
+                    dispatch(setAgeFilter(clearedFilter));
+                    setLocalAge(0);
+                    setLocalAgeType("");
+                    setLocalGender("");
+                  }
+                  setAgeFilterResetSignal((prev) => prev + 1);
+                  setWitnessBy(0);
+                  refreshSkillLeaderboard(skillNo, 0);
+                  setIsSorted(true);
+                  setOpenSkillShortDialog(false);
+                  toast.success(`Sorted by Skill ${skillNo}!`);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
 
           <Dialog open={openSkillDialog} onOpenChange={setOpenSkillDialog}>
             <DialogTrigger asChild>
@@ -506,90 +627,41 @@ const AdminButton = () => {
 
                 refreshSkillLeaderboard(0, newWitnessBy);
               }}
-              className={
-                witnessBy === 1
-                  ? "rounded-lg h-16 w-full border border-emerald-300/50 bg-emerald-500/25 px-4 text-white shadow-none transition hover:-translate-y-0.5 hover:bg-emerald-500/35 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight"
-                  : quickActionButtonClass
-              }
+              className={witnessBy === 1 ? quickActionActiveButtonClass : quickActionButtonClass}
             >
               {witnessBy === 1 ? "WITNESSED" : "WITNESSED ONLY"}
             </Button>
           )}
+
+          {/* {!isRoster && (
+            <Button
+              onClick={handleUpgrade}
+              className="bg-[#6766CC] bg-[length:200%_100%] animate-gradient-x
+              border border-gray-400 text-white font-bold uppercase
+              rounded-xl py-8 px-24 w-full shadow-lg
+              flex flex-col items-center justify-center gap-1
+              text-xs text-center leading-snug"
+            >
+              <CreditCard size={20} />
+              <span>PURCHASE</span>
+              <span className="text-[8px] normal-case font-semibold text-white/80">
+                Ignore if Club has a Licence
+              </span>
+            </Button>
+          )} */}
         </div>
       </QuickActionsCard>
 
-
-        {/* SINGLE DIALOG */}
-        <Dialog
-          open={openSkillShortDialog}
-          onOpenChange={setOpenSkillShortDialog}
-        >
-          <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
-            <BasicLeaderboardShort
-              ladderId={ladderId}
-              onClose={() => {
-                setOpenSkillShortDialog(false);
-                setIsSorted(false);
-              }}
-              onSkillsUpdated={(skillNo) => {
-                setCurrentSkillNo(skillNo);
-
-                const clearedFilter = { age: 0, ageType: "", gender: "" };
-                if (isSkill) {
-                  dispatch(setSkillAgeFilter(clearedFilter));
-                } else if (isPositive) {
-                  dispatch(setPositiveAgeFilter(clearedFilter));
-                } else if (isNegative) {
-                  dispatch(setNegativeAgeFilter(clearedFilter));
-                } else {
-                  dispatch(setAgeFilter(clearedFilter));
-                  setLocalAge(0);
-                  setLocalAgeType("");
-                  setLocalGender("");
-                }
-                setAgeFilterResetSignal((prev) => prev + 1);
-                setWitnessBy(0);
-
-                refreshSkillLeaderboard(skillNo, 0);
-                setIsSorted(true);
-                setOpenSkillShortDialog(false);
-                toast.success(`Sorted by Skill ${skillNo}!`);
-              }}
-            />
-          </DialogContent>
-        </Dialog>
-
-        {/* {!isRoster && (
-          <Button
-            onClick={handleUpgrade}
-            className="bg-[#6766CC] bg-[length:200%_100%] animate-gradient-x 
-            border border-gray-400 text-white font-bold uppercase 
-            rounded-xl py-8 px-24 w-full shadow-lg 
-            flex flex-col items-center justify-center gap-1 
-            text-xs text-center leading-snug"
-          >
-            <CreditCard size={20} />
-
-            <span>PURCHASE</span>
-
-            <span className="text-[8px] normal-case font-semibold text-white/80">
-              Ignore if Club has a Licence
-            </span>
-          </Button>
-        )} */}
-
-      {/* CONFIRM DIALOG */}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className={themedAlertDialogClass}>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-600">
+            <AlertDialogTitle className="text-[var(--best-board-danger)]">
               Do you want to reset ?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-800">
+            <AlertDialogDescription className="text-[var(--best-board-muted)]">
               {confirmType === "zero" &&
                 "This will reset ALL scores to ZERO. This action cannot be undone!"}
-              {confirmType === "update" &&
-                "This will move two up and two down."}
+              {confirmType === "update" && "This will move two up and two down."}
               {confirmType === "reset" &&
                 "This will completely DELETE the entire leaderboard. All data will be lost !"}
               {confirmType === "reset_skill" &&
@@ -597,12 +669,12 @@ const AdminButton = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="hover:bg-red-400 transition-colors">
+            <AlertDialogCancel className="border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] text-[var(--best-board-text)] transition-colors hover:bg-[var(--best-board-surface)]">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmAction}
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+              className="border-0 bg-[var(--background-image-gradient-brand)] text-white"
             >
               {resetLoading ? "Processing..." : "Confirm"}
             </AlertDialogAction>
@@ -610,9 +682,8 @@ const AdminButton = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* UPLOAD CSV */}
       <Dialog open={openUploadDialog} onOpenChange={setOpenUploadDialog}>
-        <DialogContent className="bg-gray-400 rounded-lg border border-[#313546] sm:max-w-xl">
+        <DialogContent className={themedUploadDialogClass}>
           <UploadPlayerLists
             ladderId={ladderId}
             onSuccessClose={() => {

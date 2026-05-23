@@ -14,18 +14,18 @@ export default function BespokeFooter() {
   };
 
   return (
-    <footer className="w-full bg-[#030712] text-white p-6 sm:p-10 border-t border-white/5">
+    <footer className="w-full border-t border-border bg-background p-6 text-foreground sm:p-10">
       <div className="max-w-8xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-6">
         
         {/* CARD 1: SSP AI ASSISTANT */}
         <div 
           onClick={handleBotClick}
-          className="relative overflow-hidden rounded-2xl border border-purple-950 bg-[#070913] p-3 shadow-2xl flex flex-col lg:flex-row justify-between items-center gap-6 cursor-pointer hover:border-purple-800 transition-all duration-300"
+          className="relative flex cursor-pointer flex-col items-center justify-between gap-6 overflow-hidden rounded-2xl border border-border bg-card p-3 text-foreground shadow-2xl transition-all duration-300 hover:border-primary/40 lg:flex-row"
         >
           <div className="flex items-start gap-4 flex-1">
             {/* Robot 3D Avatar */}
             <div className="relative flex-shrink-0">
-              <div className="w-16 h-16 rounded-full bg-[#0F172A] border border-purple-500/30 flex items-center justify-center overflow-hidden shadow-lg">
+              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-primary/20 bg-[color:color-mix(in_srgb,var(--card),var(--primary)_8%)] shadow-lg">
                 <svg className="w-12 h-12 text-slate-200" viewBox="0 0 64 64" fill="none">
                   <rect x="16" y="20" width="32" height="28" rx="8" fill="url(#botHeadGrad)" stroke="#A78BFA" strokeWidth="1.5" />
                   <path d="M32 20V10" stroke="#C084FC" strokeWidth="2" strokeLinecap="round" />
@@ -51,13 +51,13 @@ export default function BespokeFooter() {
             
             {/* Description Text */}
             <div className="space-y-1">
-              <h3 className="text-lg font-bold tracking-wide text-[#A855F7]">
+              <h3 className="text-lg font-bold tracking-wide text-primary">
                 SSP AI ASSISTANT
               </h3>
-              <p className="text-sm font-medium text-slate-200">
+              <p className="text-sm font-medium text-foreground">
                 Your intelligent assistant available anytime.
               </p>
-              <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
+              <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
                 Get help with setup, competitions, members, tokens, rewards and more.
               </p>
             </div>
@@ -67,48 +67,48 @@ export default function BespokeFooter() {
           <div className="flex items-center gap-1 sm:gap-2.5 justify-center p-2 rounded-2xl w-full lg:w-auto">
             {/* Step 1 */}
             <div className="flex flex-col items-center text-center w-[72px]">
-              <div className="w-10 h-10 rounded-full border border-purple-500/50 flex items-center justify-center text-purple-400 bg-transparent">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </div>
-              <span className="text-[9px] text-slate-400 mt-2 leading-tight">Ask a question</span>
+              <span className="mt-2 text-[9px] leading-tight text-muted-foreground">Ask a question</span>
             </div>
             
             <div className="text-purple-900/60 font-bold hidden sm:block">→</div>
             
             {/* Step 2 */}
             <div className="flex flex-col items-center text-center w-[72px]">
-              <div className="w-10 h-10 rounded-full border border-cyan-500/50 flex items-center justify-center text-cyan-400 bg-transparent">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-cyan-500/40 bg-cyan-500/10 text-cyan-500">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <span className="text-[9px] text-slate-400 mt-2 leading-tight">Get instant answers</span>
+              <span className="mt-2 text-[9px] leading-tight text-muted-foreground">Get instant answers</span>
             </div>
             
             <div className="text-purple-900/60 font-bold hidden sm:block">→</div>
             
             {/* Step 3 */}
             <div className="flex flex-col items-center text-center w-[72px]">
-              <div className="w-10 h-10 rounded-full border border-green-500/30 flex items-center justify-center text-green-400 bg-transparent">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-500/35 bg-emerald-500/10 text-emerald-500">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <span className="text-[9px] text-slate-400 mt-2 leading-tight">Step-by-step guidance</span>
+              <span className="mt-2 text-[9px] leading-tight text-muted-foreground">Step-by-step guidance</span>
             </div>
             
             <div className="text-purple-900/60 font-bold hidden sm:block">→</div>
             
             {/* Step 4 */}
             <div className="flex flex-col items-center text-center w-[72px]">
-              <div className="w-10 h-10 rounded-full border border-green-500 flex items-center justify-center text-green-400 bg-transparent">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-500 bg-emerald-500/10 text-emerald-500">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <span className="text-[9px] text-slate-400 mt-2 leading-tight">Get things done faster</span>
+              <span className="mt-2 text-[9px] leading-tight text-muted-foreground">Get things done faster</span>
             </div>
           </div>
         </div>
@@ -116,7 +116,7 @@ export default function BespokeFooter() {
         {/* CARD 2: WHATSAPP CONTACT */}
         <div 
           onClick={handleWhatsAppClick}
-          className="relative overflow-hidden rounded-2xl border border-emerald-950 bg-[#04090c] p-6 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-6 cursor-pointer hover:border-emerald-800 transition-all duration-300 group"
+          className="group relative flex cursor-pointer flex-col items-center justify-between gap-6 overflow-hidden rounded-2xl border border-border bg-card p-6 text-foreground shadow-2xl transition-all duration-300 hover:border-emerald-500/40 md:flex-row"
         >
           {/* Left section: WhatsApp icon, main text, and Graham info */}
           <div className="flex flex-col gap-8 h-full flex-1 w-full text-left">
@@ -128,13 +128,13 @@ export default function BespokeFooter() {
                   <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.58 1.98 14.106.953 11.993.953c-5.456 0-9.88 4.371-9.884 9.8.002 2.11.575 4.166 1.662 5.957l-1.01 3.693 3.797-.977zM17.13 14.54c-.282-.14-.1.665-.83.665h-.02c-.37-.02-.8-.2-1.34-.43-.72-.31-1.44-.81-1.95-1.32-.45-.45-.88-.99-1.2-1.58-.29-.53-.41-.95-.41-1.33 0-.61.35-.93.53-1.12.1-.11.23-.26.31-.38.09-.13.15-.22.23-.38.08-.16.04-.3-.02-.44-.06-.14-.52-1.26-.72-1.74-.19-.46-.39-.4-.53-.41h-.45c-.15 0-.4.06-.61.28-.21.22-.8.78-.8 1.9s.82 2.2 1.05 2.5c.23.3 2.14 3.27 5.18 4.58.72.31 1.28.5 1.72.64.73.23 1.4.2 1.93.12.59-.09 1.8-.74 2.05-1.45.26-.71.26-1.32.18-1.45-.07-.13-.27-.21-.55-.35z" />
                 </svg>
               </div>
-              <span className="text-xs tracking-wider text-[#22C55E] font-bold">
+              <span className="text-xs font-bold tracking-wider text-emerald-500">
                 WHATSAPP CONTACT
               </span>
             </div>
             <div className="flex justify-between">
             {/* Connect with the Creator text */}
-            <h4 className="text-2xl font-bold text-white mt-4 mb-5 leading-snug">
+            <h4 className="mt-4 mb-5 text-2xl font-bold leading-snug text-foreground">
               Connect with <br /> 
               the <br /> 
               Creator
@@ -142,7 +142,7 @@ export default function BespokeFooter() {
             
             {/* Graham Jaggers Profile details */}
             <div className="flex flex-col items-center w-24">
-              <div className="relative w-24 h-24 rounded-full overflow-hidden border border-emerald-500/20 bg-slate-900">
+              <div className="relative h-24 w-24 overflow-hidden rounded-full border border-emerald-500/20 bg-[color:color-mix(in_srgb,var(--card),black_8%)]">
                 <Image 
                   src="/graham_jaggers.png" 
                   alt="Graham Jaggers" 
@@ -150,7 +150,7 @@ export default function BespokeFooter() {
                   className="object-cover"
                 />
               </div>
-              <p className="text-[11px] text-slate-300 text-center mt-2 font-medium whitespace-nowrap">
+              <p className="mt-2 text-center text-[11px] font-medium whitespace-nowrap text-muted-foreground">
                 Graham Jaggers
               </p>
             </div>
