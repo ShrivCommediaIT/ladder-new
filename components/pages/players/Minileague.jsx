@@ -13,7 +13,6 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchUserProfile } from "@/redux/slices/profileSlice";
 import PlayerSearch from "../users/PlayerSearch";
-import LadderLinkPanel from "./LadderLinkPanel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
 import { paymentPage } from "@/helper/RouteName";
@@ -224,9 +223,6 @@ const Minileague = () => {
 
       {/* Search */}
       <div className="flex flex-col gap-3 md:flex-row md:justify-between">
-        {user?.user_type?.toLowerCase() === "admin" && ladderId && (
-          <LadderLinkPanel ladderId={ladderId} />
-        )}
         <div className="w-full">
           <PlayerSearch
             searchTerm={searchQuery}

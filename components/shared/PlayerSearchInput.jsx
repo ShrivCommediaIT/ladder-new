@@ -16,7 +16,6 @@ import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { fetchUserProfile } from "@/redux/slices/profileSlice";
 import PlayerSearchInput from "./PlayerSearchInput";
-// import LadderLinkPanel from "./LadderLinkPanel";
 import { useSearchParams } from "next/navigation";
 
 const PlayerInfo = () => {
@@ -94,7 +93,6 @@ const PlayerInfo = () => {
       {playerList.length > 0 && (
         <div className="w-full">
           <div className="flex">
-            {user?.user_type === "admin" && <LadderLinkPanel />}
             <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           </div>
         </div>

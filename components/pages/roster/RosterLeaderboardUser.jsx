@@ -10,7 +10,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import Logo from "@/public/logo1.png";
-import LadderLinkPanel from "../players/LadderLinkPanel";
 import PlayerStatusToggle from "../../shared/PlayerStatusToggle";
 import { EditPlayer } from "../../shared/EditPlayer";
 
@@ -201,10 +200,6 @@ const RosterLeaderboard = () => {
   return (
     <div className="space-y-5">
       <ToastContainer />
-
-      <div>
-        <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />
-      </div>
 
       {/* Search */}
       <input

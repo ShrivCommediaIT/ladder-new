@@ -94,7 +94,7 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
                 : "best-board-card-soft border border-[var(--best-board-border)] text-[var(--best-board-text)] hover:bg-[var(--best-board-surface)]"
           } flex h-full w-full flex-col items-center justify-center gap-1 rounded-xl px-4 py-3 text-[10px] font-bold uppercase leading-tight shadow-none transition-all active:scale-95`}
         >
-          {isActive ? "AGE/GENDER" : "AGE/GENDER FILTER"}
+          {isActive ? "AGE/GENDER" : "AGE/GENDER"}
         </Button>
       </DialogTrigger>
       <DialogContent className="best-board-card flex max-w-sm flex-col items-center rounded-xl border border-[var(--best-board-border)] p-6 text-[var(--best-board-text)]">

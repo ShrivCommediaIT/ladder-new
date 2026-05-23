@@ -8,7 +8,6 @@ import { Card } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
 import { BasicLeaderboardEdit } from "./BasicLeaderboardEdit";
-import LadderLinkPanel from "./LadderLinkPanel";
 import { fetchSkillLeaderboard, setAgeFilter as setSkillAgeFilter } from "@/redux/slices/BasicLeaderboardSlice";
 import PlayerSearchInput from "./PlayerSearchInput";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -20,8 +19,9 @@ import { getRequest } from "@/services/apiService";
 import { ArrowDownUp, Eye, Funnel, Plus, RotateCcw, Zap, XCircle } from "lucide-react";
 import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
 import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
+import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
 import AgeFilter from "@/components/shared/AgeFilter";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 
 
@@ -48,7 +48,7 @@ const PlayerCard = ({
       skillObj?.witness_by ||
       "";
     const score = scoreObj ? Number(scoreObj.best_score) : 0; // 🔒 internal logic
-    const bestScore = scoreObj ? Number(scoreObj.best_score) : 0; 
+    const bestScore = scoreObj ? Number(scoreObj.best_score) : 0;
     const inputScore =
       scoreObj?.input_score !== null && scoreObj?.input_score !== undefined
         ? Number(scoreObj.input_score)
@@ -139,10 +139,10 @@ const PlayerCard = ({
                 </p>
               )}
               {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender == "male" ?"M":"F"}
-                  </p>
-                )}
+                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
+                  {player.gender == "male" ? "M" : "F"}
+                </p>
+              )}
             </div>
             <div className="text-[#d4e5e8] text-xs truncate">
               {player?.phone || "N/A"}
@@ -267,7 +267,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const { appliedAge,ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge, ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
   const showAgeRank = Number(appliedAge) > 0;
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [mobileSection, setMobileSection] = useState("players");
@@ -298,13 +298,29 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, []);
 
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedSkillFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
+    (skillNo = selectedSkillFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, witness = localWitnessBy) => {
       if (ladderId) {
         setIsRefreshing(true);
         const params = {
           ladder_id: ladderId,
           type: "skill",
         };
+        if (skillNo && skillNo !== 0) {
+          params.sortbyskillnumber = skillNo;
+        }
+
+        if (witness === 1) {
+          params.witness_by = 1;
+        } else {
+          if (age && age > 0) {
+            params.dob = age;
+            if (ageType) params.age_type = ageType;
+          }
+          if (gender) {
+            params.gender = gender;
+          }
+        }
+
         Promise.all([
           dispatch(fetchSkillLeaderboard(params)),
           dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })),
@@ -313,7 +329,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         });
       }
     },
-    [dispatch, ladderId, selectedSkillFilter, appliedAge, appliedAgeType, appliedGender],
+    [dispatch, ladderId, selectedSkillFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy],
   );
 
 
@@ -411,7 +427,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = age ? Number(age) : "";
     dispatch(setSkillAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(selectedSkillFilter, ageNum, ageType, gender);
+    refreshLeaderboard(selectedSkillFilter, ageNum, ageType, gender, 0);
   };
 
   const handleClearAll = () => {
@@ -419,13 +435,12 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     setLocalWitnessBy(0);
     dispatch(setSkillAgeFilter({ age: 0, ageType: "", gender: "" }));
     setAgeFilterResetSignal((p) => p + 1);
-    refreshLeaderboard(0);
+    refreshLeaderboard(0, 0, "", "", 0);
   };
 
   const quickActions = [
     { id: "reset", label: "Reset", icon: RotateCcw, onClick: () => setResetOpen(true) },
     { id: "add-remove", label: "Add / Remove", icon: Plus, onClick: () => setAddRemoveOpen(true) },
-    { id: "sort", label: "Sort", icon: ArrowDownUp, onClick: () => setSortOpen(true) },
     { id: "skill-sort", label: isSorted ? "Sorted" : "Skill Sort", icon: Funnel, onClick: () => setOpenSkillSortDialog(true) },
     { id: "setup", label: "Setup", icon: Zap, onClick: () => setOpenSkillSetupDialog(true) },
     {
@@ -440,8 +455,10 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           dispatch(setSkillAgeFilter({ age: 0, ageType: "", gender: "" }));
           setAgeFilterResetSignal((p) => p + 1);
           setIsSorted(false);
+          refreshLeaderboard(0, 0, "", "", 1);
+        } else {
+          refreshLeaderboard(0, appliedAge, appliedAgeType, appliedGender, 0);
         }
-        refreshLeaderboard(0);
       },
     },
     { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters} /> },
@@ -475,7 +492,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
             sortOpen={sortOpen}
             setSortOpen={setSortOpen}
             filterOpen={false}
-            setFilterOpen={() => {}}
+            setFilterOpen={() => { }}
             appliedAge={0}
             appliedGender=""
             groupSize={1}
@@ -493,7 +510,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
             setResetOpen={setResetOpen}
             setAddRemoveOpen={setAddRemoveOpen}
             setSortOpen={setSortOpen}
-            setFilterOpen={() => {}}
+            setFilterOpen={() => { }}
             activityItems={activityItems}
             handleDeleteActivity={handleDeleteActivity}
             contactOpen={contactOpen}
@@ -508,7 +525,6 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           <div className="flex flex-col gap-2">
             <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           </div>
-          <LadderLinkPanel ladderId={ladderId} ladderType="skill" />
           {(loading || isRefreshing) && (
             <p className="text-center text-xs opacity-70 text-[var(--best-board-muted)]">Updating list...</p>
           )}
@@ -566,9 +582,25 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
               dispatch(setSkillAgeFilter({ age: 0, ageType: "", gender: "" }));
               setAgeFilterResetSignal((p) => p + 1);
               setLocalWitnessBy(0);
-              refreshLeaderboard(skillNo);
+              refreshLeaderboard(skillNo, 0, "", "", 0);
               setIsSorted(true);
               setOpenSkillSortDialog(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Add / Remove Dialog */}
+      <Dialog open={addRemoveOpen} onOpenChange={setAddRemoveOpen}>
+        <DialogContent className="best-board-card border-[var(--best-board-border)] text-white sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add / Remove Players</DialogTitle>
+          </DialogHeader>
+          <AddRemoveBox
+            ladderId={ladderId}
+            onSuccessRefresh={() => {
+              setAddRemoveOpen(false);
+              refreshLeaderboard();
             }}
           />
         </DialogContent>

@@ -15,6 +15,7 @@ import { fetchUserActivity } from "@/redux/slices/activitySlice";
 import { getRequest, postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { EditPlayer } from "./EditPlayer";
+import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
 import {
   Dialog,
   DialogContent,
@@ -25,135 +26,16 @@ import ControlsSection from "../../shared/ControlsSection";
 import BestOfPlayerListSection from "./bestof/BestOfPlayerListSection";
 import InfoSection from "../../shared/InfoSection";
 import LadderPageLayout from "../../shared/LadderPageLayout";
-import { ArrowDownUp, Filter, Plus, RotateCcw } from "lucide-react";
+import PlayerSearchInput from "./PlayerSearchInput";
+import { ArrowDownUp, Plus, RotateCcw, XCircle } from "lucide-react";
+import AgeFilter from "@/components/shared/AgeFilter";
+
 
 const MOBILE_SECTIONS = [
   { id: "toolbar", label: "Tools" },
   { id: "players", label: "Players" },
   { id: "info", label: "Info" },
 ];
-
-const FilterDialog = ({
-  open,
-  onOpenChange,
-  defaultAge,
-  defaultAgeType,
-  defaultGender,
-  onApply,
-  onClear,
-}) => {
-  const [age, setAge] = useState(defaultAge ? String(defaultAge) : "");
-  const [ageType, setAgeType] = useState(defaultAgeType || "");
-  const [gender, setGender] = useState(defaultGender || "");
-
-  useEffect(() => {
-    if (open) {
-      setAge(defaultAge ? String(defaultAge) : "");
-      setAgeType(defaultAgeType || "");
-      setGender(defaultGender || "");
-    }
-  }, [defaultAge, defaultAgeType, defaultGender, open]);
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="best-board-card border-[var(--best-board-border)] text-[var(--best-board-text)] sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Age / Gender Filter</DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-5">
-          <div>
-            <p className="mb-3 text-sm font-semibold">Gender</p>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "Male", value: "male" },
-                { label: "Female", value: "female" },
-              ].map((item) => (
-                <button
-                  key={item.value}
-                  type="button"
-                  onClick={() => setGender((current) => (current === item.value ? "" : item.value))}
-                  className={`rounded-lg border px-4 py-2 text-sm ${gender === item.value
-                    ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)]"
-                    : "border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
-                    }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <p className="mb-3 text-sm font-semibold">Age Type</p>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "Under", value: "under" },
-                { label: "Over", value: "over" },
-              ].map((item) => (
-                <button
-                  key={item.value}
-                  type="button"
-                  onClick={() => setAgeType((current) => (current === item.value ? "" : item.value))}
-                  className={`rounded-lg border px-4 py-2 text-sm ${ageType === item.value
-                    ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)]"
-                    : "border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
-                    }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-semibold">Age</label>
-            <input
-              value={age}
-              onChange={(e) => setAge(e.target.value.replace(/\D/g, "").slice(0, 2))}
-              placeholder="Enter age"
-              className="w-full rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] px-3 py-2 text-sm outline-none"
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setAge("");
-                setAgeType("");
-                setGender("");
-                onClear();
-                onOpenChange(false);
-              }}
-              className="flex-1 rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] px-4 py-2 text-sm font-medium"
-            >
-              Clear
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (age && !ageType) {
-                  toast.error("Select age type first.");
-                  return;
-                }
-                if (!age && !gender) {
-                  toast.error("Choose at least one filter.");
-                  return;
-                }
-                onApply(age ? Number(age) : 0, ageType, gender);
-                onOpenChange(false);
-              }}
-              className="flex-1 rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-4 py-2 text-sm font-medium"
-            >
-              Apply
-            </button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
 
 const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange }) => {
   const dispatch = useDispatch();
@@ -191,7 +73,8 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
   const [isOpen, setIsOpen] = useState(false);
   const [modalTab, setModalTab] = useState("result");
   const [mobileSection, setMobileSection] = useState("players");
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
+  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
   const [resetOpen, setResetOpen] = useState(false);
   const [addRemoveOpen, setAddRemoveOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
@@ -264,13 +147,14 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
   }, [ladderId, numericLadderId, players, refreshLeaderboard]);
 
   const filteredPlayers = useMemo(() => {
-    const cleanedSearch = effectiveSearch.toLowerCase().trim();
+    const cleanedSearch = effectiveSearch;
     let nextPlayers = playerList;
 
     if (cleanedSearch) {
-      nextPlayers = playerList.filter((player) =>
-        player?.name?.toLowerCase().includes(cleanedSearch),
-      );
+      nextPlayers = playerList.filter((player) => {
+        const cleanName = (player?.name || "").replace(/\s+/g, "").toLowerCase();
+        return cleanName.includes(cleanedSearch);
+      });
     }
 
     const uniquePlayers = Array.from(new Map(nextPlayers.map((player) => [player.id, player])).values());
@@ -381,15 +265,11 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
     }
   };
 
-  const handleApplyFilter = (age, ageType, gender) => {
-    dispatch(setAgeFilter({ age, ageType, gender }));
-    refreshLeaderboard(age, ageType, gender);
-  };
-
-  const handleClearFilter = () => {
-    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
-    refreshLeaderboard(0, "", "");
-  };
+  const handleAgeSearch = useCallback((age, ageType, gender) => {
+    const ageNum = age ? Number(age) : 0;
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+    refreshLeaderboard(ageNum, ageType, gender);
+  }, [dispatch, refreshLeaderboard]);
 
   const handleDeleteActivity = async (id) => {
     try {
@@ -410,7 +290,6 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
     const isMiniLeague = ladderType === "minileague";
     const isSkillBoard = ["skill", "positive", "negative"].includes(ladderType);
     const isRoster = ladderType === "roster";
-    const isBestOfBoard = ["best5", "best3", "winlose", "bestof5", "bestof3"].includes(ladderType);
 
     return [
       {
@@ -427,22 +306,30 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
         onClick: () => setAddRemoveOpen(true),
       },
       {
-        id: "sort",
-        label: isSkillBoard ? "Skill Sort" : "Sort",
-        icon: ArrowDownUp,
-        onClick: () => setSortOpen(true),
-        hidden: isMiniLeague || isRoster,
+        id: "age-filter",
+        node: (
+          <AgeFilter
+            onSearch={handleAgeSearch}
+            user={false}
+            resetSignal={ageFilterResetSignal}
+            isActive={hasFilters}
+          />
+        ),
       },
       {
-        id: "filter",
-        label: "Filter",
-        icon: Filter,
-        onClick: () => setFilterOpen(true),
-        hidden: isMiniLeague || (!isBestOfBoard && !isSkillBoard && !isRoster),
-        tone: appliedAge || appliedGender ? "accent" : "default",
+        id: "clear",
+        label: "Clear All",
+        icon: XCircle,
+        tone: "danger",
+        onClick: () => {
+          dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+          setAgeFilterResetSignal((p) => p + 1);
+          refreshLeaderboard(0, "", "");
+        },
+        hidden: !hasFilters,
       },
     ];
-  }, [appliedAge, appliedGender, ladderType]);
+  }, [appliedAge, appliedGender, ladderType, ageFilterResetSignal, hasFilters, handleAgeSearch, refreshLeaderboard, dispatch]);
 
   return (
     <LadderPageLayout
@@ -462,12 +349,13 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
           setSortMode={setSortMode}
           sortOpen={sortOpen}
           setSortOpen={setSortOpen}
-          filterOpen={filterOpen}
-          setFilterOpen={setFilterOpen}
-          appliedAge={appliedAge}
-          appliedGender={appliedGender}
+          filterOpen={false}
+          setFilterOpen={() => { }}
+          appliedAge={0}
+          appliedGender=""
           groupSize={groupSize}
           onPresetChange={handlePresetChange}
+          showFilter={false}
         />
       }
       sidebar={
@@ -480,7 +368,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
           setResetOpen={setResetOpen}
           setAddRemoveOpen={setAddRemoveOpen}
           setSortOpen={setSortOpen}
-          setFilterOpen={setFilterOpen}
+          setFilterOpen={() => { }}
           activityItems={activityItems}
           handleDeleteActivity={handleDeleteActivity}
           contactOpen={contactOpen}
@@ -491,33 +379,28 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
       }
     >
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-      <BestOfPlayerListSection
-        mobileSection={mobileSection}
-        loadingPlayers={loadingPlayers}
-        reduxLoading={reduxLoading}
-        grades={grades}
-        refreshKey={refreshKey}
-        editIndex={editIndex}
-        newName={newName}
-        setNewName={setNewName}
-        setEditIndex={setEditIndex}
-        setEditGradebarId={setEditGradebarId}
-        handleUpdateSection={handleUpdateSection}
-        user={user}
-        groupSize={groupSize}
-        onOpenPlayer={openPlayerModal}
-        onChallenge={handleChallenge}
-      />
+      <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0 space-y-4`}>
+        <PlayerSearchInput value={effectiveSearch} onChange={setEffectiveSearch} />
+        <BestOfPlayerListSection
+          mobileSection={mobileSection}
+          loadingPlayers={loadingPlayers}
+          reduxLoading={reduxLoading}
+          grades={grades}
+          refreshKey={refreshKey}
+          editIndex={editIndex}
+          newName={newName}
+          setNewName={setNewName}
+          setEditIndex={setEditIndex}
+          setEditGradebarId={setEditGradebarId}
+          handleUpdateSection={handleUpdateSection}
+          user={user}
+          groupSize={groupSize}
+          onOpenPlayer={openPlayerModal}
+          onChallenge={handleChallenge}
+        />
+      </div>
 
-      <FilterDialog
-        open={filterOpen}
-        onOpenChange={setFilterOpen}
-        defaultAge={appliedAge}
-        defaultAgeType={appliedAgeType}
-        defaultGender={appliedGender}
-        onApply={handleApplyFilter}
-        onClear={handleClearFilter}
-      />
+
 
       {selectedPlayer ? (
         <EditPlayer
@@ -527,6 +410,22 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
           initialTab={modalTab}
         />
       ) : null}
+
+      {/* Add / Remove Dialog */}
+      <Dialog open={addRemoveOpen} onOpenChange={setAddRemoveOpen}>
+        <DialogContent className="best-board-card border-[var(--best-board-border)] text-white sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add / Remove Players</DialogTitle>
+          </DialogHeader>
+          <AddRemoveBox
+            ladderId={ladderId}
+            onSuccessRefresh={() => {
+              setAddRemoveOpen(false);
+              refreshLeaderboard();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </LadderPageLayout>
   );
 };

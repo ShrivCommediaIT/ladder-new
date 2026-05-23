@@ -23,10 +23,35 @@ const LadderLink = () => {
     }
   }, [user]);
 
-  const handleCopy = () => {
-    if (registerUrl) {
-      navigator.clipboard.writeText(registerUrl);
-      setCopied(true);
+  const handleCopy = async () => {
+    if (!registerUrl) return;
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(registerUrl);
+        setCopied(true);
+      } else {
+        // Fallback for non-secure contexts
+        const textarea = document.createElement("textarea");
+        textarea.value = registerUrl;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          const successful = document.execCommand("copy");
+          if (successful) {
+            setCopied(true);
+          } else {
+            console.error("Fallback copy failed");
+          }
+        } catch (err) {
+          console.error("Fallback copy failed", err);
+        }
+        document.body.removeChild(textarea);
+      }
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
     }
   };
 

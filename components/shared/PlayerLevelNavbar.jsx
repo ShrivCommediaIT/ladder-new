@@ -241,20 +241,7 @@ const PlayerLevelNavbar = ({
             )}
 
             <div className="flex items-center gap-2">
-              {isPlayersPage && (
-                <div className="relative hidden sm:block">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    value={searchValue}
-                    onChange={(event) => onSearchChange?.(event.target.value)}
-                    placeholder="Search player..."
-                    className="h-8 w-[220px] rounded-lg border border-white/10 bg-white/5 pl-9 pr-3 text-sm text-white outline-none placeholder:text-slate-400"
-                  />
-                </div>
-              )}
-
-              {showQuickGuide && (
+              
                 <button
                   onClick={() => setQuickGuideOpen(true)}
                   className="hidden sm:flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200"
@@ -267,7 +254,6 @@ const PlayerLevelNavbar = ({
                   <BookOpen className="h-3.5 w-3.5" />
                   Quick Guide
                 </button>
-              )}
 
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

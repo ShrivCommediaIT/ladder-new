@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +20,7 @@ import {
 import AdminEditPhone from "@/components/shared/AdminEditPhone";
 import LadderRulesCard from "@/components/pages/players/LadderRulesCard";
 import QuickActionsCard from "@/components/shared/QuickActionsCard";
+import ActivityLog from "@/components/pages/players/ActivityList";
 import { Copy, X } from "lucide-react";
 import { formatLadderType } from "./ladderUtils";
 
@@ -41,6 +42,66 @@ export default function InfoSection({
   quickActions = [],
   resetDescription = "This will reset the current ladder data.",
 }) {
+  const [copied, setCopied] = useState(false);
+  const [sessionUser, setSessionUser] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedSub = sessionStorage.getItem("subAdmin");
+      const storedAdmin = sessionStorage.getItem("userData");
+      if (storedSub) {
+        try {
+          setSessionUser(JSON.parse(storedSub));
+        } catch (e) {
+          console.error(e);
+        }
+      } else if (storedAdmin) {
+        try {
+          setSessionUser(JSON.parse(storedAdmin));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  }, [contactOpen]);
+
+  const isSubAdmin = sessionUser?.user_type === "sub_admin" || sessionUser?.role === "sub_admin" || (typeof window !== "undefined" && !!sessionStorage.getItem("subAdmin"));
+  const contactTitle = isSubAdmin ? "Sub-Admin Contact" : "Admin Contact";
+  const displayName = sessionUser?.name || user?.name || (isSubAdmin ? "Sub-Admin" : "Admin");
+  const displayPhone = sessionUser?.phone || user?.phone || "N/A";
+
+  const handleCopy = async () => {
+    if (!inviteUrl) return;
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(inviteUrl);
+        setCopied(true);
+      } else {
+        // Fallback for non-secure contexts (HTTP)
+        const textarea = document.createElement("textarea");
+        textarea.value = inviteUrl;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          const successful = document.execCommand("copy");
+          if (successful) {
+            setCopied(true);
+          } else {
+            console.error("Fallback copy command was unsuccessful");
+          }
+        } catch (err) {
+          console.error("Fallback copy failed", err);
+        }
+        document.body.removeChild(textarea);
+      }
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
+
   return (
     <>
       <aside className={`${mobileSection === "info" ? "block" : "hidden"} lg:sticky lg:top-[5.2rem] lg:block lg:self-start`}>
@@ -59,7 +120,7 @@ export default function InfoSection({
 
           <div className="best-board-card rounded-xl p-4">
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Admin Contact</p>
+              <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">{contactTitle}</p>
               <button
                 type="button"
                 onClick={() => setContactOpen(true)}
@@ -72,11 +133,11 @@ export default function InfoSection({
             <div className="space-y-3">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--best-board-muted)]">Name</p>
-                <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)]">{user?.name || "Admin"}</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)]">{displayName}</p>
               </div>
               <div>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--best-board-muted)]">Phone</p>
-                <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)]">{user?.phone || "N/A"}</p>
+                <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)]">{displayPhone}</p>
               </div>
             </div>
           </div>
@@ -88,14 +149,16 @@ export default function InfoSection({
             </div>
             <button
               type="button"
-              onClick={() => {
-                if (!inviteUrl) return;
-                navigator.clipboard.writeText(inviteUrl);
-              }}
-              className="best-board-action-surface mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-lg text-sm font-medium"
+              onClick={handleCopy}
+              disabled={!inviteUrl}
+              className={`best-board-action-surface mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                copied 
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" 
+                  : ""
+              }`}
             >
-              <Copy className="h-4 w-4" />
-              Copy Link
+              <Copy className={`h-4 w-4 transition-transform duration-200 ${copied ? "scale-110" : ""}`} />
+              {copied ? "Copied!" : "Copy Link"}
             </button>
           </div>
 
@@ -110,35 +173,7 @@ export default function InfoSection({
             <LadderRulesCard />
           </div>
 
-          <div className="best-board-card rounded-xl p-4">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Activity Feed</p>
-              <span className="rounded-full border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] best-board-highlight-soft">
-                Live
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {activityItems.length === 0 ? (
-                <p className="text-sm text-[var(--best-board-muted)]">No activity available.</p>
-              ) : (
-                activityItems.slice(0, 5).map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-3 border-b border-white/5 pb-3 last:border-b-0 last:pb-0">
-                    <span
-                      className={`mt-1 block h-2.5 w-2.5 rounded-full ${activity?.progress?.toLowerCase() === "down"
-                        ? "bg-[var(--best-board-danger)]"
-                        : "bg-emerald-400"
-                        }`}
-                    />
-                    <p className="flex-1 text-sm text-[var(--best-board-text)]">{activity.message}</p>
-                    <button type="button" onClick={() => handleDeleteActivity(activity.id)} className="text-[var(--best-board-danger)]">
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+          <ActivityLog />
 
           <div className="best-board-card rounded-xl p-4">
             <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Members & Local Services</p>

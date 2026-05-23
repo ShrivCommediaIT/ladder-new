@@ -24,7 +24,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Funnel, RotateCw, RefreshCw, XCircle, PlusCircle, Zap } from "lucide-react";
+import { Funnel, RotateCw, RefreshCw, XCircle, Plus, Eye, Zap } from "lucide-react";
 
 import { fetchUserActivity, clearActivityState } from "@/redux/slices/activitySlice";
 import { fetchLeaderboard, setAgeFilter } from "@/redux/slices/leaderboardSlice";
@@ -254,156 +254,133 @@ export const PlayerLists = () => {
   const resolvedLadderType = type || ladderType || "ladder";
 
   // The inline QuickActionsCard panel (replaces <AdminButton />)
+  const quickActions = [];
+
+  // Reset/Zero/Update buttons
+  if (isMiniLeague) {
+    quickActions.push({
+      id: "zero",
+      label: zeroLoading ? "Resetting..." : "Zero All",
+      icon: Zap,
+      onClick: () => { setConfirmType("zero"); setConfirmOpen(true); },
+      disabled: zeroLoading,
+    });
+    quickActions.push({
+      id: "update",
+      label: updateLoading ? "Updating..." : "Update",
+      icon: RotateCw,
+      onClick: () => { setConfirmType("update"); setConfirmOpen(true); },
+      disabled: updateLoading,
+    });
+  } else if (isSkill || isPositive || isNegative) {
+    quickActions.push({
+      id: "reset-skill",
+      label: resetLoading ? "Resetting..." : "Reset",
+      icon: XCircle,
+      onClick: () => { setConfirmType("reset_skill"); setConfirmOpen(true); },
+      disabled: resetLoading,
+    });
+  } else {
+    quickActions.push({
+      id: "reset",
+      label: resetLoading ? "Resetting..." : "Reset",
+      icon: RefreshCw,
+      onClick: () => {
+        if (isDemoLadder) {
+          toast.warning("Disabled for Demo Purposes");
+          return;
+        }
+        setConfirmType("reset");
+        setConfirmOpen(true);
+      },
+      disabled: resetLoading,
+    });
+  }
+
+  // Add / Remove Player button
+  quickActions.push({
+    id: "add-remove",
+    label: isRoster ? "Add / Remove" : "Add/Remove/Move",
+    icon: Plus,
+    onClick: () => setOpenAddPlayerDialog(true),
+  });
+
+  // Sort button
+  if (isSkill || isPositive || isNegative) {
+    quickActions.push({
+      id: "sort",
+      label: isSorted ? "Sorted" : "Sort",
+      icon: Funnel,
+      onClick: () => setOpenSkillShortDialog(true),
+    });
+  }
+
+  // Witnessed button
+  if (isSkill || isPositive || isNegative) {
+    quickActions.push({
+      id: "witnessed",
+      label: witnessBy === 1 ? "Witnessed" : "Witnessed Only",
+      icon: Eye,
+      tone: witnessBy === 1 ? "success" : "default",
+      onClick: () => {
+        const newWitnessBy = witnessBy === 1 ? 0 : 1;
+        setWitnessBy(newWitnessBy);
+        if (newWitnessBy === 1) {
+          const cleared = { age: 0, ageType: "", gender: "" };
+          if (isSkill) dispatch(setSkillAgeFilter(cleared));
+          else if (isPositive) dispatch(setPositiveAgeFilter(cleared));
+          else if (isNegative) dispatch(setNegativeAgeFilter(cleared));
+          else { dispatch(setAgeFilter(cleared)); setLocalAge(0); setLocalAgeType(""); setLocalGender(""); }
+          setAgeFilterResetSignal((p) => p + 1);
+          setIsSorted(false);
+          setCurrentSkillNo(0);
+        }
+        refreshSkillLeaderboard(0);
+      },
+    });
+  }
+
+  // Age Filter button
+  if (!isMiniLeague) {
+    quickActions.push({
+      id: "age-filter",
+      node: (
+        <AgeFilter
+          onSearch={handleAgeSearch}
+          user={false}
+          resetSignal={ageFilterResetSignal}
+          isActive={hasFiltersApplied()}
+        />
+      ),
+    });
+  }
+
+  // Setup button
+  if (isSkill || isPositive || isNegative) {
+    quickActions.push({
+      id: "setup",
+      label: "Setup",
+      icon: Zap,
+      onClick: () => setOpenSkillDialog(true),
+    });
+  }
+
+  // Clear All button
+  if ((isSorted || witnessBy === 1 || hasFiltersApplied()) && !isMiniLeague) {
+    quickActions.push({
+      id: "clear",
+      label: "Clear All",
+      icon: XCircle,
+      tone: "danger",
+      onClick: handleClearAll,
+    });
+  }
+
   const AdminPanel = () => (
-    <>
-      <QuickActionsCard title="Quick Actions">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {isMiniLeague && (
-            <>
-              <Button onClick={() => { setConfirmType("zero"); setConfirmOpen(true); }} disabled={zeroLoading} className={btnClass}>
-                <Zap size={20} /> {zeroLoading ? "RESETTING..." : "ZERO ALL"}
-              </Button>
-              <Button onClick={() => { setConfirmType("update"); setConfirmOpen(true); }} disabled={updateLoading} className={btnClass}>
-                <RotateCw size={20} /> {updateLoading ? "UPDATING..." : "UPDATE"}
-              </Button>
-            </>
-          )}
-
-          {(isSkill || isPositive || isNegative) && (
-            <Button onClick={() => { setConfirmType("reset_skill"); setConfirmOpen(true); }} disabled={resetLoading} className={btnClass}>
-              <XCircle size={20} /> {resetLoading ? "RESETTING..." : "RESET"}
-            </Button>
-          )}
-
-          {!isMiniLeague && !isSkill && !isRoster && !isPositive && !isNegative && (
-            <Button onClick={() => { if (isDemoLadder) { toast.warning("Disabled for Demo Purposes"); return; } setConfirmType("reset"); setConfirmOpen(true); }} disabled={resetLoading} className={btnClass}>
-              <RefreshCw size={20} /> {resetLoading ? "RESETTING..." : "RESET"}
-            </Button>
-          )}
-
-          <Dialog open={openAddPlayerDialog} onOpenChange={setOpenAddPlayerDialog}>
-            <DialogTrigger asChild>
-              <Button className={btnClass}><PlusCircle size={20} /> {isRoster ? "ADD / REMOVE" : "ADD/REMOVE/MOVE"}</Button>
-            </DialogTrigger>
-            <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader><DialogTitle className="sr-only">Manage Players</DialogTitle></DialogHeader>
-              <AddRemoveBox ladderId={ladderId} onSuccessRefresh={refreshLeaderboard} />
-            </DialogContent>
-          </Dialog>
-
-          {(isSkill || isPositive || isNegative) && (
-            <Button onClick={() => setOpenSkillShortDialog(true)} className={btnClass}>
-              <Funnel size={20} /> {isSorted ? "SORTED" : "SORT"}
-            </Button>
-          )}
-
-          {(isSorted || witnessBy === 1 || hasFiltersApplied()) && !isMiniLeague && (
-            <Button onClick={handleClearAll} className={dangerBtnClass}>
-              <XCircle size={20} /> CLEAR ALL
-            </Button>
-          )}
-
-          {!isMiniLeague && (
-            <div className="h-16 w-full">
-              <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFiltersApplied()} />
-            </div>
-          )}
-
-          <Dialog open={openSkillDialog} onOpenChange={setOpenSkillDialog}>
-            <DialogTrigger asChild>
-              {(isSkill || isPositive || isNegative) && (
-                <Button className={btnClass}><Zap size={20} /> SETUP</Button>
-              )}
-            </DialogTrigger>
-            <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
-              <BasicLeaderboardSetUpSkill onClose={() => setOpenSkillDialog(false)} onSkillsUpdated={refreshSkillLeaderboard} />
-            </DialogContent>
-          </Dialog>
-
-          {(isSkill || isPositive || isNegative) && (
-            <Button
-              onClick={() => {
-                const newWitnessBy = witnessBy === 1 ? 0 : 1;
-                setWitnessBy(newWitnessBy);
-                if (newWitnessBy === 1) {
-                  const cleared = { age: 0, ageType: "", gender: "" };
-                  if (isSkill) dispatch(setSkillAgeFilter(cleared));
-                  else if (isPositive) dispatch(setPositiveAgeFilter(cleared));
-                  else if (isNegative) dispatch(setNegativeAgeFilter(cleared));
-                  else { dispatch(setAgeFilter(cleared)); setLocalAge(0); setLocalAgeType(""); setLocalGender(""); }
-                  setAgeFilterResetSignal((p) => p + 1);
-                  setIsSorted(false); setCurrentSkillNo(0);
-                }
-                refreshSkillLeaderboard(0);
-              }}
-              className={witnessBy === 1 ? "rounded-lg h-16 w-full border border-emerald-300/50 bg-emerald-500/25 px-4 text-white shadow-none transition hover:-translate-y-0.5 hover:bg-emerald-500/35 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight" : btnClass}
-            >
-              {witnessBy === 1 ? "WITNESSED" : "WITNESSED ONLY"}
-            </Button>
-          )}
-        </div>
-      </QuickActionsCard>
-
-      {/* Sort by skill dialog */}
-      <Dialog open={openSkillShortDialog} onOpenChange={setOpenSkillShortDialog}>
-        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
-          <BasicLeaderboardShort
-            ladderId={ladderId}
-            onClose={() => { setOpenSkillShortDialog(false); setIsSorted(false); }}
-            onSkillsUpdated={(skillNo) => {
-              setCurrentSkillNo(skillNo);
-              const cleared = { age: 0, ageType: "", gender: "" };
-              if (isSkill) dispatch(setSkillAgeFilter(cleared));
-              else if (isPositive) dispatch(setPositiveAgeFilter(cleared));
-              else if (isNegative) dispatch(setNegativeAgeFilter(cleared));
-              else { dispatch(setAgeFilter(cleared)); setLocalAge(0); setLocalAgeType(""); setLocalGender(""); }
-              setAgeFilterResetSignal((p) => p + 1);
-              setWitnessBy(0);
-              refreshSkillLeaderboard(skillNo);
-              setIsSorted(true); setOpenSkillShortDialog(false);
-              toast.success(`Sorted by Skill ${skillNo}!`);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Confirm dialog */}
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-600">Do you want to reset?</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-800">
-              {confirmType === "zero" && "This will reset ALL scores to ZERO. This action cannot be undone!"}
-              {confirmType === "update" && "This will move two up and two down."}
-              {confirmType === "reset" && "This will completely DELETE the entire leaderboard. All data will be lost!"}
-              {confirmType === "reset_skill" && "This will completely DELETE the entire skill leaderboard. All data will be lost!"}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="hover:bg-red-400 transition-colors">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmAction} className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
-              {resetLoading ? "Processing..." : "Confirm"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Upload CSV after reset */}
-      <Dialog open={openUploadDialog} onOpenChange={setOpenUploadDialog}>
-        <DialogContent className="bg-gray-400 rounded-lg border border-[#313546] sm:max-w-xl">
-          <UploadPlayerLists
-            ladderId={ladderId}
-            onSuccessClose={() => {
-              setOpenUploadDialog(false);
-              refreshLeaderboard();
-              dispatch(fetchGradebars(ladderId));
-              toast.success("Players uploaded successfully!");
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </>
+    <QuickActionsCard title="Quick Actions" actions={quickActions} />
   );
+
+
 
   return (
     <div className={isBestLayout ? "ladder-shell min-h-screen" : "bg-gray-800 min-h-screen"}>
@@ -473,6 +450,82 @@ export const PlayerLists = () => {
           </CardContent>
         </Card>
       </footer>
+
+      {/* Sort by skill dialog */}
+      <Dialog open={openSkillShortDialog} onOpenChange={setOpenSkillShortDialog}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+          <BasicLeaderboardShort
+            ladderId={ladderId}
+            onClose={() => { setOpenSkillShortDialog(false); setIsSorted(false); }}
+            onSkillsUpdated={(skillNo) => {
+              setCurrentSkillNo(skillNo);
+              const cleared = { age: 0, ageType: "", gender: "" };
+              if (isSkill) dispatch(setSkillAgeFilter(cleared));
+              else if (isPositive) dispatch(setPositiveAgeFilter(cleared));
+              else if (isNegative) dispatch(setNegativeAgeFilter(cleared));
+              else { dispatch(setAgeFilter(cleared)); setLocalAge(0); setLocalAgeType(""); setLocalGender(""); }
+              setAgeFilterResetSignal((p) => p + 1);
+              setWitnessBy(0);
+              refreshSkillLeaderboard(skillNo);
+              setIsSorted(true); setOpenSkillShortDialog(false);
+              toast.success(`Sorted by Skill ${skillNo}!`);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm dialog */}
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-600">Do you want to reset?</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-800">
+              {confirmType === "zero" && "This will reset ALL scores to ZERO. This action cannot be undone!"}
+              {confirmType === "update" && "This will move two up and two down."}
+              {confirmType === "reset" && "This will completely DELETE the entire leaderboard. All data will be lost!"}
+              {confirmType === "reset_skill" && "This will completely DELETE the entire skill leaderboard. All data will be lost!"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="hover:bg-red-400 transition-colors">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmAction} className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
+              {resetLoading ? "Processing..." : "Confirm"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Upload CSV after reset */}
+      <Dialog open={openUploadDialog} onOpenChange={setOpenUploadDialog}>
+        <DialogContent className="bg-gray-400 rounded-lg border border-[#313546] sm:max-w-xl">
+          <UploadPlayerLists
+            ladderId={ladderId}
+            onSuccessClose={() => {
+              setOpenUploadDialog(false);
+              refreshLeaderboard();
+              dispatch(fetchGradebars(ladderId));
+              toast.success("Players uploaded successfully!");
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Add / Remove Dialog */}
+      <Dialog open={openAddPlayerDialog} onOpenChange={setOpenAddPlayerDialog}>
+        <DialogContent className="bg-[#163344] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Manage Players</DialogTitle>
+          </DialogHeader>
+          <AddRemoveBox ladderId={ladderId} onSuccessRefresh={refreshLeaderboard} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Skill Setup Dialog */}
+      <Dialog open={openSkillDialog} onOpenChange={setOpenSkillDialog}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+          <BasicLeaderboardSetUpSkill onClose={() => setOpenSkillDialog(false)} onSkillsUpdated={refreshSkillLeaderboard} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

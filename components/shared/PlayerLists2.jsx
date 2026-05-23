@@ -93,7 +93,6 @@ const PlayerLists2 = () => {
       {playerList.length > 0 && (
         <div className="w-full">
           <div className="flex">
-            {/* {user?.user_type === "admin" && <LadderLinkPanel />} */}
             <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           </div>
         </div>

@@ -1,4 +1,5 @@
 "use client";
+"use client";
 import { IMAGE_BASE_URL } from "@/constants/api";
 
 import Image from "next/image";
@@ -6,23 +7,22 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMiniLeague, setAgeFilter } from "@/redux/slices/minileagueSlice";
 import { setSelectedPlayer } from "@/redux/slices/leaderboardSlice";
-import { MinileagueEditPlayer } from "./MinileagueEditPlayer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchUserProfile } from "@/redux/slices/profileSlice";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
-import LadderLinkPanel from "./LadderLinkPanel";
+import { MinileagueEditPlayer } from "./MinileagueEditPlayer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Minileague from "./Minileague";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import Minileague from "./Minileague";
 import PlayerSearch from "../users/PlayerSearch";
 import { postWithParams } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
@@ -33,7 +33,9 @@ import InfoSection from "@/components/shared/InfoSection";
 import LadderPageLayout from "@/components/shared/LadderPageLayout";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
 import { getRequest } from "@/services/apiService";
-import { Plus, RotateCcw } from "lucide-react";
+import { Plus, RotateCcw, XCircle } from "lucide-react";
+import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
+import AgeFilter from "@/components/shared/AgeFilter";
 
 /* ================= Player Card ================= */
 const PlayerCard = ({
@@ -129,8 +131,8 @@ const PlayerCard = ({
                 <div
                   key={r}
                   className={`w-7 h-7 flex items-center justify-center rounded font-bold border ${found
-                      ? "bg-white text-black border-[#7ea1af]"
-                      : "bg-[#7ea1af]/50 border-[#528189]"
+                    ? "bg-white text-black border-[#7ea1af]"
+                    : "bg-[#7ea1af]/50 border-[#528189]"
                     }`}
                 >
                   {found?.point || ""}
@@ -178,6 +180,8 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
   const [contactOpen, setContactOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [addRemoveOpen, setAddRemoveOpen] = useState(false);
+  const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
+  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
   const inviteUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`
@@ -351,9 +355,36 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
   );
 
   const activityItems = activityState?.data?.data || [];
+  const handleAgeSearch = (age, ageType, gender) => {
+    const ageNum = age ? Number(age) : 0;
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+  };
+
   const quickActions = [
     { id: "reset", label: "Zero All", icon: RotateCcw, onClick: () => setResetOpen(true) },
     { id: "add-remove", label: "Add / Move", icon: Plus, onClick: () => setAddRemoveOpen(true) },
+    {
+      id: "age-filter",
+      node: (
+        <AgeFilter
+          onSearch={handleAgeSearch}
+          user={false}
+          resetSignal={ageFilterResetSignal}
+          isActive={hasFilters}
+        />
+      ),
+    },
+    {
+      id: "clear",
+      label: "Clear All",
+      icon: XCircle,
+      tone: "danger",
+      onClick: () => {
+        dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+        setAgeFilterResetSignal((p) => p + 1);
+      },
+      hidden: !hasFilters,
+    },
   ];
 
 
@@ -376,11 +407,11 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
           refreshLeaderboard={refreshLeaderboard}
           ladderId={ladderId}
           sortMode="rank"
-          setSortMode={() => {}}
+          setSortMode={() => { }}
           sortOpen={false}
-          setSortOpen={() => {}}
+          setSortOpen={() => { }}
           filterOpen={false}
-          setFilterOpen={() => {}}
+          setFilterOpen={() => { }}
           appliedAge={0}
           appliedGender=""
           groupSize={1}
@@ -400,8 +431,8 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
           setContactOpen={setContactOpen}
           setResetOpen={setResetOpen}
           setAddRemoveOpen={setAddRemoveOpen}
-          setSortOpen={() => {}}
-          setFilterOpen={() => {}}
+          setSortOpen={() => { }}
+          setFilterOpen={() => { }}
           activityItems={activityItems}
           handleDeleteActivity={handleDeleteActivity}
           contactOpen={contactOpen}
@@ -412,65 +443,64 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
         />
       }
     >
-        <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
-      <div className="flex flex-col gap-2">
-        <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
-      </div>
-      <LadderLinkPanel ladderId={ladderId} ladderType={ladderType} />
-      <ToastContainer />
-
-      {loadingPlayers ? (
-        Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 w-full" />
-        ))
-      ) : finalSections.length === 0 ? (
-        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
-      ) : (
-        finalSections.map((section, idx) => (
-          <div key={idx}>
-            <div className="mb-2 flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] px-3 py-2 font-bold text-[var(--best-board-text)]">
-              <span>{section.label}</span>
-
-              {user?.user_type === "admin" && (
-                <Button
-                  className="text-xs"
-                  onClick={() => {
-                    setCurrentSectionName(section.label);
-                    setNewSectionName(section.label);
-                    setNewSectionSize(sectionSize);
-                    setIsSectionModalOpen(true);
-                  }}
-                >
-                  ✏️ Settings
-                </Button>
-              )}
-            </div>
-
-            {section.players.map((player, pidx) => {
-              const globalIndex = idx * sectionSize + pidx;
-              return (
-                <PlayerCard
-                  key={player.id}
-                  player={{ ...player, sectionIndex: idx }}
-                  rank={player.rank || globalIndex + 1}
-                  isAllowed={true} // Everyone allowed now
-                  canEdit={
-                    user?.user_type === "admin" || user?.id === player?.user_id
-                  }
-                  groupSize={sectionSize}
-                  onEdit={handleEditPlayer}
-                  currentUser={user}
-                />
-              );
-            })}
-
-            {Array.from({ length: section.blankCount }).map((_, i) => (
-              <PlayerCard key={i} isBlank />
-            ))}
-          </div>
-        ))
-      )}
+      <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
+        <div className="flex flex-col gap-2">
+          <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
         </div>
+        <ToastContainer />
+
+
+        {loadingPlayers ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))
+        ) : finalSections.length === 0 ? (
+          <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+        ) : (
+          finalSections.map((section, idx) => (
+            <div key={idx} className="mb-4">
+              <div className="mb-2 flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] px-3 py-2 font-bold text-[var(--best-board-text)]">
+                <span>{section.label}</span>
+
+                {user?.user_type === "admin" && (
+                  <Button
+                    className="text-xs bg-transparent border border-[var(--best-board-border)] hover:bg-[var(--best-board-surface-soft)] text-white"
+                    onClick={() => {
+                      setCurrentSectionName(section.label);
+                      setNewSectionName(section.label);
+                      setNewSectionSize(sectionSize);
+                      setIsSectionModalOpen(true);
+                    }}
+                  >
+                    ✏️ Settings
+                  </Button>
+                )}
+              </div>
+
+              {section.players.map((player, pidx) => {
+                const globalIndex = idx * sectionSize + pidx;
+                return (
+                  <PlayerCard
+                    key={player.id}
+                    player={{ ...player, sectionIndex: idx }}
+                    rank={player.rank || globalIndex + 1}
+                    canEdit={
+                      user?.user_type === "admin" || user?.id === player?.user_id
+                    }
+                    groupSize={sectionSize}
+                    onEdit={handleEditPlayer}
+                    currentUser={user}
+                  />
+                );
+              })}
+
+              {Array.from({ length: section.blankCount }).map((_, i) => (
+                <PlayerCard key={i} isBlank />
+              ))}
+            </div>
+          ))
+        )}
+      </div>
 
       <MinileagueEditPlayer
         open={isOpen}
@@ -526,12 +556,24 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Add / Remove Dialog */}
+      <Dialog open={addRemoveOpen} onOpenChange={setAddRemoveOpen}>
+        <DialogContent className="best-board-card border-[var(--best-board-border)] text-white sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add / Move Players</DialogTitle>
+          </DialogHeader>
+          <AddRemoveBox
+            ladderId={ladderId}
+            onSuccessRefresh={() => {
+              setAddRemoveOpen(false);
+              refreshLeaderboard();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </LadderPageLayout>
   );
 };
 
 export default MinileaguePlayers;
-
-
-
-

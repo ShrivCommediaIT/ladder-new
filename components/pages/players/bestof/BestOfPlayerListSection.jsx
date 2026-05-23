@@ -74,7 +74,7 @@ const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
           ) : null}
           {player?.gender !== undefined && player?.gender !== null && player?.gender !== "" ? (
             <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)]">
-              {player.gender ? "M" : "F"}
+              {player.gender === "male" || player.gender === "Male" ? "M" : "F"}
             </span>
           ) : null}
         </div>

@@ -17,7 +17,6 @@ import { Funnel, X } from "lucide-react";
 import { fetchPositiveLeaderboard, setAgeFilter } from "@/redux/slices/positiveLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
-import LadderLinkPanel from "../players/LadderLinkPanel";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 
 
@@ -487,7 +486,6 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded }) => {
               className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0"
             />
           </div>
-          <LadderLinkPanel ladderId={ladderId} ladderType="positive" />
           {loading && (
             <p className="text-white text-center hidden">Loading...</p>
           )}

@@ -7,11 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Card } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
-import LadderLinkPanel from "./LadderLinkPanel";
 import { ArrowDownUp, Eye, Funnel, Plus, RotateCcw, Zap, XCircle } from "lucide-react";
 import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
 import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 import PlayerSearchInput from "./PlayerSearchInput";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
@@ -192,22 +192,41 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, []);
 
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, witness = localWitnessBy) => {
       if (ladderId) {
-        const payload = { ladder_id: ladderId, type: "negative" };
+        const payload = {
+          ladder_id: ladderId,
+          type: "negative",
+        };
+        if (skillNo && skillNo !== 0) {
+          payload.sortbyskillnumber = skillNo;
+        }
+
+        if (witness === 1) {
+          payload.witness_by = 1;
+        } else {
+          if (age && age > 0) {
+            payload.dob = age;
+            if (ageType) payload.age_type = ageType;
+          }
+          if (gender) {
+            payload.gender = gender;
+          }
+        }
+
         Promise.all([
           dispatch(fetchNegativeLeaderboard(payload)),
           dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })),
         ]);
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy],
   );
 
   const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = age ? Number(age) : "";
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
+    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender, 0);
   };
 
   useEffect(() => { if (onPlayerAdded) refreshLeaderboard(); }, [onPlayerAdded, refreshLeaderboard]);
@@ -284,7 +303,6 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const quickActions = [
     { id: "reset", label: "Reset", icon: RotateCcw, onClick: () => setResetOpen(true) },
     { id: "add-remove", label: "Add / Remove", icon: Plus, onClick: () => setAddRemoveOpen(true) },
-    { id: "sort", label: "Sort", icon: ArrowDownUp, onClick: () => setSortOpen(true) },
     { id: "skill-sort", label: isSorted ? "Sorted" : "Skill Sort", icon: Funnel, onClick: () => setOpenSkillSortDialog(true) },
     { id: "setup", label: "Setup", icon: Zap, onClick: () => setOpenSkillSetupDialog(true) },
     {
@@ -299,8 +317,10 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
           setAgeFilterResetSignal((p) => p + 1);
           setIsSorted(false);
+          refreshLeaderboard(0, 0, "", "", 1);
+        } else {
+          refreshLeaderboard(0, appliedAge, appliedAgeType, appliedGender, 0);
         }
-        refreshLeaderboard();
       },
     },
     { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters} /> },
@@ -310,7 +330,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         setIsSorted(false); setLocalWitnessBy(0);
         dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
         setAgeFilterResetSignal((p) => p + 1);
-        refreshLeaderboard();
+        refreshLeaderboard(0, 0, "", "", 0);
       },
       hidden: !isSorted && !hasFilters && localWitnessBy !== 1,
     },
@@ -361,7 +381,6 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       >
         <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
-          <LadderLinkPanel ladderId={ladderId} ladderType="negative" />
           {loading && <p className="hidden text-center text-white">Loading...</p>}
           <div className="mt-2 space-y-2">
             {filteredPlayers.length === 0 ? (
@@ -415,9 +434,25 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
               dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
               setAgeFilterResetSignal((p) => p + 1);
               setLocalWitnessBy(0);
-              refreshLeaderboard(_skillNo);
+              refreshLeaderboard(_skillNo, 0, "", "", 0);
               setIsSorted(true);
               setOpenSkillSortDialog(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Add / Remove Dialog */}
+      <Dialog open={addRemoveOpen} onOpenChange={setAddRemoveOpen}>
+        <DialogContent className="best-board-card border-[var(--best-board-border)] text-white sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add / Remove Players</DialogTitle>
+          </DialogHeader>
+          <AddRemoveBox
+            ladderId={ladderId}
+            onSuccessRefresh={() => {
+              setAddRemoveOpen(false);
+              refreshLeaderboard();
             }}
           />
         </DialogContent>
