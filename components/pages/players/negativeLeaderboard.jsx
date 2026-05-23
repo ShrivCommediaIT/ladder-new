@@ -1,21 +1,21 @@
 "use client";
 import { API_ENDPOINTS, IMAGE_BASE_URL } from "@/constants/api";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { Card } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
-import { BasicLeaderboardEdit } from "./BasicLeaderboardEdit";
 import LadderLinkPanel from "./LadderLinkPanel";
-import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
-import { Button } from "@/components/ui/button";
-import { ArrowDownUp, Filter, Plus, RotateCcw, X, Trophy, ListOrdered } from "lucide-react";
+import { ArrowDownUp, Eye, Funnel, Plus, RotateCcw, Zap, XCircle } from "lucide-react";
+import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
+import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import PlayerSearchInput from "./PlayerSearchInput";
 import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUserEdit";
-import { fetchNegativeLeaderboard, setAppliedAge, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
+import { fetchNegativeLeaderboard, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import { convertTimeToSeconds } from "@/helper/helperFunction";
@@ -24,8 +24,6 @@ import InfoSection from "@/components/shared/InfoSection";
 import LadderPageLayout from "@/components/shared/LadderPageLayout";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
 import { getRequest } from "@/services/apiService";
-
-
 
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({
@@ -36,76 +34,36 @@ const PlayerCard = ({
   isInverted,
   onSkillClick,
   onTargetAchieved,
-  currentUser,
 }) => {
-  const playerImageUrl = player?.image
-    ? `${IMAGE_BASE_URL}/${player.image}`
-    : Logo;
-  const skillCellClass =
-    "w-[46px] sm:w-[58px] h-6 shrink-0 px-1 flex items-center justify-center text-[9px] sm:text-[10px] rounded";
+  const playerImageUrl = player?.image ? `${IMAGE_BASE_URL}/${player.image}` : Logo;
+  const skillCellClass = "w-[46px] sm:w-[58px] h-6 shrink-0 px-1 flex items-center justify-center text-[9px] sm:text-[10px] rounded";
+
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const skillNumberKey = String(skillNumber);
     const scoreObj = scores?.find((s) => String(s.skill_number) === skillNumberKey);
     const skillObj = skills?.find((s) => String(s.skill_number) === skillNumberKey);
-    const witnessBy =
-      scoreObj?.witness_by ||
-      skillObj?.witness_by ||
-      "";
-
+    const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
     const rawNegativeScore = scoreObj?.negative_ladder_bestscore;
     const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
-
     const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
     const rawDisplayScore = rawBestScore || rawNegativeScore || "";
-    const displayScore = rawDisplayScore
-      ? convertTimeToSeconds(rawDisplayScore)
-      : "0";
-
-    const target =
-      skillObj?.target !== null && skillObj?.target !== undefined
-        ? Number(skillObj.target)
-        : null;
-
+    const displayScore = rawDisplayScore ? convertTimeToSeconds(rawDisplayScore) : "0";
+    const target = skillObj?.target !== null && skillObj?.target !== undefined ? Number(skillObj.target) : null;
     let isTargetAchieved = false;
-
-    if (
-      target !== null &&
-      target !== 0 &&
-      score !== 0 &&
-      !isNaN(target) &&
-      !isNaN(score)
-    ) {
+    if (target !== null && target !== 0 && score !== 0 && !isNaN(target) && !isNaN(score)) {
       isTargetAchieved = isInverted ? score >= target : score <= target;
     }
-
-    return {
-      witnessBy,
-      score,
-      displayScore,
-      target,
-      isTargetAchieved,
-      input_score: rawBestScore,
-    };
+    return { witnessBy, score, displayScore, target, isTargetAchieved, input_score: rawBestScore };
   };
-  const achievedTargets =
-    player.skills
-      ?.map((skill) => {
-        const scoreData = getScoreBySkillNumber(
-          player.scores || [],
-          player.skills || [],
-          skill.skill_number,
-        );
-        return scoreData.isTargetAchieved;
-      })
-      .filter(Boolean).length || 0;
 
-  //  Trigger celebration when targets achieved
+  const achievedTargets = player.skills?.map((skill) => {
+    const scoreData = getScoreBySkillNumber(player.scores || [], player.skills || [], skill.skill_number);
+    return scoreData.isTargetAchieved;
+  }).filter(Boolean).length || 0;
+
   useEffect(() => {
-    if (achievedTargets > 0) {
-      onTargetAchieved(player.name, achievedTargets);
-    }
+    if (achievedTargets > 0) onTargetAchieved(player.name, achievedTargets);
   }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
-
 
   return (
     <Card className="best-board-card w-full rounded-2xl border border-[var(--best-board-border-strong)] bg-[var(--best-board-surface)] p-2 shadow-lg sm:p-3 relative">
@@ -113,57 +71,34 @@ const PlayerCard = ({
         <PlayerStatusToggle player={player} user={false} />
       </div>
       <div className="flex-1 min-w-0">
-        {/* Header */}
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
           <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
-            <Image
-              src={playerImageUrl}
-              alt={player?.name}
-              width={80}
-              height={80}
-              className="object-cover rounded"
-              unoptimized
-            />
+            <Image src={playerImageUrl} alt={player?.name} width={80} height={80} className="object-cover rounded" unoptimized />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
               {player?.name || "N/A"}
-              {player.age && (
-                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-3">
-                  {player.age}
-                </p>
-              )}
-              {player.gender && (
-                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                  {player.gender == "male" ? "M" : "F"}
-                </p>
-              )}
+              {player.age && <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-3">{player.age}</p>}
+              {player.gender && <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
             </div>
-            <div className="text-[#d4e5e8] text-xs truncate">
-              {player?.phone || "N/A"}
-            </div>
+            <div className="text-[#d4e5e8] text-xs truncate">{player?.phone || "N/A"}</div>
           </div>
           <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
             <div className="flex flex-col items-center">
               <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm shadow-sm leading-none h-7 sm:h-auto flex items-center">
                 {Math.abs(player.total_point || 0)}
               </span>
-              <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
+              <p className="text-[9px] text-white mt-1 font-semibold">Total Pts</p>
             </div>
-
             <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
               {showAgeRank && (
                 <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
-                    {ageRank}
-                  </div>
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">{ageRank}</div>
                   <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-1 whitespace-nowrap">Age Rank</p>
                 </div>
               )}
               <div className="flex flex-col items-center">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
-                  {overallRank}
-                </div>
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">{overallRank}</div>
                 <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
               </div>
             </div>
@@ -176,46 +111,24 @@ const PlayerCard = ({
               <div className="w-max min-w-full">
                 <div className="flex gap-[3px] overflow-y-visible pb-2">
                   {player.skills.map((skill, i) => {
-                    const isNegative = skill.skill_sign === "-";
-
+                    const isNeg = skill.skill_sign === "-";
                     return (
-                      <div
-                        key={i}
-                        onClick={() => onSkillClick(player.id, skill.skill_number)}
+                      <div key={i} onClick={() => onSkillClick(player.id, skill.skill_number)}
                         className={`${skillCellClass} cursor-pointer text-black bg-white hover:bg-emerald-500 relative`}
-                        title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
-                      >
-                        {/* minus sign box ke upar */}
-                        {isNegative && (
-                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
-                            −
-                          </span>
-                        )}
-
+                        title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}>
+                        {isNeg && <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">−</span>}
                         {skill.skill_number}
                       </div>
                     );
                   })}
                 </div>
-
-                {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
                 <div className="flex gap-[3px]">
                   {player.skills.map((skill, i) => {
-                    const scoreData = getScoreBySkillNumber(
-                      player.scores || [],
-                      player.skills || [],
-                      skill.skill_number,
-                    );
+                    const scoreData = getScoreBySkillNumber(player.scores || [], player.skills || [], skill.skill_number);
                     return (
-                      <div
-                        key={i}
-                        className={`${skillCellClass} font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
-                          ? "bg-green-400 text-black shadow-md font-semibold"
-                          : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
-                          } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
-                        title={`Best Score: ${scoreData.displayScore}s | Target: ${scoreData.target || "N/A"
-                          }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
-                      >
+                      <div key={i}
+                        className={`${skillCellClass} font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved ? "bg-green-400 text-black shadow-md font-semibold" : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"} ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
+                        title={`Best Score: ${scoreData.displayScore}s | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}>
                         {scoreData.displayScore}
                       </div>
                     );
@@ -225,9 +138,7 @@ const PlayerCard = ({
             </div>
           </>
         ) : (
-          <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
-            No skills data
-          </div>
+          <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">No skills data</div>
         )}
       </div>
     </Card>
@@ -239,25 +150,25 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
+
   const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedWitnessBy } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const showAgeRank = Number(appliedAge) > 0;
-
   const isInverted = ladderDetails?.inverted == 0;
+  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
 
   const currentUser = useSelector((state) => state.user?.user);
   const activityState = useSelector((state) => state.activity);
 
-  // CELEBRATION STATE ONLY
-  const [showCelebration, setShowCelebration] = useState(false);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_showCelebration, setShowCelebration] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [selectedSkillNumber, setSelectedSkillNumber] = useState(null);
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
+  const [selectedPositiveFilter, _setSelectedPositiveFilter] = useState(0);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [mobileSection, setMobileSection] = useState("players");
   const [contactOpen, setContactOpen] = useState(false);
@@ -265,27 +176,25 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [addRemoveOpen, setAddRemoveOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [sortMode, setSortMode] = useState("rank");
-  const inviteUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=negative`
-      : "";
+  const [openSkillSetupDialog, setOpenSkillSetupDialog] = useState(false);
+  const [openSkillSortDialog, setOpenSkillSortDialog] = useState(false);
+  const [localWitnessBy, setLocalWitnessBy] = useState(0);
+  const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
+  const [isSorted, setIsSorted] = useState(false);
+
+  const inviteUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=negative`
+    : "";
+
   const handleTargetAchieved = useCallback(() => {
     setShowCelebration(true);
-    setTimeout(
-      () => {
-        setShowCelebration(false);
-      },
-      4000 + Math.random() * 1000,
-    );
+    setTimeout(() => setShowCelebration(false), 4000 + Math.random() * 1000);
   }, []);
 
   const refreshLeaderboard = useCallback(
     (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
       if (ladderId) {
-        const payload = {
-          ladder_id: ladderId,
-          type: "negative",
-        };
+        const payload = { ladder_id: ladderId, type: "negative" };
         Promise.all([
           dispatch(fetchNegativeLeaderboard(payload)),
           dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })),
@@ -301,18 +210,8 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender);
   };
 
-
-  useEffect(() => {
-    if (onPlayerAdded) {
-      refreshLeaderboard();
-    }
-  }, [onPlayerAdded, refreshLeaderboard]);
-
-  useEffect(() => {
-    if (ladderId) {
-      refreshLeaderboard();
-    }
-  }, [ladderId]);
+  useEffect(() => { if (onPlayerAdded) refreshLeaderboard(); }, [onPlayerAdded, refreshLeaderboard]);
+  useEffect(() => { if (ladderId) refreshLeaderboard(); }, [ladderId]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -320,37 +219,24 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
-          if (parsedUser && parsedUser.id) {
-            setCurrentUserId(Number(parsedUser.id));
-          }
+          if (parsedUser?.id) setCurrentUserId(Number(parsedUser.id));
         } catch (err) {
-          console.error("Failed to parse user from localStorage", err);
+          console.error("Failed to parse user from sessionStorage", err);
         }
       }
     }
   }, []);
 
-
-  const handleSkillClick = useCallback(
-
-    (playerId, skillNumber) => {
-
-
-      const player = data.find((p) => p.id === playerId);
-      if (!player) return;
-
-      const skillObj = player.skills.find(
-        (s) => s.skill_number === skillNumber,
-      );
-
-      if (!skillObj) return;
-      setSelectedPlayerId(playerId);
-      setSelectedSkillNumber(skillNumber);
-      setSelectedSkillActivityId(skillObj.id);
-      setOpenEdit(true);
-    },
-    [data, currentUserId],
-  );
+  const handleSkillClick = useCallback((playerId, skillNumber) => {
+    const player = data.find((p) => p.id === playerId);
+    if (!player) return;
+    const skillObj = player.skills.find((s) => s.skill_number === skillNumber);
+    if (!skillObj) return;
+    setSelectedPlayerId(playerId);
+    setSelectedSkillNumber(skillNumber);
+    setSelectedSkillActivityId(skillObj.id);
+    setOpenEdit(true);
+  }, [data, currentUserId]);
 
   const handleEditClose = useCallback(() => {
     setOpenEdit(false);
@@ -362,60 +248,74 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
   const filteredPlayers = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    const clean = (name = "") =>
-      name.replace(/\s+/g, "").toLowerCase();
+    const clean = (name = "") => name.replace(/\s+/g, "").toLowerCase();
     const baseList = !q
       ? data
       : [
-        ...data
-          .filter((p) => clean(p.name).startsWith(q))
-          .sort((a, b) => a.name.localeCompare(b.name)),
-        ...data
-          .filter((p) => !clean(p.name).startsWith(q) && clean(p.name).includes(q))
-          .sort((a, b) => a.name.localeCompare(b.name)),
+        ...data.filter((p) => clean(p.name).startsWith(q)).sort((a, b) => a.name.localeCompare(b.name)),
+        ...data.filter((p) => !clean(p.name).startsWith(q) && clean(p.name).includes(q)).sort((a, b) => a.name.localeCompare(b.name)),
       ];
-
-    return [...baseList].sort((a, b) => {
-      if (sortMode === "name") {
-        return (a?.name || "").localeCompare(b?.name || "");
-      }
-      return Number(a?.rank || 0) - Number(b?.rank || 0);
-    });
+    return [...baseList].sort((a, b) =>
+      sortMode === "name" ? (a?.name || "").localeCompare(b?.name || "") : Number(a?.rank || 0) - Number(b?.rank || 0)
+    );
   }, [data, searchQuery, sortMode]);
 
-  const handleDeleteActivity = useCallback(
-    async (id) => {
-      try {
-        await getRequest(API_ENDPOINTS.ACTIVITY_DELETE, { id });
-        dispatch(fetchUserActivity({ ladder_id: Number(ladderId) }));
-      } catch (error) {
-        console.error("Failed to delete activity", error);
-      }
-    },
-    [dispatch, ladderId],
-  );
+  const handleDeleteActivity = useCallback(async (id) => {
+    try {
+      await getRequest(API_ENDPOINTS.ACTIVITY_DELETE, { id });
+      dispatch(fetchUserActivity({ ladder_id: Number(ladderId) }));
+    } catch (error) {
+      console.error("Failed to delete activity", error);
+    }
+  }, [dispatch, ladderId]);
 
-  const handleResetBoard = useCallback(
-    async () => {
-      try {
-        await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
-        setResetOpen(false);
-        refreshLeaderboard();
-      } catch (error) {
-        console.error("Failed to reset leaderboard", error);
-      }
-    },
-    [ladderId, refreshLeaderboard],
-  );
-
+  const handleResetBoard = useCallback(async () => {
+    try {
+      await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
+      setResetOpen(false);
+      refreshLeaderboard();
+    } catch (error) {
+      console.error("Failed to reset leaderboard", error);
+    }
+  }, [ladderId, refreshLeaderboard]);
 
   const activityItems = activityState?.data?.data || [];
+
   const quickActions = [
     { id: "reset", label: "Reset", icon: RotateCcw, onClick: () => setResetOpen(true) },
     { id: "add-remove", label: "Add / Remove", icon: Plus, onClick: () => setAddRemoveOpen(true) },
-    { id: "filter", label: "Filter", icon: Filter, onClick: handleAgeSearch, hidden: true },
     { id: "sort", label: "Sort", icon: ArrowDownUp, onClick: () => setSortOpen(true) },
+    { id: "skill-sort", label: isSorted ? "Sorted" : "Skill Sort", icon: Funnel, onClick: () => setOpenSkillSortDialog(true) },
+    { id: "setup", label: "Setup", icon: Zap, onClick: () => setOpenSkillSetupDialog(true) },
+    {
+      id: "witnessed",
+      label: localWitnessBy === 1 ? "Witnessed" : "Witnessed Only",
+      icon: Eye,
+      tone: localWitnessBy === 1 ? "success" : "default",
+      onClick: () => {
+        const next = localWitnessBy === 1 ? 0 : 1;
+        setLocalWitnessBy(next);
+        if (next === 1) {
+          dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+          setAgeFilterResetSignal((p) => p + 1);
+          setIsSorted(false);
+        }
+        refreshLeaderboard();
+      },
+    },
+    { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters} /> },
+    {
+      id: "clear", label: "Clear All", icon: XCircle, tone: "danger",
+      onClick: () => {
+        setIsSorted(false); setLocalWitnessBy(0);
+        dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+        setAgeFilterResetSignal((p) => p + 1);
+        refreshLeaderboard();
+      },
+      hidden: !isSorted && !hasFilters && localWitnessBy !== 1,
+    },
   ];
+
   return (
     <>
       <LadderPageLayout
@@ -428,23 +328,14 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
               { id: "players", label: "Players" },
               { id: "info", label: "Info" },
             ]}
-            resetOpen={resetOpen}
-            setResetOpen={setResetOpen}
-            addRemoveOpen={addRemoveOpen}
-            setAddRemoveOpen={setAddRemoveOpen}
-            refreshLeaderboard={refreshLeaderboard}
-            ladderId={ladderId}
-            sortMode={sortMode}
-            setSortMode={setSortMode}
-            sortOpen={sortOpen}
-            setSortOpen={setSortOpen}
-            filterOpen={false}
-            setFilterOpen={() => {}}
-            appliedAge={0}
-            appliedGender=""
-            groupSize={1}
-            showFilter={false}
-            showSectionSize={false}
+            resetOpen={resetOpen} setResetOpen={setResetOpen}
+            addRemoveOpen={addRemoveOpen} setAddRemoveOpen={setAddRemoveOpen}
+            refreshLeaderboard={refreshLeaderboard} ladderId={ladderId}
+            sortMode={sortMode} setSortMode={setSortMode}
+            sortOpen={sortOpen} setSortOpen={setSortOpen}
+            filterOpen={false} setFilterOpen={() => {}}
+            appliedAge={0} appliedGender=""
+            groupSize={1} showFilter={false} showSectionSize={false}
           />
         }
         sidebar={
@@ -468,44 +359,69 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           />
         }
       >
-          <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
-            <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
-            <LadderLinkPanel ladderId={ladderId} ladderType="negative" />
-            {loading && (
-              <p className="hidden text-center text-white">Loading...</p>
+        <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
+          <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+          <LadderLinkPanel ladderId={ladderId} ladderType="negative" />
+          {loading && <p className="hidden text-center text-white">Loading...</p>}
+          <div className="mt-2 space-y-2">
+            {filteredPlayers.length === 0 ? (
+              <div className="best-board-card rounded-xl px-6 py-10 text-center font-bold text-[var(--best-board-muted)]">No players found</div>
+            ) : (
+              filteredPlayers.map((player, index) => (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  overallRank={player.rank || index + 1}
+                  showAgeRank={showAgeRank}
+                  ageRank={index + 1}
+                  isInverted={isInverted}
+                  onSkillClick={handleSkillClick}
+                  onTargetAchieved={handleTargetAchieved}
+                  currentUser={currentUser}
+                  appliedWitnessBy={appliedWitnessBy}
+                />
+              ))
             )}
-            <div className="mt-2 space-y-2">
-              {filteredPlayers.length === 0 ? (
-                <div className="best-board-card rounded-xl px-6 py-10 text-center font-bold text-[var(--best-board-muted)]">No players found</div>
-              ) : (
-                filteredPlayers.map((player, index) => (
-                  <PlayerCard
-                    key={player.id}
-                    player={player}
-                    overallRank={player.rank || index + 1}
-                    showAgeRank={showAgeRank}
-                    ageRank={index + 1}
-                    isInverted={isInverted}
-                    onSkillClick={handleSkillClick}
-                    onTargetAchieved={handleTargetAchieved}
-                    currentUser={currentUser}
-                    appliedWitnessBy={appliedWitnessBy}
-                  />
-                ))
-              )}
-            </div>
           </div>
+        </div>
       </LadderPageLayout>
+
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardUserEdit
           open={openEdit}
           onClose={handleEditClose}
-          currentId={selectedPlayerId && selectedPlayerId}
+          currentId={selectedPlayerId}
           ladderId={ladderId}
           skillNumber={selectedSkillNumber}
           skillActivityId={selectedSkillActivityId}
         />
       )}
+
+      <Dialog open={openSkillSetupDialog} onOpenChange={setOpenSkillSetupDialog}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+          <BasicLeaderboardSetUpSkill
+            onClose={() => setOpenSkillSetupDialog(false)}
+            onSkillsUpdated={refreshLeaderboard}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openSkillSortDialog} onOpenChange={setOpenSkillSortDialog}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+          <BasicLeaderboardShort
+            ladderId={ladderId}
+            onClose={() => { setOpenSkillSortDialog(false); setIsSorted(false); }}
+            onSkillsUpdated={(_skillNo) => {
+              dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+              setAgeFilterResetSignal((p) => p + 1);
+              setLocalWitnessBy(0);
+              refreshLeaderboard(_skillNo);
+              setIsSorted(true);
+              setOpenSkillSortDialog(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

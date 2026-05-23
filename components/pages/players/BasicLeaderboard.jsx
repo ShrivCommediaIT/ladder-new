@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import Logo from "@/public/logo1.png";
 import { BasicLeaderboardEdit } from "./BasicLeaderboardEdit";
 import LadderLinkPanel from "./LadderLinkPanel";
-import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
+import { fetchSkillLeaderboard, setAgeFilter as setSkillAgeFilter } from "@/redux/slices/BasicLeaderboardSlice";
 import PlayerSearchInput from "./PlayerSearchInput";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import ControlsSection from "@/components/shared/ControlsSection";
@@ -17,7 +17,11 @@ import InfoSection from "@/components/shared/InfoSection";
 import LadderPageLayout from "@/components/shared/LadderPageLayout";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
 import { getRequest } from "@/services/apiService";
-import { ArrowDownUp, Plus, RotateCcw } from "lucide-react";
+import { ArrowDownUp, Eye, Funnel, Plus, RotateCcw, Zap, XCircle } from "lucide-react";
+import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
+import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
+import AgeFilter from "@/components/shared/AgeFilter";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 
 
@@ -272,6 +276,12 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [addRemoveOpen, setAddRemoveOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [sortMode, setSortMode] = useState("rank");
+  const [openSkillSetupDialog, setOpenSkillSetupDialog] = useState(false);
+  const [openSkillSortDialog, setOpenSkillSortDialog] = useState(false);
+  const [localWitnessBy, setLocalWitnessBy] = useState(0);
+  const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
+  const [isSorted, setIsSorted] = useState(false);
+  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
   const isInverted = ladderDetails?.inverted == 0;
   const inviteUrl =
     typeof window !== "undefined"
@@ -397,10 +407,45 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   );
 
   const activityItems = activityState?.data?.data || [];
+
+  const handleAgeSearch = (age, ageType, gender) => {
+    const ageNum = age ? Number(age) : "";
+    dispatch(setSkillAgeFilter({ age: ageNum, ageType, gender }));
+    refreshLeaderboard(selectedSkillFilter, ageNum, ageType, gender);
+  };
+
+  const handleClearAll = () => {
+    setIsSorted(false);
+    setLocalWitnessBy(0);
+    dispatch(setSkillAgeFilter({ age: 0, ageType: "", gender: "" }));
+    setAgeFilterResetSignal((p) => p + 1);
+    refreshLeaderboard(0);
+  };
+
   const quickActions = [
     { id: "reset", label: "Reset", icon: RotateCcw, onClick: () => setResetOpen(true) },
     { id: "add-remove", label: "Add / Remove", icon: Plus, onClick: () => setAddRemoveOpen(true) },
     { id: "sort", label: "Sort", icon: ArrowDownUp, onClick: () => setSortOpen(true) },
+    { id: "skill-sort", label: isSorted ? "Sorted" : "Skill Sort", icon: Funnel, onClick: () => setOpenSkillSortDialog(true) },
+    { id: "setup", label: "Setup", icon: Zap, onClick: () => setOpenSkillSetupDialog(true) },
+    {
+      id: "witnessed",
+      label: localWitnessBy === 1 ? "Witnessed" : "Witnessed Only",
+      icon: Eye,
+      tone: localWitnessBy === 1 ? "success" : "default",
+      onClick: () => {
+        const next = localWitnessBy === 1 ? 0 : 1;
+        setLocalWitnessBy(next);
+        if (next === 1) {
+          dispatch(setSkillAgeFilter({ age: 0, ageType: "", gender: "" }));
+          setAgeFilterResetSignal((p) => p + 1);
+          setIsSorted(false);
+        }
+        refreshLeaderboard(0);
+      },
+    },
+    { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters} /> },
+    { id: "clear", label: "Clear All", icon: XCircle, tone: "danger", onClick: handleClearAll, hidden: !isSorted && !hasFilters && localWitnessBy !== 1 },
   ];
 
 
@@ -500,6 +545,34 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           skillActivityId={selectedSkillActivityId}
         />
       )}
+
+      {/* Skill Setup Dialog */}
+      <Dialog open={openSkillSetupDialog} onOpenChange={setOpenSkillSetupDialog}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+          <BasicLeaderboardSetUpSkill
+            onClose={() => setOpenSkillSetupDialog(false)}
+            onSkillsUpdated={refreshLeaderboard}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Skill Sort Dialog */}
+      <Dialog open={openSkillSortDialog} onOpenChange={setOpenSkillSortDialog}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+          <BasicLeaderboardShort
+            ladderId={ladderId}
+            onClose={() => { setOpenSkillSortDialog(false); setIsSorted(false); }}
+            onSkillsUpdated={(skillNo) => {
+              dispatch(setSkillAgeFilter({ age: 0, ageType: "", gender: "" }));
+              setAgeFilterResetSignal((p) => p + 1);
+              setLocalWitnessBy(0);
+              refreshLeaderboard(skillNo);
+              setIsSorted(true);
+              setOpenSkillSortDialog(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
