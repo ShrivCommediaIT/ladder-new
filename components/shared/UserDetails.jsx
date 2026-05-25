@@ -204,7 +204,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
                 className="cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/30"
               >
                 <Key className="mr-2 h-4 w-4 text-green-600" />
-                Submit to Talent Board
+                Admin to Talent Board 
               </DropdownMenuItem>
 
               <DropdownMenuItem
