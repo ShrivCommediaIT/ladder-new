@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
+import AgeFilter from "@/components/shared/AgeFilter";
 
 const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
   const rankNum = Number(rank);
@@ -55,7 +56,7 @@ const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSiz
   );
 };
 
-export default function PlayersList({ ladderId: propLadderId, ladderType: propLadderType }) {
+export default function PlayersList({ ladderId: propLadderId, ladderType: propLadderType, onActionsChanged }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
@@ -117,6 +118,31 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [showRemove, setShowRemove] = useState(false);
+  const [resetSignal, setResetSignal] = useState(0);
+
+  useEffect(() => {
+    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (onActionsChanged) {
+      const actions = [];
+      
+      actions.push({
+        id: "age-filter",
+        node: (
+          <div className="h-16 w-full flex items-center justify-center rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-card-soft)] hover:bg-[var(--best-board-surface)] transition-all px-2">
+            <AgeFilter onSearch={(age, ageType, gender) => {
+              const ageNum = age ? Number(age) : "";
+              dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+            }} user={true} resetSignal={resetSignal} />
+          </div>
+        )
+      });
+
+      onActionsChanged(actions);
+    }
+  }, [resetSignal, onActionsChanged, dispatch]);
 
   const currentUser = players.find((p) => Number(p.id) === Number(loggedInUserId));
   const myRank = currentUser?.rank || "-";
@@ -231,28 +257,15 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
         <PlayerSearch
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          onAgeSearch={(age, ageType, gender) => {
-            const ageNum = age ? Number(age) : "";
-            dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-          }}
           onClearFilters={() => {
             dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+            setResetSignal((p) => p + 1);
           }}
           activeFilters={
             Boolean(searchTerm) ||
             appliedAge > 0 ||
             Boolean(appliedGender)
           }
-          defaultAge={appliedAge}
-        />
-      </div>
-
-      {/* Buttons */}
-      <div className="px-4 mt-2">
-        <LeaderboardActionButtons
-          onlyLeave={true}
-          currentUserId={loggedInUserId}
-          handleSelfRemove={handleSelfRemove}
         />
       </div>
 
@@ -264,8 +277,13 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       {/* PLAYERS LIST */}
       {grades.map((grade, gradeIndex) => (
         <div key={gradeIndex} className="mt-8 px-4">
-          <div className="mb-3 sticky top-0 bg-[#223848] px-4 py-2 rounded-lg shadow-lg text-xl text-white font-bold tracking-wide z-10">
-            {grade.label}
+          <div className="mb-3 sticky top-0 best-board-section-banner flex items-center justify-between rounded-xl px-4 py-3 text-white font-bold tracking-wide z-10">
+            <span className="best-board-highlight uppercase tracking-[0.18em]">
+              {grade.label}
+            </span>
+            <span className="rounded bg-white/5 px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
+              {grade.players.length} players
+            </span>
           </div>
 
           <div className="space-y-3">
@@ -284,60 +302,49 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: pidx * 0.03 }}
                   onClick={() => handlePlayerClick(player)}
-                  className={`flex flex-col mb-3 rounded-lg shadow transition-all font-sans relative overflow-hidden ${isCurrentUser
-                    ? "cursor-pointer hover:bg-[#143238]"
-                    : "opacity-60 cursor-not-allowed"
-                    }`}
-                  style={{
-                    background: "#223848",
-                    border: "2px solid #4eb0a2",
-                  }}
+                  className={`group flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-4 py-4 transition hover:border-[var(--best-board-border-strong)] ${
+                    isCurrentUser ? "cursor-pointer" : "cursor-not-allowed opacity-60"
+                  }`}
                 >
-                  <div
-                    className="flex justify-between items-center px-4 py-2"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <PlayerStatusToggle player={player} user={true} />
-                  </div>
-
-                  <div className="flex items-center justify-between px-2 py-3 sm:px-4 sm:py-4">
-                    {/* LEFT */}
-                    <div className="flex-1">
-                      <div className="flex w-full items-center mb-2">
-                        <PlayerRankBadge rank={player.rank || pidx + 1} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
-
-                        <div className="flex-1 min-w-0">
-                          <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-                            {player?.name || "N/A"}
-                            {player.age && (
-                              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                                {player.age}
-                              </p>
-                            )}
-                            {player.gender && (
-                              <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                                {player.gender == "male" ? "M" : "F"}
-                              </p>
-                            )}
-                          </div>
-                          <div className="text-[#d4e5e8] text-xs truncate">
-                            {player?.phone || "N/A"}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* RIGHT AVATAR */}
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center ml-3 shrink-0">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <PlayerRankBadge rank={player.rank || pidx + 1} sizeClass="h-12 w-12 sm:h-16 sm:w-16 shrink-0" imgSize={64} textClass="text-xs sm:text-sm" />
+                    
+                    {/* Avatar */}
+                    {player.image ? (
                       <Image
                         src={playerImageUrl}
                         alt={player.name}
-                        width={96}
-                        height={96}
-                        className="object-cover w-full h-full rounded"
+                        width={64}
+                        height={64}
+                        className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shrink-0"
                         unoptimized
                       />
+                    ) : (
+                      <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-sm sm:text-base font-bold text-white shrink-0">
+                        {player.name ? player.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "P"}
+                      </div>
+                    )}
+
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="truncate text-h5 font-semibold text-[var(--best-board-text)]">{player?.name || "N/A"}</p>
+                        {player.age && (
+                          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)] border border-white/10">
+                            {player.age}
+                          </span>
+                        )}
+                        {player.gender && (
+                          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)] border border-white/10">
+                            {player.gender === "male" ? "M" : "F"}
+                          </span>
+                        )}
+                      </div>
+                      <p className="truncate text-sm text-[var(--best-board-muted)]">{player?.phone || "N/A"}</p>
                     </div>
+                  </div>
+
+                  <div className="ml-4 flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                    <PlayerStatusToggle player={player} user={true} />
                   </div>
                 </motion.div>
               );
@@ -354,6 +361,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
           currentId={selectedPlayerId}
           ladder_id={ladderId}
           ladder_type={ladderType}
+          userLevel={true}
         />
       )}
 

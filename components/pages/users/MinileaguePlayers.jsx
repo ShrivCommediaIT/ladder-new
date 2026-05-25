@@ -69,8 +69,7 @@ const PlayerCard = ({
   if (isBlank) {
     return (
       <div
-        className="flex items-center min-h-[18vh] justify-center px-2 py-2 mb-3 rounded-lg shadow"
-        style={{ background: "#223848", border: "2px dashed #4eb0a2" }}
+        className="flex items-center min-h-[18vh] justify-center px-2 py-2 mb-3 rounded-xl border border-dashed border-[var(--best-board-border)] bg-[var(--best-board-surface)]"
       />
     );
   }
@@ -97,23 +96,18 @@ const PlayerCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       onClick={() => onClick()}
-      className={`flex flex-col mb-3 rounded-lg shadow transition-all relative overflow-hidden ${isCurrentUser
-          ? "cursor-pointer hover:bg-[#143238]"
-          : "opacity-60 cursor-not-allowed"
-        }`}
-      style={{
-        background: "#223848",
-        border: "2px solid #4eb0a2",
-      }}
+      className={`group flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-4 py-4 transition hover:border-[var(--best-board-border-strong)] ${
+        isCurrentUser ? "cursor-pointer" : "opacity-60 cursor-not-allowed"
+      }`}
     >
       <div
-        className="flex justify-between items-center px-4 py-2"
+        className="flex justify-between items-center px-2 py-1"
         onClick={(e) => e.stopPropagation()}
       >
         <PlayerStatusToggle player={player} user={true} />
       </div>
 
-      <div className="flex items-center justify-between px-3 py-4">
+      <div className="flex items-center justify-between mt-2">
         <div className="flex-1 min-w-0 overflow-hidden">
           <div className="flex w-full items-center mb-2 min-w-0">
             <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
@@ -323,8 +317,13 @@ const MinileaguePlayers = ({ ladderId }) => {
       ) : (
         finalSections.map((section, idx) => (
           <div key={idx} className="mt-8">
-            <div className="mb-3 sticky top-0 bg-[#223848] px-4 py-2 rounded-lg shadow-lg text-xl text-white font-bold tracking-wide z-10">
-              {section.label}
+            <div className="mb-3 sticky top-0 best-board-section-banner flex items-center justify-between rounded-xl px-4 py-3 text-white font-bold tracking-wide z-10">
+              <span className="best-board-highlight uppercase tracking-[0.18em]">
+                {section.label}
+              </span>
+              <span className="rounded bg-white/5 px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
+                {section.players.length} players
+              </span>
             </div>
 
             <div className="space-y-3">

@@ -59,8 +59,8 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, loggedInUserId }
   return (
     <div
       onClick={() => isCurrentUser && onEditClick(player)}
-      className={`flex flex-col mb-3 rounded-lg bg-[#1a2f3d] border border-[#4eb0a2] overflow-hidden transition-all ${
-        isCurrentUser ? "cursor-pointer hover:bg-[#244252]" : "opacity-70 grayscale-[0.5]"
+      className={`flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] hover:border-[var(--best-board-border-strong)] transition overflow-hidden ${
+        isCurrentUser ? "cursor-pointer" : "opacity-70 grayscale-[0.5]"
       }`}
     >
       <div
@@ -337,6 +337,15 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
       ) : (
         !loading && sections.map((section, idx) => (
           <div key={idx} className="mb-8 px-4">
+            <div className="mb-3 sticky top-0 best-board-section-banner flex items-center justify-between rounded-xl px-4 py-3 text-white font-bold tracking-wide z-10">
+              <span className="best-board-highlight uppercase tracking-[0.18em]">
+                {section.label}
+              </span>
+              <span className="rounded bg-white/5 px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
+                {section.players.length} players
+              </span>
+            </div>
+
             <div className="space-y-3">
               {section.players.map((player, i) => (
                 <PlayerCard

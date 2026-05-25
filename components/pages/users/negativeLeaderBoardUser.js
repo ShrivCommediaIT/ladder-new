@@ -19,6 +19,7 @@ import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import { convertTimeToSeconds } from "@/helper/helperFunction";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
+import AgeFilter from "@/components/shared/AgeFilter";
 
 const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
   const rankNum = Number(rank);
@@ -131,7 +132,7 @@ const PlayerCard = ({
     if (achievedTargets > 0) {
       onTargetAchieved(player.name, achievedTargets);
     }
-  }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
+  }, [achievedTargets, player.name, onTargetAchieved]);
 
   const getRankBySkillNumber = (ranks, skillNumber) => {
     const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
@@ -139,7 +140,7 @@ const PlayerCard = ({
   };
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 relative group">
+    <Card className="w-full rounded-xl shadow-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface)] hover:border-[var(--best-board-border-strong)] transition p-3 relative group">
       <div className="flex justify-between items-start mb-1 px-1">
         <PlayerStatusToggle player={player} user={true} />
       </div>
@@ -269,7 +270,7 @@ const PlayerCard = ({
 
 
 /* ---------------- MAIN COMPONENT ---------------- */
-const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
+const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
@@ -306,6 +307,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [isSorted, setIsSorted] = useState(false);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false); // FIXED: UNCOMMENTED
+  const [resetSignal, setResetSignal] = useState(0);
   const [showRemove, setShowRemove] = useState(false);
   const [selectedPositiveFilter, setSelectedPositiveFilter] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -357,7 +359,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
     [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
   );
 
-  const handleAgeSearch = (age, ageType, gender) => {
+  const handleAgeSearch = useCallback((age, ageType, gender) => {
     const ageNum = age ? Number(age) : "";
     const isClearing = age === null || age === "";
 
@@ -371,14 +373,51 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
 
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
     refreshLeaderboard(isClearing ? 0 : selectedPositiveFilter, ageNum, ageType, gender);
-  };
+  }, [dispatch, selectedPositiveFilter, refreshLeaderboard]);
 
   const handleClearFilters = useCallback(() => {
     setSearchQuery("");
     setIsSorted(false);
     setSelectedSkillFilter(0);
     setSelectedPositiveFilter(0);
-  }, []);
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+    refreshLeaderboard(0, 0, "", "");
+    setResetSignal((p) => p + 1);
+  }, [dispatch, refreshLeaderboard]);
+
+  useEffect(() => {
+    if (onActionsChanged) {
+      const actions = [];
+
+      if (!isSorted && appliedAge === 0) {
+        actions.push({
+          id: "sort-by-skill",
+          label: "Sort by Skill",
+          icon: Funnel,
+          onClick: handleSortBySkill,
+        });
+      } else {
+        actions.push({
+          id: "clear-all-filters",
+          label: "Clear All Filters",
+          icon: Funnel,
+          onClick: handleClearFilters,
+          tone: "danger",
+        });
+      }
+
+      actions.push({
+        id: "age-filter",
+        node: (
+          <div className="h-16 w-full flex items-center justify-center rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-card-soft)] hover:bg-[var(--best-board-surface)] transition-all px-2">
+            <AgeFilter onSearch={handleAgeSearch} user={true} resetSignal={resetSignal} />
+          </div>
+        )
+      });
+
+      onActionsChanged(actions);
+    }
+  }, [isSorted, appliedAge, resetSignal, onActionsChanged, handleAgeSearch]);
 
   // MANUAL REFRESH HANDLERS (only when explicitly called)
   const handleSelfRemove = useCallback(() => {
@@ -447,6 +486,10 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
     refreshLeaderboard(selectedSkillFilter);
   }, [refreshLeaderboard, selectedSkillFilter]);
 
+  useEffect(() => {
+    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+  }, [dispatch]);
+
   // FIXED: ONLY LOAD ONCE WHEN ladderId CHANGES (NO INFINITE LOOP)
   useEffect(() => {
     if (ladderId) {
@@ -462,69 +505,47 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   return (
     <>
-      <main className="min-h-screen flex justify-center ">
-        <div className="w-full max-w-2xl px-4 py-4 space-y-4">
-          {/* {loading && <p className="text-white text-center py-8"></p>} */}
+      <div className="w-full space-y-4 mt-4">
+        {/* {loading && <p className="text-white text-center py-8"></p>} */}
 
-          {/* Search + Buttons */}
-          <div className="flex flex-col sm:flex-col sm:items-start gap-2">
-            {/* Search Input */}
-            <div className="flex-1 w-full min-w-0">
-              <PlayerSearch
-                searchTerm={searchQuery}
-                setSearchTerm={setSearchQuery}
-                onAgeSearch={handleAgeSearch}
-                onClearFilters={handleClearFilters}
-                activeFilters={Boolean(searchQuery) || appliedAge > 0 || Boolean(appliedGender)}
-                defaultAge={appliedAge}
-              />
-            </div>
+        {/* Search + Buttons */}
+        <div className="flex flex-col sm:flex-col sm:items-start gap-2">
+          {/* Search Input */}
+          <div className="flex-1 w-full min-w-0">
+            <PlayerSearch
+              searchTerm={searchQuery}
+              setSearchTerm={setSearchQuery}
+              onClearFilters={handleClearFilters}
+              activeFilters={Boolean(searchQuery) || appliedAge > 0 || Boolean(appliedGender)}
+            />
+          </div>
 
-            <div className="flex-1 w-full min-w-0">
-
-
-              {/* Buttons */}
-              <LeaderboardActionButtons
-                isSorted={isSorted}
-                appliedAge={appliedAge}
-                isRefreshing={isRefreshing}
-                handleSortBySkill={handleSortBySkill}
-                handleClearAll={handleClearAll}
-                currentUserId={currentUserId}
-                handleSelfRemove={handleSelfRemove}
-                showPrint={false}
-                sortByText="Skill"
-                className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:mt-0"
-              />
-            </div>
-
-            {/* Player Cards */}
-            <div className="space-y-2 mt-2 w-full">
-              {filteredPlayers.length === 0 ? (
-                <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
-              ) : (
-                filteredPlayers.map((player, index) => {
-                  const isEditablePlayer = player.id === currentUserId;
-                  return (
-                    <PlayerCard
-                      key={player.id}
-                      player={player}
-                      overallRank={player.rank || index + 1}
-                      showAgeRank={showAgeRank}
-                      ageRank={index + 1}
-                      isInverted={isInverted}
-                      onSkillClick={handleSkillClick}
-                      onTargetAchieved={handleTargetAchieved} // No-op since celebration is handled inside PlayerCard
-                      isEditable={isEditablePlayer}
-                      loggedInUser={loggedInUser}
-                    />
-                  );
-                })
-              )}
-            </div>
+          {/* Player Cards */}
+          <div className="space-y-2 mt-2 w-full">
+            {filteredPlayers.length === 0 ? (
+              <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+            ) : (
+              filteredPlayers.map((player, index) => {
+                const isEditablePlayer = player.id === currentUserId;
+                return (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    overallRank={player.rank || index + 1}
+                    showAgeRank={showAgeRank}
+                    ageRank={index + 1}
+                    isInverted={isInverted}
+                    onSkillClick={handleSkillClick}
+                    onTargetAchieved={handleTargetAchieved} // No-op since celebration is handled inside PlayerCard
+                    isEditable={isEditablePlayer}
+                    loggedInUser={loggedInUser}
+                  />
+                );
+              })
+            )}
           </div>
         </div>
-      </main>
+      </div>
 
       <Dialog open={openSort} onOpenChange={setOpenSort}>
         <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">

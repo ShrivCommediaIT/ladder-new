@@ -34,6 +34,7 @@ const EditPlayerDetails = ({
   ladderId,
   selectedPlayer,
   onClose = () => {},
+  userLevel = false,
 }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -85,19 +86,20 @@ const EditPlayerDetails = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!form.user_id || !form.id) {
-      toast.error("User ID or Player ID is missing.");
-      return;
-    }
-
-    const formData = {
-      id: form.id,
-      name: form.name,
-      phone: form.phone,
-      gender: form.gender,
-      dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
-      age: calculateAge(form.dob),
-    };
+    const formData = userLevel
+      ? {
+          id: form.id,
+          name: form.name,
+          phone: form.phone,
+        }
+      : {
+          id: form.id,
+          name: form.name,
+          phone: form.phone,
+          gender: form.gender,
+          dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
+          age: calculateAge(form.dob),
+        };
 
     setShowSkeleton(true);
     dispatch(editUserDetails({ user_id: form.user_id, formData }));
@@ -179,26 +181,28 @@ const EditPlayerDetails = ({
             </div>
 
 
-                        <div>
-              <Label
-                htmlFor="dob"
-                className="text-gray-300 font-semibold py-2 text-lg"
-              >
-                Date of Birth
-              </Label>
+            {!userLevel && (
+              <div>
+                <Label
+                  htmlFor="dob"
+                  className="text-gray-300 font-semibold py-2 text-lg"
+                >
+                  Date of Birth
+                </Label>
 
-              <DateOfBirthInput
-                id="dob"
-                value={form.dob}
-                onChange={(date) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    dob: date,
-                  }))
-                }
-                className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
-              />
-            </div>
+                <DateOfBirthInput
+                  id="dob"
+                  value={form.dob}
+                  onChange={(date) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      dob: date,
+                    }))
+                  }
+                  className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                />
+              </div>
+            )}
 
             <div>
               <Label
@@ -218,22 +222,24 @@ const EditPlayerDetails = ({
               />
             </div>
 
-            <div className="w-full">
-              <Label className="text-gray-300 font-semibold py-2 text-lg">Gender</Label>
-              <Select
-                key={form.gender}
-                value={form.gender}
-                onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
-              >
-                <SelectTrigger className="bg-gray-700/50 border-gray-500 w-full text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12">
-                  <SelectValue placeholder="Select Gender" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {!userLevel && (
+              <div className="w-full">
+                <Label className="text-gray-300 font-semibold py-2 text-lg">Gender</Label>
+                <Select
+                  key={form.gender}
+                  value={form.gender}
+                  onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
+                >
+                  <SelectTrigger className="bg-gray-700/50 border-gray-500 w-full text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <Button
               type="submit"

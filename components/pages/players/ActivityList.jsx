@@ -10,7 +10,7 @@ import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { X } from "lucide-react";
 
-const ActivityLog = ({ ladderId: propLadderId }) => {
+const ActivityLog = ({ ladderId: propLadderId, userLevel = false }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
@@ -107,15 +107,17 @@ const ActivityLog = ({ ladderId: propLadderId }) => {
                 <p className="flex-1 text-sm text-[var(--best-board-text)] break-words leading-relaxed">
                   {activity.message}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(activity.id)}
-                  disabled={isDeleting}
-                  className="text-[var(--best-board-danger)] hover:scale-110 active:scale-95 transition-transform p-0.5"
-                  title="Delete Activity"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                {!userLevel && (
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(activity.id)}
+                    disabled={isDeleting}
+                    className="text-[var(--best-board-danger)] hover:scale-110 active:scale-95 transition-transform p-0.5"
+                    title="Delete Activity"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             );
           })

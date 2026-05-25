@@ -22,6 +22,7 @@ import BasicLeaderboardActivityEntryCard from "../players/BasicLeaderboardActivi
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
+import AgeFilter from "@/components/shared/AgeFilter";
 
 /* ---------------- HELPER FUNCTIONS ---------------- */
 
@@ -124,7 +125,7 @@ const PlayerCard = ({
   };
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] overflow-hidden relative gap-0 p-4 group">
+    <Card className="w-full rounded-xl shadow-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface)] hover:border-[var(--best-board-border-strong)] transition overflow-hidden relative gap-0 p-4 group">
       <div
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
@@ -262,7 +263,7 @@ const PlayerCard = ({
 };
 
 /* ---------------- MAIN COMPONENT ---------------- */
-const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
+const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
@@ -323,6 +324,10 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
   const isInverted = ladderDetails?.inverted == 0;
 
   useEffect(() => {
+    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+  }, [dispatch]);
+
+  useEffect(() => {
     if (!ladderId) return;
 
     const fetchSkillSetup = async () => {
@@ -372,7 +377,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
       const payload = {
         ladder_id: ladderId,
         type: "skill",
-        sortbyskillnumber :skillNo,
+        sortbyskillnumber: skillNo,
         age: age,
         age_type: ageType,
         gender: gender,
@@ -428,7 +433,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
       setIsSorted(true);
       setSelectedSkillFilter(skillNo);
       console.log("setSelectedSkillFilter", skillNo);
-      
+
       refreshLeaderboard(skillNo);
     },
     [refreshLeaderboard],
@@ -446,6 +451,40 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
     dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
     refreshLeaderboard(0, 0, "", "");
   }, [refreshLeaderboard]);
+
+  useEffect(() => {
+    if (onActionsChanged) {
+      const actions = [];
+
+      if (!isSorted && appliedAge === 0) {
+        actions.push({
+          id: "sort-by-activity",
+          label: "Sort by Activity",
+          icon: Funnel,
+          onClick: handleSortBySkill,
+        });
+      } else {
+        actions.push({
+          id: "clear-all-filters",
+          label: "Clear All Filters",
+          icon: Funnel,
+          onClick: handleClearAll,
+          tone: "danger",
+        });
+      }
+
+      actions.push({
+        id: "age-filter",
+        node: (
+          <div className="h-16 w-full flex items-center justify-center rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-card-soft)] hover:bg-[var(--best-board-surface)] transition-all px-2">
+            <AgeFilter onSearch={handleAgeSearch} user={true} resetSignal={playerSearchResetSignal} />
+          </div>
+        )
+      });
+
+      onActionsChanged(actions);
+    }
+  }, [isSorted, appliedAge, playerSearchResetSignal, onActionsChanged, handleAgeSearch]);
 
   const handleSkillClick = useCallback(
     (playerId, skillNumber) => {
@@ -492,66 +531,50 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId }) => {
 
   return (
     <>
-      <main className="min-h-screen flex justify-center ">
-        <div className="w-full max-w-2xl px-4 py-4 space-y-4">
-          {/* {loading && <p className="text-white text-center py-8"></p>} */}
+      <div className="w-full space-y-4 mt-4">
+      {/* {loading && <p className="text-white text-center py-8"></p>} */}
 
-          {/* Search + Buttons */}
-          <div className="flex flex-col sm:flex-col sm:items-start gap-2">
-            {/* Search Input */}
-            <div className="flex-1 w-full min-w-0">
-              <PlayerSearch
-                searchTerm={searchQuery}
-                setSearchTerm={setSearchQuery}
-                onAgeSearch={handleAgeSearch}
-                onClearFilters={handleClearFilters}
-                activeFilters={hasFiltersApplied}
-                defaultAge={appliedAge}
-                resetSignal={playerSearchResetSignal}
-              />
-            </div>
-
-            {/* Buttons */}
-            <LeaderboardActionButtons
-              isSorted={isSorted}
-              appliedAge={appliedAge}
-              isRefreshing={isRefreshing}
-              handleSortBySkill={handleSortBySkill}
-              handleClearAll={handleClearAll}
-              currentUserId={currentUserId}
-              handleSelfRemove={handleSelfRemove}
-              showPrint={true}
-              skills={safeSkillsForPrint}
-              ladderId={ladderId}
-              sortByText="Activity"
-            />
-          </div>
-
-          {/* Player Cards */}
-          <div className="space-y-2 mt-2">
-            {filteredPlayers.length === 0 ? (
-              <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
-            ) : filteredPlayers.map((player, index) => {
-              const isEditablePlayer = player.id === currentUserId;
-              return (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  overallRank={player.rank || index + 1}
-                  appliedAge={appliedAge}
-                  ageRank={index + 1}
-                  isInverted={isInverted}
-                  onSkillClick={handleSkillClick}
-                  isEditable={isEditablePlayer}
-                  loggedInUser={loggedInUser}
-                />
-              );
-            })}
-          </div>
+      <div className="flex flex-col sm:flex-col sm:items-start gap-2">
+        {/* Search Input */}
+        <div className="flex-1 w-full min-w-0">
+          <PlayerSearch
+            searchTerm={searchQuery}
+            setSearchTerm={setSearchQuery}
+            onClearFilters={handleClearFilters}
+            activeFilters={hasFiltersApplied}
+            resetSignal={playerSearchResetSignal}
+          />
         </div>
-      </main>
 
+        <BasicLeaderboardPrintSkillsSheet
+          skills={safeSkillsForPrint}
+          ladderId={ladderId}
+          className="hidden"
+        />
+      </div>
 
+      {/* Player Cards */}
+      <div className="space-y-2 mt-2">
+        {filteredPlayers.length === 0 ? (
+          <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+        ) : filteredPlayers.map((player, index) => {
+          const isEditablePlayer = player.id === currentUserId;
+          return (
+            <PlayerCard
+              key={player.id}
+              player={player}
+              overallRank={player.rank || index + 1}
+              appliedAge={appliedAge}
+              ageRank={index + 1}
+              isInverted={isInverted}
+              onSkillClick={handleSkillClick}
+              isEditable={isEditablePlayer}
+              loggedInUser={loggedInUser}
+            />
+          );
+        })}
+      </div>
+    </div>
 
       <Dialog open={openSort} onOpenChange={setOpenSort}>
         <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">

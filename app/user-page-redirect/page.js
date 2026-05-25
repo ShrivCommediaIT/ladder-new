@@ -6,17 +6,20 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 
-import LadderRuleCardUser from "@/components/pages/users/LadderRuleCardUser";
-import UserHeading from "@/components/pages/users/UserHeading";
 import UserDetailsTypeUser from "@/components/shared/UserDetailsTypeUser";
-import ContactAdmin from "@/components/shared/ContactAdmin";
 import MinileaguePlayers from "@/components/pages/users/MinileaguePlayers";
 import InfoBar from "@/components/pages/users/InfoBar";
 import { Button } from "@/components/ui/button";
-import ActivityLogUser from "@/components/shared/ActivityLogUser";
 import PlayersList from "@/components/pages/users/PlayersList";
 import BasicLeaderboardUser from "@/components/pages/users/BasicLeaderboardUser";
 import RosterLeaderboardUser from "@/components/pages/users/RosterLeaderboardUser";
+import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
+import BespokeFooter from "@/components/shared/BespokeFooter";
+import InfoSection from "@/components/shared/InfoSection";
+import { EditPlayer } from "@/components/shared/EditPlayer";
+import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { User, XCircle } from "lucide-react";
 
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
@@ -28,10 +31,18 @@ function UserPageRedirectRouter() {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
+  // ---------------- URL PARAMS ----------------
+  const ladderId = searchParams.get("ladder_id");
+  const ladderType = searchParams.get("ladder_type");
+
   const [isLadderView, setIsLadderView] = useState(true);
   const [isDesktop, setIsDesktop] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // User Action Modals State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
 
   // ---------------- GET USER FROM LOCALSTORAGE ----------------
   useEffect(() => {
@@ -58,9 +69,36 @@ function UserPageRedirectRouter() {
   // ---------------- USER ID (only localStorage) ----------------
   const loggedInUserId = user?.user_id || user?.id || null;
 
-  // ---------------- URL PARAMS ----------------
-  const ladderId = searchParams.get("ladder_id");
-  const ladderType = searchParams.get("ladder_type");
+  // Resolve current user rank from Redux
+  const players =
+    useSelector((state) => state.player?.players?.[Number(ladderId)]?.data) || [];
+  const currentUser = players.find((p) => Number(p.id) === Number(loggedInUserId));
+  const myRank = currentUser?.rank || "-";
+
+  // Invite URL and User Quick Actions
+  const inviteUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`
+    : "";
+
+  const quickActions = [];
+  if (loggedInUserId) {
+    quickActions.push({
+      id: "edit-profile",
+      label: "Edit Profile",
+      icon: User,
+      onClick: () => setIsEditModalOpen(true),
+    });
+
+    quickActions.push({
+      id: "leave-ladder",
+      label: "Leave Ladder",
+      icon: XCircle,
+      tone: "danger",
+      onClick: () => setIsLeaveDialogOpen(true),
+    });
+  }
+
+
 
   const isMiniLeague = ladderType === "minileague";
   const isSkill = ladderType === "skill";
@@ -71,6 +109,8 @@ function UserPageRedirectRouter() {
   // Redundant fetch removed because child components (MinileaguePlayers, BasicLeaderboardUser, etc.) 
   // handle their own data fetching including specific filters like age and gender.
 
+  const [extraActions, setExtraActions] = useState([]);
+
   // ---------------- PLAYERS RENDER ----------------
   const renderPlayers = () => {
     if (isMiniLeague) {
@@ -78,12 +118,18 @@ function UserPageRedirectRouter() {
         <MinileaguePlayers
           ladderId={ladderId}
           editableUserId={loggedInUserId}
+          onActionsChanged={setExtraActions}
         />
       );
     }
 
     if (isSkill) {
-      return <BasicLeaderboardUser ladderId={ladderId} />;
+      return (
+        <BasicLeaderboardUser
+          ladderId={ladderId}
+          onActionsChanged={setExtraActions}
+        />
+      );
     }
 
     if (isPositive) {
@@ -91,6 +137,7 @@ function UserPageRedirectRouter() {
         <PositiveLeaderboardUser
           ladderId={ladderId}
           ladderType={ladderType}
+          onActionsChanged={setExtraActions}
         />
       );
     }
@@ -100,6 +147,7 @@ function UserPageRedirectRouter() {
         <NegativeLeaderboardUser
           ladderId={ladderId}
           ladderType={ladderType}
+          onActionsChanged={setExtraActions}
         />
       );
     }
@@ -118,7 +166,9 @@ function UserPageRedirectRouter() {
     return (
       <PlayersList
         ladderId={ladderId}
+        ladderType={ladderType}
         editableUserId={loggedInUserId}
+        onActionsChanged={setExtraActions}
       />
     );
   };
@@ -148,66 +198,107 @@ function UserPageRedirectRouter() {
     );
   }
 
-  // ---------------- UI ----------------
+  const baseActions = [];
+  if (loggedInUserId) {
+    baseActions.push({
+      id: "edit-profile",
+      label: "Edit Profile",
+      icon: User,
+      onClick: () => setIsEditModalOpen(true),
+    });
+
+    baseActions.push({
+      id: "leave-ladder",
+      label: "Leave Ladder",
+      icon: XCircle,
+      tone: "danger",
+      onClick: () => setIsLeaveDialogOpen(true),
+    });
+  }
+
+  const mergedQuickActions = [...baseActions, ...extraActions];
+
   return (
-    <div className="flex flex-col bg-gray-800 min-h-screen">
-      <header className="sticky top-0 z-50 backdrop-blur-md">
-        <div className="px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
-          <UserHeading />
+    <div className="ladder-shell flex flex-col min-h-screen">
+      <PlayerLevelNavbar
+        userLevel={true}
+        ladderType={ladderType}
+      />
 
-          <div className="flex items-center gap-4">
-            <Button
-              size="sm"
-              onClick={() => setIsLadderView((v) => !v)}
-              className="py-2 px-3 bg-gray-700 shadow border-gray-700 text-white cursor-pointer"
-            >
-              {isLadderView ? "Ladder ON" : "Ladder OFF"}
-            </Button>
 
-            <UserDetailsTypeUser ladderType={ladderType} />
-          </div>
+      <main className="w-full px-1 pb-6 sm:px-6 lg:px-10 py-4">
+        <div className="grid items-start gap-6 grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_360px] xl:grid-cols-[minmax(0,0.86fr)_400px]">
+          <AnimatePresence>
+            {isLadderView && (
+              <motion.div
+                key="ladder"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="min-w-0"
+              >
+                {renderPlayers()}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {(!isLadderView || isDesktop) && (
+              <motion.div
+                key="sidebar"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col gap-4"
+              >
+                <InfoSection
+                  userLevel={true}
+                  ladderType={ladderType}
+                  user={user}
+                  inviteUrl={inviteUrl}
+                  quickActions={mergedQuickActions}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </header>
-
-      <div className="px-4 py-2">
-        <InfoBar />
-      </div>
-
-      <main className="flex flex-col lg:flex-row lg:w-full gap-4">
-        <AnimatePresence>
-          {isLadderView && (
-            <motion.div
-              key="ladder"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="flex-1"
-            >
-              {renderPlayers()}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {(!isLadderView || isDesktop) && (
-            <motion.div
-              key="sidebar"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col flex-1 gap-4"
-            >
-              <ContactAdmin />
-              <LadderRuleCardUser />
-              <ActivityLogUser ladderId={ladderId} />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </main>
 
+
       <ToastContainer />
+
+      {isEditModalOpen && (
+        <EditPlayer
+          open={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            if (ladderId && ladderType) {
+              dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderType }));
+            }
+          }}
+          currentId={loggedInUserId}
+          ladder_id={ladderId}
+          ladder_type={ladderType}
+        />
+      )}
+
+      <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>
+        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
+          <BasicLeaderboardUserRemove
+            ladderId={ladderId}
+            myRank={myRank}
+            onClose={() => setIsLeaveDialogOpen(false)}
+            onSuccessRefresh={() => {
+              setIsLeaveDialogOpen(false);
+              if (ladderId && ladderType) {
+                dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderType }));
+              }
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

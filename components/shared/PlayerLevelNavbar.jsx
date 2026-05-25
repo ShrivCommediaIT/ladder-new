@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
+import { IMAGE_BASE_URL } from "@/constants/api";
 import {
   LogOut,
   UserCircle2,
@@ -56,6 +58,7 @@ const PlayerLevelNavbar = ({
   ladderType,
   searchValue = "",
   onSearchChange,
+  userLevel = false,
 }) => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -81,11 +84,24 @@ const PlayerLevelNavbar = ({
   const resolvedType = ladderType || playerEntry?.ladderDetails?.type || "";
   const resolvedTypeLabel = formatLadderType(resolvedType);
 
-  const isPlayersPage = activeTab === "players";
-  const showQuickGuide = !isPlayersPage;
+  const logo = playerEntry?.ladderDetails?.logo || null;
+  const imagePath =
+    logo && logo !== "null"
+      ? logo.startsWith("http")
+        ? logo
+        : `${IMAGE_BASE_URL}/${logo}`
+      : null;
+
+  const isPlayersPage = activeTab === "players" || userLevel;
+  const showQuickGuide = !isPlayersPage && !userLevel;
   const userInitial = user?.name?.trim()?.[0]?.toUpperCase() || "?";
   const displayName = user?.name || "Guest";
-  const roleLabel = user?.user_type === "sub_admin" ? "Sub Admin" : "Admin";
+  const roleLabel =
+    user?.user_type === "admin"
+      ? "Admin"
+      : user?.user_type === "sub_admin"
+      ? "Sub Admin"
+      : "Player";
 
   useEffect(() => {
     setMounted(true);
@@ -97,8 +113,10 @@ const PlayerLevelNavbar = ({
     try {
       const storedAdmin = sessionStorage.getItem("userData");
       const storedSubAdmin = sessionStorage.getItem("subAdmin");
+      const storedUser = sessionStorage.getItem("user");
       const admin = storedAdmin ? JSON.parse(storedAdmin) : null;
       const subAdmin = storedSubAdmin ? JSON.parse(storedSubAdmin) : null;
+      const normalUser = storedUser ? JSON.parse(storedUser) : null;
 
       if (admin?.user_type === "admin") {
         setUser(admin);
@@ -106,6 +124,10 @@ const PlayerLevelNavbar = ({
       }
       if (subAdmin?.user_type === "sub_admin") {
         setUser(subAdmin);
+        return;
+      }
+      if (normalUser) {
+        setUser(normalUser);
         return;
       }
       setUser(null);
@@ -177,9 +199,20 @@ const PlayerLevelNavbar = ({
           <div className="flex h-14 items-center justify-between gap-3">
             {isPlayersPage ? (
               <div className="flex min-w-0 flex-1 items-start gap-3">
-                <div className="best-board-pill flex h-10 min-w-14 items-center justify-center rounded-lg px-3 text-sm font-bold">
+                <div className="best-board-pill flex h-10 min-w-14 items-center justify-center rounded-lg px-3 text-sm font-bold shrink-0">
                   {resolvedType === "best3" ? "B3" : resolvedType === "winlose" ? "W/L" : "B5"}
                 </div>
+                {imagePath && (
+                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 shadow-md">
+                    <Image
+                      src={imagePath}
+                      alt="Ladder Logo"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                )}
                 <div className="min-w-0">
                   <h1
                     className={`truncate text-shadow-muted text-p4 md:text-h5 font-extrabold tracking-[0.08em] ${
@@ -211,7 +244,7 @@ const PlayerLevelNavbar = ({
               </button>
             )}
 
-            {!isPlayersPage && (
+            {!userLevel && !isPlayersPage && (
               <div className="hidden md:flex items-center gap-1">
                 {NAV_LINKS.map(({ label, key }) => {
                   const isActive = currentTab === key;
@@ -242,6 +275,7 @@ const PlayerLevelNavbar = ({
 
             <div className="flex items-center gap-2">
               
+              {!userLevel && (
                 <button
                   onClick={() => setQuickGuideOpen(true)}
                   className="hidden sm:flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200"
@@ -254,6 +288,7 @@ const PlayerLevelNavbar = ({
                   <BookOpen className="h-3.5 w-3.5" />
                   Quick Guide
                 </button>
+              )}
 
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -289,38 +324,42 @@ const PlayerLevelNavbar = ({
                       <p className="text-xs text-slate-400">{roleLabel}</p>
                     </div>
 
-                    <button
-                      onClick={handleDashboard}
-                      className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
-                    >
-                      <Shield className="h-4 w-4 text-blue-400" />
-                      {user?.user_type === "sub_admin" ? "Sub-Admin Dashboard" : "Admin Dashboard"}
-                    </button>
+                    {!userLevel && (
+                      <>
+                        <button
+                          onClick={handleDashboard}
+                          className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                        >
+                          <Shield className="h-4 w-4 text-blue-400" />
+                          {user?.user_type === "sub_admin" ? "Sub-Admin Dashboard" : "Admin Dashboard"}
+                        </button>
 
-                    {user?.user_type === "admin" && (
-                      <button
-                        onClick={() => {
-                          router.push(createClubId);
-                          setProfileOpen(false);
-                        }}
-                        className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
-                      >
-                        <UserCircle2 className="h-4 w-4 text-blue-400" />
-                        Generate Club ID
-                      </button>
-                    )}
+                        {user?.user_type === "admin" && (
+                          <button
+                            onClick={() => {
+                              router.push(createClubId);
+                              setProfileOpen(false);
+                            }}
+                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                          >
+                            <UserCircle2 className="h-4 w-4 text-blue-400" />
+                            Generate Club ID
+                          </button>
+                        )}
 
-                    {user?.user_type === "admin" && (
-                      <button
-                        onClick={() => {
-                          setIsChangePasswordOpen(true);
-                          setProfileOpen(false);
-                        }}
-                        className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
-                      >
-                        <Key className="h-4 w-4 text-emerald-400" />
-                        Change Password
-                      </button>
+                        {user?.user_type === "admin" && (
+                          <button
+                            onClick={() => {
+                              setIsChangePasswordOpen(true);
+                              setProfileOpen(false);
+                            }}
+                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                          >
+                            <Key className="h-4 w-4 text-emerald-400" />
+                            Change Password
+                          </button>
+                        )}
+                      </>
                     )}
 
                     <button
@@ -347,13 +386,15 @@ const PlayerLevelNavbar = ({
                 )}
               </div>
 
-              <button
-                onClick={() => setMobileOpen((previous) => !previous)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white md:hidden"
-                aria-label="Toggle mobile menu"
-              >
-                {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
+              {!userLevel && (
+                <button
+                  onClick={() => setMobileOpen((previous) => !previous)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white md:hidden"
+                  aria-label="Toggle mobile menu"
+                >
+                  {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
+              )}
             </div>
           </div>
         </div>

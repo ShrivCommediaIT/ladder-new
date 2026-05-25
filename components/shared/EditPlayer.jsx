@@ -39,7 +39,9 @@ export const EditPlayer = ({
   currentId = null,
   setLoading = () => { },
   ladderId = null,
+  ladder_id: propLadderId = null,
   ladder_type: propLadderType = null,
+  userLevel = false,
 }) => {
   const dispatch = useDispatch();
 
@@ -60,7 +62,7 @@ export const EditPlayer = ({
   }, []);
 
   const userId = Number(localUser?.id || localUser?.user_id || null);
-  const ladder_id = Number(ladderId || localUser?.ladder_id || null);
+  const ladder_id = Number(ladderId || propLadderId || localUser?.ladder_id || null);
 
 
   const storePlayers =
@@ -158,7 +160,9 @@ export const EditPlayer = ({
   /* If roster → only Edit + Upload */
 
   const tabs =
-    ladderType === "roster"
+    userLevel
+      ? allTabs.filter((t) => t.value === "edit")
+      : ladderType === "roster"
       ? allTabs.filter((t) => t.value === "edit" || t.value === "load")
       : allTabs;
 
@@ -265,6 +269,7 @@ export const EditPlayer = ({
                     userId={selectedPlayer?.id}       // ✅ pass explicitly
                     ladderId={ladder_id}
                     onClose={onClose}
+                    userLevel={userLevel}
                   />
                 )}
               </TabsContent>
