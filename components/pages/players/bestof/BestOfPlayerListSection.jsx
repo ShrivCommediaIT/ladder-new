@@ -89,7 +89,7 @@ const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
           e.stopPropagation();
           onChallenge(player);
         }}
-        className="hidden rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-3 py-1.5 text-xs font-medium text-white transition group-hover:block"
+        className="hidden rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-3 py-1.5 text-xs font-medium text-[var(--best-board-text)] transition group-hover:block cursor-pointer"
       >
         Challenge
       </button>

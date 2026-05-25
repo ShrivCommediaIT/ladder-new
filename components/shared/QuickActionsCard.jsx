@@ -15,7 +15,7 @@ export function QuickActionButton({ icon: Icon, label, onClick, disabled = false
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-lg h-16 w-full border px-4 text-white shadow-none transition hover:-translate-y-0.5 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight disabled:cursor-not-allowed disabled:opacity-60 ${TONE_CLASSES[tone] || TONE_CLASSES.default}`}
+      className={`rounded-lg h-16 w-full border px-4 text-[var(--best-board-text)] shadow-none transition hover:-translate-y-0.5 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight disabled:cursor-not-allowed disabled:opacity-60 ${TONE_CLASSES[tone] || TONE_CLASSES.default}`}
     >
       {Icon && <Icon className="h-5 w-5" />}
       <span>{label}</span>

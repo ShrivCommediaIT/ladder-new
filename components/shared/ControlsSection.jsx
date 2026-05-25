@@ -10,6 +10,13 @@ import {
 } from "@/components/ui/dialog";
 import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
 import { ArrowDownUp, Filter, Plus, RotateCcw } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const ActionButton = ({ icon: Icon, children, active = false, ...props }) => (
   <button
@@ -167,17 +174,25 @@ export default function ControlsSection({
           {showSectionSize ? (
             <div className="flex items-center gap-3">
               <span className="text-sm text-[var(--best-board-muted)]">{sectionLabel}</span>
-              <select
-                value={groupSize}
-                onChange={(e) => onPresetChange?.(Number(e.target.value))}
-                className="h-10 rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-3 text-sm text-white outline-none"
+              <Select
+                value={String(groupSize)}
+                onValueChange={(value) => onPresetChange?.(Number(value))}
               >
-                {sectionOptions.map((size) => (
-                  <option key={size} value={size}>
-                    {size} sections
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="h-10 w-36 rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-3 text-sm text-[var(--primary)] font-medium outline-none shadow-none flex items-center justify-between">
+                  <SelectValue placeholder={`${groupSize} sections`} />
+                </SelectTrigger>
+                <SelectContent className="w-36 min-w-[9rem] max-w-[9rem] bg-white dark:bg-[var(--best-board-surface)] border border-[var(--best-board-border)] text-[var(--best-board-text)] shadow-lg z-50">
+                  {sectionOptions.map((size) => (
+                    <SelectItem
+                      key={size}
+                      value={String(size)}
+                      className="text-black dark:text-white text-xs hover:bg-[var(--best-board-surface-soft)] focus:bg-[var(--best-board-surface-soft)] focus:text-[var(--best-board-text)] cursor-pointer"
+                    >
+                      {size} sections
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           ) : null}
         </div>
