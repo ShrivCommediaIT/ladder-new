@@ -47,7 +47,31 @@ const LadderLinkPanel = ({ ladderId, ladderType }) => {
     setLoginUrl(url);
   }, [ladderId, ladderType]);
 
-  const handleCopy = () => {
+  const copyToClipboard = async (text) => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.setAttribute("readonly", "");
+    textArea.style.position = "absolute";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.select();
+
+    const copiedSuccessfully = document.execCommand("copy");
+    document.body.removeChild(textArea);
+
+    return copiedSuccessfully;
+  };
+
+  const handleCopy = async () => {
     if (!loginUrl) return;
 
     if (isDemo) {
@@ -55,10 +79,20 @@ const LadderLinkPanel = ({ ladderId, ladderType }) => {
       return;
     }
 
-    navigator.clipboard.writeText(loginUrl);
-    setCopied(true);
+    try {
+      const copiedSuccessfully = await copyToClipboard(loginUrl);
 
-    setTimeout(() => setCopied(false), 2000);
+      if (!copiedSuccessfully) {
+        toast.error("Unable to copy link");
+        return;
+      }
+
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Copy failed", error);
+      toast.error("Unable to copy link");
+    }
   };
 
   if (!loginUrl) return null;
