@@ -27,7 +27,7 @@ export default function BespokeFooter() {
         >
           <div className="relative aspect-[680/232] min-h-[118px] w-full sm:min-h-[150px] md:min-h-[185px] lg:min-h-[220px] xl:h-full xl:min-h-[232px]">
             <Image
-              src="/ai.PNG"
+              src="/ai.png"
               alt="SSP AI Assistant"
               fill
               sizes="(max-width: 1279px) 100vw, 50vw"
@@ -45,7 +45,7 @@ export default function BespokeFooter() {
         >
           <div className="relative aspect-[612/267] min-h-[138px] w-full sm:min-h-[175px] md:min-h-[220px] lg:min-h-[250px] xl:h-full xl:min-h-[267px]">
             <Image
-              src="/wtsapp.PNG"
+              src="/wtsapp.png"
               alt="WhatsApp contact card"
               fill
               sizes="(max-width: 1279px) 100vw, 50vw"
