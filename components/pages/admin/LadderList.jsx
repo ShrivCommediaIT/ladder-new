@@ -205,8 +205,8 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                       className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm cursor-pointer
                         ${
                           isDemo
-                            ? "text-cyan-300 border border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"
-                            : "text-cyan-300 border border-cyan-300/30 hover:bg-cyan-300/10 hover:text-white"
+                            ? "text-primary border border-primary/50 hover:bg-primary/10 hover:text-primary"
+                            : "text-primary border border-primary/30 hover:bg-primary/10 hover:text-primary"
                         }`}
                       onClick={() =>
                         handleEditClick(ladder.id, ladder.type, ladder.inverted)
