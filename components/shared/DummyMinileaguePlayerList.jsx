@@ -21,6 +21,38 @@ import { Button } from "@/components/ui/button";
 import Logo from "@/public/logo1.png";
 import PlayerPerformationRanking from "./PlayerPerformationRanking";
 
+const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
+  const rankNum = Number(rank);
+  let src = "/ranksImg/rank.png";
+  let scaleClass = "scale-[1.22] group-hover:scale-[1.34]";
+  if (rankNum === 1) {
+    src = "/ranksImg/rank-1.png";
+    scaleClass = "scale-100 group-hover:scale-110";
+  } else if (rankNum === 2) {
+    src = "/ranksImg/rank-2.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  } else if (rankNum === 3) {
+    src = "/ranksImg/rank-3.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  }
+
+  return (
+    <div className={`relative flex shrink-0 items-center justify-center select-none ${sizeClass}`}>
+      <Image
+        src={src}
+        alt={`Rank ${rank}`}
+        width={imgSize}
+        height={imgSize}
+        className={`object-contain transition-transform duration-200 ${scaleClass} ${sizeClass}`}
+        unoptimized
+      />
+      <span className={`absolute inset-0 flex items-center justify-center font-black text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)] ${textClass}`}>
+        {rank}
+      </span>
+    </div>
+  );
+};
+
 const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupSize }) => {
   if (isBlank) {
     return (
@@ -48,7 +80,7 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       onClick={onClick}
-      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans sm:px-4 sm:py-3 ${isAllowed && canEdit
+      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans sm:px-4 sm:py-3 group ${isAllowed && canEdit
           ? "cursor-pointer hover:bg-[#143238]"
           : "opacity-70 cursor-not-allowed"
         }`}
@@ -62,9 +94,7 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
         <div className="flex w-full items-center mb-2 min-w-0">
 
           {/* RANK */}
-          <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#48aaa8] border-2 border-white text-lg sm:text-2xl font-bold text-white mr-2 shrink-0">
-            {rank}
-          </div>
+          <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
 
           {/* NAME + PHONE */}
           <div className="flex-1 min-w-0 overflow-hidden">

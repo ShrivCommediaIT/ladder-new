@@ -16,6 +16,38 @@ import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import PlayerStatusToggle from "./PlayerStatusToggle";
 
+const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
+  const rankNum = Number(rank);
+  let src = "/ranksImg/rank.png";
+  let scaleClass = "scale-[1.22] group-hover:scale-[1.34]";
+  if (rankNum === 1) {
+    src = "/ranksImg/rank-1.png";
+    scaleClass = "scale-100 group-hover:scale-110";
+  } else if (rankNum === 2) {
+    src = "/ranksImg/rank-2.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  } else if (rankNum === 3) {
+    src = "/ranksImg/rank-3.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  }
+
+  return (
+    <div className={`relative flex shrink-0 items-center justify-center select-none ${sizeClass}`}>
+      <Image
+        src={src}
+        alt={`Rank ${rank}`}
+        width={imgSize}
+        height={imgSize}
+        className={`object-contain transition-transform duration-200 ${scaleClass} ${sizeClass}`}
+        unoptimized
+      />
+      <span className={`absolute inset-0 flex items-center justify-center font-black text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)] ${textClass}`}>
+        {rank}
+      </span>
+    </div>
+  );
+};
+
 /* ─────────────────────────────────────────────
    1. DEFAULT CARD  (bestof5 / best5 / best3 / winlose)
 ───────────────────────────────────────────── */
@@ -32,12 +64,10 @@ const DefaultPlayerCard = ({ player, rank }) => {
       >
         <PlayerStatusToggle player={player} user={true} />
       </div>
-      <div className="flex items-center justify-between px-2 py-2 sm:px-4 sm:py-3">
+      <div className="flex items-center justify-between px-2 py-2 sm:px-4 sm:py-3 group">
         <div className="flex-1">
         <div className="flex w-full items-center mb-2">
-          <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#48aaa8] border-2 border-white text-lg sm:text-2xl font-bold text-white mr-2 shrink-0">
-            {rank}
-          </div>
+          <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
           <div className="flex-1 min-w-0">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
               {player?.name || "N/A"}
@@ -74,10 +104,10 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
       >
         <PlayerStatusToggle player={player} user={true} />
       </div>
-      <div className="flex items-center justify-between px-2 py-2 sm:px-4 sm:py-3">
+      <div className="flex items-center justify-between px-2 py-2 sm:px-4 sm:py-3 group">
         <div className="flex-1 min-w-0 overflow-hidden">
         <div className="flex w-full items-center mb-2 min-w-0">
-          <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#48aaa8] border-2 border-white text-lg sm:text-2xl font-bold text-white mr-2 shrink-0">{rank}</div>
+          <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
           <div className="flex-1 min-w-0 overflow-hidden">
             <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate max-w-[160px] sm:max-w-[240px]">
               {player?.name || "N/A"}
@@ -144,7 +174,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
   };
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] mb-3 overflow-hidden">
+    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] mb-3 overflow-hidden group">
       <div
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
@@ -171,7 +201,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
               <p className="text-[9px] text-white mt-1 font-semibold">Total Pts</p>
             </div>
             <div className="flex flex-col items-center">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black text-xs sm:text-sm">{rank}</div>
+              <PlayerRankBadge rank={rank} />
               <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
             </div>
           </div>
@@ -222,7 +252,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
 const RosterPlayerCard = ({ player, rank }) => {
   const src = player.image ? `${IMAGE_BASE_URL}/${player.image}` : Logo;
   return (
-    <div className="flex flex-col mb-3 rounded-lg bg-[#1a2f3d] border border-[#4eb0a2] overflow-hidden">
+    <div className="flex flex-col mb-3 rounded-lg bg-[#1a2f3d] border border-[#4eb0a2] overflow-hidden group">
       <div
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
@@ -230,7 +260,7 @@ const RosterPlayerCard = ({ player, rank }) => {
         <PlayerStatusToggle player={player} user={true} />
       </div>
       <div className="flex items-center justify-between px-3 py-3 gap-3">
-        <div className="w-7 h-7 rounded-full bg-[#48aaa8] text-white font-bold flex items-center justify-center text-xs flex-shrink-0">{rank}</div>
+        <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16" imgSize={64} textClass="text-xs sm:text-sm" />
         <div className="flex flex-col min-w-0 flex-1">
           <div className="border border-white text-white text-[10px] px-1.5 py-0.5 w-fit mb-1">{"status : " + (player?.token_status || "Newcomer")}</div>
           <div className="flex items-center gap-1 flex-wrap">

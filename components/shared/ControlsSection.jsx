@@ -68,21 +68,23 @@ export default function ControlsSection({
 }) {
   return (
     <>
-      <div className="mb-4 flex gap-2 lg:hidden">
-        {mobileSections.map((section) => (
-          <button
-            key={section.id}
-            type="button"
-            onClick={() => setMobileSection(section.id)}
-            className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium ${
-              mobileSection === section.id
-                ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)]"
-                : "border-[var(--best-board-border)] bg-[var(--best-board-surface)]"
-            }`}
-          >
-            {section.label}
-          </button>
-        ))}
+      <div className="mb-4 flex gap-2 lg:hidden mt-5">
+        {mobileSections
+          .filter((section) => section.id !== "toolbar" && section.label !== "Tools")
+          .map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              onClick={() => setMobileSection(section.id)}
+              className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium ${
+                mobileSection === section.id
+                  ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)]"
+                  : "border-[var(--best-board-border)] bg-[var(--best-board-surface)]"
+              }`}
+            >
+              {section.label}
+            </button>
+          ))}
       </div>
 
       <div className={`${mobileSection === "toolbar" || mobileSection === "players" ? "block" : "hidden"} lg:sticky lg:top-[4.8rem] lg:z-30 lg:block`}>

@@ -50,6 +50,38 @@ const getRankBySkillNumber = (ranks, skillNumber) => {
   return rankObj ? rankObj.rank : "-";
 };
 
+const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
+  const rankNum = Number(rank);
+  let src = "/ranksImg/rank.png";
+  let scaleClass = "scale-[1.22] group-hover:scale-[1.34]";
+  if (rankNum === 1) {
+    src = "/ranksImg/rank-1.png";
+    scaleClass = "scale-100 group-hover:scale-110";
+  } else if (rankNum === 2) {
+    src = "/ranksImg/rank-2.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  } else if (rankNum === 3) {
+    src = "/ranksImg/rank-3.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  }
+
+  return (
+    <div className={`relative flex shrink-0 items-center justify-center select-none ${sizeClass}`}>
+      <Image
+        src={src}
+        alt={`Rank ${rank}`}
+        width={imgSize}
+        height={imgSize}
+        className={`object-contain transition-transform duration-200 ${scaleClass} ${sizeClass}`}
+        unoptimized
+      />
+      <span className={`absolute inset-0 flex items-center justify-center font-black text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)] ${textClass}`}>
+        {rank}
+      </span>
+    </div>
+  );
+};
+
 /* ---------------- PLAYER CARD ---------------- */
 
 const PlayerCard = ({ player, overallRank, onSkillClick, isEditable,isInverted }) => {
@@ -58,7 +90,7 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable,isInverted }
     : Logo;
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3">
+    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] p-2 sm:p-3 group">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10">
@@ -82,9 +114,7 @@ const PlayerCard = ({ player, overallRank, onSkillClick, isEditable,isInverted }
             <p className="text-[10px] text-white mt-1">Total Pts</p>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-9 h-9 rounded-full bg-blue-200 border-2 border-white flex items-center justify-center font-bold text-black">
-              {overallRank}
-            </div>
+            <PlayerRankBadge rank={overallRank} />
             <p className="text-[10px] text-white mt-1">Overall Rank</p>
           </div>
         </div>

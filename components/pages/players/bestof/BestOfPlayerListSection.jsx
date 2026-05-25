@@ -20,6 +20,38 @@ const SectionBadge = ({ count }) => (
   </span>
 );
 
+const PlayerRankBadge = ({ rank }) => {
+  const rankNum = Number(rank);
+  let src = "/ranksImg/rank.png";
+  let scaleClass = "scale-[1.22] group-hover:scale-[1.34]";
+  if (rankNum === 1) {
+    src = "/ranksImg/rank-1.png";
+    scaleClass = "scale-100 group-hover:scale-110";
+  } else if (rankNum === 2) {
+    src = "/ranksImg/rank-2.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  } else if (rankNum === 3) {
+    src = "/ranksImg/rank-3.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  }
+
+  return (
+    <div className="relative flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center select-none">
+      <Image
+        src={src}
+        alt={`Rank ${rank}`}
+        width={64}
+        height={64}
+        className={`h-12 w-12 sm:h-16 sm:w-16 object-contain transition-transform duration-200 ${scaleClass}`}
+        unoptimized
+      />
+      <span className="absolute inset-0 flex items-center justify-center text-xs sm:text-sm font-black text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)]">
+        {rank}
+      </span>
+    </div>
+  );
+};
+
 const PlayerAvatar = ({ player, rank }) => {
   const imageUrl = getPlayerImageUrl(player);
   if (imageUrl) {
@@ -27,9 +59,9 @@ const PlayerAvatar = ({ player, rank }) => {
       <Image
         src={imageUrl}
         alt={player?.name || "Player"}
-        width={38}
-        height={38}
-        className="h-10 w-10 rounded-full object-cover"
+        width={64}
+        height={64}
+        className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shrink-0"
         unoptimized
       />
     );
@@ -38,13 +70,13 @@ const PlayerAvatar = ({ player, rank }) => {
   if (!player?.image) {
     const colorClass = PLAYER_COLOR_CLASSES[(Number(rank) - 1) % PLAYER_COLOR_CLASSES.length];
     return (
-      <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br ${colorClass} text-sm font-bold text-white`}>
+      <div className={`flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br ${colorClass} text-sm sm:text-base font-bold text-white shrink-0`}>
         {getPlayerInitials(player?.name)}
       </div>
     );
   }
 
-  return <Image src={Logo} alt="Player" width={38} height={38} className="h-10 w-10 rounded-full object-cover" />;
+  return <Image src={Logo} alt="Player" width={64} height={64} className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shrink-0" />;
 };
 
 const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
@@ -60,9 +92,7 @@ const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
       }`}
   >
     <div className="flex min-w-0 items-center gap-3">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-sm font-semibold text-[var(--best-board-muted)]">
-        {rank}
-      </div>
+      <PlayerRankBadge rank={rank} />
       <PlayerAvatar player={player} rank={rank} />
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">

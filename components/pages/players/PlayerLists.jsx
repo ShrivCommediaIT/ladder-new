@@ -394,7 +394,7 @@ export const PlayerLists = () => {
       />
 
       {isBestLayout ? (
-        <div className="w-full px-4 pb-6 sm:px-6 lg:px-10">
+        <div className="w-full px-1 pb-6 sm:px-6 lg:px-10">
           <PlayersLists1 searchValue={bestSearchValue} onSearchChange={setBestSearchValue} />
         </div>
       ) : (

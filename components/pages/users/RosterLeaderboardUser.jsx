@@ -16,6 +16,38 @@ import { EditPlayer } from "@/components/shared/EditPlayer";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import PlayerSearch from "./PlayerSearch";
 
+const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
+  const rankNum = Number(rank);
+  let src = "/ranksImg/rank.png";
+  let scaleClass = "scale-[1.22] group-hover:scale-[1.34]";
+  if (rankNum === 1) {
+    src = "/ranksImg/rank-1.png";
+    scaleClass = "scale-100 group-hover:scale-110";
+  } else if (rankNum === 2) {
+    src = "/ranksImg/rank-2.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  } else if (rankNum === 3) {
+    src = "/ranksImg/rank-3.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  }
+
+  return (
+    <div className={`relative flex shrink-0 items-center justify-center select-none ${sizeClass}`}>
+      <Image
+        src={src}
+        alt={`Rank ${rank}`}
+        width={imgSize}
+        height={imgSize}
+        className={`object-contain transition-transform duration-200 ${scaleClass} ${sizeClass}`}
+        unoptimized
+      />
+      <span className={`absolute inset-0 flex items-center justify-center font-black text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)] ${textClass}`}>
+        {rank}
+      </span>
+    </div>
+  );
+};
+
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, loggedInUserId }) => {
   const isCurrentUser = String(loggedInUserId) === String(player.id);
@@ -99,17 +131,13 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, loggedInUserId }
             Total = {player?.total_token ?? 0}
           </div>
 
-          <div className="w-8 h-8 rounded-full bg-[#48aaa8] text-white font-bold flex items-center justify-center text-sm flex-shrink-0">
-            {rank}
-          </div>
+          <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16" imgSize={64} textClass="text-xs sm:text-sm" />
         </div>
 
         {/* ===== MOBILE VIEW ===== */}
         <div className="flex md:hidden items-center justify-between w-full gap-2">
           <div className="flex items-start gap-2 flex-1 min-w-0">
-            <div className="w-7 h-7 rounded-full bg-[#48aaa8] text-white font-bold flex items-center justify-center text-xs flex-shrink-0 mt-1">
-              {rank}
-            </div>
+            <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mt-1" imgSize={64} textClass="text-xs sm:text-sm" />
             <div className="flex flex-col min-w-0">
               <div className="border border-white text-white text-[10px] px-1.5 py-0.5 w-fit mb-1 leading-tight">
                 {"status : " + (player?.token_status || "Newcomer")}

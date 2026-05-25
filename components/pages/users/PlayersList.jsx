@@ -23,6 +23,38 @@ import { useSearchParams } from "next/navigation";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
 
+const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
+  const rankNum = Number(rank);
+  let src = "/ranksImg/rank.png";
+  let scaleClass = "scale-[1.22] group-hover:scale-[1.34]";
+  if (rankNum === 1) {
+    src = "/ranksImg/rank-1.png";
+    scaleClass = "scale-100 group-hover:scale-110";
+  } else if (rankNum === 2) {
+    src = "/ranksImg/rank-2.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  } else if (rankNum === 3) {
+    src = "/ranksImg/rank-3.png";
+    scaleClass = "scale-[1.15] group-hover:scale-[1.26]";
+  }
+
+  return (
+    <div className={`relative flex shrink-0 items-center justify-center select-none ${sizeClass}`}>
+      <Image
+        src={src}
+        alt={`Rank ${rank}`}
+        width={imgSize}
+        height={imgSize}
+        className={`object-contain transition-transform duration-200 ${scaleClass} ${sizeClass}`}
+        unoptimized
+      />
+      <span className={`absolute inset-0 flex items-center justify-center font-black text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)] ${textClass}`}>
+        {rank}
+      </span>
+    </div>
+  );
+};
+
 export default function PlayersList({ ladderId: propLadderId, ladderType: propLadderType }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -272,9 +304,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                     {/* LEFT */}
                     <div className="flex-1">
                       <div className="flex w-full items-center mb-2">
-                        <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#48aaa8] border-2 border-white text-lg sm:text-2xl font-bold text-white mr-2 shrink-0">
-                          {player.rank || pidx + 1}
-                        </div>
+                        <PlayerRankBadge rank={player.rank || pidx + 1} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
 
                         <div className="flex-1 min-w-0">
                           <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
