@@ -476,15 +476,18 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
       actions.push({
         id: "age-filter",
         node: (
-          <div className="h-16 w-full flex items-center justify-center rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-card-soft)] hover:bg-[var(--best-board-surface)] transition-all px-2">
-            <AgeFilter onSearch={handleAgeSearch} user={true} resetSignal={playerSearchResetSignal} />
-          </div>
+          <AgeFilter
+            onSearch={handleAgeSearch}
+            user={false}
+            resetSignal={playerSearchResetSignal}
+            isActive={appliedAge > 0 || Boolean(appliedGender)}
+          />
         )
       });
 
       onActionsChanged(actions);
     }
-  }, [isSorted, appliedAge, playerSearchResetSignal, onActionsChanged, handleAgeSearch]);
+  }, [isSorted, appliedAge, appliedGender, playerSearchResetSignal, onActionsChanged, handleAgeSearch]);
 
   const handleSkillClick = useCallback(
     (playerId, skillNumber) => {

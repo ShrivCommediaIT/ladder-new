@@ -29,6 +29,7 @@ import LadderPageLayout from "../../shared/LadderPageLayout";
 import PlayerSearchInput from "./PlayerSearchInput";
 import { ArrowDownUp, Plus, RotateCcw, XCircle } from "lucide-react";
 import AgeFilter from "@/components/shared/AgeFilter";
+import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsAndInvite";
 
 
 const MOBILE_SECTIONS = [
@@ -380,6 +381,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
     >
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0 space-y-4`}>
+        <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
         <PlayerSearchInput value={effectiveSearch} onChange={setEffectiveSearch} />
         <BestOfPlayerListSection
           mobileSection={mobileSection}

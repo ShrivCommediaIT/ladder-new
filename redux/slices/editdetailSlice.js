@@ -12,7 +12,7 @@ export const editUserDetails = createAsyncThunk(
       const data = new FormData();
       data.append("user_id", user_id);
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
+        if (value !== undefined && value !== null && key !== "user_id") {
           data.append(key, value);
         }
       });

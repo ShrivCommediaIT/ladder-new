@@ -44,46 +44,66 @@ const LadderRuleCardUser = ({ ladderIdProp }) => {
 
   if (loading) {
     return (
-      <div className="space-y-4 w-full p-6 rounded-3xl bg-white/5 border border-white/10 shadow-xl">
-        <h2 className="text-xl font-semibold text-amber-400">Ladder Rules</h2>
-        <Skeleton className="h-10 w-full bg-gray-700" />
-        <Skeleton className="h-24 w-full bg-gray-800" />
+      <div className="rounded-2xl border border-primary/20 bg-card/95 p-4 shadow-lg">
+        <div className="mb-4 rounded-xl border border-primary/15 bg-gradient-to-r from-primary/12 via-secondary/12 to-primary/8 px-4 py-3">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-primary/80">
+            INFORMATION / RULES
+          </p>
+        </div>
+        <div className="space-y-4 w-full">
+          <Skeleton className="h-14 w-full rounded-xl bg-muted animate-pulse" />
+          <Skeleton className="h-14 w-full rounded-xl bg-muted animate-pulse" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 w-full px-6">
-      {rulesList.map((rule) => {
-        const isOpen = openRuleIds.includes(rule.id);
+    <div className="rounded-2xl border border-primary/20 bg-card/95 p-4 shadow-lg">
+      <div className="mb-4 rounded-xl border border-primary/15 bg-gradient-to-r from-primary/12 via-secondary/12 to-primary/8 px-4 py-3">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-primary/80">
+          INFORMATION / RULES
+        </p>
+      </div>
 
-        return (
-          <div key={rule.id} className="space-y-3 pb-6 rounded-xl transition-all duration-300">
-            <div
-              className="text-white bg-gradient-to-r from-[#154052] to-blue-900 rounded-lg text-xl sm:text-2xl p-4 flex items-center justify-between cursor-pointer shadow-xl"
-              onClick={() => toggleRule(rule.id)}
-            >
-              <span>{rule.title || "Ladder Rules"}</span>
-              <ChevronDown
-                size={24}
-                className={`text-amber-400 transform transition-transform ${isOpen ? "rotate-180" : ""
-                  }`}
-              />
-            </div>
+      <div className="space-y-4 w-full">
+        {rulesList.length === 0 ? (
+          <p className="text-sm text-[var(--best-board-muted)] text-center py-4">
+            No rules available.
+          </p>
+        ) : (
+          rulesList.map((rule) => {
+            const isOpen = openRuleIds.includes(rule.id);
 
-            {isOpen && (
-              <div className="pt-2">
+            return (
+              <div key={rule.id} className="space-y-3 rounded-2xl border border-border/70 bg-card/70 p-3 shadow-sm transition-all duration-300">
                 <div
-                  className="mt-2 bg-gray-900/70 p-6 text-gray-200 rounded-xl text-base sm:text-lg max-h-[380px] overflow-y-auto border border-gray-800 prose prose-invert max-w-none space-y-3 leading-relaxed"
-                  dangerouslySetInnerHTML={{
-                    __html: rule.rules || "No rules available.",
-                  }}
-                />
+                  className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/15 via-secondary/20 to-primary/10 px-4 py-4 text-foreground shadow-sm flex items-center justify-between gap-3 cursor-pointer"
+                  onClick={() => toggleRule(rule.id)}
+                >
+                  <span className="text-h5 font-semibold text-[var(--best-board-text)]">{rule.title || "Ladder Rules"}</span>
+                  <div className="flex">
+                    <span className="cursor-pointer text-primary p-2 rounded-md hover:bg-primary/10 transition-colors">
+                      {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </span>
+                  </div>
+                </div>
+
+                {isOpen && (
+                  <div className="pt-2">
+                    <div
+                      className="mt-2 max-h-[380px] overflow-y-auto rounded-2xl border border-border bg-background/70 p-5 text-sm sm:text-base text-foreground space-y-3 leading-relaxed shadow-inner"
+                      dangerouslySetInnerHTML={{
+                        __html: rule.rules || "No rules available.",
+                      }}
+                    />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        );
-      })}
+            );
+          })
+        )}
+      </div>
     </div>
   );
 };

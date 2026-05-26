@@ -383,6 +383,7 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
         currentId={editPlayerId}
         ladderId={ladderId}
         ladder_type="roster"
+        userLevel={true}
       />
     </div>
   );

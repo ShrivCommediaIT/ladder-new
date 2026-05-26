@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
-import {
-  FaLongArrowAltDown,
-  FaLongArrowAltUp,
-  FaChevronLeft,
-  FaChevronRight,
-} from "react-icons/fa";
-import digitalTwin from "@/public/digital-twin.gif";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { getRequest } from "@/services/apiService";
@@ -19,14 +11,11 @@ const ActivityLogUser = ({ ladderId }) => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [firstLoad, setFirstLoad] = useState(true);
-
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const ACTIVITIES_PER_PAGE = 10;
-
-  /* ================= FETCH ================= */
 
   const fetchActivities = useCallback(async (page = 1, silent = false) => {
     if (!ladderId) return;
@@ -63,53 +52,32 @@ const ActivityLogUser = ({ ladderId }) => {
       );
 
       setError("");
-
     } catch (err) {
-      setError("");
+      setError(err?.message || "Failed to load activity.");
     } finally {
       setLoading(false);
       setFirstLoad(false);
     }
   }, [ladderId]);
 
-
-  /* First Load */
-
   useEffect(() => {
     if (!ladderId) return;
-
     setCurrentPage(1);
-
     fetchActivities(1);
-
   }, [ladderId, fetchActivities]);
 
-
-  /* Pagination Change */
-
   useEffect(() => {
     if (!ladderId) return;
-
     fetchActivities(currentPage, true);
-
-  }, [currentPage]);
-
-
-  /* Auto Refresh Smooth */
+  }, [currentPage, ladderId, fetchActivities]);
 
   useEffect(() => {
     if (!ladderId) return;
-
     const interval = setInterval(() => {
       fetchActivities(currentPage, true);
     }, 3000);
-
     return () => clearInterval(interval);
-
   }, [ladderId, currentPage, fetchActivities]);
-
-
-  /* Pagination */
 
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -117,172 +85,102 @@ const ActivityLogUser = ({ ladderId }) => {
     }
   };
 
-
-  /* Render Activities */
-
   const renderActivities = () => {
     return activities.map((activity, index) => {
-
       const progress =
         activity.progress?.toLowerCase() ||
         activity.direction?.toLowerCase() ||
         activity.type?.toLowerCase() ||
         "";
 
-      const icon =
-        progress.includes("up") || progress.includes("win") ? (
-          <FaLongArrowAltUp
-            className="text-green-400"
-            size={18}
-          />
-        ) : progress.includes("down") ||
-          progress.includes("loss") ||
-          progress.includes("lose") ? (
-          <FaLongArrowAltDown
-            className="text-pink-400"
-            size={18}
-          />
-        ) : null;
+      const isDown = progress.includes("down") || progress.includes("loss") || progress.includes("lose");
 
       return (
-
         <motion.div
           key={activity.id || index}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="mb-3 p-4 bg-gradient-to-tr from-gray-800 via-gray-900 to-gray-800 rounded-xl shadow-md flex gap-3"
+          transition={{ duration: 0.2 }}
+          className="flex items-start gap-3 border-b border-white/5 pb-3 last:border-b-0 last:pb-0"
         >
-
-          {icon}
-
-          <div>
-
-            <p className="text-white text-base">
-              {activity.message}
-            </p>
-
-          </div>
-
+          <span
+            className={`mt-1.5 block h-2.5 w-2.5 rounded-full flex-shrink-0 ${
+              isDown
+                ? "bg-[var(--best-board-danger)]"
+                : "bg-emerald-400"
+            }`}
+          />
+          <p className="flex-1 text-sm text-[var(--best-board-text)] break-words leading-relaxed">
+            {activity.message}
+          </p>
         </motion.div>
-
       );
     });
   };
 
-
-  /* Pagination UI */
-
   const renderPagination = () => {
-
     return (
-
-      <div className="flex justify-center gap-2 mt-4">
-
+      <div className="flex justify-center items-center gap-2 mt-4 pt-3 border-t border-white/5">
         <button
+          type="button"
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-1 bg-gray-800 rounded"
+          className="px-3 py-1.5 bg-white/5 border border-[var(--best-board-border)] text-xs text-[var(--best-board-muted)] rounded transition hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-white/5 cursor-pointer flex items-center justify-center"
         >
-          <FaChevronLeft />
+          <FaChevronLeft size={10} />
         </button>
 
-        <span className="px-4 py-1 text-white">
-
+        <span className="px-3 text-xs text-[var(--best-board-muted)]">
           {currentPage} / {totalPages}
-
         </span>
 
         <button
+          type="button"
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 bg-gray-800 rounded"
+          className="px-3 py-1.5 bg-white/5 border border-[var(--best-board-border)] text-xs text-[var(--best-board-muted)] rounded transition hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-white/5 cursor-pointer flex items-center justify-center"
         >
-          <FaChevronRight />
+          <FaChevronRight size={10} />
         </button>
-
       </div>
-
     );
-
   };
 
-
   return (
+    <div className="best-board-card rounded-xl p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Activity Feed</p>
+        <span className="rounded-full border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] best-board-highlight-soft">
+          Live
+        </span>
+      </div>
 
-    <Card className="mx-6 bg-gradient-to-r from-[#141C2B] to-gray-900 text-white">
-
-      <CardContent className="p-6">
-
-        {/* Header */}
-
-        <h2 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-3">
-
-          <Image
-            src={digitalTwin}
-            width={40}
-            height={40}
-            alt="activity"
-          />
-
-          ACTIVITY
-
-        </h2>
-
-
-        {/* List */}
-
-        <div className="max-h-[400px] overflow-y-auto space-y-3">
-
-          {firstLoad && loading ? (
-
-            <div className="space-y-4">
-
-              {Array.from({ length: 5 }).map((_, i) => (
-
-                <div key={i} className="flex gap-3">
-
-                  <Skeleton className="h-6 w-6 rounded-full"/>
-
-                  <div className="flex-1 space-y-2">
-
-                    <Skeleton className="h-4 w-2/3"/>
-
-                    <Skeleton className="h-3 w-1/3"/>
-
-                  </div>
-
+      <div className="max-h-[350px] overflow-y-auto pr-1 space-y-3">
+        {firstLoad && loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="flex items-center gap-3 pb-3 border-b border-white/5">
+                <Skeleton className="h-2.5 w-2.5 rounded-full bg-zinc-700 animate-pulse" />
+                <div className="flex-1 space-y-1">
+                  <Skeleton className="h-3 w-3/4 bg-zinc-700 animate-pulse" />
                 </div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <p className="text-xs text-red-400 text-center py-4">{error}</p>
+        ) : activities.length === 0 ? (
+          <p className="text-sm text-[var(--best-board-muted)] text-center py-4">
+            No activity available.
+          </p>
+        ) : (
+          renderActivities()
+        )}
+      </div>
 
-              ))}
-
-            </div>
-
-          ) : activities.length === 0 ? (
-
-            <p className="text-center text-gray-400">
-
-              No activity available
-
-            </p>
-
-          ) : (
-
-            renderActivities()
-
-          )}
-
-        </div>
-
-
-        {totalPages > 1 && renderPagination()}
-
-      </CardContent>
-
-    </Card>
-
+      {totalPages > 1 && renderPagination()}
+    </div>
   );
-
 };
 
 export default ActivityLogUser;

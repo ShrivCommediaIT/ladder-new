@@ -36,6 +36,7 @@ import { getRequest } from "@/services/apiService";
 import { Plus, RotateCcw, XCircle } from "lucide-react";
 import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
 import AgeFilter from "@/components/shared/AgeFilter";
+import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsAndInvite";
 
 const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
   const rankNum = Number(rank);
@@ -188,13 +189,12 @@ const PlayerCard = ({
 };
 
 /* ================= Main Component ================= */
-const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
+const MinileaguePlayers = () => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = searchParams.get("ladder_id");
-  const ladderTypeParam = searchParams.get("ladder_type");
 
-  const ladderType = ladderTypeParam || parentLadderType || "minileague";
+  const ladderType = "minileague";
 
   const user = useSelector((state) => state.user?.user);
   const activityState = useSelector((state) => state.activity);
@@ -474,6 +474,7 @@ const MinileaguePlayers = ({ ladderType: parentLadderType }) => {
       }
     >
       <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
+        <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
         <div className="flex flex-col gap-2">
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
         </div>

@@ -22,6 +22,7 @@ import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShor
 import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
 import AgeFilter from "@/components/shared/AgeFilter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsAndInvite";
 
 
 
@@ -533,7 +534,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         sidebar={
           <InfoSection
             mobileSection={mobileSection}
-            ladderType="skill"
+            ladderType="skills"
             user={currentUser}
             inviteUrl={inviteUrl}
             setContactOpen={setContactOpen}
@@ -552,6 +553,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         }
       >
         <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
+          <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
           <div className="flex flex-col gap-2">
             <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           </div>

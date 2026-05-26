@@ -93,7 +93,7 @@ export default function LeaderboardActionButtons({
       </div>
 
       {onAgeSearch && (
-        <div className="h-10 flex-shrink-0 ml-auto">
+        <div >
           <AgeFilter onSearch={onAgeSearch} user={true} resetSignal={resetSignal} />
         </div>
       )}

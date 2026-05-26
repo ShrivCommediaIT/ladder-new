@@ -60,10 +60,19 @@ const EditPlayerDetails = ({
     if (selectedPlayer) {
       const parsedDob = parseDobToDate(selectedPlayer.dob);
 
+      let correctId = selectedPlayer.id;
+      if (!correctId && selectedPlayer.user_id && !isNaN(Number(selectedPlayer.user_id))) {
+        correctId = Number(selectedPlayer.user_id);
+      }
+      if (!correctId && userId && !isNaN(Number(userId))) {
+        correctId = Number(userId);
+      }
+
+      const idStr = correctId ? correctId.toString() : "";
+
       setForm({
-        id: (selectedPlayer.id ?? selectedPlayer.user_id)?.toString() || "",
-        user_id:
-          (selectedPlayer.user_id ?? selectedPlayer.id)?.toString() || "",
+        id: idStr,
+        user_id: idStr,
         dob: parsedDob,
         name: selectedPlayer.name || "",
         phone: selectedPlayer.phone || "",
@@ -86,14 +95,18 @@ const EditPlayerDetails = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const targetUserId = form.user_id || form.id || userId;
+
     const formData = userLevel
       ? {
-          id: form.id,
+          id: form.id || targetUserId,
+          user_id: targetUserId,
           name: form.name,
           phone: form.phone,
         }
       : {
-          id: form.id,
+          id: form.id || targetUserId,
+          user_id: targetUserId,
           name: form.name,
           phone: form.phone,
           gender: form.gender,
@@ -102,7 +115,7 @@ const EditPlayerDetails = ({
         };
 
     setShowSkeleton(true);
-    dispatch(editUserDetails({ user_id: form.user_id, formData }));
+    dispatch(editUserDetails({ user_id: targetUserId, formData }));
   };
 
   useEffect(() => {

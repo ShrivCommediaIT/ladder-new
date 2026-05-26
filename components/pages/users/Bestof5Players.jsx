@@ -296,6 +296,9 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           currentId={selectedPlayerId}
+          ladder_id={ladderId}
+          ladder_type={ladderType}
+          userLevel={true}
         />
       )}
 

@@ -191,8 +191,8 @@ export default function InfoSection({
             </div>
           )}
 
-          {!userLevel && (
-            <div className="best-board-card rounded-xl p-4">
+          {inviteUrl && (
+            <div className="best-board-card rounded-xl p-4 hidden lg:block">
               <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Invite URL</p>
               <div className="rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-bg)] p-3 text-xs text-[var(--best-board-muted)] break-all">
                 {inviteUrl || "Invite link unavailable"}
@@ -213,7 +213,9 @@ export default function InfoSection({
             </div>
           )}
 
-          <QuickActionsCard actions={quickActions} />
+          <div className="hidden lg:block">
+            <QuickActionsCard actions={quickActions} />
+          </div>
 
           {userLevel ? (
             <LadderRuleCardUser ladderIdProp={propLadderId} />

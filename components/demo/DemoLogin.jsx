@@ -67,7 +67,6 @@ export default function DemoLogin({ ladderId }) {
       try {
         const decodedType = atob(decodeURIComponent(encodedLadderTypeFromQuery));
         setDecodedLadderType(decodedType);
-        console.log("Decoded ladder Type:", decodedType);
       } catch (e) {
         console.error("Invalid encoded ladder Type", e);
       }

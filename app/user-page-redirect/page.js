@@ -26,6 +26,7 @@ import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import PositiveLeaderboard from "@/components/pages/players/PositiveLeaderBoard";
 import PositiveLeaderboardUser from "@/components/pages/users/positiveLeaderBoardUser";
 import NegativeLeaderboardUser from "@/components/pages/users/negativeLeaderBoardUser";
+import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsAndInvite";
 
 function UserPageRedirectRouter() {
   const dispatch = useDispatch();
@@ -33,7 +34,7 @@ function UserPageRedirectRouter() {
 
   // ---------------- URL PARAMS ----------------
   const ladderId = searchParams.get("ladder_id");
-  const ladderType = searchParams.get("ladder_type");
+  const ladderType = searchParams.get("ladder_type") || searchParams.get("type")
 
   const [isLadderView, setIsLadderView] = useState(true);
   const [isDesktop, setIsDesktop] = useState(false);
@@ -67,12 +68,30 @@ function UserPageRedirectRouter() {
   }, []);
 
   // ---------------- USER ID (only localStorage) ----------------
-  const loggedInUserId = user?.user_id || user?.id || null;
+  const loggedInUserId = user?.id || (!isNaN(Number(user?.user_id)) ? Number(user?.user_id) : null);
 
   // Resolve current user rank from Redux
   const players =
     useSelector((state) => state.player?.players?.[Number(ladderId)]?.data) || [];
-  const currentUser = players.find((p) => Number(p.id) === Number(loggedInUserId));
+  const minileagueData = useSelector((state) => state.minileague?.data || []);
+  const rosterData = useSelector((state) => state.rosterLeaderboard?.data || []);
+
+  const currentUser = (() => {
+    if (!loggedInUserId) return null;
+    if (ladderType === "minileague") {
+      for (let i = 0; i < minileagueData.length; i++) {
+        const users = minileagueData[i]?.users_record || minileagueData[i]?.users || [];
+        const found = users.find((p) => Number(p.id || p.user_id) === Number(loggedInUserId));
+        if (found) return found;
+      }
+    } else if (ladderType === "roster") {
+      return rosterData.find((p) => Number(p.id) === Number(loggedInUserId));
+    } else {
+      return players.find((p) => Number(p.id) === Number(loggedInUserId));
+    }
+    return null;
+  })();
+
   const myRank = currentUser?.rank || "-";
 
   // Invite URL and User Quick Actions
@@ -81,7 +100,7 @@ function UserPageRedirectRouter() {
     : "";
 
   const quickActions = [];
-  if (loggedInUserId) {
+  if (loggedInUserId && currentUser) {
     quickActions.push({
       id: "edit-profile",
       label: "Edit Profile",
@@ -238,6 +257,10 @@ function UserPageRedirectRouter() {
                 transition={{ duration: 0.3 }}
                 className="min-w-0"
               >
+                <MobileQuickActionsAndInvite
+                  inviteUrl={inviteUrl}
+                  quickActions={mergedQuickActions}
+                />
                 {renderPlayers()}
               </motion.div>
             )}
@@ -251,7 +274,7 @@ function UserPageRedirectRouter() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex flex-col gap-4"
+                className="flex flex-col gap-4 lg:sticky lg:top-[5.2rem] lg:self-start"
               >
                 <InfoSection
                   userLevel={true}
@@ -281,6 +304,7 @@ function UserPageRedirectRouter() {
           currentId={loggedInUserId}
           ladder_id={ladderId}
           ladder_type={ladderType}
+          userLevel={true}
         />
       )}
 

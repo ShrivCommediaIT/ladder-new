@@ -368,6 +368,7 @@ const MinileaguePlayers = ({ ladderId }) => {
             setSelectedSectionIndex(null);
           }}
           setLoading={() => { }}
+          userLevel={true}
         />
       )}
 

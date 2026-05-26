@@ -19,6 +19,7 @@ import ControlsSection from "@/components/shared/ControlsSection";
 import InfoSection from "@/components/shared/InfoSection";
 import LadderPageLayout from "@/components/shared/LadderPageLayout";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
+import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsAndInvite";
 import {
   Dialog,
   DialogContent,
@@ -481,7 +482,7 @@ const RosterLeaderboard = () => {
     >
       <ToastContainer />
       <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
-
+        <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
         <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
 
         {loading &&

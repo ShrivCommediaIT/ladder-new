@@ -169,10 +169,11 @@ export const EditPlayer = ({
   // Reset on modal open
   useEffect(() => {
     if (open) {
-      setMobileTab("");
-      setActiveTab(tabs[0]?.value || "");
+      const defaultVal = tabs[0]?.value || "";
+      setMobileTab(defaultVal);
+      setActiveTab(defaultVal);
     }
-  }, [open]);
+  }, [open, tabs]);
 
   // Also reset mobile when ladderType changes (tabs list changes)
   useEffect(() => {
@@ -266,7 +267,7 @@ export const EditPlayer = ({
                 ) : (
                   <EditPlayerDetails
                     selectedPlayer={selectedPlayer}   // ✅ correct prop name
-                    userId={selectedPlayer?.id}       // ✅ pass explicitly
+                    userId={selectedPlayer?.id || currentId}       // ✅ pass explicitly with robust fallback
                     ladderId={ladder_id}
                     onClose={onClose}
                     userLevel={userLevel}

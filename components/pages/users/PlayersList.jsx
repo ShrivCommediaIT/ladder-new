@@ -131,18 +131,21 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       actions.push({
         id: "age-filter",
         node: (
-          <div className="h-16 w-full flex items-center justify-center rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-card-soft)] hover:bg-[var(--best-board-surface)] transition-all px-2">
-            <AgeFilter onSearch={(age, ageType, gender) => {
+          <AgeFilter
+            onSearch={(age, ageType, gender) => {
               const ageNum = age ? Number(age) : "";
               dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-            }} user={true} resetSignal={resetSignal} />
-          </div>
+            }}
+            user={false}
+            resetSignal={resetSignal}
+            isActive={appliedAge > 0 || Boolean(appliedGender)}
+          />
         )
       });
 
       onActionsChanged(actions);
     }
-  }, [resetSignal, onActionsChanged, dispatch]);
+  }, [resetSignal, onActionsChanged, dispatch, appliedAge, appliedGender]);
 
   const currentUser = players.find((p) => Number(p.id) === Number(loggedInUserId));
   const myRank = currentUser?.rank || "-";

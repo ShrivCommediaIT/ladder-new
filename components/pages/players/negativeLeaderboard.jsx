@@ -24,6 +24,7 @@ import InfoSection from "@/components/shared/InfoSection";
 import LadderPageLayout from "@/components/shared/LadderPageLayout";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
 import { getRequest } from "@/services/apiService";
+import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsAndInvite";
 
 const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
   const rankNum = Number(rank);
@@ -412,6 +413,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         }
       >
         <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
+          <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
           {loading && <p className="hidden text-center text-white">Loading...</p>}
           <div className="mt-2 space-y-2">

@@ -132,7 +132,7 @@ export const InvertRanckings = () => {
     useEffect(() => {
         // On component mount, read the inverted state from URL and set local order state
         let Inverted
-        if ((type === 'negative'&& inverType === '0')) {
+        if ((type === 'negative'&& inverType === '1')) {
             Inverted = true
         } else if(type !== 'negative'){
             Inverted = inverType === '0';

@@ -3,22 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
-import { FaPhoneVolume } from "react-icons/fa";
-import { MdContentCopy } from "react-icons/md"; // ✅ copy icon import
 import { useSearchParams } from "next/navigation";
 
-
-
 const ContactAdmin = () => {
-    const searchParams = useSearchParams();
-    const ladderId = searchParams.get("ladder_id");
-    const [adminDetails, setAdminDetails] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [copied, setCopied] = useState(false);
-
+  const searchParams = useSearchParams();
+  const ladderId = searchParams.get("ladder_id");
+  const [adminDetails, setAdminDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (!ladderId) return; // ✅ ladderId required
+    if (!ladderId) return;
 
     const fetchAdmin = async () => {
       try {
@@ -38,53 +33,58 @@ const ContactAdmin = () => {
     if (adminDetails?.admin_phone) {
       navigator.clipboard.writeText(adminDetails.admin_phone);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // 2 sec
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
   if (loading) {
-    return <div className="p-4 text-center">Loading...</div>;
+    return (
+      <div className="best-board-card rounded-xl p-4 space-y-3">
+        <div className="h-4 w-1/3 bg-white/5 animate-pulse rounded" />
+        <div className="h-6 w-2/3 bg-white/5 animate-pulse rounded" />
+      </div>
+    );
   }
 
   if (!adminDetails) {
     return (
-      <div className="p-4 text-center text-red-500">
+      <div className="best-board-card rounded-xl p-4 text-center text-red-500 text-sm">
         Failed to load admin details
       </div>
     );
   }
 
   return (
-    <div className="px-8">
-      <h2 className="text-lg font-bold border-b-2 text-white mb-2 text-center md:text-left">
-        Contact Admin
-      </h2>
+    <div className="best-board-card rounded-xl p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Admin Contact</p>
+        {adminDetails?.admin_phone && (
+          <button
+            type="button"
+            onClick={handleCopy}
+            className={`rounded-md border px-3 py-1 text-xs transition-all duration-200 cursor-pointer ${
+              copied
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                : "border-[var(--best-board-border)] bg-white/5 text-[var(--best-board-muted)] hover:bg-white/10"
+            }`}
+          >
+            {copied ? "Copied!" : "Copy Phone"}
+          </button>
+        )}
+      </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-gray-300">
-        {/* ✅ Admin Name */}
-        <p className="capitalize text-center sm:text-left">
-          <span className="font-semibold">Name:</span>{" "}
-          {adminDetails.admin_name || "Not Available"}
-        </p>
-
-        {/* ✅ Admin Phone with Copy Button */}
-        <div className="flex items-center justify-center sm:justify-start gap-2">
-          <FaPhoneVolume className="text-lg" />
-          <span className="font-semibold">
-            {adminDetails.admin_phone || "Not Provided"}
-          </span>
-
-          {/* ✅ Copy button with dynamic text */}
-          {adminDetails?.admin_phone && (
-            <button
-              onClick={handleCopy}
-              className={`flex items-center cursor-pointer gap-1 px-2 py-1 text-xs rounded transition 
-                ${copied ? "bg-green-500 hover:bg-green-500" : "bg-gray-200 hover:bg-gray-300"}`}
-            >
-              <MdContentCopy className="text-gray-800" />
-              {copied ? "Copied!" : "Copy"}
-            </button>
-          )}
+      <div className="space-y-3">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--best-board-muted)]">Name</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)] capitalize">
+            {adminDetails?.admin_name || "Admin"}
+          </p>
+        </div>
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--best-board-muted)]">Phone</p>
+          <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)]">
+            {adminDetails?.admin_phone || "Not Provided"}
+          </p>
         </div>
       </div>
     </div>

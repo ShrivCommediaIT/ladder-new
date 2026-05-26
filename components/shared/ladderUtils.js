@@ -15,6 +15,11 @@ export const formatLadderType = (type) => {
     best5: "Best of 5",
     best3: "Best of 3",
     winlose: "Win / Lose",
+    roster: "Roster",
+    minileague: "Mini League",
+    positive: "Leaderboard (Asc/Desc)",
+    negative: "Leaderboard (Times) (Asc/Desc)",
+    skills: "Skills/Performance Challenge Boards (Asc/Desc)",
   };
 
   return map[type] || "Best of 5";

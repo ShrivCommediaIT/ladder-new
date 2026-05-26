@@ -390,15 +390,18 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
       actions.push({
         id: "age-filter",
         node: (
-          <div className="h-16 w-full flex items-center justify-center rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-card-soft)] hover:bg-[var(--best-board-surface)] transition-all px-2">
-            <AgeFilter onSearch={handleAgeSearch} user={true} resetSignal={resetSignal} />
-          </div>
+          <AgeFilter
+            onSearch={handleAgeSearch}
+            user={false}
+            resetSignal={resetSignal}
+            isActive={appliedAge > 0 || Boolean(appliedGender)}
+          />
         )
       });
 
       onActionsChanged(actions);
     }
-  }, [isSorted, appliedAge, resetSignal, onActionsChanged, handleAgeSearch]);
+  }, [isSorted, appliedAge, appliedGender, resetSignal, onActionsChanged, handleAgeSearch]);
 
   const handleSortBySkill = useCallback(() => {
     setOpenSort(true);

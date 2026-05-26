@@ -32,6 +32,7 @@ export const MinileagueEditPlayer = ({
   ladderId: propLadderId,
   setLoading = () => {},
   sectionIndex = null,
+  userLevel = false,
 }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -156,15 +157,26 @@ export const MinileagueEditPlayer = ({
 
   /* ---------------- UI ---------------- */
 
-  const [selectedTab, setSelectedTab] = useState("result");
-
-  const tabs = [
+  const allTabs = [
     { value: "result", label: "Result" },
     { value: "challenge", label: "Challenge" },
     { value: "stats", label: "Stats" },
     { value: "edit", label: "Edit" },
     { value: "load", label: "Upload" },
   ];
+
+  const tabs = userLevel 
+    ? allTabs.filter((t) => t.value === "edit") 
+    : allTabs;
+
+  const [selectedTab, setSelectedTab] = useState("result");
+
+  // Reset tab on mount
+  useEffect(() => {
+    if (open && tabs.length > 0) {
+      setSelectedTab(tabs[0].value);
+    }
+  }, [open, tabs]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
