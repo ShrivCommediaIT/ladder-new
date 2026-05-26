@@ -57,8 +57,11 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
   if (isBlank) {
     return (
       <div
-        className="flex items-center min-h-[18vh] justify-center px-2 py-2 mb-3 rounded-lg shadow"
-        style={{ background: "#223848", border: "2px dashed #4eb0a2" }}
+        className="flex items-center min-h-[18vh] justify-center px-2 py-2 mb-3 rounded-lg shadow animate-pulse"
+        style={{
+          background: "var(--best-board-surface-soft)",
+          border: "2px dashed var(--best-board-border-strong)",
+        }}
       />
     );
   }
@@ -67,8 +70,7 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
     ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}`
     : Logo;
 
-  const sectionStartRank =
-    Math.floor((rank - 1) / groupSize) * groupSize + 1;
+  const sectionStartRank = Math.floor((rank - 1) / groupSize) * groupSize + 1;
   const currentSectionRanks = Array.from(
     { length: groupSize },
     (_, i) => sectionStartRank + i
@@ -80,94 +82,156 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       onClick={onClick}
-      className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all font-sans sm:px-4 sm:py-3 group ${isAllowed && canEdit
-          ? "cursor-pointer hover:bg-[#143238]"
-          : "opacity-70 cursor-not-allowed"
-        }`}
+      className={`mb-3 rounded-xl transition-all duration-200 group overflow-hidden ${
+        isAllowed && canEdit ? "cursor-pointer" : "opacity-70 cursor-not-allowed"
+      }`}
       style={{
-        background: "#223848",
-        border: "2px solid #4eb0a2",
+        background: "var(--best-board-surface)",
+        border: "1px solid var(--best-board-border-strong)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
       }}
     >
-      {/* ✅ LEFT CONTENT – FIXED OVERFLOW */}
-      <div className="flex-1 min-w-0 overflow-hidden">
-        <div className="flex w-full items-center mb-2 min-w-0">
-
-          {/* RANK */}
-          <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
-
-          {/* NAME + PHONE */}
-          <div className="flex-1 min-w-0 overflow-hidden">
-            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate max-w-[160px] sm:max-w-[240px]">
-              {player?.name || "N/A"}
-              {player.age && (
-                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                  {player.age}
-                </p>
-              )}
-              {player.gender && (
-                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                  {player.gender == "male" ? "M" : "F"}
-                </p>
-              )}
-            </div>
-            <div className="text-[#d4e5e8] text-xs truncate">
-              {player?.phone || "N/A"}
-            </div>
-          </div>
-
-          {/* TOTAL POINT */}
-          <div className="ml-2 w-14 sm:w-16 text-center flex-shrink-0">
-            <span className="bg-[#1b4542] text-[#fdf7c3] px-2 sm:px-3 py-1 rounded-full font-extrabold text-lg sm:text-xl border border-white">
-              {player?.total_point || 0}
-            </span>
-          </div>
+      {/* ── TOP STRIP ── */}
+      <div
+        className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2"
+        style={{
+          borderBottom: "1px solid var(--best-board-border)",
+          background: "var(--secondary)",
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] sm:text-xs text-white bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30 font-medium">
+            {isAllowed && canEdit ? "Manage Player" : "Locked Card"}
+          </span>
         </div>
 
-        {/* SCORE BOXES */}
-        <div className="mt-1">
-          <div className="flex gap-1 mb-1 overflow-x-auto">
-            {currentSectionRanks.map((headerRank) => (
-              <div
-                key={headerRank}
-                className="w-6 h-5 sm:w-8 sm:h-6 flex items-center justify-center text-xs sm:text-sm font-bold text-white rounded bg-[#28495e] border border-[#4eb0a2]"
-              >
-                {headerRank}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex gap-1 overflow-x-auto">
-            {currentSectionRanks.map((r) => {
-              const found = player.result_details?.find(
-                (i) => Number(i.rank) === Number(r)
-              );
-              return (
-                <div
-                  key={r}
-                  className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${found
-                      ? "bg-white text-[#092733] border-[#7ea1af]"
-                      : "bg-[#7ea1af] bg-opacity-50 border-[#528189] text-xs"
-                    }`}
-                >
-                  {found ? found.point : ""}
-                </div>
-              );
-            })}
-          </div>
+        <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
+          {player.age && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.age}
+            </span>
+          )}
+          {player.gender && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.gender == "male" ? "M" : "F"}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* ✅ IMAGE – LOCKED, NEVER OVERFLOWS */}
-      <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center ml-3 flex-shrink-0">
-        <Image
-          src={playerImageUrl}
-          alt={player?.name}
-          width={96}
-          height={96}
-          className="object-cover w-full h-full rounded"
-          unoptimized
-        />
+      {/* ── MAIN BODY ── */}
+      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
+        {/* LEFT SECTION */}
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <div className="flex w-full items-center mb-2 min-w-0">
+            <PlayerRankBadge
+              rank={rank}
+              sizeClass="h-10 w-10 sm:h-12 sm:w-12"
+              imgSize={48}
+              textClass="text-[9px] sm:text-xs"
+            />
+            <div className="flex-1 min-w-0 ml-2">
+              <div className="text-[var(--best-board-text)] font-bold text-xs sm:text-sm truncate">
+                {player?.name || "N/A"}
+              </div>
+              <div
+                className="text-[10px] sm:text-xs truncate leading-tight"
+                style={{ color: "var(--best-board-muted)" }}
+              >
+                {player?.phone || "N/A"}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-1">
+            <div className="flex gap-1 mb-1 overflow-x-auto">
+              {currentSectionRanks.map((headerRank) => (
+                <div
+                  key={headerRank}
+                  className="w-6 h-5 sm:w-8 sm:h-6 flex items-center justify-center text-[10px] font-bold text-[var(--best-board-text)] rounded bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)]"
+                >
+                  {headerRank}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-1 overflow-x-auto">
+              {currentSectionRanks.map((r) => {
+                const found = player.result_details?.find(
+                  (i) => Number(i.rank) === Number(r)
+                );
+                return (
+                  <div
+                    key={r}
+                    className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${
+                      found
+                        ? "bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] border-[var(--best-board-border-strong)]"
+                        : "bg-[var(--best-board-surface-soft)] opacity-60 border-[var(--best-board-border)] text-[10px] text-[var(--best-board-muted)]"
+                    }`}
+                  >
+                    {found ? found.point : ""}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT SECTION */}
+        <div
+          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+          style={{ borderLeft: "1px solid var(--best-board-border)" }}
+        >
+          {/* Total Points */}
+          <div
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+            style={{
+              background: "var(--best-board-accent-soft)",
+              border: "1px solid var(--best-board-border-strong)",
+            }}
+          >
+            <span
+              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
+              style={{ color: "var(--best-board-highlight)" }}
+            >
+              {player?.total_point || 0}
+            </span>
+            <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              Points
+            </span>
+          </div>
+
+          <div
+            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+            style={{ border: "1px solid var(--best-board-border-strong)" }}
+          >
+            <Image
+              src={playerImageUrl}
+              alt={player?.name || "Player"}
+              width={72}
+              height={72}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              unoptimized
+            />
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -295,8 +359,8 @@ export default function DummyPlayerList({ ladderId }) {
       {/* ✅ LADDER TITLE - From DummyPlayerList */}
       {ladderDetails?.name && (
         <div className="py-4 text-center sm:text-left px-4">
-          <h2 className="text-2xl font-bold text-white">{ladderDetails.name}</h2>
-          <p className="text-gray-200 text-md border-b-2 border-amber-500 py-1 font-semibold">
+          <h2 className="text-2xl font-bold text-[var(--best-board-text)]">{ladderDetails.name}</h2>
+          <p className="text-[var(--best-board-muted)] text-md border-b-2 border-amber-500 py-1 font-semibold">
             Admin: {ladderDetails.admin_name} ({ladderDetails.admin_phone})
           </p>
         </div>
@@ -313,7 +377,7 @@ export default function DummyPlayerList({ ladderId }) {
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
+      <div className="flex justify-start items-center gap-2 mt-4 px-4">
         <PlayerPerformationRanking ladderId={ladderId} />
       </div>
 
@@ -326,7 +390,15 @@ export default function DummyPlayerList({ ladderId }) {
         finalSections.map((section, idx) => (
           <div key={idx} className="mt-8 px-4">
             {/* ✅ SECTION HEADER */}
-            <div className="mb-3 sticky top-0 bg-[#223848] px-4 py-2 rounded-lg shadow-lg text-xl text-white font-bold tracking-wide z-10">
+            <div
+              className="mb-3 sticky top-0 px-4 py-2 rounded-xl border font-bold text-base sm:text-lg z-10"
+              style={{
+                border: "1px solid var(--best-board-border)",
+                background: "var(--best-board-surface-soft)",
+                color: "var(--best-board-text)",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              }}
+            >
               {section.label}
             </div>
 

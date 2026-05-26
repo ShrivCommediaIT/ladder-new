@@ -55,31 +55,116 @@ const DefaultPlayerCard = ({ player, rank }) => {
   const src = player.image ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}` : Logo;
   return (
     <div
-      className="flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] shadow font-sans cursor-pointer hover:scale-[1.01] hover:border-[var(--best-board-border-strong)] transition-all duration-150"
+      className="mb-3 rounded-xl transition-all duration-200 group overflow-hidden"
+      style={{
+        background: "var(--best-board-surface)",
+        border: "1px solid var(--best-board-border-strong)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
+      }}
     >
+      {/* ── TOP STRIP ── */}
       <div
-        className="flex justify-between items-center px-4 py-2"
-        onClick={(e) => e.stopPropagation()}
+        className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2"
+        style={{
+          borderBottom: "1px solid var(--best-board-border)",
+          background: "var(--secondary)",
+        }}
       >
         <PlayerStatusToggle player={player} user={true} viewOnly={true} />
-      </div>
-      <div className="flex items-center justify-between px-2 py-2 sm:px-4 sm:py-3 group">
-        <div className="flex-1">
-        <div className="flex w-full items-center mb-2">
-          <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
-          <div className="flex-1 min-w-0">
-            <div className="text-[var(--best-board-text)] flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}
-              {player.age && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">{player.age}</p>}
-              {player.gender && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
-            </div>
-            <div className="text-[var(--best-board-muted)] text-xs truncate">{player?.phone || "N/A"}</div>
-          </div>
+
+        <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
+          {player.age && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.age}
+            </span>
+          )}
+          {player.gender && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
         </div>
       </div>
-      <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center ml-3 shrink-0">
-        <Image src={src} alt={player.name} width={96} height={96} className="object-cover w-full h-full rounded" unoptimized />
-      </div>
+
+      {/* ── MAIN BODY ── */}
+      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
+        {/* LEFT SECTION: rank badge + info */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
+          <PlayerRankBadge
+            rank={rank}
+            sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
+            imgSize={56}
+            textClass="text-[10px] sm:text-xs md:text-sm"
+          />
+
+          <div className="flex-1 min-w-0">
+            <div className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight text-[var(--best-board-text)]">
+              {player?.name || "N/A"}
+            </div>
+            <div
+              className="text-[10px] sm:text-xs truncate mb-1 leading-tight"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              {player?.phone || "N/A"}
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT SECTION: total tokens badge + avatar */}
+        <div
+          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+          style={{ borderLeft: "1px solid var(--best-board-border)" }}
+        >
+          {/* Total Tokens badge */}
+          <div
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+            style={{
+              background: "var(--best-board-accent-soft)",
+              border: "1px solid var(--best-board-border-strong)",
+            }}
+          >
+            <span
+              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
+              style={{ color: "var(--best-board-highlight)" }}
+            >
+              {player?.total_point ?? player?.total_token ?? 0}
+            </span>
+            <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              Points
+            </span>
+          </div>
+
+          <div
+            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+            style={{ border: "1px solid var(--best-board-border-strong)" }}
+          >
+            <Image
+              src={src}
+              alt={player?.name || "Player"}
+              width={72}
+              height={72}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              unoptimized
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -92,53 +177,150 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
   const src = player?.image ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}` : Logo;
   const sectionStart = Math.floor((rank - 1) / groupSize) * groupSize + 1;
   const sectionRanks = Array.from({ length: groupSize }, (_, i) => sectionStart + i);
+
   return (
     <div
-      className="flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] shadow font-sans cursor-pointer hover:scale-[1.01] hover:border-[var(--best-board-border-strong)] transition-all duration-150"
+      className="mb-3 rounded-xl transition-all duration-200 group overflow-hidden"
+      style={{
+        background: "var(--best-board-surface)",
+        border: "1px solid var(--best-board-border-strong)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
+      }}
     >
+      {/* ── TOP STRIP ── */}
       <div
-        className="flex justify-between items-center px-4 py-2"
-        onClick={(e) => e.stopPropagation()}
+        className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2"
+        style={{
+          borderBottom: "1px solid var(--best-board-border)",
+          background: "var(--secondary)",
+        }}
       >
         <PlayerStatusToggle player={player} user={true} viewOnly={true} />
+
+        <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
+          {player.age && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.age}
+            </span>
+          )}
+          {player.gender && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="flex items-center justify-between px-2 py-2 sm:px-4 sm:py-3 group">
+
+      {/* ── MAIN BODY ── */}
+      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
+        {/* LEFT SECTION */}
         <div className="flex-1 min-w-0 overflow-hidden">
-        <div className="flex w-full items-center mb-2 min-w-0">
-          <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
-          <div className="flex-1 min-w-0 overflow-hidden">
-            <div className="text-[var(--best-board-text)] flex items-center gap-2 text-sm sm:text-base font-semibold truncate max-w-[160px] sm:max-w-[240px]">
-              {player?.name || "N/A"}
-              {player.age && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">{player.age}</p>}
-              {player.gender && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
+          <div className="flex w-full items-center mb-2 min-w-0">
+            <PlayerRankBadge
+              rank={rank}
+              sizeClass="h-10 w-10 sm:h-12 sm:w-12"
+              imgSize={48}
+              textClass="text-[9px] sm:text-xs"
+            />
+            <div className="flex-1 min-w-0 ml-2">
+              <div className="text-[var(--best-board-text)] font-bold text-xs sm:text-sm truncate">
+                {player?.name || "N/A"}
+              </div>
+              <div
+                className="text-[10px] sm:text-xs truncate leading-tight"
+                style={{ color: "var(--best-board-muted)" }}
+              >
+                {player?.phone || "N/A"}
+              </div>
             </div>
-            <div className="text-[var(--best-board-muted)] text-xs truncate">{player?.phone || "N/A"}</div>
           </div>
-          <div className="ml-2 w-14 sm:w-16 text-center flex-shrink-0">
-            <span className="bg-[var(--best-board-accent-soft)] text-[var(--best-board-text)] px-2 sm:px-3 py-1 rounded-full font-extrabold text-lg sm:text-xl border border-[var(--best-board-border-strong)]">{player?.total_point || 0}</span>
-          </div>
-        </div>
-        <div className="mt-1">
-          <div className="flex gap-1 mb-1 overflow-x-auto">
-            {sectionRanks.map(r => (
-              <div key={r} className="w-6 h-5 sm:w-8 sm:h-6 flex items-center justify-center text-xs font-bold text-[var(--best-board-text)] rounded bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)]">{r}</div>
-            ))}
-          </div>
-          <div className="flex gap-1 overflow-x-auto">
-            {sectionRanks.map(r => {
-              const found = player.result_details?.find(i => Number(i.rank) === Number(r));
-              return (
-                <div key={r} className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${found ? "bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] border-[var(--best-board-border-strong)]" : "bg-[var(--best-board-surface-soft)] opacity-60 border-[var(--best-board-border)] text-xs text-[var(--best-board-muted)]"}`}>
-                  {found ? found.point : ""}
+
+          <div className="mt-1">
+            <div className="flex gap-1 mb-1 overflow-x-auto">
+              {sectionRanks.map(r => (
+                <div
+                  key={r}
+                  className="w-6 h-5 sm:w-8 sm:h-6 flex items-center justify-center text-[10px] font-bold text-[var(--best-board-text)] rounded bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)]"
+                >
+                  {r}
                 </div>
-              );
-            })}
+              ))}
+            </div>
+            <div className="flex gap-1 overflow-x-auto">
+              {sectionRanks.map(r => {
+                const found = player.result_details?.find(i => Number(i.rank) === Number(r));
+                return (
+                  <div
+                    key={r}
+                    className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${
+                      found
+                        ? "bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] border-[var(--best-board-border-strong)]"
+                        : "bg-[var(--best-board-surface-soft)] opacity-60 border-[var(--best-board-border)] text-[10px] text-[var(--best-board-muted)]"
+                    }`}
+                  >
+                    {found ? found.point : ""}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
-      <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center ml-3 flex-shrink-0">
-        <Image src={src} alt={player?.name} width={96} height={96} className="object-cover w-full h-full rounded" unoptimized />
-      </div>
+
+        {/* RIGHT SECTION */}
+        <div
+          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+          style={{ borderLeft: "1px solid var(--best-board-border)" }}
+        >
+          {/* Total Points */}
+          <div
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+            style={{
+              background: "var(--best-board-accent-soft)",
+              border: "1px solid var(--best-board-border-strong)",
+            }}
+          >
+            <span
+              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
+              style={{ color: "var(--best-board-highlight)" }}
+            >
+              {player?.total_point || 0}
+            </span>
+            <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              Points
+            </span>
+          </div>
+
+          <div
+            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+            style={{ border: "1px solid var(--best-board-border-strong)" }}
+          >
+            <Image
+              src={src}
+              alt={player?.name || "Player"}
+              width={72}
+              height={72}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              unoptimized
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -147,7 +329,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
 /* ─────────────────────────────────────────────
    3. SKILL / POSITIVE / NEGATIVE CARD
 ───────────────────────────────────────────── */
-const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false }) => {
+const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true, isNegative = false }) => {
   const src = player?.image ? `${IMAGE_BASE_URL}/${player.image}` : Logo;
 
   const getScore = (scores, skills, skillNumber, isInverted) => {
@@ -172,75 +354,218 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
   };
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface)] mb-3 overflow-hidden group cursor-pointer hover:scale-[1.01] hover:border-[var(--best-board-border-strong)] transition-all duration-150">
+    <div
+      className="mb-3 rounded-xl transition-all duration-200 group overflow-hidden"
+      style={{
+        background: "var(--best-board-surface)",
+        border: "1px solid var(--best-board-border-strong)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
+      }}
+    >
+      {/* ── TOP STRIP ── */}
       <div
-        className="flex justify-between items-center px-4 py-2"
-        onClick={(e) => e.stopPropagation()}
+        className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2"
+        style={{
+          borderBottom: "1px solid var(--best-board-border)",
+          background: "var(--secondary)",
+        }}
       >
         <PlayerStatusToggle player={player} user={true} viewOnly={true} />
-      </div>
-      <div className="p-2 sm:p-3">
-        <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 sm:gap-3 mb-2">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
-            <Image src={src} alt={player?.name} width={80} height={80} className="object-cover rounded" unoptimized />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[var(--best-board-text)] flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-              {player?.name || "N/A"}
-              {player.age && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">{player.age}</p>}
-              {player.gender && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
-            </div>
-            <div className="text-[var(--best-board-muted)] text-xs truncate">{player?.phone || "N/A"}</div>
-          </div>
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <div className="flex flex-col items-center">
-              <span className="bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border border-[var(--best-board-border)] text-xs sm:text-sm">{Math.abs(player.total_point || 0)}</span>
-              <p className="text-[9px] text-[var(--best-board-muted)] mt-1 font-semibold">Total Pts</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <PlayerRankBadge rank={rank} />
-              <p className="text-[8px] sm:text-[9px] text-[var(--best-board-muted)] font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
-            </div>
-          </div>
-        </div>
 
-        {player.skills?.length > 0 ? (
-          <>
-            <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
-              {player.skills.map((skill, i) => (
-                <div key={i} className="min-w-[24px] h-6 flex items-center justify-center text-[10px] text-[var(--best-board-text)] rounded bg-[var(--best-board-surface-strong)] border border-[var(--best-board-border)] relative">
-                  {skill.skill_sign === "-" && <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">−</span>}
-                  {skill.skill_number}
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
-              {player.skills.map((skill, i) => {
-                const { score, isTargetAchieved } = getScore(player.scores || [], player.skills || [], skill.skill_number, player.isInverted);
-                return (
-                  <div key={i} className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm ${isTargetAchieved ? "bg-[var(--best-board-success)] text-white" : "bg-[var(--best-board-surface-soft)] text-[var(--best-board-text)] border-[var(--best-board-border)]"}`}>
-                    {score}
+        <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
+          {player.age && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.age}
+            </span>
+          )}
+          {player.gender && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── MAIN BODY ── */}
+      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
+        {/* LEFT SECTION */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+            <div className="flex flex-col items-center gap-1 flex-shrink-0">
+              <PlayerRankBadge
+                rank={rank}
+                sizeClass="h-10 w-10 sm:h-12 sm:w-12"
+                imgSize={48}
+                textClass="text-[9px] sm:text-xs"
+              />
+              {showAgeRank && (
+                <div className="flex flex-col items-center">
+                  <div
+                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
+                    style={{ background: "var(--best-board-success)" }}
+                  >
+                    {ageRank}
                   </div>
-                );
-              })}
+                  <p
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
+                    style={{ color: "var(--best-board-success)" }}
+                  >
+                    Age
+                  </p>
+                </div>
+              )}
             </div>
-            {showRanks && (
-              <div className="flex gap-[3px] overflow-x-auto pb-1">
+            <div className="flex-1 min-w-0">
+              <div className="text-[var(--best-board-text)] font-bold text-xs sm:text-sm truncate">
+                {player?.name || "N/A"}
+              </div>
+              <div
+                className="text-[10px] sm:text-xs truncate leading-tight"
+                style={{ color: "var(--best-board-muted)" }}
+              >
+                {player?.phone || "N/A"}
+              </div>
+            </div>
+          </div>
+
+          {player.skills?.length > 0 ? (
+            <>
+              {/* ── SKILL NUMBER ROW ── */}
+              <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
                 {player.skills.map((skill, i) => (
-                  <div key={i} className="min-w-[24px] h-6 flex items-center justify-center rounded font-bold text-[10px] bg-[var(--best-board-accent-soft)] text-[var(--best-board-text)] shadow-sm border border-[var(--best-board-border)]">
-                    {getRank(player.ranks || [], skill.skill_number)}
+                  <div
+                    key={i}
+                    className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded relative"
+                    style={{
+                      background: "var(--best-board-accent-soft)",
+                      border: "1px solid var(--best-board-border-strong)",
+                      color: "var(--best-board-highlight)",
+                    }}
+                  >
+                    {skill.skill_sign === "-" && (
+                      <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-extrabold leading-none" style={{ color: "var(--best-board-danger)" }}>
+                        −
+                      </span>
+                    )}
+                    {skill.skill_number}
                   </div>
                 ))}
               </div>
-            )}
-          </>
-        ) : (
-          <div className="h-7 bg-[var(--best-board-surface-soft)] rounded text-xs text-[var(--best-board-muted)] flex items-center justify-center">No skills data</div>
-        )}
+
+              {/* ── SCORE ROW ── */}
+              <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
+                {player.skills.map((skill, i) => {
+                  const { score, isTargetAchieved } = getScore(
+                    player.scores || [],
+                    player.skills || [],
+                    skill.skill_number,
+                    player.isInverted
+                  );
+                  const scoreObj = player.scores?.find(s => s.skill_number === skill.skill_number);
+                  const witnessBy = scoreObj?.witness_by || "";
+
+                  return (
+                    <div
+                      key={i}
+                      className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all border
+                        ${
+                          witnessBy
+                            ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
+                            : isTargetAchieved
+                            ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] shadow-md"
+                            : "bg-[var(--best-board-warning)] text-[#0f172a] border-[var(--best-board-border-strong)] hover:brightness-95"
+                        }`}
+                      title={`Best Score: ${score} | Target: ${skill.target || "N/A"}${isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
+                    >
+                      {Math.abs(score || 0).toFixed(2)}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ── RANK ROW ── */}
+              {showRanks && (
+                <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+                  {player.skills.map((skill, i) => (
+                    <div
+                      key={i}
+                      className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center rounded font-bold text-[9px] sm:text-[10px] border"
+                      style={{
+                        background: "var(--best-board-accent-soft)",
+                        borderColor: "var(--best-board-border)",
+                        color: "var(--best-board-highlight)",
+                      }}
+                    >
+                      {getRank(player.ranks || [], skill.skill_number)}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="h-7 bg-[var(--best-board-surface-soft)] rounded text-xs text-[var(--best-board-muted)] flex items-center justify-center">
+              No skills data
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT SECTION */}
+        <div
+          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+          style={{ borderLeft: "1px solid var(--best-board-border)" }}
+        >
+          {/* Total Points */}
+          <div
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+            style={{
+              background: "var(--best-board-accent-soft)",
+              border: "1px solid var(--best-board-border-strong)",
+            }}
+          >
+            <span
+              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
+              style={{ color: "var(--best-board-highlight)" }}
+            >
+              {Math.abs(player.total_point || 0)}
+            </span>
+            <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              Points
+            </span>
+          </div>
+
+          <div
+            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+            style={{ border: "1px solid var(--best-board-border-strong)" }}
+          >
+            <Image
+              src={src}
+              alt={player?.name || "Player"}
+              width={72}
+              height={72}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              unoptimized
+            />
+          </div>
+        </div>
       </div>
-      </div>
-    </Card>
+    </div>
   );
 };
 
@@ -250,38 +575,130 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
 const RosterPlayerCard = ({ player, rank }) => {
   const src = player.image ? `${IMAGE_BASE_URL}/${player.image}` : Logo;
   return (
-    <div className="flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] overflow-hidden group cursor-pointer hover:scale-[1.01] hover:border-[var(--best-board-border-strong)] transition-all duration-150">
+    <div
+      className="mb-3 rounded-xl transition-all duration-200 group overflow-hidden"
+      style={{
+        background: "var(--best-board-surface)",
+        border: "1px solid var(--best-board-border-strong)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
+      }}
+    >
+      {/* ── TOP STRIP ── */}
       <div
-        className="flex justify-between items-center px-4 py-2"
-        onClick={(e) => e.stopPropagation()}
+        className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2"
+        style={{
+          borderBottom: "1px solid var(--best-board-border)",
+          background: "var(--secondary)",
+        }}
       >
         <PlayerStatusToggle player={player} user={true} viewOnly={true} />
+
+        <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
+          {player?.token_status && (
+            <span className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-[var(--best-board-surface-soft)] border-[var(--best-board-border)] text-[var(--best-board-text)]">
+              Status: {player.token_status}
+            </span>
+          )}
+          {player.age && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.age}
+            </span>
+          )}
+          {player.gender && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="flex items-center justify-between px-3 py-3 gap-3">
-        <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16" imgSize={64} textClass="text-xs sm:text-sm" />
-        <div className="flex flex-col min-w-0 flex-1">
-          <div className="border border-[var(--best-board-border)] bg-white/5 text-[var(--best-board-muted)] text-[10px] px-1.5 py-0.5 w-fit mb-1">{"status : " + (player?.token_status || "Newcomer")}</div>
-          <div className="flex items-center gap-1 flex-wrap">
-            <div className="text-[var(--best-board-text)] font-bold text-sm truncate">{player?.name ?? "N/A"}</div>
-            {player?.age && (
-              <span className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit">{player.age}</span>
-            )}
-            {player?.gender && (
-              <span className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit">{player.gender === "male" ? "M" : "F"}</span>
-            )}
-          </div>
-          <div className="text-[var(--best-board-muted)] text-xs truncate">{player?.phone ?? "N/A"}</div>
-          <div className="text-[var(--best-board-text)] text-[11px] mt-0.5">
-            {player?.today_token ?? 0} Tokens{" "}
-            <span className="text-[var(--primary)] font-semibold ml-1">Redeem</span>
+
+      {/* ── MAIN BODY ── */}
+      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
+        {/* LEFT SECTION */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
+          <PlayerRankBadge
+            rank={rank}
+            sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
+            imgSize={56}
+            textClass="text-[10px] sm:text-xs md:text-sm"
+          />
+
+          <div className="flex-1 min-w-0">
+            <div className="text-[var(--best-board-text)] font-bold text-xs sm:text-sm truncate mb-0.5 leading-tight">
+              {player?.name || "N/A"}
+            </div>
+            <div
+              className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              {player?.phone || "N/A"}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] sm:text-xs" style={{ color: "var(--best-board-muted)" }}>Today:</span>
+                <span className="text-xs sm:text-sm font-bold text-[var(--best-board-text)] bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] px-2 py-0.5 rounded">
+                  {player?.today_token ?? "0"}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="flex flex-col items-center flex-shrink-0">
-          <div className="text-[var(--best-board-muted)] text-[10px] font-medium text-center leading-tight">Total<br />Tokens</div>
-          <div className="bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] border border-[var(--best-board-border)] font-bold text-base px-3 py-0.5 mt-1 min-w-[44px] text-center rounded-sm">{player?.total_token ?? 0}</div>
-        </div>
-        <div className="w-11 h-11 rounded flex items-center justify-center flex-shrink-0 overflow-hidden bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)]">
-          <Image src={src} alt={player.name} width={44} height={44} className="object-cover" unoptimized />
+
+        {/* RIGHT SECTION */}
+        <div
+          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+          style={{ borderLeft: "1px solid var(--best-board-border)" }}
+        >
+          {/* Total Tokens badge */}
+          <div
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+            style={{
+              background: "var(--best-board-accent-soft)",
+              border: "1px solid var(--best-board-border-strong)",
+            }}
+          >
+            <span
+              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
+              style={{ color: "var(--best-board-highlight)" }}
+            >
+              {player?.total_token ?? 0}
+            </span>
+            <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              Tokens
+            </span>
+          </div>
+
+          <div
+            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+            style={{ border: "1px solid var(--best-board-border-strong)" }}
+          >
+            <Image
+              src={src}
+              alt={player?.name || "Player"}
+              width={72}
+              height={72}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              unoptimized
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -333,6 +750,10 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
   const positiveLadderDetails = useSelector(state => state.positiveLeaderBoard?.ladderDetails || null);
   const negativeLadderDetails = useSelector(state => state.negativeLeaderBoard?.ladderDetails || null);
   const rosterLadderDetails = useSelector(state => state.rosterLeaderboard?.ladderDetails || null);
+
+  const appliedAgeSkill = useSelector(state => state.skillLeaderboard?.appliedAge);
+  const appliedAgePositive = useSelector(state => state.positiveLeaderBoard?.appliedAge);
+  const appliedAgeNegative = useSelector(state => state.negativeLeaderBoard?.appliedAge);
 
   const displayLadderDetails = 
     type === "minileague" ? minileagueLadderDetails :
@@ -413,7 +834,7 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
           <input type="text" placeholder="Search players..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
             className="w-full rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] placeholder:text-[var(--best-board-muted)]" />
         </div>
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
+        <div className="flex justify-start items-center gap-2 mt-4 px-4">
           <PlayerPerformationRanking ladderId={ladderId} />
         </div>
         {filteredSections.length === 0 ? (
@@ -461,9 +882,18 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
           <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
         ) : (
           <div className="px-4 space-y-2">
-            {filtered.map((player, idx) => (
-              <SkillPlayerCard key={player.id || idx} player={{...player, isInverted: displayLadderDetails?.inverted == 0}} rank={player.rank || idx + 1} />
-            ))}
+            {filtered.map((player, idx) => {
+              const showAgeRank = Number(appliedAgeSkill) > 0;
+              return (
+                <SkillPlayerCard
+                  key={player.id || idx}
+                  player={{...player, isInverted: displayLadderDetails?.inverted == 0}}
+                  rank={player.rank || idx + 1}
+                  showAgeRank={showAgeRank}
+                  ageRank={idx + 1}
+                />
+              );
+            })}
           </div>
         )}
       </div>
@@ -491,9 +921,19 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
           <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
         ) : (
           <div className="px-4 space-y-2">
-            {filtered.map((player, idx) => (
-              <SkillPlayerCard key={player.id || idx} player={{...player, isInverted: displayLadderDetails?.inverted == 0}} rank={player.rank || idx + 1} showRanks={false} />
-            ))}
+            {filtered.map((player, idx) => {
+              const showAgeRank = Number(appliedAgePositive) > 0;
+              return (
+                <SkillPlayerCard
+                  key={player.id || idx}
+                  player={{...player, isInverted: displayLadderDetails?.inverted == 0}}
+                  rank={player.rank || idx + 1}
+                  showAgeRank={showAgeRank}
+                  ageRank={idx + 1}
+                  showRanks={false}
+                />
+              );
+            })}
           </div>
         )}
       </div>
@@ -521,9 +961,20 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
           <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
         ) : (
           <div className="px-4 space-y-2">
-            {filtered.map((player, idx) => (
-              <SkillPlayerCard key={player.id || idx} player={{...player, isInverted: displayLadderDetails?.inverted == 0}} rank={player.rank || idx + 1} showRanks={false} isNegative={true} />
-            ))}
+            {filtered.map((player, idx) => {
+              const showAgeRank = Number(appliedAgeNegative) > 0;
+              return (
+                <SkillPlayerCard
+                  key={player.id || idx}
+                  player={{...player, isInverted: displayLadderDetails?.inverted == 0}}
+                  rank={player.rank || idx + 1}
+                  showAgeRank={showAgeRank}
+                  ageRank={idx + 1}
+                  showRanks={false}
+                  isNegative={true}
+                />
+              );
+            })}
           </div>
         )}
       </div>
@@ -534,14 +985,6 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
   /* ── ROSTER ── */
   if (type === "roster") {
     const filtered = rosterData.filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()));
-    const groupSize = 7;
-    const sections = [];
-    for (let i = 0; i < filtered.length; i += groupSize) {
-      sections.push({
-        players: filtered.slice(i, i + groupSize),
-        startIdx: i,
-      });
-    }
     return (
       <div>
         {displayLadderDetails?.name && (
@@ -556,22 +999,18 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
           <input type="text" placeholder="Search players..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
             className="w-full rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] placeholder:text-[var(--best-board-muted)]" />
         </div>
-        {sections.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
         ) : (
-          sections.map((section, idx) => (
-            <div key={idx} className="mb-8 px-4">
-              <div className="space-y-3">
-                {section.players.map((player, pidx) => (
-                  <RosterPlayerCard
-                    key={player.id || pidx}
-                    player={player}
-                    rank={player.rank || (section.startIdx + pidx + 1)}
-                  />
-                ))}
-              </div>
-            </div>
-          ))
+          <div className="px-4 space-y-3 mt-3">
+            {filtered.map((player, idx) => (
+              <RosterPlayerCard
+                key={player.id || idx}
+                player={player}
+                rank={player.rank || idx + 1}
+              />
+            ))}
+          </div>
         )}
       </div>
     );
