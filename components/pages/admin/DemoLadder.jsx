@@ -52,7 +52,10 @@ const DemoLadder = ({ userId }) => {
       ? JSON.parse(sessionStorage.getItem("userData") || "null")
       : null;
 
-  const refreshLadders = () => {
+  const refreshLadders = (force = false) => {
+    if (loading) return;
+    if (!force && allLadders && allLadders.length > 0) return;
+
     if (admin?.user_type === "admin") {
       dispatch(fetchLadders({ userId: admin.id }));
       return;

@@ -18,7 +18,9 @@ const ContactAdmin = () => {
     const fetchAdmin = async () => {
       try {
         const res = await getRequest(API_ENDPOINTS.LEADERBOARD, { ladder_id: ladderId });
-        setAdminDetails(res.ladderDetails);
+        setAdminDetails(res?.ladderDetails);
+        console.log("admin details :", res?.ladderDetails);
+        
       } catch (err) {
         console.error("Error fetching admin details:", err);
       } finally {
@@ -83,7 +85,7 @@ const ContactAdmin = () => {
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--best-board-muted)]">Phone</p>
           <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)]">
-            {adminDetails?.admin_phone || "Not Provided"}
+            {adminDetails?.admin_phone || "Not Provided11"}
           </p>
         </div>
       </div>

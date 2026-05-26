@@ -169,11 +169,10 @@ const PlayerCard = ({
                 return (
                   <div
                     key={r}
-                    className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-xs font-bold transition-all ${
-                      found
+                    className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-xs font-bold transition-all ${found
                         ? "bg-[var(--best-board-surface-strong)] border border-[var(--best-board-border-strong)] text-[var(--best-board-text)] shadow-[0_1px_4px_rgba(0,0,0,0.18)]"
                         : "bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] text-[var(--best-board-muted)]"
-                    }`}
+                      }`}
                   >
                     {found?.point ?? ""}
                   </div>
@@ -437,11 +436,11 @@ const MinileaguePlayers = () => {
           refreshLeaderboard={refreshLeaderboard}
           ladderId={ladderId}
           sortMode="rank"
-          setSortMode={() => {}}
+          setSortMode={() => { }}
           sortOpen={false}
-          setSortOpen={() => {}}
+          setSortOpen={() => { }}
           filterOpen={false}
-          setFilterOpen={() => {}}
+          setFilterOpen={() => { }}
           appliedAge={0}
           appliedGender=""
           groupSize={1}
@@ -461,8 +460,8 @@ const MinileaguePlayers = () => {
           setContactOpen={setContactOpen}
           setResetOpen={setResetOpen}
           setAddRemoveOpen={setAddRemoveOpen}
-          setSortOpen={() => {}}
-          setFilterOpen={() => {}}
+          setSortOpen={() => { }}
+          setFilterOpen={() => { }}
           activityItems={activityItems}
           handleDeleteActivity={handleDeleteActivity}
           contactOpen={contactOpen}

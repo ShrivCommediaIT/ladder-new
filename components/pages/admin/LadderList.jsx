@@ -48,7 +48,10 @@ const LadderList = ({ userId }) => {
       ? JSON.parse(sessionStorage.getItem("userData") || "null")
       : null;
 
-  const refreshLadders = () => {
+  const refreshLadders = (force = false) => {
+    if (loading) return;
+    if (!force && allLadders && allLadders.length > 0) return;
+
     if (admin?.user_type === "admin") {
       dispatch(fetchLadders({ userId: admin.id }));
       return;
@@ -76,7 +79,7 @@ const LadderList = ({ userId }) => {
   const handleDelete = async (ladderId) => {
     try {
       await getRequest(API_ENDPOINTS.DELETE_LEADERBOARD, { ladder_id: ladderId });
-      refreshLadders();
+      refreshLadders(true);
     } catch (error) {
       console.error("Delete failed:", error?.response?.data || error.message);
     } finally {

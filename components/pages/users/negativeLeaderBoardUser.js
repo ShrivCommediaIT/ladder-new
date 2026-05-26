@@ -140,131 +140,223 @@ const PlayerCard = ({
   };
 
   return (
-    <Card className="w-full rounded-xl shadow-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface)] hover:border-[var(--best-board-border-strong)] transition p-3 relative group">
-      <div className="flex justify-between items-start mb-1 px-1">
+    <div
+      className="mb-3 rounded-xl transition-all duration-200 group overflow-hidden cursor-default"
+      style={{
+        background: "var(--best-board-surface)",
+        border: "1px solid var(--best-board-border-strong)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
+      }}
+    >
+      {/* ── TOP STRIP: toggle + age/gender chips ── */}
+      <div
+        className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2"
+        style={{
+          borderBottom: "1px solid var(--best-board-border)",
+          background: "var(--secondary)",
+        }}
+      >
+        {/* Toggle on the left */}
         <PlayerStatusToggle player={player} user={true} />
+
+        <div className="flex items-center gap-1 flex-shrink-0 flex-wrap justify-end">
+          {player.age && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.age}
+            </span>
+          )}
+          {player.gender && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        {/* Header */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-2">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
-            <Image
-              src={playerImageUrl}
-              alt={player?.name}
-              width={80}
-              height={80}
-              className="object-cover rounded"
-              unoptimized
+
+      {/* ── MAIN BODY ── */}
+      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
+
+        {/* LEFT SECTION: rank badge + name/phone/skills */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
+
+          {/* Rank badge + optional age rank below */}
+          <div className="flex flex-col items-center gap-1 flex-shrink-0">
+            <PlayerRankBadge
+              rank={overallRank}
+              sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
+              imgSize={56}
+              textClass="text-[10px] sm:text-xs md:text-sm"
             />
+            {showAgeRank && (
+              <div className="flex flex-col items-center">
+                <div
+                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
+                  style={{ background: "var(--best-board-success)" }}
+                >
+                  {ageRank}
+                </div>
+                <p
+                  className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
+                  style={{ color: "var(--best-board-success)" }}
+                >
+                  Age
+                </p>
+              </div>
+            )}
           </div>
+
+          {/* Info block */}
           <div className="flex-1 min-w-0">
-            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+
+            {/* Player name */}
+            <div
+              className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight"
+              style={{ color: "var(--best-board-text)" }}
+            >
               {player?.name || "N/A"}
-              {player.age && (
-                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-3">
-                  {player.age}
-                </p>
-              )}
-              {player.gender && (
-                <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                  {player.gender == "male" ? "M" : "F"}
-                </p>
-              )}
             </div>
-            <div className="text-[#d4e5e8] text-xs truncate">
+
+            {/* Phone */}
+            <div
+              className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight"
+              style={{ color: "var(--best-board-muted)" }}
+            >
               {player?.phone || "N/A"}
             </div>
-          </div>
-          <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
-            <div className="flex flex-col items-center">
-              <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm shadow-sm leading-none h-7 sm:h-auto flex items-center">
-                {Math.abs(player.total_point || 0)}
-              </span>
-              <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
-            </div>
 
-            <div className="flex items-center gap-2 border-l border-white/20 pl-2 sm:pl-3">
-              {showAgeRank && (
-                <div className="flex flex-col items-center">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-black shadow-sm text-xs sm:text-sm">
-                    {ageRank}
-                  </div>
-                  <p className="text-[8px] sm:text-[9px] text-emerald-400 font-bold mt-1 whitespace-nowrap">Age Rank</p>
-                </div>
-              )}
-              <div className="flex flex-col items-center">
-                <PlayerRankBadge rank={overallRank} />
-                <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {player.skills?.length > 0 ? (
-          <>
-            <div className="-mx-1 overflow-x-auto pb-1 mb-1 px-1 scrollbar-thin">
-              <div className="w-max min-w-full">
-                <div className="flex gap-[3px] overflow-y-visible pb-2">
+            {/* Skills section */}
+            {player.skills?.length > 0 ? (
+              <>
+                {/* ── SKILL NUMBER ROW ── */}
+                <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
                   {player.skills.map((skill, i) => {
-                    const isNegative = skill.skill_sign === "-";
-
+                    const isNeg = skill.skill_sign === "-";
                     return (
                       <div
                         key={i}
                         onClick={() => isEditable && onSkillClick(player.id, skill.skill_number)}
-                        className={`${skillCellClass}  text-black relative ${isEditable
-                          ? "cursor-pointer bg-white hover:bg-emerald-500 hover:scale-110"
-                          : "cursor-not-allowed bg-white opacity-40 text-gray-500"
-                          }`}
+                        className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors cursor-pointer relative"
+                        style={{
+                          background: "var(--best-board-accent-soft)",
+                          border: "1px solid var(--best-board-border-strong)",
+                          color: "var(--best-board-highlight)",
+                        }}
                         title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
                       >
-                        {/* minus sign box ke upar */}
-                        {isNegative && (
-                          <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">
+                        {isNeg && (
+                          <span
+                            className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-extrabold leading-none"
+                            style={{ color: "var(--best-board-danger)" }}
+                          >
                             −
                           </span>
                         )}
-
                         {skill.skill_number}
                       </div>
                     );
                   })}
                 </div>
 
-                {/* ✅ SCORES - YELLOW by default, GREEN when target achieved */}
-                <div className="flex gap-[3px]">
+                {/* ── SCORE ROW ── */}
+                <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
                   {player.skills.map((skill, i) => {
                     const scoreData = getScoreBySkillNumber(
                       player.scores || [],
                       player.skills || [],
-                      skill.skill_number,
+                      skill.skill_number
                     );
                     return (
                       <div
                         key={i}
-                        className={`${skillCellClass} font-medium border shadow-sm transition-all duration-200 group relative ${scoreData.isTargetAchieved
-                          ? "bg-green-400 text-black shadow-md font-semibold"
-                          : "bg-yellow-200 text-black font-semibold border-yellow-200/50 hover:bg-yellow-300 hover:shadow-md"
-                          } ${scoreData.witnessBy ? "underline decoration-black decoration-[3px] bg-green-400" : ""}`}
-                        title={`Score: ${scoreData.score} | Target: ${scoreData.target || "N/A"
-                          }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
+                        className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
+                          ${
+                            scoreData.witnessBy
+                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
+                              : scoreData.isTargetAchieved
+                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
+                              : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
+                          }`}
+                        title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {scoreData.displayScore}
+                        {scoreData.displayScore !== "0" ? scoreData.displayScore : ""}
                       </div>
                     );
                   })}
                 </div>
+              </>
+            ) : (
+              <div
+                className="h-6 rounded text-[10px] flex items-center justify-center"
+                style={{
+                  background: "var(--best-board-surface-soft)",
+                  border: "1px solid var(--best-board-border)",
+                  color: "var(--best-board-muted)",
+                }}
+              >
+                No skills
               </div>
-            </div>
-
-          </>
-        ) : (
-          <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">
-            No skills data
+            )}
           </div>
-        )}
+        </div>
+
+        {/* ── RIGHT SECTION: points badge + avatar ── */}
+        <div
+          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+          style={{ borderLeft: "1px solid var(--best-board-border)" }}
+        >
+          {/* Total Points badge */}
+          <div
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[56px]"
+            style={{
+              background: "var(--best-board-accent-soft)",
+              border: "1px solid var(--best-board-border-strong)",
+            }}
+          >
+            <span
+              className="text-sm sm:text-base md:text-[10px] font-black leading-none w-full text-center truncate"
+              style={{ color: "var(--best-board-highlight)" }}
+            >
+              {Math.abs(player?.total_point || 0)}
+            </span>
+            <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              pts
+            </span>
+          </div>
+
+          {/* Player avatar */}
+          <div
+            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+            style={{ border: "1px solid var(--best-board-border-strong)" }}
+          >
+            <Image
+              src={playerImageUrl}
+              alt={player?.name || "Player"}
+              width={72}
+              height={72}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              unoptimized
+            />
+          </div>
+        </div>
       </div>
-    </Card>
+    </div>
   );
 };
 

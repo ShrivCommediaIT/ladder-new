@@ -74,9 +74,8 @@ export default function LadderInfo({ ladders }) {
               transition={{ delay: index * 0.1 }}
               className="
                 group flex items-center justify-between 
-                rounded-xl border border-white/10 bg-black/30 
-                px-3 py-3 hover:bg-white/10 hover:shadow-lg 
-                hover:shadow-cyan-500/10 transition
+                rounded-xl border border-border bg-muted/30 
+                px-3 py-3 hover:bg-muted/50 transition
                 cursor-pointer
               "
               onClick={() => handleEditClick(ladder.id, ladder.type, ladder.inverted)}
@@ -90,11 +89,11 @@ export default function LadderInfo({ ladders }) {
               {isMobile ? (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="grid place-items-center h-8 w-8 rounded-full bg-white/10 text-cyan-300 hover:scale-110 transition">
+                    <button className="grid place-items-center h-8 w-8 rounded-full bg-primary/10 text-primary hover:scale-110 hover:bg-primary/20 transition">
                       <Info className="w-4 h-4" />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[90vw] max-w-sm border border-white/10 bg-[#0b1020]/95 text-white backdrop-blur-xl shadow-xl animate-in fade-in zoom-in">
+                  <PopoverContent className="w-[90vw] max-w-sm border border-border bg-card text-foreground backdrop-blur-xl shadow-xl animate-in fade-in zoom-in">
                     <p className="text-xs sm:text-sm leading-relaxed">{ladder.info}</p>
                   </PopoverContent>
                 </Popover>
@@ -102,7 +101,7 @@ export default function LadderInfo({ ladders }) {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button className="grid place-items-center h-8 w-8 rounded-full bg-white/10 text-cyan-300 hover:scale-110 transition">
+                      <button className="grid place-items-center h-8 w-8 rounded-full bg-primary/10 text-primary hover:scale-110 hover:bg-primary/20 transition">
                         <Info className="w-4 h-4" />
                       </button>
                     </TooltipTrigger>

@@ -23,7 +23,12 @@ import {
 import { Button } from "@/components/ui/button";
 import Logo from "@/public/logo1.png";
 
-const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
+const PlayerRankBadge = ({
+  rank,
+  sizeClass = "h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14",
+  imgSize = 56,
+  textClass = "text-xs sm:text-sm",
+}) => {
   const rankNum = Number(rank);
   let src = "/ranksImg/rank.png";
   let scaleClass = "scale-[1.22] group-hover:scale-[1.34]";
@@ -68,9 +73,7 @@ const PlayerCard = ({
 }) => {
   if (isBlank) {
     return (
-      <div
-        className="flex items-center min-h-[18vh] justify-center px-2 py-2 mb-3 rounded-xl border border-dashed border-[var(--best-board-border)] bg-[var(--best-board-surface)]"
-      />
+      <div className="flex items-center justify-center min-h-[12vh] sm:min-h-[15vh] px-2 py-2 mb-3 rounded-xl bg-[var(--best-board-surface)] border-2 border-dashed border-[var(--best-board-border-strong)]" />
     );
   }
 
@@ -80,9 +83,7 @@ const PlayerCard = ({
     ? `${IMAGE_BASE_URL}/${player.image}?t=${cacheBust}`
     : Logo;
 
-  const sectionStartRank =
-    Math.floor((rank - 1) / groupSize) * groupSize + 1;
-
+  const sectionStartRank = Math.floor((rank - 1) / groupSize) * groupSize + 1;
   const currentSectionRanks = Array.from(
     { length: groupSize },
     (_, i) => sectionStartRank + i
@@ -96,61 +97,68 @@ const PlayerCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       onClick={() => onClick()}
-      className={`group flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-4 py-4 transition hover:border-[var(--best-board-border-strong)] ${
-        isCurrentUser ? "cursor-pointer" : "opacity-60 cursor-not-allowed"
-      }`}
+      className={`mb-3 rounded-xl transition-all duration-200 group overflow-hidden bg-[var(--best-board-surface)] border border-[var(--best-board-border-strong)] shadow-[0_4px_16px_rgba(0,0,0,0.18)] ${isCurrentUser ? "cursor-pointer" : "opacity-60 cursor-not-allowed"
+        }`}
     >
-      <div
-        className="flex justify-between items-center px-2 py-1"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <PlayerStatusToggle player={player} user={true} />
+      {/* ── TOP STRIP: toggle + age/gender chips ── */}
+      <div className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2 border-b border-[var(--best-board-border)] bg-primary">
+        {/* PlayerStatusToggle - DO NOT CHANGE USER=TRUE */}
+        <div onClick={(e) => e.stopPropagation()}>
+          <PlayerStatusToggle player={player} user={true} />
+        </div>
+
+        {/* Age + gender chips */}
+        <div className="flex items-center gap-1 flex-shrink-0 flex-wrap justify-end">
+          {player.age && (
+            <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white dark:bg-[var(--best-board-accent-soft)] text-[var(--best-board-highlight)] border border-[var(--best-board-border-strong)]">
+              {player.age}
+            </span>
+          )}
+          {player.gender && (
+            <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white dark:bg-[var(--best-board-accent-soft)] text-[var(--best-board-highlight)] border border-[var(--best-board-border-strong)]">
+              {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center justify-between mt-2">
-        <div className="flex-1 min-w-0 overflow-hidden">
-          <div className="flex w-full items-center mb-2 min-w-0">
-            <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
+      {/* ── MAIN BODY ── */}
+      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
 
-            <div className="flex-1 min-w-0 overflow-hidden mb-3">
-              <div className="text-white flex items-center align-center gap-2 text-sm sm:text-base font-semibold truncate max-w-[160px] sm:max-w-[240px]">
-                {player?.name || "N/A"}
-                {player.age && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                    {player.age}
-                  </p>
-                )}
-                {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender == "male" ? "M" : "F"}
-                  </p>
-                )}
-              </div>
-              <div className="text-[#d4e5e8] text-xs truncate">
-                {player?.phone || "N/A"}
-              </div>
+        {/* LEFT SECTION */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
+
+          <PlayerRankBadge
+            rank={rank}
+            sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
+            imgSize={56}
+            textClass="text-[10px] sm:text-xs md:text-sm"
+          />
+
+          <div className="flex-1 min-w-0">
+            {/* Player name */}
+            <div className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight text-[var(--best-board-text)]">
+              {player?.name || "N/A"}
             </div>
 
-            <div className="ml-2 w-14 sm:w-16 text-center flex-shrink-0">
-              <span className="bg-[#1b4542] text-[#fdf7c3] px-2 sm:px-3 py-1 rounded-full font-extrabold text-lg sm:text-xl border border-white">
-                {player?.total_point || 0}
-              </span>
+            <div className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight text-[var(--best-board-muted)]">
+              {player?.phone || "N/A"}
             </div>
-          </div>
 
-          <div className="mt-1">
-            <div className="flex gap-1 mb-1 overflow-x-auto">
-              {currentSectionRanks.map((headerRank) => (
+            {/* GW RANK NUMBER ROW */}
+            <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
+              {currentSectionRanks.map((r) => (
                 <div
-                  key={headerRank}
-                  className="w-6 h-5 sm:w-8 sm:h-6 flex items-center justify-center text-xs sm:text-sm font-bold text-white rounded bg-[#28495e] border border-[#4eb0a2]"
+                  key={r}
+                  className="w-6 h-5 sm:w-7 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]"
                 >
-                  {headerRank}
+                  {r}
                 </div>
               ))}
             </div>
 
-            <div className="flex gap-1 overflow-x-auto">
+            {/* GW POINTS RESULT ROW */}
+            <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
               {currentSectionRanks.map((r) => {
                 const found = player.result_details?.find(
                   (i) => Number(i.rank) === Number(r)
@@ -158,12 +166,12 @@ const PlayerCard = ({
                 return (
                   <div
                     key={r}
-                    className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${found
-                      ? "bg-white text-[#092733] border-[#7ea1af]"
-                      : "bg-[#7ea1af] bg-opacity-50 border-[#528189] text-xs"
+                    className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-xs font-bold transition-all ${found
+                        ? "bg-[var(--best-board-surface-strong)] border border-[var(--best-board-border-strong)] text-[var(--best-board-text)] shadow-[0_1px_4px_rgba(0,0,0,0.18)]"
+                        : "bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] text-[var(--best-board-muted)]"
                       }`}
                   >
-                    {found ? found.point : ""}
+                    {found?.point ?? ""}
                   </div>
                 );
               })}
@@ -171,17 +179,30 @@ const PlayerCard = ({
           </div>
         </div>
 
-        {/* IMAGE */}
-        <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center ml-3 flex-shrink-0">
-          <Image
-            src={playerImageUrl}
-            alt={player?.name || "Player"}
-            width={96}
-            height={96}
-            className="object-cover w-full h-full rounded-lg shadow-md"
-            unoptimized
-            onError={(e) => (e.currentTarget.src = Logo.src)}
-          />
+        {/* RIGHT SECTION: points badge + avatar */}
+        <div className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0 border-l border-[var(--best-board-border)]">
+
+          {/* Points badge */}
+          <div className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-2 sm:px-3 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[56px] bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)]">
+            <span className="text-base sm:text-xl md:text-2xl font-black leading-none text-[var(--best-board-highlight)]">
+              {player?.total_point || 0}
+            </span>
+            <span className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5 text-[var(--best-board-muted)]">
+              pts
+            </span>
+          </div>
+
+          {/* Player avatar */}
+          <div className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px] border border-[var(--best-board-border-strong)]">
+            <Image
+              src={playerImageUrl}
+              alt={player?.name || "Player"}
+              width={72}
+              height={72}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              unoptimized
+            />
+          </div>
         </div>
       </div>
     </motion.div>
