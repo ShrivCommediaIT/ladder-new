@@ -191,8 +191,8 @@ export default function InfoSection({
             </div>
           )}
 
-          {inviteUrl && (
-            <div className="best-board-card rounded-xl p-4 hidden lg:block">
+          {inviteUrl && !userLevel && (
+            <div className="best-board-card rounded-xl p-4">
               <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Invite URL</p>
               <div className="rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-bg)] p-3 text-xs text-[var(--best-board-muted)] break-all">
                 {inviteUrl || "Invite link unavailable"}

@@ -131,11 +131,11 @@ const DummyActivity = ({ ladderId }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mb-3 p-4 bg-gradient-to-tr from-gray-800 via-gray-900 to-gray-800 rounded-xl shadow-md flex gap-3 border border-gray-700 hover:border-purple-500 hover:shadow-lg transition-all"
+          className="mb-3 p-4 bg-[var(--best-board-surface-soft)] rounded-xl shadow flex gap-3 border border-[var(--best-board-border)] hover:border-[var(--primary)] hover:shadow-md transition-all duration-150"
         >
           {icon}
           <div>
-            <p className="text-white text-base">{activity.message}</p>
+            <p className="text-[var(--best-board-text)] text-base">{activity.message}</p>
           </div>
         </motion.div>
       );
@@ -150,17 +150,17 @@ const DummyActivity = ({ ladderId }) => {
       <button
         onClick={() => goToPage(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-3 py-1 bg-gray-800 rounded disabled:opacity-40"
+        className="px-3 py-1 bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] text-[var(--best-board-text)] rounded disabled:opacity-40"
       >
         <FaChevronLeft />
       </button>
-      <span className="px-4 py-1 text-white">
+      <span className="px-4 py-1 text-[var(--best-board-text)]">
         {currentPage} / {totalPages}
       </span>
       <button
         onClick={() => goToPage(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-3 py-1 bg-gray-800 rounded disabled:opacity-40"
+        className="px-3 py-1 bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] text-[var(--best-board-text)] rounded disabled:opacity-40"
       >
         <FaChevronRight />
       </button>
@@ -174,7 +174,7 @@ const DummyActivity = ({ ladderId }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <Card className="mx-6 bg-gradient-to-r from-[#141C2B] to-gray-900 text-white">
+      <Card className="mx-6 bg-[var(--best-board-surface)] border border-[var(--best-board-border)] text-[var(--best-board-text)] shadow-lg rounded-2xl">
         <CardContent className="p-6">
 
           {/* Header */}
@@ -211,7 +211,7 @@ const DummyActivity = ({ ladderId }) => {
                 ))}
               </div>
             ) : activities.length === 0 ? (
-              <p className="text-center text-gray-400">No activity available</p>
+              <p className="text-center text-[var(--best-board-muted)]">No activity available</p>
             ) : (
               renderActivities()
             )}

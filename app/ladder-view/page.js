@@ -1,112 +1,72 @@
-
 "use client";
 
-import { useState } from "react";
 import { useSelector } from "react-redux"; // ✅ Added for ladder type detection
 import DummyPlayerList from "@/components/shared/DummyPlayerList";           // ✅ best5/winlose
-import DummyMinileaguePlayerList from "@/components/shared/DummyMinileaguePlayerList"; // ✅ minileague
-import DummyActivity from "@/components/shared/DummyActivity";
-import DummyUserRules from "@/components/shared/DummyUserRules";
-import { motion, AnimatePresence } from "framer-motion";
-import { useSearchParams } from "next/navigation";
-import LocalDiscount from "@/components/shared/LocalDiscount";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import DummyBasicLeaderBoard from "@/components/shared/DummyBasicLeaderBoard";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import InfoSection from "@/components/shared/InfoSection";
 
 export default function LadderView() {
   const router = useRouter();
-  const [showLadder, setShowLadder] = useState(true);
   const searchParams = useSearchParams();
   const ladderId = searchParams.get("ladder_id");
-const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
+  const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
+  
   // ✅ Detect ladder type from Redux store
   const ladderDetails = useSelector((state) => {
     // Check both player and minileague slices
     return state.player?.players?.[ladderId]?.ladderDetails || 
            state.minileague?.ladderDetails || {};
   });
-  
-  // const ladderType = ladderDetails?.type || ladderId || "winlose";
-  
+
+  const inviteUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`
+    : "";
+
   // ✅ Select correct component based on ladder type
   const getPlayersComponent = () => {
-    // if (ladderType === "minileague") {
-    //   return <DummyMinileaguePlayerList ladderId={ladderId} />;
-    // }
-
-    // if (ladderType === "skill") {
-    //   return <DummyBasicLeaderBoard ladderId={ladderId} />
-    // }
-
-    return <DummyPlayerList ladderId={ladderId} />;
+    return <DummyPlayerList ladderId={ladderId} ladderType={ladderType} />;
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen py-4 bg-gray-800">
-      {/* Back Button */}
-      <div className="sm:px-12 md:px-12 lg:px-12 w-full mb-2"></div>
+    <div className="flex flex-col w-full min-h-screen py-4 bg-background text-foreground relative">
+      {/* Floating Theme Toggle */}
+      <div className="fixed top-4 right-4 z-[60]">
+        <ThemeToggle />
+      </div>
 
-      <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 px-4 sm:px-8 lg:px-12 max-w-8xl mx-auto">
+      {/* Back Button and Header Actions */}
+      <div className="w-full flex items-center justify-between px-4 sm:px-8 lg:px-12 max-w-8xl mx-auto mb-6">
         <Button
           variant="outline"
           size="lg"
-          className="w-full sm:w-auto bg-gray-500 text-white cursor-pointer px-6 sm:px-8 py-2 text-sm sm:text-md font-semibold"
+          className="w-full sm:w-auto bg-[var(--best-board-surface)] text-[var(--best-board-text)] hover:bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] cursor-pointer px-6 sm:px-8 py-2 text-sm sm:text-md font-semibold"
           onClick={() => router.back()}
         >
           ← Back
         </Button>
-
-        <Button
-          onClick={() => setShowLadder(!showLadder)}
-          variant="outline"
-          size="lg"
-          className="w-full sm:w-auto cursor-pointer px-6 sm:px-8 py-2 text-sm sm:text-md font-semibold bg-white-500 text-white hover:bg-gray-600 hover:text-white"
-        >
-          {showLadder ? "Ladder ON" : "Ladder OFF"}
-        </Button>
       </div>
 
-      {/* Layout */}
-      <div className="flex flex-col md:flex-row w-full px-4 sm:px-0 md:px-0 lg:px-0 mx-auto">
-        {/* Mobile/desktop Ladder */}
-        <AnimatePresence>
-          {showLadder && (
-            <motion.div
-              key="ladder"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-              className="flex-1 md:flex-2"
-            >
-              {getPlayersComponent()} {/* ✅ Renders correct component */}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Other Components */}
-        <AnimatePresence>
-          {(!showLadder || window.innerWidth >= 768) && (
-            <motion.div
-              key="others"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-              className="flex-1 flex flex-col gap-4 sm:mt-16"
-            >
-              <div className="flex items-center justify-center w-full">
-                <DummyUserRules ladderId={ladderId} />
-              </div>
-
-              <div className="flex items-center justify-center w-full">
-                <DummyActivity ladderId={ladderId} />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      {/* Grid Layout (Side-by-side on desktop, stacked on mobile) */}
+      <main className="w-full px-4 sm:px-8 lg:px-12 pb-6 max-w-8xl mx-auto">
+        <div className="grid items-start gap-6 grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_360px] xl:grid-cols-[minmax(0,0.86fr)_400px]">
+          {/* Left Panel: Leaderboard */}
+          <div className="min-w-0">
+            {getPlayersComponent()}
+          </div>
+          
+          {/* Right Panel: Premium User Info Section */}
+          <div className="lg:sticky lg:top-[5.2rem] lg:self-start">
+            <InfoSection
+              userLevel={true}
+              ladderType={ladderType}
+              user={null}
+              inviteUrl={inviteUrl}
+            />
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

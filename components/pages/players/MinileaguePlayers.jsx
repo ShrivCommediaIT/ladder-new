@@ -1,5 +1,4 @@
 "use client";
-"use client";
 import { IMAGE_BASE_URL } from "@/constants/api";
 
 import Image from "next/image";
@@ -16,14 +15,12 @@ import Logo from "@/public/logo1.png";
 import { MinileagueEditPlayer } from "./MinileagueEditPlayer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Minileague from "./Minileague";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import PlayerSearch from "../users/PlayerSearch";
 import { postWithParams } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -38,7 +35,13 @@ import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
 import AgeFilter from "@/components/shared/AgeFilter";
 import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsAndInvite";
 
-const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
+/* ================= Rank Badge ================= */
+const PlayerRankBadge = ({
+  rank,
+  sizeClass = "h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14",
+  imgSize = 56,
+  textClass = "text-xs sm:text-sm",
+}) => {
   const rankNum = Number(rank);
   let src = "/ranksImg/rank.png";
   let scaleClass = "scale-[1.22] group-hover:scale-[1.34]";
@@ -82,10 +85,7 @@ const PlayerCard = ({
 }) => {
   if (isBlank) {
     return (
-      <div
-        className="flex items-center justify-center min-h-[18vh] px-2 py-2 mb-3 rounded-lg shadow"
-        style={{ background: "var(--best-board-surface)", border: "2px dashed var(--best-board-border-strong)" }}
-      />
+      <div className="flex items-center justify-center min-h-[12vh] sm:min-h-[15vh] px-2 py-2 mb-3 rounded-xl bg-[var(--best-board-surface)] border-2 border-dashed border-[var(--best-board-border-strong)]" />
     );
   }
 
@@ -93,9 +93,7 @@ const PlayerCard = ({
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
 
-  const sectionStartRank =
-    Math.floor((rank - 1) / groupSize) * groupSize + 1;
-
+  const sectionStartRank = Math.floor((rank - 1) / groupSize) * groupSize + 1;
   const currentSectionRanks = Array.from(
     { length: groupSize },
     (_, i) => sectionStartRank + i
@@ -104,91 +102,118 @@ const PlayerCard = ({
   return (
     <div
       onClick={() => onEdit(player)}
-      className="mb-3 cursor-pointer rounded-lg shadow transition-all hover:bg-[var(--best-board-surface-soft)] group"
-      style={{ background: "var(--best-board-surface)", border: "2px solid var(--best-board-border-strong)" }}
+      className="mb-3 cursor-pointer rounded-xl transition-all duration-200 group overflow-hidden bg-[var(--best-board-surface)] border border-[var(--best-board-border-strong)] shadow-[0_4px_16px_rgba(0,0,0,0.18)]"
     >
-      <div className="flex justify-between items-start mb-1 px-1 mt-1">
+      {/* ── TOP STRIP: toggle + age/gender chips ── */}
+      <div className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2 border-b border-[var(--best-board-border)] bg-primary">
+        {/* PlayerStatusToggle */}
         <PlayerStatusToggle player={player} user={false} />
+
+        {/* Age + gender chips */}
+        <div className="flex items-center gap-1 flex-shrink-0 flex-wrap justify-end">
+          {player.age && (
+            <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white dark:bg-[var(--best-board-accent-soft)] text-[var(--best-board-highlight)] border border-[var(--best-board-border-strong)]">
+              {player.age}
+            </span>
+          )}
+          {player.gender && (
+            <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white dark:bg-[var(--best-board-accent-soft)] text-[var(--best-board-highlight)] border border-[var(--best-board-border-strong)]">
+              {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center justify-between px-2 py-2 ">
-        <div className="flex-1 min-w-0">
-          <div className="flex w-full items-center mb-2">
-            <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
+      {/* ── MAIN BODY ── */}
+      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
 
-            <div className="flex-1 min-w-0">
-              <div className="text-white flex items-center gap-2 text-sm font-semibold truncate">
-                {player?.name || "N/A"}
-                {player.age && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                    {player.age}
-                  </p>
-                )}
-                {player.gender && (
-                  <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender == "male" ? "M" : "F"}
-                  </p>
-                )}
-              </div>
-              <div className="text-[#d4e5e8] text-xs truncate">
-                {player?.phone || "N/A"}
-              </div>
+        {/* LEFT SECTION */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
+
+          <PlayerRankBadge
+            rank={rank}
+            sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
+            imgSize={56}
+            textClass="text-[10px] sm:text-xs md:text-sm"
+          />
+
+          <div className="flex-1 min-w-0">
+            {/* Player name */}
+            <div className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight text-[var(--best-board-text)]">
+              {player?.name || "N/A"}
             </div>
 
-            <div className="ml-2 w-14 text-center">
-              <span className="bg-[#1b4542] text-[#fdf7c3] px-3 py-1 rounded-full font-extrabold text-lg border border-white">
-                {player?.total_point || 0}
-              </span>
+            {/* Phone / ID */}
+            <div className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight text-[var(--best-board-muted)]">
+              {player?.phone || "N/A"}
             </div>
-          </div>
 
-          <div className="flex gap-1 mb-1 overflow-x-auto">
-            {currentSectionRanks.map((r) => (
-              <div
-                key={r}
-                className="w-7 h-6 flex items-center justify-center text-xs text-white rounded bg-[#28495e] border border-[#4eb0a2]"
-              >
-                {r}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex gap-1 overflow-x-auto">
-            {currentSectionRanks.map((r) => {
-              const found = player.result_details?.find(
-                (i) => Number(i.rank) === Number(r)
-              );
-              return (
+            {/* GW RANK NUMBER ROW */}
+            <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
+              {currentSectionRanks.map((r) => (
                 <div
                   key={r}
-                  className={`w-7 h-7 flex items-center justify-center rounded font-bold border ${found
-                    ? "bg-white text-black border-[#7ea1af]"
-                    : "bg-[#7ea1af]/50 border-[#528189]"
-                    }`}
+                  className="w-6 h-5 sm:w-7 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]"
                 >
-                  {found?.point || ""}
+                  {r}
                 </div>
-              );
-            })}
+              ))}
+            </div>
+
+            {/* GW POINTS RESULT ROW */}
+            <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+              {currentSectionRanks.map((r) => {
+                const found = player.result_details?.find(
+                  (i) => Number(i.rank) === Number(r)
+                );
+                return (
+                  <div
+                    key={r}
+                    className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-xs font-bold transition-all ${
+                      found
+                        ? "bg-[var(--best-board-surface-strong)] border border-[var(--best-board-border-strong)] text-[var(--best-board-text)] shadow-[0_1px_4px_rgba(0,0,0,0.18)]"
+                        : "bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] text-[var(--best-board-muted)]"
+                    }`}
+                  >
+                    {found?.point ?? ""}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        <div className="ml-3 w-20 h-20">
-          <Image
-            src={playerImageUrl}
-            alt={player?.name}
-            width={80}
-            height={80}
-            className="object-cover rounded"
-            unoptimized
-          />
+        {/* RIGHT SECTION: points badge + avatar */}
+        <div className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0 border-l border-[var(--best-board-border)]">
+
+          {/* Points badge */}
+          <div className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-2 sm:px-3 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[56px] bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)]">
+            <span className="text-base sm:text-xl md:text-2xl font-black leading-none text-[var(--best-board-highlight)]">
+              {player?.total_point || 0}
+            </span>
+            <span className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5 text-[var(--best-board-muted)]">
+              pts
+            </span>
+          </div>
+
+          {/* Player avatar */}
+          <div className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px] border border-[var(--best-board-border-strong)]">
+            <Image
+              src={playerImageUrl}
+              alt={player?.name || "Player"}
+              width={72}
+              height={72}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              unoptimized
+            />
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-/* ================= Main Component ================= */
+/* ================= Main Component (unchanged) ================= */
 const MinileaguePlayers = () => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -198,8 +223,12 @@ const MinileaguePlayers = () => {
 
   const user = useSelector((state) => state.user?.user);
   const activityState = useSelector((state) => state.activity);
-  const { data: sectionedPlayers, appliedAge, appliedAgeType, appliedGender } =
-    useSelector((state) => state.minileague || {});
+  const {
+    data: sectionedPlayers,
+    appliedAge,
+    appliedAgeType,
+    appliedGender,
+  } = useSelector((state) => state.minileague || {});
 
   const [loadingPlayers, setLoadingPlayers] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
@@ -211,16 +240,14 @@ const MinileaguePlayers = () => {
   const [resetOpen, setResetOpen] = useState(false);
   const [addRemoveOpen, setAddRemoveOpen] = useState(false);
   const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
-  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
+  const hasFilters =
+    (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
   const inviteUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`
       : "";
 
-  // Section Size / Flexibility
   const [sectionSize, setSectionSize] = useState(7);
-
-  // Section Modal
   const [isSectionModalOpen, setIsSectionModalOpen] = useState(false);
   const [currentSectionName, setCurrentSectionName] = useState("");
   const [newSectionName, setNewSectionName] = useState("");
@@ -240,9 +267,7 @@ const MinileaguePlayers = () => {
       payload.dob = appliedAge;
       payload.age_type = appliedAgeType;
     }
-    if (appliedGender) {
-      payload.gender = appliedGender;
-    }
+    if (appliedGender) payload.gender = appliedGender;
     try {
       await Promise.all([
         dispatch(fetchMiniLeague(payload)),
@@ -275,45 +300,25 @@ const MinileaguePlayers = () => {
 
   const updateSectionName = async (currentName, updateName) => {
     try {
-      const res = await postWithParams(API_ENDPOINTS.MINILEAGUE_UPDATE_GRADEBAR_NAME, {
-        ladder_id: ladderId,
-        current_name: currentName,
-        update_name: updateName,
-      });
+      const res = await postWithParams(
+        API_ENDPOINTS.MINILEAGUE_UPDATE_GRADEBAR_NAME,
+        {
+          ladder_id: ladderId,
+          current_name: currentName,
+          update_name: updateName,
+        }
+      );
       if (res?.status) refreshLeaderboard();
     } catch (error) {
       console.error(error);
     }
   };
 
-
-
-  // Trust server-side ordering from API
   const processedSections = sectionedPlayers;
-
-
-  const searchPlayers = React.useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return [];
-
-    const list = [];
-
-    processedSections.forEach((sec, sidx) => {
-      (sec?.users_record || []).forEach((p) => {
-        if (p?.name?.toLowerCase().includes(q)) {
-          list.push({ ...p, sectionIndex: sidx });
-        }
-      });
-    });
-
-    return list; // order same as API
-  }, [processedSections, searchQuery]);
-
 
   const finalSections = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
 
-    //  NORMAL MODE — unchanged
     if (!q) {
       return processedSections.map((sec) => ({
         label: sec?.section,
@@ -325,18 +330,12 @@ const MinileaguePlayers = () => {
       }));
     }
 
-    // SEARCH MODE
     const sections = [];
-
     processedSections.forEach((sec) => {
       const allPlayers = sec?.users_record || [];
-
       const startsWith = allPlayers
-        .filter((p) =>
-          p?.name?.toLowerCase().startsWith(q)
-        )
+        .filter((p) => p?.name?.toLowerCase().startsWith(q))
         .sort((a, b) => a.name.localeCompare(b.name));
-
       const contains = allPlayers
         .filter(
           (p) =>
@@ -344,18 +343,10 @@ const MinileaguePlayers = () => {
             p?.name?.toLowerCase().includes(q)
         )
         .sort((a, b) => a.name.localeCompare(b.name));
-
       const players = [...startsWith, ...contains];
-
-      if (players.length > 0) {
-        sections.push({
-          label: sec?.section,
-          players,
-          blankCount: 0,
-        });
-      }
+      if (players.length > 0)
+        sections.push({ label: sec?.section, players, blankCount: 0 });
     });
-
     return sections;
   }, [processedSections, searchQuery, sectionSize]);
 
@@ -368,31 +359,41 @@ const MinileaguePlayers = () => {
         console.error("Failed to delete activity", error);
       }
     },
-    [dispatch, ladderId],
+    [dispatch, ladderId]
   );
 
-  const handleResetBoard = useCallback(
-    async () => {
-      try {
-        await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
-        setResetOpen(false);
-        refreshLeaderboard();
-      } catch (error) {
-        console.error("Failed to reset leaderboard", error);
-      }
-    },
-    [ladderId, refreshLeaderboard],
-  );
+  const handleResetBoard = useCallback(async () => {
+    try {
+      await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, {
+        ladder_id: ladderId,
+      });
+      setResetOpen(false);
+      refreshLeaderboard();
+    } catch (error) {
+      console.error("Failed to reset leaderboard", error);
+    }
+  }, [ladderId, refreshLeaderboard]);
 
   const activityItems = activityState?.data?.data || [];
+
   const handleAgeSearch = (age, ageType, gender) => {
     const ageNum = age ? Number(age) : 0;
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
   };
 
   const quickActions = [
-    { id: "reset", label: "Zero All", icon: RotateCcw, onClick: () => setResetOpen(true) },
-    { id: "add-remove", label: "Add / Move", icon: Plus, onClick: () => setAddRemoveOpen(true) },
+    {
+      id: "reset",
+      label: "Zero All",
+      icon: RotateCcw,
+      onClick: () => setResetOpen(true),
+    },
+    {
+      id: "add-remove",
+      label: "Add / Move",
+      icon: Plus,
+      onClick: () => setAddRemoveOpen(true),
+    },
     {
       id: "age-filter",
       node: (
@@ -417,7 +418,6 @@ const MinileaguePlayers = () => {
     },
   ];
 
-
   return (
     <LadderPageLayout
       className="space-y-6"
@@ -437,11 +437,11 @@ const MinileaguePlayers = () => {
           refreshLeaderboard={refreshLeaderboard}
           ladderId={ladderId}
           sortMode="rank"
-          setSortMode={() => { }}
+          setSortMode={() => {}}
           sortOpen={false}
-          setSortOpen={() => { }}
+          setSortOpen={() => {}}
           filterOpen={false}
-          setFilterOpen={() => { }}
+          setFilterOpen={() => {}}
           appliedAge={0}
           appliedGender=""
           groupSize={1}
@@ -461,8 +461,8 @@ const MinileaguePlayers = () => {
           setContactOpen={setContactOpen}
           setResetOpen={setResetOpen}
           setAddRemoveOpen={setAddRemoveOpen}
-          setSortOpen={() => { }}
-          setFilterOpen={() => { }}
+          setSortOpen={() => {}}
+          setFilterOpen={() => {}}
           activityItems={activityItems}
           handleDeleteActivity={handleDeleteActivity}
           contactOpen={contactOpen}
@@ -473,29 +473,50 @@ const MinileaguePlayers = () => {
         />
       }
     >
-      <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
-        <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
+      <div
+        className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}
+      >
+        <MobileQuickActionsAndInvite
+          inviteUrl={inviteUrl}
+          quickActions={quickActions}
+        />
         <div className="flex flex-col gap-2">
           <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
         </div>
         <ToastContainer />
 
-
         {loadingPlayers ? (
           Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 w-full" />
+            <Skeleton key={i} className="h-16 w-full mb-3" />
           ))
         ) : finalSections.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+          <div
+            className="text-center py-10 font-bold"
+            style={{ color: "var(--best-board-muted)" }}
+          >
+            No players found
+          </div>
         ) : (
           finalSections.map((section, idx) => (
             <div key={idx} className="mb-4">
-              <div className="mb-2 flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] px-3 py-2 font-bold text-[var(--best-board-text)]">
+              {/* Section header */}
+              <div
+                className="mb-2 flex items-center justify-between rounded-xl px-2 sm:px-3 py-2 font-bold text-sm sm:text-base"
+                style={{
+                  border: "1px solid var(--best-board-border)",
+                  background: "var(--best-board-surface-soft)",
+                  color: "var(--best-board-text)",
+                }}
+              >
                 <span>{section.label}</span>
-
                 {user?.user_type === "admin" && (
                   <Button
-                    className="text-xs bg-transparent border border-[var(--best-board-border)] hover:bg-[var(--best-board-surface-soft)] text-white"
+                    className="text-xs h-7 sm:h-8 px-2 sm:px-3"
+                    style={{
+                      background: "transparent",
+                      border: "1px solid var(--best-board-border)",
+                      color: "var(--best-board-text)",
+                    }}
                     onClick={() => {
                       setCurrentSectionName(section.label);
                       setNewSectionName(section.label);
@@ -516,7 +537,8 @@ const MinileaguePlayers = () => {
                     player={{ ...player, sectionIndex: idx }}
                     rank={player.rank || globalIndex + 1}
                     canEdit={
-                      user?.user_type === "admin" || user?.id === player?.user_id
+                      user?.user_type === "admin" ||
+                      user?.id === player?.user_id
                     }
                     groupSize={sectionSize}
                     onEdit={handleEditPlayer}
@@ -533,6 +555,7 @@ const MinileaguePlayers = () => {
         )}
       </div>
 
+      {/* Edit player modal */}
       <MinileagueEditPlayer
         open={isOpen}
         currentId={selectedPlayerLocal?.id}
@@ -543,11 +566,10 @@ const MinileaguePlayers = () => {
 
       {/* Section Settings Modal */}
       <Dialog open={isSectionModalOpen} onOpenChange={setIsSectionModalOpen}>
-        <DialogContent className="bg-[#0f2a2d] text-white">
+        <DialogContent className="bg-[#0f2a2d] text-white max-w-[90vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Section Settings</DialogTitle>
           </DialogHeader>
-
           <div className="space-y-3">
             <div>
               <label>Section Name</label>
@@ -556,7 +578,6 @@ const MinileaguePlayers = () => {
                 onChange={(e) => setNewSectionName(e.target.value)}
               />
             </div>
-
             <div>
               <label>Section Size</label>
               <Input
@@ -568,9 +589,10 @@ const MinileaguePlayers = () => {
                 onChange={(e) => setNewSectionSize(Number(e.target.value))}
               />
             </div>
-
             <div className="flex justify-end gap-2">
-              <Button onClick={() => setIsSectionModalOpen(false)}>Cancel</Button>
+              <Button onClick={() => setIsSectionModalOpen(false)}>
+                Cancel
+              </Button>
               <Button
                 onClick={async () => {
                   if (!newSectionName.trim()) return toast.error("Enter name");
@@ -590,7 +612,13 @@ const MinileaguePlayers = () => {
 
       {/* Add / Remove Dialog */}
       <Dialog open={addRemoveOpen} onOpenChange={setAddRemoveOpen}>
-        <DialogContent className="best-board-card border-[var(--best-board-border)] text-white sm:max-w-2xl">
+        <DialogContent
+          className="border text-white max-w-[90vw] sm:max-w-2xl"
+          style={{
+            background: "var(--best-board-surface)",
+            borderColor: "var(--best-board-border)",
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Add / Move Players</DialogTitle>
           </DialogHeader>

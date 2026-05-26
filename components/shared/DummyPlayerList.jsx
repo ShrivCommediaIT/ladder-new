@@ -55,26 +55,25 @@ const DefaultPlayerCard = ({ player, rank }) => {
   const src = player.image ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}` : Logo;
   return (
     <div
-      className="flex flex-col mb-3 rounded-lg shadow font-sans cursor-default"
-      style={{ background: "#223848", border: "2px solid #4eb0a2" }}
+      className="flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] shadow font-sans cursor-pointer hover:scale-[1.01] hover:border-[var(--best-board-border-strong)] transition-all duration-150"
     >
       <div
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <PlayerStatusToggle player={player} user={true} />
+        <PlayerStatusToggle player={player} user={true} viewOnly={true} />
       </div>
       <div className="flex items-center justify-between px-2 py-2 sm:px-4 sm:py-3 group">
         <div className="flex-1">
         <div className="flex w-full items-center mb-2">
           <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
           <div className="flex-1 min-w-0">
-            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+            <div className="text-[var(--best-board-text)] flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
               {player?.name || "N/A"}
-              {player.age && <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">{player.age}</p>}
-              {player.gender && <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
+              {player.age && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">{player.age}</p>}
+              {player.gender && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
             </div>
-            <div className="text-[#d4e5e8] text-xs truncate">{player?.phone || "N/A"}</div>
+            <div className="text-[var(--best-board-muted)] text-xs truncate">{player?.phone || "N/A"}</div>
           </div>
         </div>
       </div>
@@ -95,42 +94,41 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
   const sectionRanks = Array.from({ length: groupSize }, (_, i) => sectionStart + i);
   return (
     <div
-      className="flex flex-col mb-3 rounded-lg shadow font-sans"
-      style={{ background: "#223848", border: "2px solid #4eb0a2" }}
+      className="flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] shadow font-sans cursor-pointer hover:scale-[1.01] hover:border-[var(--best-board-border-strong)] transition-all duration-150"
     >
       <div
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <PlayerStatusToggle player={player} user={true} />
+        <PlayerStatusToggle player={player} user={true} viewOnly={true} />
       </div>
       <div className="flex items-center justify-between px-2 py-2 sm:px-4 sm:py-3 group">
         <div className="flex-1 min-w-0 overflow-hidden">
         <div className="flex w-full items-center mb-2 min-w-0">
           <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mr-2" imgSize={64} textClass="text-xs sm:text-sm" />
           <div className="flex-1 min-w-0 overflow-hidden">
-            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate max-w-[160px] sm:max-w-[240px]">
+            <div className="text-[var(--best-board-text)] flex items-center gap-2 text-sm sm:text-base font-semibold truncate max-w-[160px] sm:max-w-[240px]">
               {player?.name || "N/A"}
-              {player.age && <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">{player.age}</p>}
-              {player.gender && <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
+              {player.age && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">{player.age}</p>}
+              {player.gender && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
             </div>
-            <div className="text-[#d4e5e8] text-xs truncate">{player?.phone || "N/A"}</div>
+            <div className="text-[var(--best-board-muted)] text-xs truncate">{player?.phone || "N/A"}</div>
           </div>
           <div className="ml-2 w-14 sm:w-16 text-center flex-shrink-0">
-            <span className="bg-[#1b4542] text-[#fdf7c3] px-2 sm:px-3 py-1 rounded-full font-extrabold text-lg sm:text-xl border border-white">{player?.total_point || 0}</span>
+            <span className="bg-[var(--best-board-accent-soft)] text-[var(--best-board-text)] px-2 sm:px-3 py-1 rounded-full font-extrabold text-lg sm:text-xl border border-[var(--best-board-border-strong)]">{player?.total_point || 0}</span>
           </div>
         </div>
         <div className="mt-1">
           <div className="flex gap-1 mb-1 overflow-x-auto">
             {sectionRanks.map(r => (
-              <div key={r} className="w-6 h-5 sm:w-8 sm:h-6 flex items-center justify-center text-xs font-bold text-white rounded bg-[#28495e] border border-[#4eb0a2]">{r}</div>
+              <div key={r} className="w-6 h-5 sm:w-8 sm:h-6 flex items-center justify-center text-xs font-bold text-[var(--best-board-text)] rounded bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)]">{r}</div>
             ))}
           </div>
           <div className="flex gap-1 overflow-x-auto">
             {sectionRanks.map(r => {
               const found = player.result_details?.find(i => Number(i.rank) === Number(r));
               return (
-                <div key={r} className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${found ? "bg-white text-[#092733] border-[#7ea1af]" : "bg-[#7ea1af] bg-opacity-50 border-[#528189] text-xs"}`}>
+                <div key={r} className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${found ? "bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] border-[var(--best-board-border-strong)]" : "bg-[var(--best-board-surface-soft)] opacity-60 border-[var(--best-board-border)] text-xs text-[var(--best-board-muted)]"}`}>
                   {found ? found.point : ""}
                 </div>
               );
@@ -174,12 +172,12 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
   };
 
   return (
-    <Card className="w-full rounded-2xl shadow-lg border border-teal-400/80 bg-[#163344] mb-3 overflow-hidden group">
+    <Card className="w-full rounded-2xl shadow-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface)] mb-3 overflow-hidden group cursor-pointer hover:scale-[1.01] hover:border-[var(--best-board-border-strong)] transition-all duration-150">
       <div
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <PlayerStatusToggle player={player} user={true} />
+        <PlayerStatusToggle player={player} user={true} viewOnly={true} />
       </div>
       <div className="p-2 sm:p-3">
         <div className="flex-1 min-w-0">
@@ -188,21 +186,21 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
             <Image src={src} alt={player?.name} width={80} height={80} className="object-cover rounded" unoptimized />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
+            <div className="text-[var(--best-board-text)] flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
               {player?.name || "N/A"}
-              {player.age && <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">{player.age}</p>}
-              {player.gender && <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
+              {player.age && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-5">{player.age}</p>}
+              {player.gender && <p className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">{player.gender === "male" ? "M" : "F"}</p>}
             </div>
-            <div className="text-[#d4e5e8] text-xs truncate">{player?.phone || "N/A"}</div>
+            <div className="text-[var(--best-board-muted)] text-xs truncate">{player?.phone || "N/A"}</div>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <div className="flex flex-col items-center">
-              <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm">{Math.abs(player.total_point || 0)}</span>
-              <p className="text-[9px] text-white mt-1 font-semibold">Total Pts</p>
+              <span className="bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border border-[var(--best-board-border)] text-xs sm:text-sm">{Math.abs(player.total_point || 0)}</span>
+              <p className="text-[9px] text-[var(--best-board-muted)] mt-1 font-semibold">Total Pts</p>
             </div>
             <div className="flex flex-col items-center">
               <PlayerRankBadge rank={rank} />
-              <p className="text-[8px] sm:text-[9px] text-white font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
+              <p className="text-[8px] sm:text-[9px] text-[var(--best-board-muted)] font-semibold mt-1 whitespace-nowrap">Overall Rank</p>
             </div>
           </div>
         </div>
@@ -211,7 +209,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
           <>
             <div className="flex gap-[3px] overflow-x-auto pb-1 mb-1">
               {player.skills.map((skill, i) => (
-                <div key={i} className="min-w-[24px] h-6 flex items-center justify-center text-[10px] text-black rounded bg-white relative">
+                <div key={i} className="min-w-[24px] h-6 flex items-center justify-center text-[10px] text-[var(--best-board-text)] rounded bg-[var(--best-board-surface-strong)] border border-[var(--best-board-border)] relative">
                   {skill.skill_sign === "-" && <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[12px] font-extrabold text-white leading-none">−</span>}
                   {skill.skill_number}
                 </div>
@@ -221,7 +219,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
               {player.skills.map((skill, i) => {
                 const { score, isTargetAchieved } = getScore(player.scores || [], player.skills || [], skill.skill_number, player.isInverted);
                 return (
-                  <div key={i} className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm ${isTargetAchieved ? "bg-green-400 text-black" : "bg-yellow-200 text-black"}`}>
+                  <div key={i} className={`min-w-[24px] h-6 flex items-center justify-center text-[10px] rounded font-medium border shadow-sm ${isTargetAchieved ? "bg-[var(--best-board-success)] text-white" : "bg-[var(--best-board-surface-soft)] text-[var(--best-board-text)] border-[var(--best-board-border)]"}`}>
                     {score}
                   </div>
                 );
@@ -230,7 +228,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
             {showRanks && (
               <div className="flex gap-[3px] overflow-x-auto pb-1">
                 {player.skills.map((skill, i) => (
-                  <div key={i} className="min-w-[24px] h-6 flex items-center justify-center rounded font-bold text-[10px] bg-blue-200 text-black shadow-sm border border-gray-200">
+                  <div key={i} className="min-w-[24px] h-6 flex items-center justify-center rounded font-bold text-[10px] bg-[var(--best-board-accent-soft)] text-[var(--best-board-text)] shadow-sm border border-[var(--best-board-border)]">
                     {getRank(player.ranks || [], skill.skill_number)}
                   </div>
                 ))}
@@ -238,7 +236,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
             )}
           </>
         ) : (
-          <div className="h-7 bg-gray-800 rounded text-xs text-gray-400 flex items-center justify-center">No skills data</div>
+          <div className="h-7 bg-[var(--best-board-surface-soft)] rounded text-xs text-[var(--best-board-muted)] flex items-center justify-center">No skills data</div>
         )}
       </div>
       </div>
@@ -252,37 +250,37 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
 const RosterPlayerCard = ({ player, rank }) => {
   const src = player.image ? `${IMAGE_BASE_URL}/${player.image}` : Logo;
   return (
-    <div className="flex flex-col mb-3 rounded-lg bg-[#1a2f3d] border border-[#4eb0a2] overflow-hidden group">
+    <div className="flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] overflow-hidden group cursor-pointer hover:scale-[1.01] hover:border-[var(--best-board-border-strong)] transition-all duration-150">
       <div
         className="flex justify-between items-center px-4 py-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <PlayerStatusToggle player={player} user={true} />
+        <PlayerStatusToggle player={player} user={true} viewOnly={true} />
       </div>
       <div className="flex items-center justify-between px-3 py-3 gap-3">
         <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16" imgSize={64} textClass="text-xs sm:text-sm" />
         <div className="flex flex-col min-w-0 flex-1">
-          <div className="border border-white text-white text-[10px] px-1.5 py-0.5 w-fit mb-1">{"status : " + (player?.token_status || "Newcomer")}</div>
+          <div className="border border-[var(--best-board-border)] bg-white/5 text-[var(--best-board-muted)] text-[10px] px-1.5 py-0.5 w-fit mb-1">{"status : " + (player?.token_status || "Newcomer")}</div>
           <div className="flex items-center gap-1 flex-wrap">
-            <div className="text-white font-bold text-sm truncate">{player?.name ?? "N/A"}</div>
+            <div className="text-[var(--best-board-text)] font-bold text-sm truncate">{player?.name ?? "N/A"}</div>
             {player?.age && (
-              <span className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit">{player.age}</span>
+              <span className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit">{player.age}</span>
             )}
             {player?.gender && (
-              <span className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit">{player.gender === "male" ? "M" : "F"}</span>
+              <span className="text-[var(--best-board-muted)] border border-[var(--best-board-border)] bg-white/5 px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit">{player.gender === "male" ? "M" : "F"}</span>
             )}
           </div>
-          <div className="text-gray-300 text-xs truncate">{player?.phone ?? "N/A"}</div>
-          <div className="text-white text-[11px] mt-0.5">
+          <div className="text-[var(--best-board-muted)] text-xs truncate">{player?.phone ?? "N/A"}</div>
+          <div className="text-[var(--best-board-text)] text-[11px] mt-0.5">
             {player?.today_token ?? 0} Tokens{" "}
-            <span className="text-[#48aaa8] font-semibold ml-1">Redeem</span>
+            <span className="text-[var(--primary)] font-semibold ml-1">Redeem</span>
           </div>
         </div>
         <div className="flex flex-col items-center flex-shrink-0">
-          <div className="text-white text-[10px] font-medium text-center leading-tight">Total<br />Tokens</div>
-          <div className="bg-white text-black font-bold text-base px-3 py-0.5 mt-1 min-w-[44px] text-center rounded-sm">{player?.total_token ?? 0}</div>
+          <div className="text-[var(--best-board-muted)] text-[10px] font-medium text-center leading-tight">Total<br />Tokens</div>
+          <div className="bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] border border-[var(--best-board-border)] font-bold text-base px-3 py-0.5 mt-1 min-w-[44px] text-center rounded-sm">{player?.total_token ?? 0}</div>
         </div>
-        <div className="w-11 h-11 rounded flex items-center justify-center flex-shrink-0 overflow-hidden bg-[#223848] border border-[#4eb0a2]">
+        <div className="w-11 h-11 rounded flex items-center justify-center flex-shrink-0 overflow-hidden bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)]">
           <Image src={src} alt={player.name} width={44} height={44} className="object-cover" unoptimized />
         </div>
       </div>
@@ -293,7 +291,7 @@ const RosterPlayerCard = ({ player, rank }) => {
 /* ─────────────────────────────────────────────
    MAIN COMPONENT
 ───────────────────────────────────────────── */
-export default function DummyPlayerList({ ladderId }) {
+export default function DummyPlayerList({ ladderId, ladderType: propLadderType }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
@@ -304,8 +302,8 @@ export default function DummyPlayerList({ ladderId }) {
   // Redux data
   const ladderDetails = useSelector(state => state.player?.players?.[ladderId]?.ladderDetails || null);
   
-  // Determine active type (URL param > API type > Default)
-  const type = (ladderTypeFromUrl || ladderDetails?.type || "bestof5").toLowerCase();
+  // Determine active type (Prop > URL param > API type > Default)
+  const type = (propLadderType || ladderTypeFromUrl || ladderDetails?.type || "bestof5").toLowerCase();
   const ladderType = type;
 
   const preset = useSelector(state => state.gradebar?.preset || 10);
@@ -343,6 +341,14 @@ export default function DummyPlayerList({ ladderId }) {
     type === "negative" ? negativeLadderDetails :
     type === "roster" ? rosterLadderDetails :
     ladderDetails;
+
+  const totalPlayersCount = 
+    type === "minileague" ? minileagueSections.reduce((acc, sec) => acc + (sec?.users_record?.length || 0), 0) :
+    type === "skill" ? skillData.length :
+    type === "positive" ? positiveData.length :
+    type === "negative" ? negativeData.length :
+    type === "roster" ? rosterData.length :
+    standardPlayers.length;
 
   useEffect(() => {
     if (!ladderId) return;
@@ -397,26 +403,30 @@ export default function DummyPlayerList({ ladderId }) {
       <div>
         {displayLadderDetails?.name && (
           <div className="py-4 text-center sm:text-start px-4">
-            <h2 className="text-2xl font-bold text-white">{displayLadderDetails.name}</h2>
-            <p className="text-gray-200 text-md border-b-2 border-amber-500 py-1 font-semibold">
-              Admin: {displayLadderDetails.admin_name} ({displayLadderDetails.admin_phone})
+            <h2 className="text-2xl font-bold text-[var(--best-board-text)]">{displayLadderDetails.name}</h2>
+            <p className="text-[var(--best-board-muted)] text-md border-b border-[var(--best-board-border)] py-1.5 font-semibold">
+              Live Rankings · {totalPlayersCount} players
             </p>
           </div>
         )}
         <div className="mb-6 px-4">
           <input type="text" placeholder="Search players..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-            className="w-full rounded-md border border-gray-600 bg-[#223848] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4eb0a2]" />
+            className="w-full rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] placeholder:text-[var(--best-board-muted)]" />
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
           <PlayerPerformationRanking ladderId={ladderId} />
         </div>
         {filteredSections.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+          <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
         ) : (
           <div className="space-y-8 sm:px-4">
             {filteredSections.map((section, idx) => (
               <div key={idx} className="mt-4 px-4">
-                <div className="mb-3 sticky top-0 bg-[#223848] px-4 py-2 rounded-lg shadow-lg text-xl text-white font-bold tracking-wide z-10">{section.label}</div>
+                <div className="mb-3 sticky top-0 best-board-section-banner flex items-center justify-between rounded-xl px-4 py-3 text-white font-bold tracking-wide z-10">
+                  <span className="best-board-highlight uppercase tracking-[0.18em]">
+                    {section.label}
+                  </span>
+                </div>
                 <div className="space-y-3">
                   {section.players.map((player, pidx) => (
                     <MinileaguePlayerCard key={player.id || pidx} player={player} rank={player.rank || (idx * groupSize + pidx + 1)} groupSize={groupSize} />
@@ -437,18 +447,18 @@ export default function DummyPlayerList({ ladderId }) {
       <div>
         {displayLadderDetails?.name && (
           <div className="py-4 text-center sm:text-start px-4">
-            <h2 className="text-2xl font-bold text-white">{displayLadderDetails.name}</h2>
-            <p className="text-gray-200 text-md border-b-2 border-amber-500 py-1 font-semibold">
-              Admin: {displayLadderDetails.admin_name} ({displayLadderDetails.admin_phone})
+            <h2 className="text-2xl font-bold text-[var(--best-board-text)]">{displayLadderDetails.name}</h2>
+            <p className="text-[var(--best-board-muted)] text-md border-b border-[var(--best-board-border)] py-1.5 font-semibold">
+              Live Rankings · {totalPlayersCount} players
             </p>
           </div>
         )}
         <div className="mb-6 px-4">
           <input type="text" placeholder="Search players..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-            className="w-full rounded-md border border-gray-600 bg-[#223848] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4eb0a2]" />
+            className="w-full rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] placeholder:text-[var(--best-board-muted)]" />
         </div>
         {filtered.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+          <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
         ) : (
           <div className="px-4 space-y-2">
             {filtered.map((player, idx) => (
@@ -467,18 +477,18 @@ export default function DummyPlayerList({ ladderId }) {
       <div>
         {displayLadderDetails?.name && (
           <div className="py-4 text-center sm:text-start px-4">
-            <h2 className="text-2xl font-bold text-white">{displayLadderDetails.name}</h2>
-            <p className="text-gray-200 text-md border-b-2 border-amber-500 py-1 font-semibold">
-              Admin: {displayLadderDetails.admin_name} ({displayLadderDetails.admin_phone})
+            <h2 className="text-2xl font-bold text-[var(--best-board-text)]">{displayLadderDetails.name}</h2>
+            <p className="text-[var(--best-board-muted)] text-md border-b border-[var(--best-board-border)] py-1.5 font-semibold">
+              Live Rankings · {totalPlayersCount} players
             </p>
           </div>
         )}
         <div className="mb-6 px-4">
           <input type="text" placeholder="Search players..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-            className="w-full rounded-md border border-gray-600 bg-[#223848] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4eb0a2]" />
+            className="w-full rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] placeholder:text-[var(--best-board-muted)]" />
         </div>
         {filtered.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+          <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
         ) : (
           <div className="px-4 space-y-2">
             {filtered.map((player, idx) => (
@@ -497,18 +507,18 @@ export default function DummyPlayerList({ ladderId }) {
       <div>
         {displayLadderDetails?.name && (
           <div className="py-4 text-center sm:text-start px-4">
-            <h2 className="text-2xl font-bold text-white">{displayLadderDetails.name}</h2>
-            <p className="text-gray-200 text-md border-b-2 border-amber-500 py-1 font-semibold">
-              Admin: {displayLadderDetails.admin_name} ({displayLadderDetails.admin_phone})
+            <h2 className="text-2xl font-bold text-[var(--best-board-text)]">{displayLadderDetails.name}</h2>
+            <p className="text-[var(--best-board-muted)] text-md border-b border-[var(--best-board-border)] py-1.5 font-semibold">
+              Live Rankings · {totalPlayersCount} players
             </p>
           </div>
         )}
         <div className="mb-6 px-4">
           <input type="text" placeholder="Search players..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-            className="w-full rounded-md border border-gray-600 bg-[#223848] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4eb0a2]" />
+            className="w-full rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] placeholder:text-[var(--best-board-muted)]" />
         </div>
         {filtered.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+          <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
         ) : (
           <div className="px-4 space-y-2">
             {filtered.map((player, idx) => (
@@ -536,18 +546,18 @@ export default function DummyPlayerList({ ladderId }) {
       <div>
         {displayLadderDetails?.name && (
           <div className="py-4 text-center sm:text-start px-4">
-            <h2 className="text-2xl font-bold text-white">{displayLadderDetails.name}</h2>
-            <p className="text-gray-200 text-md border-b-2 border-amber-500 py-1 font-semibold">
-              Admin: {displayLadderDetails.admin_name} ({displayLadderDetails.admin_phone})
+            <h2 className="text-2xl font-bold text-[var(--best-board-text)]">{displayLadderDetails.name}</h2>
+            <p className="text-[var(--best-board-muted)] text-md border-b border-[var(--best-board-border)] py-1.5 font-semibold">
+              Live Rankings · {totalPlayersCount} players
             </p>
           </div>
         )}
         <div className="mb-6 px-4">
           <input type="text" placeholder="Search players..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-            className="w-full rounded-md border border-gray-600 bg-[#223848] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4eb0a2]" />
+            className="w-full rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] placeholder:text-[var(--best-board-muted)]" />
         </div>
         {sections.length === 0 ? (
-          <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+          <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
         ) : (
           sections.map((section, idx) => (
             <div key={idx} className="mb-8 px-4">
@@ -578,16 +588,16 @@ export default function DummyPlayerList({ ladderId }) {
     <div>
       {displayLadderDetails?.name && (
         <div className="py-4 text-center sm:text-start px-4">
-          <h2 className="text-2xl font-bold text-white">{displayLadderDetails.name}</h2>
-          <p className="text-gray-200 text-md border-b-2 border-amber-500 py-1 font-semibold">
-            Admin Details: {displayLadderDetails.admin_name} ({displayLadderDetails.admin_phone})
+          <h2 className="text-2xl font-bold text-[var(--best-board-text)]">{displayLadderDetails.name}</h2>
+          <p className="text-[var(--best-board-muted)] text-md border-b border-[var(--best-board-border)] py-1.5 font-semibold">
+            Live Rankings · {totalPlayersCount} players
           </p>
         </div>
       )}
 
       <div className="mb-6 px-4">
         <input type="text" placeholder="Search players..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-          className="w-full rounded-md border border-gray-600 bg-[#223848] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4eb0a2]" />
+          className="w-full rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] placeholder:text-[var(--best-board-muted)]" />
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
@@ -595,12 +605,16 @@ export default function DummyPlayerList({ ladderId }) {
       </div>
 
       {grades.length === 0 ? (
-        <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
+        <div className="text-center py-10 text-[var(--best-board-muted)] font-bold">No players found</div>
       ) : (
         <div className="space-y-8 sm:px-4 md:px-4">
           {grades.map((grade, index) => (
             <div key={index}>
-              <div className="mb-3 sticky top-0 bg-[#223848] px-4 py-2 rounded-lg shadow-lg text-xl text-white font-bold tracking-wide z-10">{grade.label}</div>
+              <div className="mb-3 sticky top-0 best-board-section-banner flex items-center justify-between rounded-xl px-4 py-3 text-white font-bold tracking-wide z-10">
+                <span className="best-board-highlight uppercase tracking-[0.18em]">
+                  {grade.label}
+                </span>
+              </div>
               <div className="space-y-3">
                 {grade.players.map((player, pidx) => (
                   <DefaultPlayerCard key={player.id || pidx} player={player} rank={player.rank || pidx + 1} />

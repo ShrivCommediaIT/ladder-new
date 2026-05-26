@@ -337,11 +337,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                       <button
                         type="button"
                         onClick={handleEyeClick}
-                        className="rounded-full p-3 shadow-lg hover:scale-105 transition-transform"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, rgb(var(--brand-bright-rgb) / 0.24), rgb(var(--brand-primary-rgb) / 0.14))",
-                        }}
+                        className="rounded-full p-3 shadow-lg hover:scale-105 transition-transform bg-white"
                       >
                         <Image
                           src="/eyeLogin.png"
@@ -444,6 +440,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                     </Label>
 
                     <Input
+                      type={mode === "login" ? (showLoginPassword ? "text" : "password") : "text"}
                       value={mode === "login" ? loginForm.watch("password") : registerForm.watch("username")}
                       onChange={(e) => mode === "login" ? loginForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 4)) : registerForm.setValue("username", e.target.value)}
                       className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"

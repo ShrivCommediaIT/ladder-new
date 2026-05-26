@@ -80,10 +80,10 @@ const DummyUserRules = ({ ladderId }) => {
     );
   };
 
-  if (loading) return <p className="text-gray-300">Loading rules...</p>;
+  if (loading) return <p className="text-[var(--best-board-muted)]">Loading rules...</p>;
 
   return (
-    <div className="space-y-6 w-full sm:px-4 md:px-0 max-w-md mt-4 sm:mt-0 md:mt-0 bg-gray-800 rounded-lg p-4 shadow-md">
+    <div className="space-y-6 w-full sm:px-4 md:px-0 max-w-md mt-4 sm:mt-0 md:mt-0 bg-[var(--best-board-surface)] border border-[var(--best-board-border)] rounded-2xl p-4 shadow-md">
       {rules.map((rule, index) => {
         const isOpen = openRuleIds.includes(index);
 
@@ -92,12 +92,12 @@ const DummyUserRules = ({ ladderId }) => {
             {isEditingIndex === index && userType === "admin" ? (
               <div className="space-y-3 w-full">
                 <Input
-                  className="text-lg sm:text-xl font-bold text-white bg-gray-700 border-none focus:ring-2 focus:ring-cyan-500 w-full"
+                  className="text-lg sm:text-xl font-bold text-[var(--best-board-text)] bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] focus:ring-2 focus:ring-[var(--primary)] w-full"
                   value={tempTitle}
                   onChange={(e) => setTempTitle(e.target.value)}
                 />
                 <Textarea
-                  className="w-full bg-gray-700 text-white border-none focus:ring-2 focus:ring-cyan-500"
+                  className="w-full bg-[var(--best-board-surface-soft)] text-[var(--best-board-text)] border border-[var(--best-board-border)] focus:ring-2 focus:ring-[var(--primary)]"
                   rows={4}
                   value={tempContent}
                   onChange={(e) => setTempContent(e.target.value)}
@@ -105,14 +105,14 @@ const DummyUserRules = ({ ladderId }) => {
                 <div className="flex flex-col sm:flex-row justify-end gap-2 w-full">
                   <Button
                     onClick={() => handleSave(index)}
-                    className="mt-2 sm:mt-0 bg-cyan-500 cursor-pointer px-6 sm:px-8 rounded font-semibold hover:bg-cyan-600 w-full sm:w-auto text-white"
+                    className="mt-2 sm:mt-0 bg-[var(--primary)] cursor-pointer px-6 sm:px-8 rounded font-semibold hover:opacity-90 w-full sm:w-auto text-white"
                   >
                     Save
                   </Button>
                   <Button
                     variant="secondary"
                     onClick={handleCancel}
-                    className="mt-2 sm:mt-0 bg-gray-900 cursor-pointer px-6 sm:px-8 rounded font-semibold hover:bg-cyan-900 w-full sm:w-auto text-white"
+                    className="mt-2 sm:mt-0 bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] cursor-pointer px-6 sm:px-8 rounded font-semibold hover:bg-[var(--best-board-surface-strong)] w-full sm:w-auto text-[var(--best-board-text)]"
                   >
                     Cancel
                   </Button>
@@ -120,13 +120,13 @@ const DummyUserRules = ({ ladderId }) => {
               </div>
             ) : (
               <div className="w-full">
-                <div className="bg-gray-700 flex items-center justify-between gap-2 shadow p-4 text-white text-lg sm:text-xl font-bold rounded border border-cyan-600">
+                <div className="bg-[var(--best-board-surface-soft)] flex items-center justify-between gap-2 shadow p-4 text-[var(--best-board-text)] text-lg sm:text-xl font-bold rounded border border-[var(--best-board-border)]">
                   <span className="break-words">{rule.title || "No Title"}</span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleRule(index)}
-                    className="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 focus:ring-2 focus:ring-cyan-600"
+                    className="flex items-center gap-1 text-[var(--primary)] hover:text-[var(--primary-hover)] focus:ring-2 focus:ring-[var(--best-board-border)]"
                   >
                     <span className="text-xs cursor-pointer">
                       {isOpen ? "CLOSE" : "OPEN"}
@@ -137,7 +137,7 @@ const DummyUserRules = ({ ladderId }) => {
 
                 {isOpen && (
                   <div>
-                    <p className="mt-2 bg-gray-900 p-4 font-semibold rounded shadow text-base sm:text-lg text-white whitespace-pre-line break-words max-h-[380px] overflow-y-auto border border-gray-700">
+                    <p className="mt-2 bg-[var(--best-board-surface-strong)] p-4 font-medium rounded shadow text-base sm:text-lg text-[var(--best-board-text)] whitespace-pre-line break-words max-h-[380px] overflow-y-auto border border-[var(--best-board-border)]">
                       {rule.rules || "No content available."}
                     </p>
                   </div>

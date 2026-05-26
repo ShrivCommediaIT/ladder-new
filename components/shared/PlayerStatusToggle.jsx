@@ -7,10 +7,27 @@ import { Label } from "@/components/ui/label";
 import { changePlayerStatus } from "@/redux/slices/leaderboardSlice";
 import { toast } from "react-toastify";
 
-const PlayerStatusToggle = ({ player, user }) => {
+const PlayerStatusToggle = ({ player, user, viewOnly }) => {
   const dispatch = useDispatch();
 
   const isActive = Number(player?.player_status) === 1;
+
+  if (viewOnly) {
+    return (
+      <div className="flex items-center gap-1.5 py-1">
+        <div 
+          className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 ${
+            isActive 
+              ? "bg-emerald-500 border-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]" 
+              : "bg-red-500 border-red-400 shadow-[0_0_8px_rgba(239,68,68,0.5)]"
+          }`}
+        />
+        <span className="text-[10px] sm:text-xs font-bold uppercase text-[var(--best-board-muted)]">
+          {isActive ? "Active" : "Inactive"}
+        </span>
+      </div>
+    );
+  }
 
   // Logic based on the user prop (boolean)
   let isEditable = user === false; // Admin level if user={false}
