@@ -92,7 +92,7 @@ let filteredLadders = [];
 
 if (subAdmin?.user_type === "sub_admin") {
   filteredLadders = allLadders?.filter(
-    (ladder) => ladder.created_by !== "demo"  && ladder.type !== "roster"
+    (ladder) => ladder.created_by !== "demo"
   );
 } else if (admin?.user_type === "admin") {    
   filteredLadders = allLadders?.filter(

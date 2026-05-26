@@ -51,7 +51,7 @@ const PlayerRankBadge = ({ rank, sizeClass = "h-12 w-12 sm:h-16 sm:w-16", imgSiz
 /* ---------------- PLAYER CARD ---------------- */
 const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, loggedInUserId }) => {
   const isCurrentUser = String(loggedInUserId) === String(player.id);
-  
+
   const playerImageUrl = player.image
     ? `${IMAGE_BASE_URL}/${player.image}`
     : Logo;
@@ -59,141 +59,160 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, loggedInUserId }
   return (
     <div
       onClick={() => isCurrentUser && onEditClick(player)}
-      className={`flex flex-col mb-3 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] hover:border-[var(--best-board-border-strong)] transition overflow-hidden ${
-        isCurrentUser ? "cursor-pointer" : "opacity-70 grayscale-[0.5]"
+      className={`mb-3 rounded-xl transition-all duration-200 group overflow-hidden ${
+        isCurrentUser ? "cursor-pointer" : "opacity-70 grayscale-[0.3]"
       }`}
+      style={{
+        background: "var(--best-board-surface)",
+        border: isCurrentUser
+          ? "2px solid var(--best-board-highlight)"
+          : "1px solid var(--best-board-border-strong)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
+      }}
     >
+      {/* ── TOP STRIP: toggle + status + age/gender chips ── */}
       <div
-        className="flex justify-between items-center px-4 py-2"
+        className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2"
+        style={{
+          borderBottom: "1px solid var(--best-board-border)",
+          background: "var(--secondary)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <PlayerStatusToggle player={player} user={true} forceDisabled={!isCurrentUser} />
+
+        <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
+          {player?.token_status && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-white/5 border-white/10 text-white"
+            >
+              Status: {player.token_status}
+            </span>
+          )}
+          {player.age && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white text-dark-theme border border-white/20"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.age}
+            </span>
+          )}
+          {player.gender && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white text-dark-theme border border-white/20"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "var(--best-board-highlight)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center justify-between px-3 py-4">
-        {/* ===== DESKTOP VIEW (1024px+) ===== */}
-        <div className="hidden md:flex items-center w-full">
-          <div className="flex gap-3 items-center flex-shrink-0 w-[35%]">
-            <div className="flex-shrink-0 flex justify-end">
-              <div className="w-10 h-10 rounded border border-[#4eb0a2] flex items-center justify-center overflow-hidden flex-shrink-0">
-                <Image 
-                  src={playerImageUrl} 
-                  alt={player.name} 
-                  width={40} 
-                  height={40} 
-                  className="object-cover" 
-                  unoptimized 
-                  onError={(e) => (e.currentTarget.src = Logo.src)}
-                />
-              </div>
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center min-w-0">
-                <div className="text-white font-semibold text-sm truncate">{player?.name ?? "N/A"}</div>
-                {player?.age && (
-                  <div className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit ml-5">
-                    {player.age}
-                  </div>
-                )}
-                 {player.gender && (
-                  <p className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender == "male" ?"M":"F"}
-                  </p>
-                )}
-              </div>
-              <div className="text-gray-300 text-xs truncate flex items-center gap-2">
-                <span>{player?.phone ?? "N/A"}</span>
-              </div>
-            </div>
+      {/* ── MAIN BODY ── */}
+      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
+
+        {/* LEFT SECTION: rank badge + name/phone/tokens */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
+          <div className="flex flex-col items-center gap-1 flex-shrink-0">
+            <PlayerRankBadge
+              rank={rank}
+              sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
+              imgSize={56}
+              textClass="text-[10px] sm:text-xs md:text-sm"
+            />
           </div>
 
-          <div className="flex flex-col gap-1 flex-shrink-0 w-[35%]">
-            <div className="border border-white text-white text-xs px-2 py-0.5 w-fit">
-              {"status : " + (player?.token_status || "Newcomer")}
+          {/* Info block */}
+          <div className="flex-1 min-w-0">
+            {/* Player name */}
+            <div
+              className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight text-white"
+            >
+              {player?.name || "N/A"}
             </div>
-            <div className="text-white text-sm">
-              Tokens - {player?.today_token ?? 0}{" "}
+
+            {/* Phone */}
+            <div
+              className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              {player?.phone || "N/A"}
+            </div>
+
+            {/* Tokens Section */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] sm:text-xs" style={{ color: "var(--best-board-muted)" }}>Today:</span>
+                <span className="text-xs sm:text-sm font-bold text-white bg-white/5 border border-white/10 px-2 py-0.5 rounded">
+                  {player?.today_token ?? "0"}
+                </span>
+              </div>
               {isCurrentUser && (
-                <span
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onRedeemClick(player);
                   }}
-                  className="text-[#48aaa8] font-semibold cursor-pointer hover:underline ml-1"
+                  className="text-cyan-400 hover:text-cyan-300 font-bold text-xs sm:text-sm cursor-pointer underline decoration-cyan-400 decoration-[1.5px]"
                 >
                   Redeem
-                </span>
+                </button>
               )}
             </div>
           </div>
-
-          <div className="flex-shrink-0 w-[15%] text-white text-xs">
-            Total = {player?.total_token ?? 0}
-          </div>
-
-          <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16" imgSize={64} textClass="text-xs sm:text-sm" />
         </div>
 
-        {/* ===== MOBILE VIEW ===== */}
-        <div className="flex md:hidden items-center justify-between w-full gap-2">
-          <div className="flex items-start gap-2 flex-1 min-w-0">
-            <PlayerRankBadge rank={rank} sizeClass="h-12 w-12 sm:h-16 sm:w-16 mt-1" imgSize={64} textClass="text-xs sm:text-sm" />
-            <div className="flex flex-col min-w-0">
-              <div className="border border-white text-white text-[10px] px-1.5 py-0.5 w-fit mb-1 leading-tight">
-                {"status : " + (player?.token_status || "Newcomer")}
-              </div>
-              <div className="flex items-center min-w-0">
-                <div className="text-white font-bold text-xs truncate">{player?.name ?? "N/A"}</div>
-                {player?.age && (
-                  <div className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit ml-2">
-                    {player.age}
-                  </div>
-                )}
-                 {player.gender && (
-                  <p className="text-white border border-white px-1.5 py-0.5 text-[10px] leading-none font-semibold rounded shrink-0 w-fit ml-1">
-                    {player.gender == "male" ?"M":"F"}
-                  </p>
-                )}
-              </div>
-              <div className="text-gray-300 text-[10px] truncate">
-                {player?.phone ?? "N/A"}
-              </div>
-              <div className="text-white text-[11px] mt-0.5">
-                {player?.today_token ?? 0} Tokens{" "}
-                {isCurrentUser && (
-                  <span
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onRedeemClick(player);
-                    }}
-                    className="text-[#48aaa8] font-semibold cursor-pointer hover:underline ml-1"
-                  >
-                    Redeem
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center flex-shrink-0">
-            <div className="text-white text-[10px] font-medium text-center leading-tight">Total<br />Tokens</div>
-            <div className="bg-white text-black font-bold text-base px-3 py-0.5 mt-1 min-w-[44px] text-center rounded-sm">
+        {/* ── RIGHT SECTION: total tokens badge + avatar ── */}
+        <div
+          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+          style={{ borderLeft: "1px solid var(--best-board-border)" }}
+        >
+          {/* Total Tokens badge */}
+          <div
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+            style={{
+              background: "var(--best-board-accent-soft)",
+              border: "1px solid var(--best-board-border-strong)",
+            }}
+          >
+            <span
+              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
+              style={{ color: "var(--best-board-highlight)" }}
+            >
               {player?.total_token ?? 0}
-            </div>
+            </span>
+            <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              Tokens
+            </span>
           </div>
 
-          <div className="w-11 h-11 rounded flex items-center justify-center flex-shrink-0 overflow-hidden bg-[#223848] border border-[#4eb0a2]">
-            <Image 
-              src={playerImageUrl} 
-              alt={player.name} 
-              width={44} 
-              height={44} 
-              className="object-cover" 
-              unoptimized 
-              onError={(e) => (e.currentTarget.src = Logo.src)}
+          {/* Player avatar */}
+          <div
+            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+            style={{ border: "1px solid var(--best-board-border-strong)" }}
+          >
+            <Image
+              src={playerImageUrl}
+              alt={player?.name || "Player"}
+              width={72}
+              height={72}
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              unoptimized
             />
           </div>
         </div>
+
       </div>
     </div>
   );
@@ -263,15 +282,7 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
     return 0;
   });
 
-  // Grouping
-  const groupSize = 7;
-  const sections = [];
-  for (let i = 0; i < sortedPlayers.length; i += groupSize) {
-    sections.push({
-      label: gradebarDetails?.[i / groupSize]?.gradebar_name || `Minileague ${i / groupSize + 1}`,
-      players: sortedPlayers.slice(i, i + groupSize),
-    });
-  }
+  // Removed sections grouping to display a continuous flat list of players
 
   const handleRedeemClick = async (player) => {
     setSelectedPlayer(player);
@@ -332,34 +343,23 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
 
       {error && <div className="text-red-400 text-center py-10">{error}</div>}
 
-      {!loading && sections.length === 0 ? (
+      {!loading && sortedPlayers.length === 0 ? (
         <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
       ) : (
-        !loading && sections.map((section, idx) => (
-          <div key={idx} className="mb-8 px-4">
-            <div className="mb-3 sticky top-0 best-board-section-banner flex items-center justify-between rounded-xl px-4 py-3 text-white font-bold tracking-wide z-10">
-              <span className="best-board-highlight uppercase tracking-[0.18em]">
-                {section.label}
-              </span>
-              <span className="rounded bg-white/5 px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
-                {section.players.length} players
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {section.players.map((player, i) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  rank={player.rank || (idx * groupSize + i + 1)}
-                  onRedeemClick={handleRedeemClick}
-                  onEditClick={handleEditClick}
-                  loggedInUserId={loggedInUserId}
-                />
-              ))}
-            </div>
+        !loading && (
+          <div className="px-4 space-y-3">
+            {sortedPlayers.map((player, i) => (
+              <PlayerCard
+                key={player.id}
+                player={player}
+                rank={player.rank || (i + 1)}
+                onRedeemClick={handleRedeemClick}
+                onEditClick={handleEditClick}
+                loggedInUserId={loggedInUserId}
+              />
+            ))}
           </div>
-        ))
+        )
       )}
 
       <RedeemModal
