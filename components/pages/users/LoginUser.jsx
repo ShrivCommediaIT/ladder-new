@@ -26,6 +26,7 @@ import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { format } from "date-fns";
 import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
+import { calculateAge } from "@/lib/utils";
 import "react-toastify/dist/ReactToastify.css";
 
 const loginSchema = z.object({
