@@ -246,6 +246,7 @@ const MovePlayerMinileague = ({
         match_status: resultType,
         move_to_rank: Number(selectedNumber),
         move_from_rank: moveFromRank,
+        opposit_user_id:challengedPlayer.name,
         score: score || "",
         bet: betDescription || "",
         move_from_section: fromSectionName,
