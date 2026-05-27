@@ -19,8 +19,6 @@ const ContactAdmin = () => {
       try {
         const res = await getRequest(API_ENDPOINTS.LEADERBOARD, { ladder_id: ladderId });
         setAdminDetails(res?.ladderDetails);
-        console.log("admin details :", res?.ladderDetails);
-        
       } catch (err) {
         console.error("Error fetching admin details:", err);
       } finally {

@@ -1,7 +1,7 @@
 "use client";
 import { IMAGE_BASE_URL } from "@/constants/api";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { Card } from "@/components/ui/card";
@@ -477,56 +477,15 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
     fetchSkillSetup();
   }, []);
 
-  const safeSkillsForPrint = rows.map((row) => ({
-    id: row.id,
-    description: String(row.description || ""),
-    target: String(row.target || ""),
-    unit: String(row.unit || ""),
-    mode: row.mode,
-  }));
-
-  useEffect(() => {
-    if (onActionsChanged) {
-      const hasSkills = rows.some((r) => r.description && r.description.trim() !== "");
-      if (hasSkills) {
-        onActionsChanged([
-          {
-            id: "print-skills",
-            node: (
-              <BasicLeaderboardPrintSkillsSheet
-                skills={safeSkillsForPrint}
-                ladderId={ladderId}
-                className="rounded-lg h-16 w-full border px-4 text-[var(--best-board-text)] shadow-none transition hover:-translate-y-0.5 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight disabled:cursor-not-allowed disabled:opacity-60 best-board-card-soft border-[var(--best-board-border)] hover:bg-[var(--best-board-surface)]"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5"
-                >
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                  <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
-                  <rect x="6" y="14" width="12" height="8" rx="1" />
-                </svg>
-                <span>Print Skills</span>
-              </BasicLeaderboardPrintSkillsSheet>
-            ),
-          },
-        ]);
-      } else {
-        onActionsChanged([]);
-      }
-    }
-    return () => {
-      if (onActionsChanged) onActionsChanged([]);
-    };
-  }, [rows, ladderId, onActionsChanged]);
+  const safeSkillsForPrint = useMemo(() => {
+    return rows.map((row) => ({
+      id: row.id,
+      description: String(row.description || ""),
+      target: String(row.target || ""),
+      unit: String(row.unit || ""),
+      mode: row.mode,
+    }));
+  }, [rows]);
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
@@ -549,7 +508,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
     [dispatch, ladderId, isRefreshing, appliedAge, appliedAgeType, appliedGender],
   );
 
-  const handleAgeSearch = (age, ageType, gender) => {
+  const handleAgeSearch = useCallback((age, ageType, gender) => {
     const ageNum = age ? Number(age) : "";
     const isClearing = age === null || age === "";
 
@@ -562,7 +521,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
 
     dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
     refreshLeaderboard(isClearing ? 0 : selectedSkillFilter, ageNum, ageType, gender);
-  };
+  }, [dispatch, selectedSkillFilter, refreshLeaderboard]);
 
   const handleClearFilters = useCallback(() => {
     setSearchQuery("");
@@ -616,6 +575,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
     if (onActionsChanged) {
       const actions = [];
 
+      // 1. Sort / Clear filters
       if (!isSorted && appliedAge === 0) {
         actions.push({
           id: "sort-by-activity",
@@ -633,6 +593,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
         });
       }
 
+      // 2. Age filter
       actions.push({
         id: "age-filter",
         node: (
@@ -645,9 +606,60 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
         )
       });
 
+      // 3. Print Skills sheet action
+      const hasSkills = rows.some((r) => r.description && r.description.trim() !== "");
+      if (hasSkills) {
+        actions.push({
+          id: "print-skills",
+          node: (
+            <BasicLeaderboardPrintSkillsSheet
+              skills={safeSkillsForPrint}
+              ladderId={ladderId}
+              className="rounded-lg h-16 w-full border px-4 text-[var(--best-board-text)] shadow-none transition hover:-translate-y-0.5 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight disabled:cursor-not-allowed disabled:opacity-60 best-board-card-soft border-[var(--best-board-border)] hover:bg-[var(--best-board-surface)]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5"
+              >
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
+                <rect x="6" y="14" width="12" height="8" rx="1" />
+              </svg>
+              <span>Print Skills</span>
+            </BasicLeaderboardPrintSkillsSheet>
+          ),
+        });
+      }
+
       onActionsChanged(actions);
     }
-  }, [isSorted, appliedAge, appliedGender, playerSearchResetSignal, onActionsChanged, handleAgeSearch]);
+
+    return () => {
+      if (onActionsChanged) {
+        onActionsChanged([]);
+      }
+    };
+  }, [
+    isSorted,
+    appliedAge,
+    appliedGender,
+    playerSearchResetSignal,
+    onActionsChanged,
+    handleAgeSearch,
+    handleSortBySkill,
+    handleClearAll,
+    rows,
+    ladderId,
+    safeSkillsForPrint,
+  ]);
 
   const handleSkillClick = useCallback(
     (playerId, skillNumber) => {
