@@ -49,11 +49,8 @@ const PlayerCard = ({
     const rawNegativeScore = scoreObj?.negative_ladder_bestscore;
     const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
 
-    const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
-    const rawDisplayScore = rawBestScore || rawNegativeScore || "";
-    const displayScore = rawDisplayScore
-      ? convertTimeToSeconds(rawDisplayScore)
-      : "0";
+    const rawBestScore = scoreObj && Number(convertTimeToSeconds(scoreObj?.negative_ladder_bestscore))
+    const displayScore = rawBestScore
 
     const target =
       skillObj?.target !== null && skillObj?.target !== undefined
@@ -65,11 +62,11 @@ const PlayerCard = ({
     if (
       target !== null &&
       target !== 0 &&
-      score !== 0 &&
+      rawBestScore !== 0 &&
       !isNaN(target) &&
-      !isNaN(score)
+      !isNaN(rawBestScore)
     ) {
-      isTargetAchieved = isInverted ? score >= target : score <= target;
+      isTargetAchieved = isInverted ? rawBestScore <= target : rawBestScore >= target;
     }
 
     return {
@@ -145,7 +142,7 @@ const PlayerCard = ({
           <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
             <div className="flex flex-col items-center">
               <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm shadow-sm leading-none h-7 sm:h-auto flex items-center">
-                {Math.abs(player.total_point || 0)}
+                 {Number(player.total_point || 0).toFixed(2)}
               </span>
               <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
             </div>
@@ -218,7 +215,7 @@ const PlayerCard = ({
                         title={`Score: ${scoreData.score} | Target: ${scoreData.target || "N/A"
                           }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
                       >
-                        {scoreData.displayScore}
+                         {Number(scoreData.displayScore || 0).toFixed(2)}
                       </div>
                     );
                   })}
