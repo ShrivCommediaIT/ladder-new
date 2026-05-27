@@ -30,7 +30,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
-  password: z.string().min(4, "PIN must be at least 4 digits"),
+  password: z.string().regex(/^\d{6}$/, "PIN must be 6 digits"),
 });
 
 const registerSchema = z
@@ -38,8 +38,8 @@ const registerSchema = z
     name: z.string().min(1, "Full name is required"),
     dob: z.date().optional(),
     username: z.string().min(1, "Username is required"),
-    password: z.string().min(4, "PIN must be at least 4 digits"),
-    confirmPassword: z.string().min(4, "Confirm your PIN"),
+    password: z.string().regex(/^\d{6}$/, "PIN must be 6 digits"),
+    confirmPassword: z.string().min(1, "Confirm your PIN"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "PINs do not match",
@@ -442,13 +442,14 @@ export default function LoginUser({ ladderId, ladderType }) {
                     <Input
                       type={mode === "login" ? (showLoginPassword ? "text" : "password") : "text"}
                       value={mode === "login" ? loginForm.watch("password") : registerForm.watch("username")}
-                      onChange={(e) => mode === "login" ? loginForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 4)) : registerForm.setValue("username", e.target.value)}
+                      onChange={(e) => mode === "login" ? loginForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 6)) : registerForm.setValue("username", e.target.value)}
+                      maxLength={mode === "login" ? 6 : undefined}
                       className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                       style={{
                         backgroundColor: "var(--input-bg)",
                         boxShadow: "inset 0 0 0 1px var(--input-border)",
                       }}
-                      placeholder={mode === "login" ? "Enter your PIN" : "Choose a username"}
+                      placeholder={mode === "login" ? "Enter your 6 digit PIN" : "Choose a username"}
                     />
 
                     {mode === "login" && (
@@ -473,13 +474,14 @@ export default function LoginUser({ ladderId, ladderType }) {
                         <Input
                           type={showRegisterPassword ? "text" : "password"}
                           value={registerForm.watch("password")}
-                          onChange={(e) => registerForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 4))}
+                          onChange={(e) => registerForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 6))}
+                          maxLength={6}
                           className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                           style={{
                             backgroundColor: "var(--input-bg)",
                             boxShadow: "inset 0 0 0 1px var(--input-border)",
                           }}
-                          placeholder="Create a PIN"
+                          placeholder="Create a 6 digit PIN"
                         />
 
                         <button
@@ -500,13 +502,14 @@ export default function LoginUser({ ladderId, ladderType }) {
                         <Input
                           type={showConfirmPassword ? "text" : "password"}
                           value={registerForm.watch("confirmPassword")}
-                          onChange={(e) => registerForm.setValue("confirmPassword", e.target.value.replace(/\D/g, "").slice(0, 4))}
+                          onChange={(e) => registerForm.setValue("confirmPassword", e.target.value.replace(/\D/g, "").slice(0, 6))}
+                          maxLength={6}
                           className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                           style={{
                             backgroundColor: "var(--input-bg)",
                             boxShadow: "inset 0 0 0 1px var(--input-border)",
                           }}
-                          placeholder="Confirm your PIN"
+                          placeholder="Confirm your 6 digit PIN"
                         />
 
                         <button
