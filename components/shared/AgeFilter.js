@@ -96,7 +96,9 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
           } flex h-full w-full flex-col items-center justify-center gap-1 rounded-xl px-4 py-3 text-[10px] font-bold uppercase leading-tight shadow-none transition-all active:scale-95`}
         >
           <Filter className="h-5 w-5" />
-          <span>AGE/GENDER</span>
+          <span>AGE/
+            <br/>
+            GENDER</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="best-board-card text-[var(--best-board-text)] border border-[var(--best-board-border)] rounded-xl max-w-sm w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto flex flex-col items-center p-4 gap-0">

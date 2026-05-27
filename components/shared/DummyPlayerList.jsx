@@ -82,7 +82,7 @@ const DefaultPlayerCard = ({ player, rank }) => {
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.age}
+              Age : {player.age}
             </span>
           )}
           {player.gender && (
@@ -94,7 +94,7 @@ const DefaultPlayerCard = ({ player, rank }) => {
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.gender === "male" ? "M" : "F"}
+              Gender: {player.gender === "male" ? "M" : "F"}
             </span>
           )}
         </div>
@@ -207,7 +207,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.age}
+              Age : {player.age}
             </span>
           )}
           {player.gender && (
@@ -219,7 +219,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.gender === "male" ? "M" : "F"}
+              Gender: {player.gender === "male" ? "M" : "F"}
             </span>
           )}
         </div>
@@ -382,7 +382,7 @@ const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true,
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.age}
+              Age : {player.age}
             </span>
           )}
           {player.gender && (
@@ -394,7 +394,7 @@ const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true,
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.gender === "male" ? "M" : "F"}
+              Gender: {player.gender === "male" ? "M" : "F"}
             </span>
           )}
         </div>
@@ -608,7 +608,7 @@ const RosterPlayerCard = ({ player, rank }) => {
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.age}
+              Age : {player.age}
             </span>
           )}
           {player.gender && (
@@ -620,7 +620,7 @@ const RosterPlayerCard = ({ player, rank }) => {
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.gender === "male" ? "M" : "F"}
+              Gender: {player.gender === "male" ? "M" : "F"}
             </span>
           )}
         </div>

@@ -92,7 +92,7 @@ const PlayerLevelNavbar = ({
   const fileInputRef = useRef(null);
 
   const handleLogoClick = () => {
-    if (!demoLadderName) {
+    if (!demoLadderName && !userLevel) {
       setShowLogoModal(true);
     }
   };
@@ -179,7 +179,7 @@ const PlayerLevelNavbar = ({
   }, [resolvedLadderName]);
 
   const handleNameEdit = () => {
-    if (!demoLadderName) {
+    if (!demoLadderName && !userLevel) {
       setEditedName(resolvedLadderName);
       setIsEditingName(true);
     }
@@ -346,7 +346,7 @@ const PlayerLevelNavbar = ({
                 />
 
                 <div
-                  className={`relative h-10 w-10 shrink-0 ${demoLadderName ? "" : "cursor-pointer"}`}
+                  className={`relative h-10 w-10 shrink-0 ${(demoLadderName || userLevel) ? "" : "cursor-pointer"}`}
                   onClick={handleLogoClick}
                 >
                   <Image
@@ -358,7 +358,7 @@ const PlayerLevelNavbar = ({
                     unoptimized
                   />
 
-                  {!demoLadderName && (
+                  {!demoLadderName && !userLevel && (
                     <div className="absolute -bottom-0.5 -right-0.5 bg-white p-0.5 rounded-full shadow border border-gray-100 flex items-center justify-center">
                       <Pencil className="w-2.5 h-2.5 text-gray-600" />
                     </div>
@@ -401,7 +401,7 @@ const PlayerLevelNavbar = ({
                         {resolvedTypeLabel ? `${resolvedLadderName} ` : resolvedLadderName}
                       </h1>
 
-                      {!demoLadderName && (
+                      {!demoLadderName && !userLevel && (
                         <button
                           onClick={handleNameEdit}
                           className="p-1 rounded-full hover:bg-white/10 transition-all flex items-center justify-center shrink-0"

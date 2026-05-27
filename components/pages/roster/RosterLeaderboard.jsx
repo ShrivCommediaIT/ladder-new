@@ -109,7 +109,7 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.age}
+              Age : {player.age}
             </span>
           )}
           {player.gender && (
@@ -121,7 +121,7 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.gender === "male" ? "M" : "F"}
+              Gender: {player.gender === "male" ? "M" : "F"}
             </span>
           )}
         </div>

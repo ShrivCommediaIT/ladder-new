@@ -111,12 +111,12 @@ const PlayerCard = ({
         <div className="flex items-center gap-1 flex-shrink-0 flex-wrap justify-end">
           {player.age && (
             <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white dark:bg-[var(--best-board-accent-soft)] text-[var(--best-board-highlight)] border border-[var(--best-board-border-strong)]">
-              {player.age}
+              Age : {player.age}
             </span>
           )}
           {player.gender && (
             <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white dark:bg-[var(--best-board-accent-soft)] text-[var(--best-board-highlight)] border border-[var(--best-board-border-strong)]">
-              {player.gender === "male" ? "M" : "F"}
+              Gender: {player.gender === "male" ? "M" : "F"}
             </span>
           )}
         </div>

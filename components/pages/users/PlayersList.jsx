@@ -333,12 +333,12 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                         <p className="truncate text-h5 font-semibold text-[var(--best-board-text)]">{player?.name || "N/A"}</p>
                         {player.age && (
                           <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)] border border-white/10">
-                            {player.age}
+                            Age : {player.age}
                           </span>
                         )}
                         {player.gender && (
                           <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)] border border-white/10">
-                            {player.gender === "male" ? "M" : "F"}
+                            Gender: {player.gender === "male" ? "M" : "F"}
                           </span>
                         )}
                       </div>
