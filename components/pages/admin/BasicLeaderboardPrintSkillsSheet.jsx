@@ -7,6 +7,8 @@ import { useRef } from "react";
 export default function BasicLeaderboardPrintSkillsSheet({
   skills = [],
   ladderId = null,
+  className = "bg-blue-500 cursor-pointer hover:bg-blue-600 ",
+  children = "Print Skills",
 }) {
   const printRef = useRef(null);
 
@@ -224,13 +226,14 @@ ${printContent}
         </table>
       </div>
 
-      <Button
+      <button
         onClick={handlePrint}
-        className="bg-blue-500 cursor-pointer hover:bg-blue-600 "
+        className={className}
         id="print-trigger"
+        type="button"
       >
-        Print Skills
-      </Button>
+        {children}
+      </button>
     </>
   );
 }

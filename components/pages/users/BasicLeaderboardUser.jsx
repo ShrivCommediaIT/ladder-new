@@ -485,6 +485,49 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
     mode: row.mode,
   }));
 
+  useEffect(() => {
+    if (onActionsChanged) {
+      const hasSkills = rows.some((r) => r.description && r.description.trim() !== "");
+      if (hasSkills) {
+        onActionsChanged([
+          {
+            id: "print-skills",
+            node: (
+              <BasicLeaderboardPrintSkillsSheet
+                skills={safeSkillsForPrint}
+                ladderId={ladderId}
+                className="rounded-lg h-16 w-full border px-4 text-[var(--best-board-text)] shadow-none transition hover:-translate-y-0.5 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight disabled:cursor-not-allowed disabled:opacity-60 best-board-card-soft border-[var(--best-board-border)] hover:bg-[var(--best-board-surface)]"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-5 w-5"
+                >
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                  <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
+                  <rect x="6" y="14" width="12" height="8" rx="1" />
+                </svg>
+                <span>Print Skills</span>
+              </BasicLeaderboardPrintSkillsSheet>
+            ),
+          },
+        ]);
+      } else {
+        onActionsChanged([]);
+      }
+    }
+    return () => {
+      if (onActionsChanged) onActionsChanged([]);
+    };
+  }, [rows, ladderId, onActionsChanged]);
+
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
     (skillNo = 0, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
