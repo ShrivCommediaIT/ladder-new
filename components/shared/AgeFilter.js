@@ -100,68 +100,68 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
           {isActive ? "✓ AGE/GENDER" : "AGE/GENDER FILTER"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-[#163344] text-white border border-[#2dd4bf] rounded-xl max-w-sm flex flex-col items-center p-6">
-        <DialogTitle className="text-2xl font-bold uppercase tracking-wider text-center w-full mt-2">
+      <DialogContent className="bg-[#163344] text-white border border-[#2dd4bf] rounded-xl max-w-sm w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto flex flex-col items-center p-4 gap-0">
+        <DialogTitle className="text-xl font-bold uppercase tracking-wide text-center w-full mt-0">
           AGE/GENDER FILTER
         </DialogTitle>
-        <div className="w-full flex justify-center mt-2 mb-4">
-          <span className="h-1 w-20 bg-[#2dd4bf] rounded-full"></span>
+        <div className="w-full flex justify-center mt-1 mb-2">
+          <span className="h-1 w-16 bg-[#2dd4bf] rounded-full"></span>
         </div>
-        <p className="text-xl font-semibold text-[#2dd4bf]">
+        <p className="text-base font-semibold text-[#2dd4bf]">
           Select Gender
         </p>
         {/* Gender Filter Tabs */}
-        <div className="flex w-full justify-center gap-4 mb-6">
+        <div className="flex w-full justify-center gap-2 mb-3 mt-1">
           <button
             onClick={() => setGender(gender === "male" ? "" : "male")}
-            className={`flex-1 py-2 rounded font-semibold transition-all border ${gender === "male" ? "bg-[#2dd4bf] border-[#2dd4bf] text-black shadow-[0_0_10px_#2dd4bf]" : "bg-transparent border-gray-500 text-gray-300 hover:border-[#2dd4bf] hover:text-white"}`}
+            className={`flex-1 py-1.5 rounded font-semibold transition-all border text-sm ${gender === "male" ? "bg-[#2dd4bf] border-[#2dd4bf] text-black shadow-[0_0_10px_#2dd4bf]" : "bg-transparent border-gray-500 text-gray-300 hover:border-[#2dd4bf] hover:text-white"}`}
           >
             Male
           </button>
           <button
             onClick={() => setGender(gender === "female" ? "" : "female")}
-            className={`flex-1 py-2 rounded font-semibold transition-all border ${gender === "female" ? "bg-[#2dd4bf] border-[#2dd4bf] text-black shadow-[0_0_10px_#2dd4bf]" : "bg-transparent border-gray-500 text-gray-300 hover:border-[#2dd4bf] hover:text-white"}`}
+            className={`flex-1 py-1.5 rounded font-semibold transition-all border text-sm ${gender === "female" ? "bg-[#2dd4bf] border-[#2dd4bf] text-black shadow-[0_0_10px_#2dd4bf]" : "bg-transparent border-gray-500 text-gray-300 hover:border-[#2dd4bf] hover:text-white"}`}
           >
             Female
           </button>
         </div>
-        <p className="text-xl font-semibold text-[#2dd4bf]">
+        <p className="text-base font-semibold text-[#2dd4bf]">
           Select Age Type
         </p>
         {/* Under/Over Age Filter Tabs */}
-        <div className="flex w-full justify-center gap-4 mb-6 bg-[#242424] p-1 rounded-lg">
+        <div className="flex w-full justify-center gap-2 mb-3 mt-1 bg-[#242424] p-1 rounded-lg">
 
           <button
             onClick={() => setAgeType(ageType === "under" ? "" : "under")}
-            className={`flex-1 py-2 rounded-md font-bold transition-all ${ageType === "under" ? "bg-[#2dd4bf] text-black shadow-md" : "bg-transparent text-gray-400 hover:text-white"}`}
+            className={`flex-1 py-1.5 rounded-md font-bold text-sm transition-all ${ageType === "under" ? "bg-[#2dd4bf] text-black shadow-md" : "bg-transparent text-gray-400 hover:text-white"}`}
           >
             Under Age
           </button>
           <button
             onClick={() => setAgeType(ageType === "over" ? "" : "over")}
-            className={`flex-1 py-2 rounded-md font-bold transition-all ${ageType === "over" ? "bg-[#2dd4bf] text-black shadow-md" : "bg-transparent text-gray-400 hover:text-white"}`}
+            className={`flex-1 py-1.5 rounded-md font-bold text-sm transition-all ${ageType === "over" ? "bg-[#2dd4bf] text-black shadow-md" : "bg-transparent text-gray-400 hover:text-white"}`}
           >
             Over Age
           </button>
         </div>
 
-        <div className="flex flex-col items-center w-full gap-4 relative">
-          <span className="font-semibold text-gray-300">{ageType === "under" ? "that's under" : ageType === "over" ? "that's over" : "Enter Age"}</span>
-          <div className="text-white text-lg mt-2 flex items-center justify-center gap-2">
+        <div className="flex flex-col items-center w-full gap-2 relative">
+          <span className="font-semibold text-sm text-gray-300 text-center">{ageType === "under" ? "that's under" : ageType === "over" ? "that's over" : "Enter Age"}</span>
+          <div className="text-white text-base flex items-center justify-center gap-2">
             <div className="flex items-center">
               <span className="text-white w-4 border-b-2 border-white mr-[1px]"></span>
               <input
                 type="text"
                 value={calculatedAge}
                 onChange={handleAgeChange}
-                className="bg-[#242424] border border-gray-400 outline-none text-center text-xl w-16 py-1 text-white transition-colors"
+                className="bg-[#242424] border border-gray-400 outline-none text-center text-lg w-14 py-1 text-white transition-colors"
               />
               <span className="text-white w-4 border-b-2 border-white ml-[1px]"></span>
             </div>
 
           </div>
 
-          <span className="font-semibold text-gray-300">On date? Adjust Date</span>
+          <span className="font-semibold text-sm text-gray-300">Re-type in full</span>
 
           <div className="flex justify-center w-full">
             <input
@@ -169,12 +169,12 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
               value={dobInput}
               onChange={handleDobChange}
               placeholder="DD/MM/YYYY"
-              className="bg-[#242424] border border-gray-400 outline-none text-center p-1 text-2xl w-46 py-2 tracking-widest text-white transition-colors rounded"
+              className="bg-[#242424] border border-gray-400 outline-none text-center px-2 py-1.5 text-lg w-40 tracking-widest text-white transition-colors rounded"
             />
           </div>
 
         </div>
-        <div className="grid grid-cols-2 gap-4 w-full mt-10">
+        <div className="grid grid-cols-2 gap-2 w-full mt-4">
           <Button
             onClick={() => {
               setOpen(false);
@@ -183,13 +183,13 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
               setGender("");
               setAgeType("");
             }}
-            className="bg-[#fbcfe8] text-[#9d174d] hover:bg-[#f9a8d4] font-bold rounded-xl h-12 text-lg"
+            className="bg-[#fbcfe8] text-[#9d174d] hover:bg-[#f9a8d4] font-bold rounded-xl h-10 text-sm"
           >
             Cancel
           </Button>
           <Button
             onClick={applyAgeFilter}
-            className="bg-[#2dd4bf] text-[#115e59] hover:bg-[#14b8a6] font-bold rounded-xl h-12 text-lg"
+            className="bg-[#2dd4bf] text-[#115e59] hover:bg-[#14b8a6] font-bold rounded-xl h-10 text-sm"
           >
             Search
           </Button>

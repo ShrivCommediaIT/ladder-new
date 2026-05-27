@@ -130,9 +130,9 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false })
     let isTargetAchieved = false;
     if (target && target !== 0 && score !== 0 && !isNaN(target) && !isNaN(score)) {
       if (isNegative) {
-        isTargetAchieved = isInverted ? score >= target : score <= target;
-      } else {
         isTargetAchieved = isInverted ? score <= target : score >= target;
+      } else {
+        isTargetAchieved = isInverted ? score >= target : score <= target;
       }
     }
     return { score: Math.abs(score), isTargetAchieved };

@@ -33,7 +33,7 @@ const schema = z
   .object({
     name: z.string().min(1, "Name is required"),
     dob: z.date().optional(), // optional now
-    password: z.string().regex(/^\d{4}$/, "PIN must be 4 digits"),
+    password: z.string().regex(/^\d{6}$/, "PIN must be 6 digits"),
     confirmPassword: z.string(),
     gender: z.string().optional(),
   })
@@ -179,19 +179,19 @@ export default function RegisterUser({ ladderId, ladderType }) {
 
             {/* PIN */}
             <div>
-              <Label className="text-teal-400 mb-1">4 Digit PIN (One that you can easily remember - avoid 1111 and 1234)</Label>
+              <Label className="text-teal-400 mb-1">6 Digit PIN (One that you can easily remember - avoid simple patterns)</Label>
               <div className="relative">
                 <Input
-                  placeholder="Enter a 4 digit PIN"
+                  placeholder="Enter a 6 digit PIN"
                   type={showPassword ? "text" : "password"}
-                  maxLength={4}
+                  maxLength={6}
                   inputMode="numeric"
                   {...register("password")}
                   className="bg-gray-800 border-gray-700 text-white pr-12"
                   onChange={(e) =>
                     setValue(
                       "password",
-                      e.target.value.replace(/\D/g, "").slice(0, 4),
+                      e.target.value.replace(/\D/g, "").slice(0, 6),
                     )
                   }
                 />
@@ -211,16 +211,16 @@ export default function RegisterUser({ ladderId, ladderType }) {
               <Label className="text-teal-400 mb-1">Confirm PIN</Label>
               <div className="relative">
                 <Input
-                  placeholder="Confirm your 4 digit PIN"
+                  placeholder="Confirm your 6 digit PIN"
                   type={showConfirmPassword ? "text" : "password"}
-                  maxLength={4}
+                  maxLength={6}
                   inputMode="numeric"
                   {...register("confirmPassword")}
                   className="bg-gray-800 border-gray-700 text-white pr-12"
                   onChange={(e) =>
                     setValue(
                       "confirmPassword",
-                      e.target.value.replace(/\D/g, "").slice(0, 4),
+                      e.target.value.replace(/\D/g, "").slice(0, 6),
                     )
                   }
                 />
