@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import {
@@ -61,6 +63,23 @@ export default function InfoSection({
   const searchParams = useSearchParams();
   const propLadderId = searchParams.get("ladder_id");
 
+  const isDemo = useSelector((state) => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("demo") === "true") return true;
+    }
+    const createdBy = 
+      state.player?.players?.[propLadderId]?.ladderDetails?.created_by ||
+      state.player?.players?.[Number(propLadderId)]?.ladderDetails?.created_by ||
+      state.skillLeaderboard?.ladderDetails?.created_by ||
+      state.positiveLeaderBoard?.ladderDetails?.created_by ||
+      state.negativeLeaderBoard?.ladderDetails?.created_by ||
+      state.rosterLeaderboard?.ladderDetails?.created_by ||
+      state.minileague?.data?.created_by;
+
+    return createdBy?.toLowerCase() === "demo";
+  });
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedSub = sessionStorage.getItem("subAdmin");
@@ -115,6 +134,10 @@ export default function InfoSection({
 
   const handleCopy = async () => {
     if (!inviteUrl) return;
+    if (isDemo) {
+      toast.warning("Disabled for Demo Purposes");
+      return;
+    }
     try {
       if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
         await navigator.clipboard.writeText(inviteUrl);

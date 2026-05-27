@@ -4,12 +4,37 @@ import React, { useState } from "react";
 import { Copy, Check } from "lucide-react";
 import QuickActionsCard from "./QuickActionsCard";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { useSearchParams } from "next/navigation";
 
 export default function MobileQuickActionsAndInvite({ inviteUrl, quickActions }) {
   const [copied, setCopied] = useState(false);
+  const searchParams = useSearchParams();
+  const propLadderId = searchParams.get("ladder_id");
+
+  const isDemo = useSelector((state) => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("demo") === "true") return true;
+    }
+    const createdBy = 
+      state.player?.players?.[propLadderId]?.ladderDetails?.created_by ||
+      state.player?.players?.[Number(propLadderId)]?.ladderDetails?.created_by ||
+      state.skillLeaderboard?.ladderDetails?.created_by ||
+      state.positiveLeaderBoard?.ladderDetails?.created_by ||
+      state.negativeLeaderBoard?.ladderDetails?.created_by ||
+      state.rosterLeaderboard?.ladderDetails?.created_by ||
+      state.minileague?.data?.created_by;
+
+    return createdBy?.toLowerCase() === "demo";
+  });
 
   const handleCopy = async () => {
     if (!inviteUrl) return;
+    if (isDemo) {
+      toast.warning("Disabled for Demo Purposes");
+      return;
+    }
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(inviteUrl);

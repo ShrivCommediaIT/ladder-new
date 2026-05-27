@@ -5,8 +5,6 @@ import { store, persistor } from "@/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { ThemeProvider } from "next-themes";
 import AppInit from '@/components/AppInit';
-import SupportChatBot from '@/components/shared/SupportChatBot';
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from 'react';
 
 export default function RootLayout({ children }) {
@@ -31,7 +29,6 @@ useEffect(() => {
              <PersistGate loading={null} persistor={persistor}>
               <AppInit />
               {children}
-              {userType && <SupportChatBot />}
              </PersistGate>
            </Provider>
          </ThemeProvider>

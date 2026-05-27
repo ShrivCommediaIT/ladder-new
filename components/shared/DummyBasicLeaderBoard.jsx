@@ -35,7 +35,7 @@ const getScoreBySkillNumber = (scores, skills, skillNumber, isInverted) => {
     !isNaN(target) &&
     !isNaN(score)
   ) {
-   isTargetAchieved = isInverted ? score <= target : score >= target;
+    isTargetAchieved = isInverted ? score <= target : score >= target;
   }
 
   const witnessBy = scoreObj?.witness_by || "";
@@ -177,154 +177,151 @@ const PlayerCard = ({ player, overallRank, showAgeRank, ageRank, onSkillClick, i
                 {player?.name || "N/A"}
               </div>
               <div
-                className="text-[10px] sm:text-xs truncate leading-tight"
+                className="text-[10px] sm:text-xs truncate leading-tight mb-2"
                 style={{ color: "var(--best-board-muted)" }}
               >
                 {player?.phone || "N/A"}
               </div>
-            </div>
               {player.skills?.length > 0 ? (
-            <>
-              {/* ── SKILL NUMBER ROW ── */}
-              <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
-                {player.skills.map((skill, i) => {
-                  const isNegative = skill.skill_sign === "-";
-                  return (
-                    <div
-                      key={i}
-                      onClick={() =>
-                        isEditable && onSkillClick(player.id, skill.skill_number)
-                      }
-                      className={`w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors relative
+              <>
+                {/* ── SKILL NUMBER ROW ── */}
+                <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
+                  {player.skills.map((skill, i) => {
+                    const isNegative = skill.skill_sign === "-";
+                    return (
+                      <div
+                        key={i}
+                        onClick={() =>
+                          isEditable && onSkillClick(player.id, skill.skill_number)
+                        }
+                        className={`w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors relative
                         ${isEditable
-                          ? "cursor-pointer"
-                          : "cursor-not-allowed opacity-50"
-                        }`}
-                      style={{
-                        background: "var(--best-board-accent-soft)",
-                        border: "1px solid var(--best-board-border-strong)",
-                        color: "var(--best-board-highlight)",
-                      }}
-                      title={
-                        isEditable
-                          ? `Edit Skill ${skill.skill_number}: ${skill.skill_description}`
-                          : "Only own skills can be edited"
-                      }
-                    >
-                      {isNegative && (
-                        <span
-                          className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-extrabold leading-none"
-                          style={{ color: "var(--best-board-danger)" }}
-                        >
-                          −
-                        </span>
-                      )}
-                      {skill.skill_number}
-                    </div>
-                  );
-                })}
-              </div>
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed opacity-50"
+                          }`}
+                        style={{
+                          background: "var(--best-board-accent-soft)",
+                          border: "1px solid var(--best-board-border-strong)",
+                          color: "var(--best-board-highlight)",
+                        }}
+                        title={
+                          isEditable
+                            ? `Edit Skill ${skill.skill_number}: ${skill.skill_description}`
+                            : "Only own skills can be edited"
+                        }
+                      >
+                        {isNegative && (
+                          <span
+                            className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-extrabold leading-none"
+                            style={{ color: "var(--best-board-danger)" }}
+                          >
+                            −
+                          </span>
+                        )}
+                        {skill.skill_number}
+                      </div>
+                    );
+                  })}
+                </div>
 
-              {/* ── SCORE ROW ── */}
-              <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
-                {player.skills.map((skill, i) => {
-                  const scoreData = getScoreBySkillNumber(
-                    player.scores || [],
-                    player.skills || [],
-                    skill.skill_number,
-                    isInverted
-                  );
+                {/* ── SCORE ROW ── */}
+                <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
+                  {player.skills.map((skill, i) => {
+                    const scoreData = getScoreBySkillNumber(
+                      player.scores || [],
+                      player.skills || [],
+                      skill.skill_number,
+                      isInverted
+                    );
 
-                  return (
-                    <div
-                      key={i}
-                      className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all border
-                        ${
-                          scoreData.witnessBy
+                    return (
+                      <div
+                        key={i}
+                        className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all border
+                        ${scoreData.witnessBy
                             ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
                             : scoreData.isTargetAchieved
-                            ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] shadow-md"
-                            : "bg-[var(--best-board-warning)] text-[#0f172a] border-[var(--best-board-border-strong)] hover:brightness-95"
-                        }`}
-                      title={`Score: ${scoreData.score || 0} | Target: ${
-                        scoreData.target || "N/A"
-                      }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
+                              ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] shadow-md"
+                              : "bg-[var(--best-board-warning)] text-[#0f172a] border-[var(--best-board-border-strong)] hover:brightness-95"
+                          }`}
+                        title={`Score: ${scoreData.score || 0} | Target: ${scoreData.target || "N/A"
+                          }${scoreData.isTargetAchieved ? " ACHIEVED!" : ""}`}
+                      >
+                        {Math.abs(scoreData.score || 0).toFixed(2)}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* ── RANK ROW ── */}
+                <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
+                  {player.skills.map((skill, i) => (
+                    <div
+                      key={i}
+                      className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center rounded font-bold text-[9px] sm:text-[10px] border"
+                      style={{
+                        background: "var(--best-board-accent-soft)",
+                        borderColor: "var(--best-board-border)",
+                        color: "var(--best-board-highlight)",
+                      }}
                     >
-                      {Math.abs(scoreData.score || 0).toFixed(2)}
+                      {getRankBySkillNumber(player.ranks || [], skill.skill_number)}
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="h-7 bg-[var(--best-board-surface-soft)] rounded text-xs text-[var(--best-board-muted)] flex items-center justify-center">
+                No skills data
               </div>
-
-              {/* ── RANK ROW ── */}
-              <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-                {player.skills.map((skill, i) => (
-                  <div
-                    key={i}
-                    className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center rounded font-bold text-[9px] sm:text-[10px] border"
-                    style={{
-                      background: "var(--best-board-accent-soft)",
-                      borderColor: "var(--best-board-border)",
-                      color: "var(--best-board-highlight)",
-                    }}
-                  >
-                    {getRankBySkillNumber(player.ranks || [], skill.skill_number)}
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="h-7 bg-[var(--best-board-surface-soft)] rounded text-xs text-[var(--best-board-muted)] flex items-center justify-center">
-              No skills data
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT SECTION */}
-        <div
-          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
-          style={{ borderLeft: "1px solid var(--best-board-border)" }}
-        >
-          {/* Total Points */}
-          <div
-            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
-            style={{
-              background: "var(--best-board-accent-soft)",
-              border: "1px solid var(--best-board-border-strong)",
-            }}
-          >
-            <span
-              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
-              style={{ color: "var(--best-board-highlight)" }}
-            >
-              {Math.abs(player.total_point || 0)}
-            </span>
-            <span
-              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              Points
-            </span>
-          </div>
-
-          <div
-            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
-            style={{ border: "1px solid var(--best-board-border-strong)" }}
-          >
-            <Image
-              src={playerImageUrl}
-              alt={player?.name || "Player"}
-              width={72}
-              height={72}
-              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
-              unoptimized
-            />
+            )}
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+
+          {/* RIGHT SECTION */}
+          <div
+            className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+            style={{ borderLeft: "1px solid var(--best-board-border)" }}
+          >
+            {/* Total Points */}
+            <div
+              className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              <span
+                className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
+                style={{ color: "var(--best-board-highlight)" }}
+              >
+                {Math.abs(player.total_point || 0)}
+              </span>
+              <span
+                className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+                style={{ color: "var(--best-board-muted)" }}
+              >
+                Points
+              </span>
+            </div>
+
+            <div
+              className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+              style={{ border: "1px solid var(--best-board-border-strong)" }}
+            >
+              <Image
+                src={playerImageUrl}
+                alt={player?.name || "Player"}
+                width={72}
+                height={72}
+                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+                unoptimized
+              />
+            </div>
+          </div>
+        </div>
+      </div>
   );
 };
 
@@ -337,7 +334,7 @@ const DummyBasicLeaderboard = ({ ladderId: propLadderId }) => {
     (state) => state.skillLeaderboard || {}
   );
   const showAgeRank = Number(appliedAge) > 0;
-  const isInverted = ladderDetails?.inverted == 0;;
+  const isInverted = ladderDetails?.inverted == 0;
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [selectedSkillNumber, setSelectedSkillNumber] = useState(null);
@@ -350,13 +347,15 @@ const DummyBasicLeaderboard = ({ ladderId: propLadderId }) => {
   const [showRemove, setShowRemove] = useState(false);
 
   const refreshLeaderboard = useCallback(() => {
-    if (ladderId)
+    if (ladderId) {
       dispatch(fetchSkillLeaderboard({ ladder_id: ladderId, type: "skill" }));
+    }
   }, [dispatch, ladderId]);
 
   useEffect(() => {
-    if (ladderId)
+    if (ladderId) {
       dispatch(fetchSkillLeaderboard({ ladder_id: ladderId, type: "skill" }));
+    }
   }, [dispatch, ladderId]);
 
   const handleSkillClick = useCallback(
@@ -409,21 +408,23 @@ const DummyBasicLeaderboard = ({ ladderId: propLadderId }) => {
           <div className="space-y-2 mt-2">
             {filteredPlayers.length === 0 ? (
               <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
-            ) : filteredPlayers.map((player, index) => {
-              const isEditablePlayer = player.id == 1; // Dummy editable player
-              return (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  overallRank={player.rank || index + 1}
-                  showAgeRank={showAgeRank}
-                  ageRank={index + 1}
-                  onSkillClick={handleSkillClick}
-                  isEditable={isEditablePlayer}
-                  isInverted={isInverted}
-                />
-              );
-            })}
+            ) : (
+              filteredPlayers.map((player, index) => {
+                const isEditablePlayer = player.id == 1; // Dummy editable player
+                return (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    overallRank={player.rank || index + 1}
+                    showAgeRank={showAgeRank}
+                    ageRank={index + 1}
+                    onSkillClick={handleSkillClick}
+                    isEditable={isEditablePlayer}
+                    isInverted={isInverted}
+                  />
+                );
+              })
+            )}
           </div>
         </div>
       </main>
