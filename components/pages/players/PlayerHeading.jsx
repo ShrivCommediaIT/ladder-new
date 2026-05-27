@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import { postFormData, postWithParams } from "@/services/apiService";
+import { toast } from "react-toastify";
 
 const PlayerHeading = ({ demoLadderName }) => {
   const dispatch = useDispatch();
@@ -46,6 +47,7 @@ const PlayerHeading = ({ demoLadderName }) => {
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
+  const [localLogo, setLocalLogo] = useState(null);
 
   useEffect(() => {
     setEditedName(demoLadderName || ladderDetails?.name || "");
@@ -53,12 +55,12 @@ const PlayerHeading = ({ demoLadderName }) => {
 
   // --------------------------
 
-  const logo = ladderDetails?.logo;
+  const logo = localLogo || ladderDetails?.logo;
   const name = demoLadderName || ladderDetails?.name;
 
   const imagePath =
     logo && logo !== "null"
-      ? logo.startsWith("http")
+      ? logo.startsWith("http") || logo.startsWith("blob:")
         ? logo
         : `${IMAGE_BASE_URL}/${logo}`
       : "/game.png";
@@ -76,6 +78,11 @@ const PlayerHeading = ({ demoLadderName }) => {
     const file = e.target.files?.[0];
     if (!file || !ladderId) return;
 
+    // Create an instant premium local preview
+    const previewUrl = URL.createObjectURL(file);
+    const originalLogo = localLogo || ladderDetails?.logo || null;
+    setLocalLogo(previewUrl);
+
     const formData = new FormData();
     formData.append("logo", file);
     formData.append("ladder_id", ladderId);
@@ -83,9 +90,34 @@ const PlayerHeading = ({ demoLadderName }) => {
     try {
       const response = await postFormData("/user/updateladderlogo", formData);
 
-      if (response?.status === 200 || response?.status === true) window.location.reload();
+      if (response?.status === 200 || response?.status === true) {
+        toast.success("Logo updated successfully!");
+        if (response?.logo) {
+          setLocalLogo(response.logo);
+        } else if (response?.data?.logo) {
+          setLocalLogo(response.data.logo);
+        }
+      } else {
+        setLocalLogo(originalLogo);
+        let errorMsg = "Logo upload failed";
+        if (response?.error_message?.logo?.[0]) {
+          errorMsg = response.error_message.logo[0];
+        } else if (response?.message) {
+          errorMsg = response.message;
+        }
+        toast.error(errorMsg);
+      }
     } catch (err) {
       console.error("Logo upload error:", err);
+      setLocalLogo(originalLogo);
+      const errorData = err.response?.data;
+      let errorMsg = "Logo upload failed";
+      if (errorData?.error_message?.logo?.[0]) {
+        errorMsg = errorData.error_message.logo[0];
+      } else if (errorData?.message) {
+        errorMsg = errorData.message;
+      }
+      toast.error(errorMsg);
     }
   };
 
