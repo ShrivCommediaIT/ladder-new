@@ -109,6 +109,7 @@ const MoveNumberInput = ({
         score,
         admin_id: adminDetails.id,
         user_name: selectedPlayer?.name,
+        opposit_user_id:challengedPlayer.name,
         witness_by: "test",
         ...(resultType === "beat" || resultType === "lost"
           ? { bet: betDescription }
@@ -209,7 +210,7 @@ const MoveNumberInput = ({
       (p) => String(p.id) === String(currentId)
     );
 
-    if (!currentPlayer) {
+    if (!currentPlayer) {      
       toast.error("Current player not found.");
       return;
     }
