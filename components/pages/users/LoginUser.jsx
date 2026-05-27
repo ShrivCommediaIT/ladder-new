@@ -25,7 +25,7 @@ import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { format } from "date-fns";
-import { calculateAge } from "@/lib/utils";
+import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
 import "react-toastify/dist/ReactToastify.css";
 
 const loginSchema = z.object({
@@ -399,36 +399,17 @@ export default function LoginUser({ ladderId, ladderType }) {
                         <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
                           Date of Birth
                         </Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="h-[52px] w-full justify-start rounded-2xl border-0 text-left font-normal text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
-                              style={{
-                                backgroundColor: "var(--input-bg)",
-                                boxShadow: "inset 0 0 0 1px var(--input-border)",
-                              }}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {registerForm.watch("dob") ? (
-                                format(registerForm.watch("dob"), "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={registerForm.watch("dob")}
-                              onSelect={(date) => registerForm.setValue("dob", date)}
-                              disabled={(date) =>
-                                date > new Date() || date < new Date("1900-01-01")
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <DateOfBirthInput
+                          id="dob"
+                          value={registerForm.watch("dob")}
+                          onChange={(date) =>
+                            registerForm.setValue("dob", date ?? undefined, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            })
+                          }
+                          className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                        />
                       </div>
                     </>
                   )}

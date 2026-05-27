@@ -185,7 +185,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
           shouldDirty: true,
         })
       }
-      className="bg-gray-900 border-gray-700 text-white"
+      className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
     />
 
     <p className="text-red-400 text-xs">{errors.dob?.message}</p>
