@@ -110,6 +110,8 @@ export default function LoginUser({ ladderId, ladderType }) {
       confirmPassword: "",
     },
   });
+  const { errors: loginErrors } = loginForm.formState;
+  const { errors: registerErrors } = registerForm.formState;
 
   useEffect(() => {
     if (from === "ladder") {
@@ -390,6 +392,15 @@ export default function LoginUser({ ladderId, ladderType }) {
                       }}
                       placeholder={mode === "login" ? "Enter your username" : "Enter your full name"}
                     />
+                    {mode === "login" ? (
+                      loginErrors.username?.message && (
+                        <p className="text-red-400 text-xs mt-1">{loginErrors.username.message}</p>
+                      )
+                    ) : (
+                      registerErrors.name?.message && (
+                        <p className="text-red-400 text-xs mt-1">{registerErrors.name.message}</p>
+                      )
+                    )}
                   </div>
 
                   {mode === "register" && (
@@ -410,6 +421,9 @@ export default function LoginUser({ ladderId, ladderType }) {
                           }
                           className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
                         />
+                        {registerErrors.dob?.message && (
+                          <p className="text-red-400 text-xs mt-1">{registerErrors.dob.message}</p>
+                        )}
                       </div>
                     </>
                   )}
@@ -442,6 +456,16 @@ export default function LoginUser({ ladderId, ladderType }) {
                         {showLoginPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
                       </button>
                     )}
+
+                    {mode === "login" ? (
+                      loginErrors.password?.message && (
+                        <p className="text-red-400 text-xs mt-1">{loginErrors.password.message}</p>
+                      )
+                    ) : (
+                      registerErrors.username?.message && (
+                        <p className="text-red-400 text-xs mt-1">{registerErrors.username.message}</p>
+                      )
+                    )}
                   </div>
 
                   {mode === "register" && (
@@ -472,6 +496,10 @@ export default function LoginUser({ ladderId, ladderType }) {
                         >
                           {showRegisterPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
                         </button>
+
+                        {registerErrors.password?.message && (
+                          <p className="text-red-400 text-xs mt-1">{registerErrors.password.message}</p>
+                        )}
                       </div>
 
                       {/* Confirm PIN */}
@@ -500,6 +528,10 @@ export default function LoginUser({ ladderId, ladderType }) {
                         >
                           {showConfirmPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
                         </button>
+
+                        {registerErrors.confirmPassword?.message && (
+                          <p className="text-red-400 text-xs mt-1">{registerErrors.confirmPassword.message}</p>
+                        )}
                       </div>
                     </>
                   )}
