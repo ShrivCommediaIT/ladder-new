@@ -51,6 +51,9 @@ export default function LoginUser({ ladderId, ladderType }) {
     if (!username || !password)
       return toast.error("Username and Password are required!");
 
+    if (password.length !== 6)
+      return toast.error("PIN must be 6 digits.");
+
     if (!finalLadderId || !finalLadderType)
       return toast.error("Ladder ID or type missing!");
 
@@ -155,19 +158,19 @@ export default function LoginUser({ ladderId, ladderType }) {
           {/* Password */}
           <div className="mb-8 relative">
             <Label className="text-teal-400  text-md mb-1 block">
-              4 Digit Pin (numbers only available)
+              6 Digit Pin (numbers only available)
             </Label>
 
             <Input
               type={showPassword ? "text" : "password"}
               value={password}
-              maxLength={4}
+              maxLength={6}
               inputMode="numeric"
               onChange={(e) =>
-                setPassword(e.target.value.replace(/\D/g, "").slice(0, 4))
+                setPassword(e.target.value.replace(/\D/g, "").slice(0, 6))
               }
               className="rounded-xl border-gray-600 bg-gray-800 text-gray-100 pr-12 text-lg tracking-widest"
-              placeholder="Enter 4 digit PIN"
+              placeholder="Enter 6 digit PIN"
             />
 
             <button

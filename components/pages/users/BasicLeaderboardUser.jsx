@@ -74,11 +74,11 @@ const PlayerCard = ({
     if (
       target !== null &&
       target !== 0 &&
-      score !== 0 &&
+      bestScore !== 0 &&
       !isNaN(target) &&
-      !isNaN(score)
+      !isNaN(bestScore)
     ) {
-      isTargetAchieved = isInverted ? score <= target : score >= target;
+      isTargetAchieved = isInverted ? bestScore >= target : bestScore <= target;
     }
 
     return {

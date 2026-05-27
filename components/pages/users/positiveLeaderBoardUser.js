@@ -64,11 +64,11 @@ const PlayerCard = ({
     if (
       target !== null &&
       target !== 0 &&
-      score !== 0 && // still using real score
+      bestScore !== 0 && // still using real score
       !isNaN(target) &&
-      !isNaN(score)
+      !isNaN(bestScore)
     ) {
-      isTargetAchieved = isInverted ? score <= target : score >= target;
+      isTargetAchieved = isInverted ? bestScore >= target : bestScore <= target;
     }
 
     return {
@@ -144,7 +144,7 @@ const PlayerCard = ({
           <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
             <div className="flex flex-col items-center">
               <span className="bg-yellow-200 text-black px-3 sm:px-4 py-0.5 sm:py-1 rounded-sm font-bold border text-xs sm:text-sm shadow-sm leading-none h-7 sm:h-auto flex items-center">
-                {Math.abs(player.total_point || 0)}
+                {(player.total_point || 0).toFixed(2)}
               </span>
               <p className="text-[9px] text-white mt-1  font-semibold">Total Pts</p>
             </div>
