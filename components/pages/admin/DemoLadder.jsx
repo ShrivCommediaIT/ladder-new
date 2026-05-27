@@ -17,19 +17,6 @@ import {
 } from "@/components/ui/popover";
 import LadderInfo from "./LadderInfo";
 
-const ladderDescriptions = {
-  win:
-    "Players move up or down based on wins and losses only. This is the simplest ladder if match scores are not important.",
-
-  best3:
-    "Used in Tennis, Squash, Badminton, Table Tennis etc. Results are 2-0 or 2-1. Match score and player effort is recorded for fair ranking.",
-
-  best5:
-    "Used where matches are decided by a best-of-5 format like 3-0, 3-1 or 3-2 with detailed performance tracking.",
-
-  skill:
-    "Set up to 12 fully customisable exercises or challenges with targets and timescales of your choosing for your students/trainees to complete. Highly motivational and useful for setting grades.",
-};
 
 const DemoLadder = ({ userId }) => {
   const dispatch = useDispatch();

@@ -82,11 +82,8 @@ const PlayerCard = ({
     const rawNegativeScore = scoreObj?.negative_ladder_bestscore;
     const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
 
-    const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
-    const rawDisplayScore = rawBestScore || rawNegativeScore || "";
-    const displayScore = rawDisplayScore
-      ? convertTimeToSeconds(rawDisplayScore)
-      : "0";
+    const rawBestScore = scoreObj && Number(convertTimeToSeconds(scoreObj?.negative_ladder_bestscore))
+    const displayScore = rawBestScore
 
     const target =
       skillObj?.target !== null && skillObj?.target !== undefined
@@ -98,11 +95,11 @@ const PlayerCard = ({
     if (
       target !== null &&
       target !== 0 &&
-      score !== 0 &&
+      rawBestScore !== 0 &&
       !isNaN(target) &&
-      !isNaN(score)
+      !isNaN(rawBestScore)
     ) {
-      isTargetAchieved = isInverted ? score >= target : score <= target;
+      isTargetAchieved = isInverted ? rawBestScore <= target : rawBestScore >= target;
     }
 
     return {
@@ -238,6 +235,7 @@ const PlayerCard = ({
               {player?.phone || "N/A"}
             </div>
 
+
             {/* Skills section */}
             {player.skills?.length > 0 ? (
               <>
@@ -292,7 +290,7 @@ const PlayerCard = ({
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {scoreData.displayScore !== "0" ? scoreData.displayScore : ""}
+                        {scoreData.displayScore !== "0" ? Number(scoreData.displayScore || 0).toFixed(2) : ""}
                       </div>
                     );
                   })}

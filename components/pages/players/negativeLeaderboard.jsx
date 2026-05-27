@@ -85,18 +85,23 @@ const PlayerCard = ({
     const scoreObj = scores?.find((s) => String(s.skill_number) === skillNumberKey);
     const skillObj = skills?.find((s) => String(s.skill_number) === skillNumberKey);
     const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
-    const rawNegativeScore = scoreObj?.negative_ladder_bestscore;
-    const score = scoreObj ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
+    const rawNegativeScore = scoreObj?.negative_ladder_score;
+    const score = scoreObj && rawNegativeScore ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
     const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
-    const rawDisplayScore = rawBestScore || rawNegativeScore || "";
-    const displayScore = rawDisplayScore ? convertTimeToSeconds(rawDisplayScore) : "0";
+    const displayScore = rawBestScore ? convertTimeToSeconds(rawBestScore) : "0";
     const target =
       skillObj?.target !== null && skillObj?.target !== undefined
         ? Number(skillObj.target)
         : null;
     let isTargetAchieved = false;
-    if (target !== null && target !== 0 && score !== 0 && !isNaN(target) && !isNaN(score)) {
-      isTargetAchieved = isInverted ? score >= target : score <= target;
+    if (
+      target !== null &&
+      target !== 0 &&
+      score !== 0 &&
+      !isNaN(target) &&
+      !isNaN(score)
+    ) {
+      isTargetAchieved = isInverted ? rawBestScore <= target : rawBestScore >= target;
     }
     return { witnessBy, score, displayScore, target, isTargetAchieved, input_score: rawBestScore };
   };
@@ -215,6 +220,7 @@ const PlayerCard = ({
               {player?.phone || "N/A"}
             </div>
 
+
             {/* Skills section */}
             {player.skills?.length > 0 ? (
               <>
@@ -269,7 +275,7 @@ const PlayerCard = ({
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {scoreData.displayScore !== "0" ? scoreData.displayScore : ""}
+                        {scoreData.displayScore !== "0" ? Number(scoreData.displayScore || 0).toFixed(2) : ""}
                       </div>
                     );
                   })}

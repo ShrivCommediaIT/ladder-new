@@ -135,7 +135,7 @@ export const InvertRanckings = () => {
         if ((type === 'negative'&& inverType === '1')) {
             Inverted = true
         } else if(type !== 'negative'){
-            Inverted = inverType === '0';
+            Inverted = inverType === '1';
         }
         setIsInverted(Inverted);
     }, [searchParams]);
@@ -169,7 +169,7 @@ export const InvertRanckings = () => {
     <div 
         onClick={handleInvertRanckings} 
         className={`border backdrop-blur-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 p-2 rounded-md cursor-pointer flex items-center justify-center bg-gradient-to-r ${
-            isInverted && type === 'negative'
+            isInverted 
             ? 'border-green-500/50 from-green-900/80 to-emerald-900/80' 
             : 'border-white/10 bg-zinc-900/70 from-gray-900 to-cyan-900'
         }`}

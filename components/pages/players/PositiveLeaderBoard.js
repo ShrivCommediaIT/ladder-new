@@ -87,8 +87,14 @@ const PlayerCard = ({
     const target = skillObj?.target !== null && skillObj?.target !== undefined ? Number(skillObj.target) : null;
     const mode = skillObj?.skill_sign || "+";
     let isTargetAchieved = false;
-    if (target !== null && target !== 0 && score !== 0 && !isNaN(target) && !isNaN(score)) {
-      isTargetAchieved = isInverted ? score >= target : score <= target;
+    if (
+      target !== null &&
+      target !== 0 &&
+      bestScore !== 0 && // still using real score
+      !isNaN(target) &&
+      !isNaN(bestScore)
+    ) {
+      isTargetAchieved = isInverted ? bestScore >= target : bestScore <= target;
     }
     return { witnessBy, score, displayScore, target, isTargetAchieved, input_score: inputScore };
   };
@@ -200,6 +206,7 @@ const PlayerCard = ({
             >
               {player?.phone || "N/A"}
             </div>
+
 
             {/* Skills section */}
             {player.skills?.length > 0 ? (

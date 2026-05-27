@@ -96,11 +96,11 @@ const PlayerCard = ({
     if (
       target !== null &&
       target !== 0 &&
-      score !== 0 && // still using real score
+      bestScore !== 0 && // still using real score
       !isNaN(target) &&
-      !isNaN(score)
+      !isNaN(bestScore)
     ) {
-      isTargetAchieved = isInverted ? score <= target : score >= target;
+      isTargetAchieved = isInverted ? bestScore >= target : bestScore <= target;
     }
 
     return {
@@ -226,6 +226,7 @@ const PlayerCard = ({
               style={{ color: "var(--best-board-text)" }}
             >
               {player?.name || "N/A"}
+
             </div>
 
             {/* Phone */}

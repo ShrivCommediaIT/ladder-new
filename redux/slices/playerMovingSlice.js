@@ -65,7 +65,7 @@ export const movePlayerBestOf5 = createAsyncThunk(
 export const moveMiniLeague = createAsyncThunk(
   "playerMoving/moveMiniLeague",
   async (
-    { ladder_id, match_status, user_id, score, move_to_rank, move_from_rank, bet = "", move_from_section, move_to_section },
+    { ladder_id, match_status, user_id, score, move_to_rank, move_from_rank, bet = "", move_from_section, move_to_section, opposit_user_id },
     { rejectWithValue }
   ) => {
     try {
@@ -78,6 +78,7 @@ export const moveMiniLeague = createAsyncThunk(
         user_id: Number(user_id),
         move_to_rank: Number(move_to_rank),
         move_from_rank: Number(move_from_rank || 0),
+        opposit_user_id,
         score: score || "",
         bet: bet || "",
         move_from_section: String(move_from_section),

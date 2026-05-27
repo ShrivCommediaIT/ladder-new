@@ -225,13 +225,6 @@ const MoveNumberMinileague = ({
       toast.error(
         `Current player rank missing! Debug: currentRank=${currentRank}, selectedPlayer.rank=${selectedPlayer?.rank}, computed=${currentPlayerRank}`
       );
-      console.error("Current player rank debug:", {
-        currentRank,
-        selectedPlayerRank: selectedPlayer?.rank,
-        currentPlayerRank,
-        currentId: effectiveCurrentId,
-        currentSection,
-      });
       setShowConfirm(false);
       return;
     }
@@ -249,6 +242,7 @@ const MoveNumberMinileague = ({
         match_status: resultType,
         move_to_rank: Number(selectedNumber),
         move_from_rank: currentPlayerRank,
+        opposit_user_id:challengedPlayer.name,
         score: score || "",
         bet: betDescription || "",
         move_from_section: fromSectionName,
@@ -289,7 +283,6 @@ const MoveNumberMinileague = ({
   };
 
   const handleEnter = () => {
-    console.log(userId)
     if (!userId || !effectiveLadderId || !effectiveCurrentId) {
       toast.error("Missing required information.");
       return;
