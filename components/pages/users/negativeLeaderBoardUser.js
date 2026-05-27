@@ -65,9 +65,10 @@ const PlayerCard = ({
   isEditable,
   currentUser,
 }) => {
-  const playerImageUrl = player?.image
-    ? `${IMAGE_BASE_URL}/${player.image}`
-    : Logo;
+  const playerImageUrl =
+    player?.image && player.image !== "null" && player.image !== "undefined" && player.image !== ""
+      ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}`
+      : Logo;
   const skillCellClass =
     "w-[46px] sm:w-[58px] h-6 shrink-0 px-1 flex items-center justify-center text-[9px] sm:text-[10px] rounded";
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {

@@ -77,9 +77,10 @@ const PlayerCard = ({
   isEditable,
   loggedInUser,
 }) => {
-  const playerImageUrl = player?.image
-    ? `${IMAGE_BASE_URL}/${player.image}`
-    : Logo;
+  const playerImageUrl =
+    player?.image && player.image !== "null" && player.image !== "undefined" && player.image !== ""
+      ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}`
+      : Logo;
 
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
