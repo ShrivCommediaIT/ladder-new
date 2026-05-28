@@ -50,7 +50,7 @@ export default function BespokeFooter() {
               fill
               sizes="(max-width: 1279px) 100vw, 50vw"
               className="object-contain object-bottom"
-              unoptimized
+              priority
             />
           </div>
         </button>
