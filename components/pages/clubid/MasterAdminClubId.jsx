@@ -42,6 +42,12 @@ export default function AccessCodeParts() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [pendingUpdateValues, setPendingUpdateValues] = useState(null);
+  const [drawerErrorMessage, setDrawerErrorMessage] = useState("");
+
+  useEffect(() => {
+    setErrorMessage("");
+    setDrawerErrorMessage("");
+  }, [isDrawerOpen]);
 
   // Main Form Validation
   const form = useForm({
@@ -72,6 +78,7 @@ export default function AccessCodeParts() {
             clubPin: String(admin.password),
           };
           setSavedData(data);
+          form.reset({ part1: data.clubId, part2: data.clubPin });
           drawerForm.reset({ part1: data.clubId, part2: data.clubPin });
         }
       } catch (err) {
@@ -79,7 +86,7 @@ export default function AccessCodeParts() {
       }
     };
     fetchSavedClub();
-  }, [drawerForm]);
+  }, [form, drawerForm]);
 
   const handleSubmit = async (values) => {
     if (!userId) return toast.error("User not logged in");
@@ -98,16 +105,11 @@ export default function AccessCodeParts() {
       const res = await postRequest("/app/user/create", payload);
       console.log("payload2", res);
 
-      // Club ID already exist case
-      if (res?.status != 200) {
-        setErrorMessage(res.error_message)
-        toast.error(res.error_message);
-        return;
-      }
-
-      // Other errors
-      if (res?.status === false) {
-        setErrorMessage(res?.message || "Action failed");
+      // Handle custom error structure (e.g., status 400 duplicate login ID exist)
+      if (res?.status === 400 || res?.status !== 200 || res?.status === false || res?.error_message) {
+        const errorMsg = res?.error_message || res?.message || "Action failed";
+        setErrorMessage(errorMsg);
+        toast.error(errorMsg);
         return;
       }
 
@@ -118,7 +120,7 @@ export default function AccessCodeParts() {
       });
 
       setSuccessDialog(true);
-      form.reset();
+      form.reset({ part1: values.part1, part2: values.part2 });
 
     } catch (err) {
       setErrorMessage("Server error occurred");
@@ -135,6 +137,7 @@ export default function AccessCodeParts() {
   const handleUpdate = async (values) => {
     if (!userId) return toast.error("User not logged in");
     setLoading(true);
+    setDrawerErrorMessage("");
     try {
       const payload = {
         user_id: userId,
@@ -145,8 +148,10 @@ export default function AccessCodeParts() {
 
       const res = await postRequest("/app/user/update", payload);
 
-      if (res?.status === false) {
-        setErrorMessage(res?.message || "Update failed");
+      if (res?.status === 400 || res?.status !== 200 || res?.status === false || res?.error_message) {
+        const errorMsg = res?.error_message || res?.message || "Update failed";
+        setDrawerErrorMessage(errorMsg);
+        toast.error(errorMsg);
       } else {
         setSavedData({ clubId: values.part1, clubPin: values.part2 });
         setIsDrawerOpen(false);
@@ -154,7 +159,7 @@ export default function AccessCodeParts() {
         drawerForm.reset(values);
       }
     } catch (err) {
-      setErrorMessage("Server error");
+      setDrawerErrorMessage("Server error");
     } finally {
       setLoading(false);
     }
@@ -177,8 +182,9 @@ export default function AccessCodeParts() {
               <Input
                 {...form.register("part1")}
                 maxLength={8}
+                readOnly={!!savedData.clubId}
                 onChange={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, "").toUpperCase()}
-                className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold tracking-[0.35em] rounded-xl focus:border-primary focus:ring-primary/20 transition-all"
+                className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold tracking-[0.35em] rounded-xl focus:border-primary focus:ring-primary/20 transition-all read-only:opacity-80"
               />
               {form.formState.errors.part1 && <p className="text-[10px] text-red-500 mt-1">{form.formState.errors.part1.message}</p>}
             </div>
@@ -188,8 +194,9 @@ export default function AccessCodeParts() {
               <Input
                 {...form.register("part2")}
                 maxLength={4}
+                readOnly={!!savedData.clubId}
                 onChange={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, "")}
-                className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold tracking-[0.35em] rounded-xl focus:border-primary focus:ring-primary/20 transition-all"
+                className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold tracking-[0.35em] rounded-xl focus:border-primary focus:ring-primary/20 transition-all read-only:opacity-80"
               />
               {form.formState.errors.part2 && <p className="text-[10px] text-red-500 mt-1">{form.formState.errors.part2.message}</p>}
             </div>
@@ -208,8 +215,8 @@ export default function AccessCodeParts() {
               </div>
             )}
 
-            <Button disabled={loading} type="submit" className="w-full rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-95 text-white shadow-lg transition-all duration-200">
-              {loading ? "Processing..." : "Generate Club ID"}
+            <Button disabled={loading || !!savedData.clubId} type="submit" className="w-full rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-95 text-white shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading ? "Processing..." : savedData.clubId ? "Club ID Generated" : "Generate Club ID"}
             </Button>
             {errorMessage && <p className="text-xs text-red-500 text-center font-semibold">{errorMessage}</p>}
           </form>
@@ -247,6 +254,8 @@ export default function AccessCodeParts() {
               />
               {drawerForm.formState.errors.part2 && <p className="text-[10px] text-red-500">{drawerForm.formState.errors.part2.message}</p>}
             </div>
+
+            {drawerErrorMessage && <p className="text-xs text-red-500 text-center font-semibold pb-2">{drawerErrorMessage}</p>}
 
             <Button disabled={loading} type="submit" className="w-full cursor-pointer bg-primary text-white hover:bg-primary/95 h-11 rounded-xl shadow-lg transition-all duration-200">
               Update clubId
