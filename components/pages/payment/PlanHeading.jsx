@@ -162,6 +162,7 @@ export default function PlanHeading() {
 
   const navItems = useMemo(
     () => [
+      { label: "SSP Talent Board", href: "#talent-board" },
       { label: "Features", href: "#features" },
       { label: "Pricing", href: "#pricing" },
       { label: "Clubs", href: "#clubs" },
@@ -369,7 +370,7 @@ export default function PlanHeading() {
           </div>
         </div>
       </section>
-            <div className="relative z-10 border-y border-border bg-background">
+      <div id="talent-board" className="relative z-10 border-y border-border bg-background scroll-mt-20">
         <PerformanceDatabase />
       </div>
 
@@ -566,6 +567,11 @@ export default function PlanHeading() {
                 Product
               </h3>
               <ul className="space-y-2">
+                <li>
+                  <a href="#talent-board" className="transition-colors hover:text-foreground">
+                    SSP Talent Board
+                  </a>
+                </li>
                 <li>
                   <a href="#features" className="transition-colors hover:text-foreground">
                     Features
