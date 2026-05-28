@@ -332,23 +332,10 @@ export default function SubmitPerformancePage() {
               Submit a Performance Result
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base max-w-2xl font-semibold">
-              Share exceptional athletic performances and help identify the world's best.
-              All submissions are reviewed by SSP before being published.
+              The SSP Talent Board allows clubs to showcase notable sporting performances and emerging talent that may be of interest to coaches, scouts and sporting organisations.
             </p>
           </div>
 
-          {/* QUALITY ASSURED CARD */}
-          <div className="flex items-start gap-4 p-4 rounded-2xl bg-cyan-500/5 dark:bg-cyan-950/20 border border-cyan-200 dark:border-cyan-500/20 max-w-sm backdrop-blur-md transition-all duration-300">
-            <div className="p-2 bg-cyan-100 dark:bg-cyan-500/10 rounded-xl border border-cyan-200 dark:border-cyan-500/30 text-cyan-600 dark:text-cyan-400">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="font-bold text-cyan-700 dark:text-cyan-300 text-sm">Quality Assured</h4>
-              <p className="text-slate-600 dark:text-zinc-300 text-xs mt-1 leading-relaxed font-semibold">
-                Every submission is manually reviewed to ensure accuracy, consistency, and athletic credibility.
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* MAIN FORM */}
@@ -751,93 +738,6 @@ export default function SubmitPerformancePage() {
                     {errors.video_link}
                   </p>
                 )}
-              </div>
-
-              {/* ADDITIONAL NOTES */}
-              <div className="lg:col-span-4 space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Additional Notes
-                </label>
-                <textarea
-                  name="aditional_notes"
-                  value={formData.aditional_notes}
-                  onChange={handleInputChange}
-                  placeholder="Any extra notes or details about the performance"
-                  rows={4}
-                  className="w-full p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-border dark:border-white/10 text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm custom-scroll resize-y"
-                />
-              </div>
-
-              {/* UPLOAD EVIDENCE FILE ZONE */}
-              <div className="lg:col-span-4 space-y-3">
-                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  Upload Evidence (Video, Photo, PDF, CSV)
-                </label>
-                
-                <div 
-                  className={`relative w-full rounded-2xl border-2 border-dashed p-8 transition-all flex flex-col items-center justify-center cursor-pointer ${
-                    dragActive 
-                      ? "border-primary dark:border-accent bg-primary/5 dark:bg-accent/5" 
-                      : evidenceFile 
-                        ? "border-emerald-500/50 bg-emerald-500/5" 
-                        : "border-border dark:border-white/20 hover:border-slate-300 dark:hover:border-white/30 bg-slate-50 dark:bg-white/5 hover:bg-slate-100/50 dark:hover:bg-white/10"
-                  }`}
-                  onDragEnter={handleDrag}
-                  onDragOver={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDrop={handleDrop}
-                  onClick={() => document.getElementById("file-upload-input").click()}
-                >
-                  <input
-                    id="file-upload-input"
-                    type="file"
-                    className="hidden"
-                    onChange={handleFileChange}
-                    accept="image/*,video/*,.pdf,.csv,.xls,.xlsx"
-                  />
-
-                  {!evidenceFile ? (
-                    <div className="flex flex-col items-center gap-3 text-center">
-                      <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-border dark:border-white/10 text-slate-500 dark:text-zinc-400">
-                        <UploadCloud className="w-6 h-6 text-slate-500 dark:text-zinc-400" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-700 dark:text-zinc-200">
-                          Drag & Drop or Click to Upload
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                          CSV, PDF, Images or Videos up to 10MB
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-4 w-full justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
-                          <FileSpreadsheet className="w-6 h-6" />
-                        </div>
-                        <div className="text-left">
-                          <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                            {evidenceFile.name}
-                          </p>
-                          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 font-semibold">
-                            {(evidenceFile.size / (1024 * 1024)).toFixed(2)} MB
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          clearFile();
-                        }}
-                        className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-500 hover:text-red-400 rounded-xl transition-all"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
               </div>
 
             </div>

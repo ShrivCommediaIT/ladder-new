@@ -488,10 +488,10 @@ export default function PerformanceDatabase() {
                 className="mt-4 bg-clip-text text-3xl font-black tracking-tight text-transparent sm:text-4xl lg:text-5xl"
                 style={{ backgroundImage: brandGradient }}
               >
-                SSP Performance Database
+                SSP Talent Board
               </h1>
               <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
-                Search and discover exceptional athletic performances from around the world.
+                Entries on the SSP Talent Board are submitted by participating clubs and organisations to help showcase emerging talent and notable sporting achievements. Interested parties are encouraged to contact the submitting club or organisation directly for further information.  SSP reserves the right to remove or hide any entry that appears unsuitable, inaccurate, incomplete, or inappropriate 
               </p>
             </div>
 

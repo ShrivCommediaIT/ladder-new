@@ -17,6 +17,7 @@ import {
   Lock,
   Mail,
   ShieldCheck,
+  Star,
   Trophy,
   UserRound,
   Users2,
@@ -306,17 +307,54 @@ export default function AuthPage({ initialMode = "login" }) {
                   Live Platform
                 </div>
 
-                <div className="space-y-5">
-                  <h1 className="max-w-md text-h11 font-extrabold leading-[0.95] text-white">
-                    Welcome
-                    <br />
-                    Back,
-                  </h1>
+                <div className="space-y-6">
+                  {/* Top Welcome Title */}
+                  <div className="space-y-2">
+                    <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                      Welcome to <br />
+                      <span className="text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]">Sports Solutions Pro</span>
+                    </h1>
 
-                  <p className="max-w-md text-p2 leading-8 text-slate-300">
-                    Manage your internal club competitions with real-time digital scoring,
-                    player tracking, bookings, and live leaderboards in one place.
-                  </p>
+                    <p className="max-w-md text-sm sm:text-base leading-relaxed text-slate-300 mt-2 font-medium">
+                      Manage your internal club competitions with real time digital score inputs, live rankings, leaderboards, ladders, mini leagues and more &ndash; perfect for coaching, motivation and self-improvement.
+                    </p>
+                  </div>
+
+                  {/* Horizontal dividing glow separator */}
+                  <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent my-6" />
+
+                  {/* Talent Board promo block */}
+                  <div className="space-y-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/10 p-5 backdrop-blur-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-cyan-400/50 bg-cyan-500/10 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+                        <Star className="h-5 w-5 fill-cyan-400/20" />
+                      </div>
+                      <h2 className="text-lg font-extrabold tracking-wide uppercase text-white">
+                        The SSP <span className="text-cyan-400">Talent Board</span>
+                      </h2>
+                    </div>
+
+                    <div className="space-y-3 text-xs sm:text-sm leading-relaxed text-slate-300 font-medium">
+                      <p>
+                        Please visit the SSP &ldquo;Talent Board&rdquo; and appreciate some of the amazing
+                        talent and achievement achieved by dedicated and talented people worldwide.
+                      </p>
+                      <p>
+                        If you are a talent scout please feel free to contact the promoter of the
+                        relevant athlete or athlete&apos;s club for more information.
+                      </p>
+                    </div>
+
+                    <div className="pt-2">
+                      <Link
+                        href="/#talent-board"
+                        className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-bold border-b border-cyan-400/40 hover:border-cyan-400 transition-all pb-0.5 text-xs sm:text-sm"
+                      >
+                        Click Here
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
 
