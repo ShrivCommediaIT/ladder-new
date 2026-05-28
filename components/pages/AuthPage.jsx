@@ -490,7 +490,7 @@ export default function AuthPage({ initialMode = "login" }) {
                                     autoComplete="name"
                                     placeholder="Enter your full name"
                                     {...field}
-                                    className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                                    className="h-[52px] px-11 rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
                                       backgroundColor: "var(--input-bg)",
                                       boxShadow: "inset 0 0 0 1px var(--input-border)",

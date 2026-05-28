@@ -369,6 +369,9 @@ export default function PlanHeading() {
           </div>
         </div>
       </section>
+            <div className="relative z-10 border-y border-border bg-background">
+        <PerformanceDatabase />
+      </div>
 
       <section id="features" className="py-24" style={{ background: "var(--landing-section-alt)" }}>
         <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
@@ -537,9 +540,7 @@ export default function PlanHeading() {
         </div>
       </section>
 
-      <div className="relative z-10 border-y border-border bg-background">
-        <PerformanceDatabase />
-      </div>
+
 
       <footer
         id="contact"

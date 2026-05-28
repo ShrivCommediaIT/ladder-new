@@ -200,14 +200,6 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                onClick={() => router.push(submitPerformancePage)}
-                className="cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/30"
-              >
-                <Key className="mr-2 h-4 w-4 text-green-600" />
-                Admin to Talent Board 
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
                 onClick={handleOpenChangePassword}
                 className="cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/30"
               >
@@ -224,6 +216,14 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
                   Register Player
                 </Link>
               )} */}
+              <DropdownMenuItem
+                onClick={() => router.push(submitPerformancePage)}
+                className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                <HelpCircle className="mr-2 h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+                Submit to Talent Board
+              </DropdownMenuItem>
+
               <DropdownMenuItem
                 onClick={() => window.open("/q-a", "_blank")}
                 className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
