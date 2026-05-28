@@ -492,7 +492,7 @@ const PlayerLevelNavbar = ({
                       <>
                         <button
                           onClick={handleDashboard}
-                          className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                          className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                         >
                           <Shield className="h-4 w-4 text-blue-400" />
                           {user?.user_type === "sub_admin" ? "Sub-Admin Dashboard" : "Admin Dashboard"}
@@ -504,7 +504,7 @@ const PlayerLevelNavbar = ({
                               router.push(createClubId);
                               setProfileOpen(false);
                             }}
-                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                           >
                             <UserCircle2 className="h-4 w-4 text-blue-400" />
                             Generate Club ID
@@ -517,7 +517,7 @@ const PlayerLevelNavbar = ({
                               setIsChangePasswordOpen(true);
                               setProfileOpen(false);
                             }}
-                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                           >
                             <Key className="h-4 w-4 text-emerald-400" />
                             Change Password
@@ -532,7 +532,7 @@ const PlayerLevelNavbar = ({
                           router.push(submitPerformancePage);
                           setProfileOpen(false);
                         }}
-                        className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                        className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                       >
                         <Trophy className="h-4 w-4 text-amber-400" />
                         Submit to Talent Board
@@ -544,7 +544,7 @@ const PlayerLevelNavbar = ({
                         window.open("/q-a", "_blank");
                         setProfileOpen(false);
                       }}
-                      className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                      className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                     >
                       <HelpCircle className="h-4 w-4 text-slate-400" />
                       Q &amp; A
@@ -554,7 +554,7 @@ const PlayerLevelNavbar = ({
 
                     <button
                       onClick={handleLogout}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-left text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
                     >
                       <LogOut className="h-4 w-4" />
                       Logout

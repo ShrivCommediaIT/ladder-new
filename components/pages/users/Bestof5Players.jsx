@@ -165,15 +165,8 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
       return;
     }
 
-    const isAdmin = user?.user_type?.toLowerCase() === "admin";
-    const isCurrentUser = String(user?.id) === String(player.id);
-
-    if (isAdmin || isCurrentUser) {
-      setSelectedPlayerId(player.id);
-      setIsModalOpen(true);
-    } else {
-      toast.warning("You can only edit your own profile");
-    }
+    setSelectedPlayerId(player.id);
+    setIsModalOpen(true);
   };
 
   return (
@@ -233,11 +226,8 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  onClick={() => canEdit && handlePlayerClick(player)}
-                  className={`flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all relative ${canEdit
-                    ? "cursor-pointer hover:bg-[#143238]"
-                    : "opacity-60 cursor-not-allowed"
-                    }`}
+                  onClick={() => handlePlayerClick(player)}
+                  className="flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all relative cursor-pointer hover:bg-[#143238]"
                   style={{
                     background: "#223848",
                     border: "2px solid #4eb0a2",
@@ -299,6 +289,7 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
           ladder_id={ladderId}
           ladder_type={ladderType}
           userLevel={true}
+          initialTab="stats"
         />
       )}
 
