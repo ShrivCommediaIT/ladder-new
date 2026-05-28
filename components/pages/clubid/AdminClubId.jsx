@@ -47,7 +47,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, X } from "lucide-react";
 
 /* ---------------- ZOD SCHEMA ---------------- */
 const formSchema = z.object({
@@ -296,32 +296,31 @@ if (
   };
 
   return (
-    <div className="flex flex-col px-4 py-10 justify-center md:flex-row gap-8 items-center md:items-stretch bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#312e81] min-h-screen">
+    <div className="flex flex-col px-4 py-10 justify-center md:flex-row gap-8 items-center md:items-stretch transition-all duration-300">
       {/* LEFT - TABLE */}
-      <Card className="md:w-1/2 w-full rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg text-white">
-        <div className="px-6 py-3 border-b border-white/20 flex justify-between ">
-          <span className="text-sm tracking-widest font-bold">
+      <Card className="md:w-1/2 w-full rounded-3xl border border-border bg-card backdrop-blur-xl shadow-lg text-foreground transition-all duration-300">
+        <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+          <span className="text-sm tracking-widest font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Section Admin List
           </span>
-          <span className="text-sm tracking-widest font-bold">
+          <span className="text-xs font-mono font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
             Club Id: {clubIdFixed}
           </span>
         </div>
 
-        <CardContent>
+        <CardContent className="pt-6">
           <Table>
             <TableHeader>
-              <TableRow className=" rounded-md hover:bg-transparent transition text-md">
-                <TableHead className="text-white font-semibold">#</TableHead>
-                <TableHead className="text-white font-semibold">
+              <TableRow className="border-b border-border hover:bg-transparent transition text-md">
+                <TableHead className="text-muted-foreground font-semibold">#</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
                   Section-admin
                 </TableHead>
-                {/* <TableHead className="text-white font-semibold">ClubId</TableHead> */}
-                <TableHead className="text-white font-semibold">
+                <TableHead className="text-muted-foreground font-semibold">
                   Section Name
                 </TableHead>
-                <TableHead className="text-white font-semibold">PIN</TableHead>
-                <TableHead className="text-white font-semibold">
+                <TableHead className="text-muted-foreground font-semibold">PIN</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
                   Action
                 </TableHead>
               </TableRow>
@@ -332,7 +331,7 @@ if (
                 <TableRow>
                   <TableCell
                     colSpan={6}
-                    className="text-center text-slate-300 py-6"
+                    className="text-center text-muted-foreground py-6"
                   >
                     No Section admin created
                   </TableCell>
@@ -341,23 +340,22 @@ if (
                 paginatedData.map((item, i) => (
                   <TableRow
                     key={i}
-                    className="hover:bg-[#155DFC]/20 transition"
+                    className="border-b border-border/50 hover:bg-primary/5 transition text-foreground"
                   >
-                    <TableCell>{startIndex + i + 1}</TableCell>
-                    <TableCell>{item.adminName}</TableCell>
-                    {/* <TableCell>{item.clubId}</TableCell> */}
-                    <TableCell>{item.sportsName}</TableCell>
-                    <TableCell className="font-mono">{item.pin}</TableCell>
+                    <TableCell className="font-semibold">{startIndex + i + 1}</TableCell>
+                    <TableCell className="font-semibold">{item.adminName}</TableCell>
+                    <TableCell className="font-semibold">{item.sportsName}</TableCell>
+                    <TableCell className="font-mono font-semibold">{item.pin}</TableCell>
                     <TableCell className="space-x-2">
                       <Button
                         onClick={() => handleEdit(item)}
-                        className="bg-blue-600 hover:bg-blue-500 cursor-pointer text-white px-6 py-1 rounded"
+                        className="bg-primary hover:bg-primary/90 text-white rounded-xl px-4 py-1 text-xs transition duration-200"
                       >
                         Edit
                       </Button>
                       <Button
                         onClick={() => handleDeleteClick(item)}
-                        className="bg-red-600 hover:bg-red-500 cursor-pointer text-white px-3 py-1 rounded"
+                        className="bg-red-500 hover:bg-red-600 text-white rounded-xl px-4 py-1 text-xs transition duration-200"
                       >
                         Delete
                       </Button>
@@ -369,21 +367,21 @@ if (
           </Table>
 
           {data.length > rowsPerPage && (
-            <div className="flex justify-between mt-4">
+            <div className="flex justify-between mt-6">
               <Button
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                className="bg-teal-800 hover:bg-teal-700 cursor-pointer"
+                className="bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-foreground border border-border rounded-xl cursor-pointer transition duration-200"
               >
                 Prev
               </Button>
-              <span className="self-center text-sm">
+              <span className="self-center text-sm font-semibold text-muted-foreground">
                 Page {currentPage} / {totalPages}
               </span>
               <Button
                 onClick={() =>
                   setCurrentPage((p) => Math.min(p + 1, totalPages))
                 }
-                className="bg-teal-800 hover:bg-teal-700 cursor-pointer"
+                className="bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-foreground border border-border rounded-xl cursor-pointer transition duration-200"
               >
                 Next
               </Button>
@@ -393,9 +391,9 @@ if (
       </Card>
 
       {/* RIGHT - CREATE FORM */}
-      <Card className="md:w-1/2 w-full rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg text-white">
+      <Card className="md:w-1/2 w-full rounded-3xl border border-border bg-card backdrop-blur-xl shadow-lg text-foreground transition-all duration-300">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl font-extrabold tracking-wide">
+          <CardTitle className="text-xl font-extrabold tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Generate Section Admin Club ID
           </CardTitle>
         </CardHeader>
@@ -411,11 +409,11 @@ if (
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Section admin Name</FormLabel>
+                    <FormLabel className="text-muted-foreground font-semibold">Section admin Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        className="h-10 bg-white text-black font-bold rounded-xl"
+                        className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold rounded-xl focus:border-primary transition-all duration-200"
                       />
                     </FormControl>
                     <FormMessage />
@@ -428,11 +426,11 @@ if (
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Section Name</FormLabel>
+                    <FormLabel className="text-muted-foreground font-semibold">Section Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        className="h-10 bg-white text-black font-bold rounded-xl"
+                        className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold rounded-xl focus:border-primary transition-all duration-200"
                       />
                     </FormControl>
                     <FormMessage />
@@ -445,12 +443,12 @@ if (
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Club ID</FormLabel>
+                    <FormLabel className="text-muted-foreground font-semibold">Club ID</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         readOnly
-                        className="h-10 bg-slate-200 text-black rounded-xl font-bold"
+                        className="h-10 bg-slate-100 dark:bg-white/10 border border-border text-muted-foreground rounded-xl font-bold cursor-not-allowed opacity-75"
                       />
                     </FormControl>
                   </FormItem>
@@ -458,8 +456,8 @@ if (
               />
 
               <FormItem>
-                <FormLabel>4 Digit PIN</FormLabel>
-                <div className="flex gap-2">
+                <FormLabel className="text-muted-foreground font-semibold">4 Digit PIN</FormLabel>
+                <div className="flex gap-2 pt-1">
                   {pinDigits.map((d, i) => (
                     <Input
                       key={i}
@@ -467,7 +465,7 @@ if (
                       maxLength={1}
                       value={d}
                       onChange={(e) => handlePinChange(i, e.target.value)}
-                      className="w-12 h-12 text-center text-black bg-white rounded-xl text-xl font-bold"
+                      className="w-12 h-12 text-center text-foreground bg-slate-50 dark:bg-white/5 border border-border rounded-xl text-xl font-bold focus:border-primary transition-all duration-200"
                     />
                   ))}
                 </div>
@@ -476,12 +474,12 @@ if (
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-xl bg-teal-800 hover:bg-teal-700 shadow-lg"
+                className="w-full rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-95 text-white shadow-lg shadow-primary/20 transition-all duration-200"
               >
                 {loading ? "Creating..." : "Generate Section Admin"}
               </Button>
               {errorMessage && (
-                <p className="text-center text-red-400 text-sm">
+                <p className="text-center text-red-500 font-semibold text-sm">
                   {errorMessage}
                 </p>
               )}
@@ -492,17 +490,17 @@ if (
 
       {/* EDIT DRAWER */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-lg bg-white shadow-lg transform transition-transform duration-300 ${isDrawerOpen ? "translate-x-0" : "translate-x-full"} z-50`}
+        className={`fixed top-0 right-0 h-full w-full max-w-md bg-card border-l border-border shadow-2xl transform transition-transform duration-300 ${isDrawerOpen ? "translate-x-0" : "translate-x-full"} z-50 text-foreground`}
       >
         <div className="p-6 flex flex-col h-full">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Edit Section Admin</h2>
-            <Button
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Edit Section Admin</h2>
+            <button
               onClick={() => setIsDrawerOpen(false)}
-              className="bg-red-500 h-8 w-8 rounded-full hover:bg-red-600 text-white px-2 py-1 cursor-pointer"
+              className="bg-primary/10 hover:bg-primary/20 text-primary h-8 w-8 rounded-full flex items-center justify-center transition-colors"
             >
-              X
-            </Button>
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           {selectedAdmin && (
@@ -511,64 +509,65 @@ if (
                 e.preventDefault();
                 handleSave();
               }}
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-6 h-full"
             >
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Admin Name
-                </label>
-                <input
-                  type="text"
-                  value={selectedAdmin.adminName}
-                  onChange={(e) =>
-                    setSelectedAdmin({
-                      ...selectedAdmin,
-                      adminName: e.target.value,
-                    })
-                  }
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-                  required
-                />
-              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-muted-foreground mb-1">
+                    Admin Name
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedAdmin.adminName}
+                    onChange={(e) =>
+                      setSelectedAdmin({
+                        ...selectedAdmin,
+                        adminName: e.target.value,
+                      })
+                    }
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-border rounded-xl px-3 py-2 text-foreground focus:border-primary focus:outline-none transition-all"
+                    required
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Section Name
-                </label>
-                <input
-                  type="text"
-                  value={selectedAdmin.sportsName}
-                  onChange={(e) =>
-                    setSelectedAdmin({
-                      ...selectedAdmin,
-                      sportsName: e.target.value,
-                    })
-                  }
-                  className="w-full border border-gray-300 rounded px-3 py-2"
-                  required
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-semibold text-muted-foreground mb-1">
+                    Section Name
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedAdmin.sportsName}
+                    onChange={(e) =>
+                      setSelectedAdmin({
+                        ...selectedAdmin,
+                        sportsName: e.target.value,
+                      })
+                    }
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-border rounded-xl px-3 py-2 text-foreground focus:border-primary focus:outline-none transition-all"
+                    required
+                  />
+                </div>
 
-
-              <div>
-                <label className="block text-sm font-medium mb-1">PIN</label>
-                <input
-                  type="text"
-                  value={selectedAdmin.pin}
-                  onChange={(e) =>
-                    setSelectedAdmin({ ...selectedAdmin, pin: e.target.value })
-                  }
-                  className="w-full border border-gray-300 rounded px-3 py-2 font-mono"
-                  maxLength={4}
-                  pattern="\d{4}"
-                  required
-                />
+                <div>
+                  <label className="block text-sm font-semibold text-muted-foreground mb-1">PIN</label>
+                  <input
+                    type="text"
+                    value={selectedAdmin.pin}
+                    onChange={(e) =>
+                      setSelectedAdmin({ ...selectedAdmin, pin: e.target.value })
+                    }
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-border rounded-xl px-3 py-2 text-foreground font-mono focus:border-primary focus:outline-none transition-all"
+                    maxLength={4}
+                    pattern="\d{4}"
+                    required
+                  />
+                </div>
               </div>
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="bg-blue-800 hover:bg-blue-700 cursor-pointer text-white px-4 py-2 rounded mt-auto"
+                className="bg-primary hover:bg-primary/95 text-white px-4 py-2 rounded-xl mt-auto shadow-lg transition duration-200"
               >
                 {loading ? "Saving..." : "Save Changes"}
               </Button>
@@ -580,25 +579,25 @@ if (
       {/* OVERLAY */}
       {isDrawerOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
           onClick={() => setIsDrawerOpen(false)}
         ></div>
       )}
 
       {/* SUCCESS DIALOG */}
       <Dialog open={successDialog} onOpenChange={setSuccessDialog}>
-        <DialogContent className="text-center">
+        <DialogContent className="text-center bg-card text-foreground border-border shadow-2xl rounded-2xl p-6 transition-all duration-300">
           <DialogHeader>
-            <CheckCircle2 className="mx-auto h-12 w-12 text-green-500" />
-            <DialogTitle>Success</DialogTitle>
-            <DialogDescription>
+            <CheckCircle2 className="mx-auto h-12 w-12 text-green-500 animate-bounce" />
+            <DialogTitle className="text-foreground">Success</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Sub Admin created successfully
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               onClick={() => setSuccessDialog(false)}
-              className="w-full bg-teal-800"
+              className="w-full bg-primary hover:bg-primary/95 text-white rounded-xl h-11 transition-all"
             >
               OK
             </Button>
@@ -608,44 +607,45 @@ if (
 
       {/* PIN ALERT */}
       <AlertDialog open={pinAlertOpen} onOpenChange={setPinAlertOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-card text-foreground border-border shadow-2xl rounded-2xl p-6 transition-all duration-300">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-600">
+            <AlertDialogTitle className="text-red-500 font-bold">
               Duplicate PIN
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-muted-foreground">
               This PIN has already been assigned to another sub-admin. Please
               use a different 4-digit PIN.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction className="bg-primary text-white hover:bg-primary/95 rounded-xl px-4 py-2 transition-all">
               OK
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* DELETE CONFIRM */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-card text-foreground border-border shadow-2xl rounded-2xl p-6 transition-all duration-300">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-600">
+            <AlertDialogTitle className="text-red-500 font-bold">
               Are you sure?
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-muted-foreground">
               Do you really want to delete this sub-admin? This action cannot be
               undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-2">
             <AlertDialogCancel asChild>
-              <Button variant="outline" className="flex-1">
+              <Button variant="outline" className="flex-1 border border-border bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-foreground rounded-xl h-11 transition-all">
                 Cancel
               </Button>
             </AlertDialogCancel>
             <AlertDialogAction asChild>
               <Button
-                className="bg-red-600 hover:bg-red-700 flex-1"
+                className="bg-red-500 hover:bg-red-600 text-white flex-1 rounded-xl h-11 transition-all"
                 onClick={handleConfirmDelete}
                 disabled={loading}
               >
@@ -656,31 +656,27 @@ if (
         </AlertDialogContent>
       </AlertDialog>
 
-
-
       {/* LOGIN PIN EXIST ALERT */}
-<AlertDialog
-  open={loginPinExistAlert}
-  onOpenChange={setLoginPinExistAlert}
->
-  <AlertDialogContent>
-    <AlertDialogHeader>
-      <AlertDialogTitle className="text-red-600">
-        Duplicate PIN
-      </AlertDialogTitle>
-
-      <AlertDialogDescription>
-        This PIN already exists. Please choose a different 4-digit PIN.
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-
-    <AlertDialogFooter>
-      <AlertDialogAction className="bg-red-600 hover:bg-red-700">
-        OK
-      </AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
+      <AlertDialog
+        open={loginPinExistAlert}
+        onOpenChange={setLoginPinExistAlert}
+      >
+        <AlertDialogContent className="bg-card text-foreground border-border shadow-2xl rounded-2xl p-6 transition-all duration-300">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-500 font-bold">
+              Duplicate PIN
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              This PIN already exists. Please choose a different 4-digit PIN.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction className="bg-primary text-white hover:bg-primary/95 rounded-xl px-4 py-2 transition-all">
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

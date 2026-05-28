@@ -7,7 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import useAuthGuard from "@/hooks/useAuthGuard";
-import UserDetails from "@/components/shared/UserDetails";
+import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
 import { postFormData } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 
@@ -320,44 +320,31 @@ export default function SubmitPerformancePage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-[#05070f] via-[#0c1224] to-black text-white py-6">
+    <div className="min-h-screen w-full bg-gradient-to-b from-[#f4faff] to-[#e8f3fc] dark:from-[#05101E] dark:via-[#091829] dark:to-[#05070f] text-foreground pb-6 transition-colors duration-300">
+      <PlayerLevelNavbar />
       <ToastContainer position="top-right" autoClose={3000} theme="dark" hideProgressBar />
 
-      {/* TOP HEADER */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-8 flex justify-between items-center border-b border-white/5 pb-4">
-        <button 
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-sm font-medium border border-white/10"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
-        </button>
-        <div>
-          <UserDetails />
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8">
         {/* HEADER INFORMATION CARD */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-300 to-fuchsia-300 text-transparent bg-clip-text mb-2">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-[#0284C7] to-accent bg-clip-text text-transparent mb-2">
               Submit a Performance Result
             </h1>
-            <p className="text-zinc-400 text-sm sm:text-base max-w-2xl">
+            <p className="text-muted-foreground text-sm sm:text-base max-w-2xl font-semibold">
               Share exceptional athletic performances and help identify the world's best.
               All submissions are reviewed by SSP before being published.
             </p>
           </div>
 
           {/* QUALITY ASSURED CARD */}
-          <div className="flex items-start gap-4 p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/20 max-w-sm backdrop-blur-md">
-            <div className="p-2 bg-cyan-500/10 rounded-xl border border-cyan-500/30 text-cyan-400">
+          <div className="flex items-start gap-4 p-4 rounded-2xl bg-cyan-500/5 dark:bg-cyan-950/20 border border-cyan-200 dark:border-cyan-500/20 max-w-sm backdrop-blur-md transition-all duration-300">
+            <div className="p-2 bg-cyan-100 dark:bg-cyan-500/10 rounded-xl border border-cyan-200 dark:border-cyan-500/30 text-cyan-600 dark:text-cyan-400">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-cyan-300 text-sm">Quality Assured</h4>
-              <p className="text-zinc-300 text-xs mt-1 leading-relaxed">
+              <h4 className="font-bold text-cyan-700 dark:text-cyan-300 text-sm">Quality Assured</h4>
+              <p className="text-slate-600 dark:text-zinc-300 text-xs mt-1 leading-relaxed font-semibold">
                 Every submission is manually reviewed to ensure accuracy, consistency, and athletic credibility.
               </p>
             </div>
@@ -366,9 +353,9 @@ export default function SubmitPerformancePage() {
 
         {/* MAIN FORM */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-6 sm:p-8 shadow-2xl space-y-8">
-            <div className="border-b border-white/5 pb-4">
-              <h3 className="text-lg sm:text-xl font-bold text-white tracking-wide">
+          <div className="rounded-2xl bg-card border border-border backdrop-blur-xl p-6 sm:p-8 shadow-2xl space-y-8 transition-all duration-300">
+            <div className="border-b border-border pb-4">
+              <h3 className="text-lg sm:text-xl font-bold text-foreground tracking-wide">
                 Athlete & Performance Details
               </h3>
             </div>
@@ -378,26 +365,26 @@ export default function SubmitPerformancePage() {
               
               {/* SPORT */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Sport <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Sport <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="sport"
                   value={formData.sport}
                   onChange={(e) => handleSelectChange("sport", e.target.value)}
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.sport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.sport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
-                  <option value="" className="bg-[#0c1224] text-zinc-400">Select Sport</option>
+                  <option value="" className="bg-white dark:bg-[#0c1224] text-slate-400 dark:text-zinc-400">Select Sport</option>
                   {sportsList.map(sport => (
-                    <option key={sport} value={sport} className="bg-[#0c1224] text-white">
+                    <option key={sport} value={sport} className="bg-white dark:bg-[#0c1224] text-slate-800 dark:text-white">
                       {sport}
                     </option>
                   ))}
                 </select>
                 {errors.sport && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.sport}
                   </p>
@@ -407,8 +394,8 @@ export default function SubmitPerformancePage() {
               {/* CUSTOM SPORT IF OTHER */}
               {formData.sport === "Other" && (
                 <div className="space-y-2">
-                  <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                    Custom Sport Name <span className="text-red-400">*</span>
+                  <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Custom Sport Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -416,12 +403,12 @@ export default function SubmitPerformancePage() {
                     value={formData.customSport}
                     onChange={handleInputChange}
                     placeholder="Enter custom sport"
-                    className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                      errors.customSport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                    } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                    className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                      errors.customSport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                   />
                   {errors.customSport && (
-                    <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       {errors.customSport}
                     </p>
@@ -431,8 +418,8 @@ export default function SubmitPerformancePage() {
 
               {/* ACTIVITY / EVENT / TEST */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Activity / Event / Test <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Activity / Event / Test <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -440,12 +427,12 @@ export default function SubmitPerformancePage() {
                   value={formData.activity}
                   onChange={handleInputChange}
                   placeholder="Select or enter activity"
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.activity ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.activity ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.activity && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.activity}
                   </p>
@@ -454,8 +441,8 @@ export default function SubmitPerformancePage() {
 
               {/* RESULT */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Result <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Result <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -463,12 +450,12 @@ export default function SubmitPerformancePage() {
                   value={formData.result}
                   onChange={handleInputChange}
                   placeholder="Enter result (e.g. 40)"
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.result ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.result ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.result && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.result}
                   </p>
@@ -477,26 +464,26 @@ export default function SubmitPerformancePage() {
 
               {/* UNIT */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Unit <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Unit <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="unit"
                   value={formData.unit}
                   onChange={(e) => handleSelectChange("unit", e.target.value)}
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.unit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.unit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
-                  <option value="" className="bg-[#0c1224] text-zinc-400">Select unit</option>
+                  <option value="" className="bg-white dark:bg-[#0c1224] text-slate-400 dark:text-zinc-400">Select unit</option>
                   {unitsList.map(unit => (
-                    <option key={unit} value={unit} className="bg-[#0c1224] text-white">
+                    <option key={unit} value={unit} className="bg-white dark:bg-[#0c1224] text-slate-800 dark:text-white">
                       {unit}
                     </option>
                   ))}
                 </select>
                 {errors.unit && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.unit}
                   </p>
@@ -506,8 +493,8 @@ export default function SubmitPerformancePage() {
               {/* CUSTOM UNIT IF OTHER */}
               {formData.unit === "Other" && (
                 <div className="space-y-2">
-                  <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                    Custom Unit <span className="text-red-400">*</span>
+                  <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Custom Unit <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -515,12 +502,12 @@ export default function SubmitPerformancePage() {
                     value={formData.customUnit}
                     onChange={handleInputChange}
                     placeholder="Enter custom unit"
-                    className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                      errors.customUnit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                    } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                    className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                      errors.customUnit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                   />
                   {errors.customUnit && (
-                    <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                    <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       {errors.customUnit}
                     </p>
@@ -530,8 +517,8 @@ export default function SubmitPerformancePage() {
 
               {/* ATHLETE FULL NAME */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Athlete Full Name <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Athlete Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -539,12 +526,12 @@ export default function SubmitPerformancePage() {
                   value={formData.full_name}
                   onChange={handleInputChange}
                   placeholder="Enter athlete full name"
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.full_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.full_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.full_name && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.full_name}
                   </p>
@@ -553,8 +540,8 @@ export default function SubmitPerformancePage() {
 
               {/* AGE */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Age <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Age <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -564,12 +551,12 @@ export default function SubmitPerformancePage() {
                   placeholder="Enter age"
                   min="1"
                   max="120"
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.age ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.age ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.age && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.age}
                   </p>
@@ -578,20 +565,20 @@ export default function SubmitPerformancePage() {
 
               {/* DATE OF PERFORMANCE */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300 flex items-center gap-1">
-                  Date of Performance <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  Date of Performance <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
                   name="date_of_performance"
                   value={formData.date_of_performance}
                   onChange={handleInputChange}
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.date_of_performance ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm scheme-dark`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.date_of_performance ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm dark:scheme-dark`}
                 />
                 {errors.date_of_performance && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.date_of_performance}
                   </p>
@@ -600,24 +587,24 @@ export default function SubmitPerformancePage() {
 
               {/* GENDER */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Gender <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Gender <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="gender"
                   value={formData.gender}
                   onChange={(e) => handleSelectChange("gender", e.target.value)}
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.gender ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.gender ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
-                  <option value="" className="bg-[#0c1224] text-zinc-400">Select gender</option>
-                  <option value="male" className="bg-[#0c1224] text-white">Male</option>
-                  <option value="female" className="bg-[#0c1224] text-white">Female</option>
-                  <option value="other" className="bg-[#0c1224] text-white">Other</option>
+                  <option value="" className="bg-white dark:bg-[#0c1224] text-slate-400 dark:text-zinc-400">Select gender</option>
+                  <option value="male" className="bg-white dark:bg-[#0c1224] text-slate-800 dark:text-white">Male</option>
+                  <option value="female" className="bg-white dark:bg-[#0c1224] text-slate-800 dark:text-white">Female</option>
+                  <option value="other" className="bg-white dark:bg-[#0c1224] text-slate-800 dark:text-white">Other</option>
                 </select>
                 {errors.gender && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.gender}
                   </p>
@@ -626,26 +613,26 @@ export default function SubmitPerformancePage() {
 
               {/* COUNTRY */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Country <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Country <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="country"
                   value={formData.country}
                   onChange={(e) => handleSelectChange("country", e.target.value)}
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.country ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.country ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
-                  <option value="" className="bg-[#0c1224] text-zinc-400">Select country</option>
+                  <option value="" className="bg-white dark:bg-[#0c1224] text-slate-400 dark:text-zinc-400">Select country</option>
                   {countries.map(country => (
-                    <option key={country} value={country} className="bg-[#0c1224] text-white">
+                    <option key={country} value={country} className="bg-white dark:bg-[#0c1224] text-slate-800 dark:text-white">
                       {country}
                     </option>
                   ))}
                 </select>
                 {errors.country && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.country}
                   </p>
@@ -654,7 +641,7 @@ export default function SubmitPerformancePage() {
 
               {/* CLUB / TEAM */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Club / Team
                 </label>
                 <input
@@ -663,14 +650,14 @@ export default function SubmitPerformancePage() {
                   value={formData.club_name}
                   onChange={handleInputChange}
                   placeholder="Enter club or team"
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-border dark:border-white/10 text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm"
                 />
               </div>
 
               {/* COACH / SUBMITTER NAME */}
               <div className="lg:col-span-2 space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Coach / Submitter Name <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Coach / Submitter Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -678,12 +665,12 @@ export default function SubmitPerformancePage() {
                   value={formData.coach_name}
                   onChange={handleInputChange}
                   placeholder="Enter your full name"
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.coach_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.coach_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.coach_name && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.coach_name}
                   </p>
@@ -692,8 +679,8 @@ export default function SubmitPerformancePage() {
 
               {/* EMAIL ADDRESS */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
-                  Email Address <span className="text-red-400">*</span>
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -701,12 +688,12 @@ export default function SubmitPerformancePage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Enter your email"
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.email ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.email ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.email && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.email}
                   </p>
@@ -715,7 +702,7 @@ export default function SubmitPerformancePage() {
 
               {/* VENUE / LOCATION */}
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Venue / Location
                 </label>
                 <input
@@ -724,13 +711,13 @@ export default function SubmitPerformancePage() {
                   value={formData.venue}
                   onChange={handleInputChange}
                   placeholder="Enter venue or location"
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-border dark:border-white/10 text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm"
                 />
               </div>
 
               {/* WIND / CONDITIONS */}
               <div className="lg:col-span-2 space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Wind / Conditions (if applicable)
                 </label>
                 <input
@@ -739,13 +726,13 @@ export default function SubmitPerformancePage() {
                   value={formData.wind}
                   onChange={handleInputChange}
                   placeholder="e.g. +1.2m/s, Indoor, etc."
-                  className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm"
+                  className="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-border dark:border-white/10 text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm"
                 />
               </div>
 
               {/* VIDEO LINK */}
               <div className="lg:col-span-4 space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Video Link (YouTube / Vimeo / Drive)
                 </label>
                 <input
@@ -754,12 +741,12 @@ export default function SubmitPerformancePage() {
                   value={formData.video_link}
                   onChange={handleInputChange}
                   placeholder="Enter video link URL"
-                  className={`w-full h-12 px-4 rounded-xl bg-white/5 border ${
-                    errors.video_link ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-white/10 focus:border-cyan-400 focus:ring-cyan-400/20"
-                  } text-white placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
+                    errors.video_link ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.video_link && (
-                  <p className="text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {errors.video_link}
                   </p>
@@ -768,7 +755,7 @@ export default function SubmitPerformancePage() {
 
               {/* ADDITIONAL NOTES */}
               <div className="lg:col-span-4 space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Additional Notes
                 </label>
                 <textarea
@@ -777,23 +764,23 @@ export default function SubmitPerformancePage() {
                   onChange={handleInputChange}
                   placeholder="Any extra notes or details about the performance"
                   rows={4}
-                  className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none transition-all text-sm custom-scroll resize-y"
+                  className="w-full p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-border dark:border-white/10 text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm custom-scroll resize-y"
                 />
               </div>
 
               {/* UPLOAD EVIDENCE FILE ZONE */}
               <div className="lg:col-span-4 space-y-3">
-                <label className="text-xs sm:text-sm font-semibold text-zinc-300">
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
                   Upload Evidence (Video, Photo, PDF, CSV)
                 </label>
                 
                 <div 
                   className={`relative w-full rounded-2xl border-2 border-dashed p-8 transition-all flex flex-col items-center justify-center cursor-pointer ${
                     dragActive 
-                      ? "border-cyan-400 bg-cyan-400/5" 
+                      ? "border-primary dark:border-accent bg-primary/5 dark:bg-accent/5" 
                       : evidenceFile 
                         ? "border-emerald-500/50 bg-emerald-500/5" 
-                        : "border-white/20 hover:border-white/30 bg-white/5 hover:bg-white/10"
+                        : "border-border dark:border-white/20 hover:border-slate-300 dark:hover:border-white/30 bg-slate-50 dark:bg-white/5 hover:bg-slate-100/50 dark:hover:bg-white/10"
                   }`}
                   onDragEnter={handleDrag}
                   onDragOver={handleDrag}
@@ -811,14 +798,14 @@ export default function SubmitPerformancePage() {
 
                   {!evidenceFile ? (
                     <div className="flex flex-col items-center gap-3 text-center">
-                      <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 text-zinc-400">
-                        <UploadCloud className="w-6 h-6 text-zinc-400" />
+                      <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-border dark:border-white/10 text-slate-500 dark:text-zinc-400">
+                        <UploadCloud className="w-6 h-6 text-slate-500 dark:text-zinc-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-zinc-200">
+                        <p className="text-sm font-bold text-slate-700 dark:text-zinc-200">
                           Drag & Drop or Click to Upload
                         </p>
-                        <p className="text-xs text-zinc-400 mt-1">
+                        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
                           CSV, PDF, Images or Videos up to 10MB
                         </p>
                       </div>
@@ -826,14 +813,14 @@ export default function SubmitPerformancePage() {
                   ) : (
                     <div className="flex items-center gap-4 w-full justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 text-emerald-400">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
                           <FileSpreadsheet className="w-6 h-6" />
                         </div>
                         <div className="text-left">
-                          <p className="text-sm font-bold text-emerald-400">
+                          <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                             {evidenceFile.name}
                           </p>
-                          <p className="text-xs text-zinc-400 mt-0.5">
+                          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5 font-semibold">
                             {(evidenceFile.size / (1024 * 1024)).toFixed(2)} MB
                           </p>
                         </div>
@@ -844,7 +831,7 @@ export default function SubmitPerformancePage() {
                           e.stopPropagation();
                           clearFile();
                         }}
-                        className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 hover:text-red-300 rounded-xl transition-all"
+                        className="p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-500 hover:text-red-400 rounded-xl transition-all"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -856,18 +843,18 @@ export default function SubmitPerformancePage() {
             </div>
 
             {/* ACTION BUTTONS */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-white/5">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border">
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="flex-1 h-14 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-bold rounded-xl shadow-lg transition-all"
+                className="flex-1 h-14 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-border dark:border-white/10 dark:hover:border-white/20 text-slate-700 dark:text-white font-bold rounded-xl shadow-lg transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 h-14 bg-gradient-to-r from-cyan-400 via-teal-500 to-fuchsia-500 text-white font-extrabold rounded-xl shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:opacity-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                className="flex-1 h-14 bg-gradient-to-r from-primary via-[#0284C7] to-accent text-white font-extrabold rounded-xl shadow-lg shadow-primary/20 dark:shadow-accent/20 hover:opacity-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
