@@ -331,13 +331,13 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate text-h5 font-semibold text-[var(--best-board-text)]">{player?.name || "N/A"}</p>
-                        {player.age && (
-                          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)] border border-white/10">
+                        {player.age !== null && player.age !== undefined && player.age !== "" && (
+                          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white border border-white/10">
                             Age : {player.age}
                           </span>
                         )}
                         {player.gender && (
-                          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)] border border-white/10">
+                          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white border border-white/10">
                             Gender: {player.gender === "male" ? "M" : "F"}
                           </span>
                         )}

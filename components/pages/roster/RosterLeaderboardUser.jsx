@@ -49,31 +49,21 @@ const PlayerCard = ({ player, rank, currentUser, onClick }) => {
         <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
           {player?.token_status && (
             <span
-              className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-white/5 border-white/10 text-white"
+              className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full best-board-tag-soft"
             >
               Status: {player.token_status}
             </span>
           )}
-          {player.age && (
+          {player.age !== null && player.age !== undefined && player.age !== "" && (
             <span
-              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white text-dark-theme border border-white/20"
-              style={{
-                background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
-                border: "1px solid var(--best-board-border-strong)",
-              }}
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap best-board-tag-accent"
             >
               Age : {player.age}
             </span>
           )}
-          {player.gender && (
+          {!!player.gender && (
             <span
-              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-white text-dark-theme border border-white/20"
-              style={{
-                background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
-                border: "1px solid var(--best-board-border-strong)",
-              }}
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap best-board-tag-accent"
             >
               Gender: {player.gender === "male" ? "M" : "F"}
             </span>
@@ -99,15 +89,14 @@ const PlayerCard = ({ player, rank, currentUser, onClick }) => {
           <div className="flex-1 min-w-0">
             {/* Player name */}
             <div
-              className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight text-white"
+              className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight best-board-text"
             >
               {player?.name || "N/A"}
             </div>
 
             {/* Phone */}
             <div
-              className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight"
-              style={{ color: "var(--best-board-muted)" }}
+              className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight best-board-muted"
             >
               {player?.phone || "N/A"}
             </div>
@@ -115,8 +104,10 @@ const PlayerCard = ({ player, rank, currentUser, onClick }) => {
             {/* Tokens Section */}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] sm:text-xs" style={{ color: "var(--best-board-muted)" }}>Today:</span>
-                <span className="text-xs sm:text-sm font-bold text-white bg-white/5 border border-white/10 px-2 py-0.5 rounded">
+                <span className="text-[10px] sm:text-xs best-board-muted">Today:</span>
+                <span
+                  className="text-xs sm:text-sm font-bold px-2 py-0.5 rounded best-board-tag-soft"
+                >
                   {player?.today_token ?? "0"}
                 </span>
               </div>

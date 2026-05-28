@@ -600,6 +600,22 @@ body {
   color: var(--best-board-muted);
 }
 
+.best-board-text {
+  color: var(--best-board-text);
+}
+
+.best-board-tag-accent {
+  background: var(--best-board-accent-soft);
+  color: white;
+  border: 1px solid var(--best-board-border-strong);
+}
+
+.best-board-tag-soft {
+  background: var(--best-board-surface-soft);
+  color: var(--best-board-text);
+  border: 1px solid var(--best-board-border);
+}
+
 .best-board-highlight {
   color: var(--best-board-highlight);
 }
