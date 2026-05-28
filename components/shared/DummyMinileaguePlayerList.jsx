@@ -111,11 +111,11 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.age}
+              Age : {player.age}
             </span>
           )}
           {player.gender && (
@@ -123,11 +123,11 @@ const PlayerCard = ({ player, rank, canEdit, isAllowed, isBlank, onClick, groupS
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              {player.gender == "male" ? "M" : "F"}
+              Gender: {player.gender === "male" ? "M" : "F"}
             </span>
           )}
         </div>

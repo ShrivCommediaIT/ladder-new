@@ -121,7 +121,7 @@ const PlayerCard = ({ player, overallRank, showAgeRank, ageRank, onSkillClick, i
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
@@ -133,7 +133,7 @@ const PlayerCard = ({ player, overallRank, showAgeRank, ageRank, onSkillClick, i
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >

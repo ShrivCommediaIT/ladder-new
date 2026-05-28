@@ -78,7 +78,7 @@ const DefaultPlayerCard = ({ player, rank }) => {
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
@@ -90,7 +90,7 @@ const DefaultPlayerCard = ({ player, rank }) => {
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
@@ -203,7 +203,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
@@ -215,7 +215,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
@@ -378,7 +378,7 @@ const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true,
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
@@ -390,7 +390,7 @@ const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true,
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
@@ -604,7 +604,7 @@ const RosterPlayerCard = ({ player, rank }) => {
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
@@ -616,7 +616,7 @@ const RosterPlayerCard = ({ player, rank }) => {
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
                 background: "var(--best-board-accent-soft)",
-                color: "var(--best-board-highlight)",
+                color: "white",
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
