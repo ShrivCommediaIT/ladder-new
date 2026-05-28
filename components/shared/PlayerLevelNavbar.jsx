@@ -627,7 +627,9 @@ const PlayerLevelNavbar = ({
                     Change Password
                   </button>
                 )}
-              </>
+              </>    
+
+              
             )}
 
             {/* Submit to Talent Board (Admin/Sub-Admin only) */}
