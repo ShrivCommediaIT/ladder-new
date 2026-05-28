@@ -29,7 +29,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { clubIdPage, subAdminPage, adminPage, createClubId } from "@/helper/RouteName";
+import { clubIdPage, subAdminPage, adminPage, createClubId, submitPerformancePage } from "@/helper/RouteName";
 import { resetUserState } from "@/redux/slices/userSlice";
 import ChangePassword from "@/components/pages/admin/ChangePassword";
 import {
@@ -526,6 +526,19 @@ const PlayerLevelNavbar = ({
                       </>
                     )}
 
+                    {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
+                      <button
+                        onClick={() => {
+                          router.push(submitPerformancePage);
+                          setProfileOpen(false);
+                        }}
+                        className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                      >
+                        <HelpCircle className="h-4 w-4 text-slate-400" />
+                        Submit to Talent Board
+                      </button>
+                    )}
+
                     <button
                       onClick={() => {
                         window.open("/q-a", "_blank");
@@ -615,6 +628,20 @@ const PlayerLevelNavbar = ({
                   </button>
                 )}
               </>
+            )}
+
+            {/* Submit to Talent Board (Admin/Sub-Admin only) */}
+            {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
+              <button
+                onClick={() => {
+                  router.push(submitPerformancePage);
+                  setMobileOpen(false);
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors text-left"
+              >
+                <HelpCircle className="h-4 w-4 text-slate-400" />
+                Submit to Talent Board
+              </button>
             )}
 
             {/* Q & A Link */}
