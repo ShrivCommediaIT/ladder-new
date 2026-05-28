@@ -11,6 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -38,9 +45,9 @@ const registerSchema = z
   .object({
     name: z.string().min(1, "Full name is required"),
     dob: z.date().optional(),
-    username: z.string().min(1, "Username is required"),
     password: z.string().regex(/^\d{6}$/, "PIN must be 6 digits"),
     confirmPassword: z.string().min(1, "Confirm your PIN"),
+    gender: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "PINs do not match",
@@ -106,9 +113,9 @@ export default function LoginUser({ ladderId, ladderType }) {
     defaultValues: {
       name: "",
       dob: undefined,
-      username: "",
       password: "",
       confirmPassword: "",
+      gender: "male",
     },
   });
   const { errors: loginErrors } = loginForm.formState;
@@ -199,7 +206,7 @@ export default function LoginUser({ ladderId, ladderType }) {
 
     try {
       await postRequest(API_ENDPOINTS.REGISTER, {
-        user_id: values.username,
+        user_id: values.name,
         password: values.password,
         name: values.name,
         user_type: "user",
@@ -207,6 +214,7 @@ export default function LoginUser({ ladderId, ladderType }) {
         ladder_type: finalLadderType,
         age: age,
         dob: dobString,
+        gender: finalLadderType !== "minileague" ? values.gender : undefined,
       });
 
       toast.success("Account created successfully!");
@@ -378,36 +386,125 @@ export default function LoginUser({ ladderId, ladderType }) {
                       </TabButton>
                     </div>
 
-                  {/* Username */}
-                  <div className="mb-6">
-                    <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
-                      {mode === "login" ? "Username" : "Name"}
-                    </Label>
-                    <Input
-                      value={mode === "login" ? loginForm.watch("username") : registerForm.watch("name")}
-                      onChange={(e) => mode === "login" ? loginForm.setValue("username", e.target.value) : registerForm.setValue("name", e.target.value)}
-                      className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
-                      style={{
-                        backgroundColor: "var(--input-bg)",
-                        boxShadow: "inset 0 0 0 1px var(--input-border)",
-                      }}
-                      placeholder={mode === "login" ? "Enter your username" : "Enter your full name"}
-                    />
-                    {mode === "login" ? (
-                      loginErrors.username?.message && (
-                        <p className="text-red-400 text-xs mt-1">{loginErrors.username.message}</p>
-                      )
-                    ) : (
-                      registerErrors.name?.message && (
-                        <p className="text-red-400 text-xs mt-1">{registerErrors.name.message}</p>
-                      )
-                    )}
-                  </div>
+                  {mode === "login" ? (
+                    <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
+                      {/* Username */}
+                      <div>
+                        <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
+                          Username
+                        </Label>
+                        <Input
+                          {...loginForm.register("username")}
+                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                          style={{
+                            backgroundColor: "var(--input-bg)",
+                            boxShadow: "inset 0 0 0 1px var(--input-border)",
+                          }}
+                          placeholder="Enter your username"
+                        />
+                        {loginErrors.username?.message && (
+                          <p className="text-red-400 text-xs mt-1">{loginErrors.username.message}</p>
+                        )}
+                      </div>
 
-                  {mode === "register" && (
-                    <>
+                      {/* PIN */}
+                      <div className="relative">
+                        <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
+                          PIN
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            type={showLoginPassword ? "text" : "password"}
+                            {...loginForm.register("password")}
+                            onChange={(e) => loginForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 6))}
+                            maxLength={6}
+                            className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                            style={{
+                              backgroundColor: "var(--input-bg)",
+                              boxShadow: "inset 0 0 0 1px var(--input-border)",
+                            }}
+                            placeholder="Enter your 6 digit PIN"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowLoginPassword(!showLoginPassword)}
+                            className="absolute right-3 top-3 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
+                          >
+                            {showLoginPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
+                          </button>
+                        </div>
+                        {loginErrors.password?.message && (
+                          <p className="text-red-400 text-xs mt-1">{loginErrors.password.message}</p>
+                        )}
+                      </div>
+
+                      {/* Login Button */}
+                      <Button
+                        type="submit"
+                        className="h-[52px] w-full rounded-2xl text-base font-bold text-white mt-4"
+                        style={{
+                          background: "linear-gradient(135deg, var(--landing-primary), var(--landing-secondary))",
+                          boxShadow: brandButtonShadow,
+                        }}
+                        disabled={loading}
+                      >
+                        {loading ? "Logging in..." : "Login"}
+                        {!loading && <ArrowRight className="h-5 w-5 ml-2 inline" />}
+                      </Button>
+                    </form>
+                  ) : (
+                    <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-5">
+                      {/* Name */}
+                      <div>
+                        <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
+                          Name
+                        </Label>
+                        <Input
+                          {...registerForm.register("name")}
+                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                          style={{
+                            backgroundColor: "var(--input-bg)",
+                            boxShadow: "inset 0 0 0 1px var(--input-border)",
+                          }}
+                          placeholder="Enter your full name"
+                        />
+                        {registerErrors.name?.message && (
+                          <p className="text-red-400 text-xs mt-1">{registerErrors.name.message}</p>
+                        )}
+                      </div>
+
+                      {/* Gender Selection */}
+                      {finalLadderType !== "minileague" && (
+                        <div>
+                          <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
+                            Gender
+                          </Label>
+                          <Select
+                            value={registerForm.watch("gender")}
+                            onValueChange={(val) => registerForm.setValue("gender", val)}
+                          >
+                            <SelectTrigger
+                              className="w-full h-[52px] rounded-2xl border-0 text-foreground focus-visible:ring-2"
+                              style={{
+                                backgroundColor: "var(--input-bg)",
+                                boxShadow: "inset 0 0 0 1px var(--input-border)",
+                              }}
+                            >
+                              <SelectValue placeholder="Select Gender" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-popover border-border text-foreground">
+                              <SelectItem className="focus:bg-accent focus:text-accent-foreground text-foreground cursor-pointer" value="male">Male</SelectItem>
+                              <SelectItem className="focus:bg-accent focus:text-accent-foreground text-foreground cursor-pointer" value="female">Female</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {registerErrors.gender?.message && (
+                            <p className="text-red-400 text-xs mt-1">{registerErrors.gender.message}</p>
+                          )}
+                        </div>
+                      )}
+
                       {/* Date of Birth */}
-                      <div className="mb-6">
+                      <div>
                         <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
                           Date of Birth
                         </Label>
@@ -426,130 +523,84 @@ export default function LoginUser({ ladderId, ladderType }) {
                           <p className="text-red-400 text-xs mt-1">{registerErrors.dob.message}</p>
                         )}
                       </div>
-                    </>
-                  )}
 
-                  {/* Password */}
-                  <div className="mb-8 relative">
-                    <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
-                      {mode === "login" ? "PIN" : "Username"}
-                    </Label>
-
-                    <Input
-                      type={mode === "login" ? (showLoginPassword ? "text" : "password") : "text"}
-                      value={mode === "login" ? loginForm.watch("password") : registerForm.watch("username")}
-                      onChange={(e) => mode === "login" ? loginForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 6)) : registerForm.setValue("username", e.target.value)}
-                      maxLength={mode === "login" ? 6 : undefined}
-                      className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
-                      style={{
-                        backgroundColor: "var(--input-bg)",
-                        boxShadow: "inset 0 0 0 1px var(--input-border)",
-                      }}
-                      placeholder={mode === "login" ? "Enter your 6 digit PIN" : "Choose a username"}
-                    />
-
-                    {mode === "login" && (
-                      <button
-                        type="button"
-                        onClick={() => setShowLoginPassword(!showLoginPassword)}
-                        className="absolute right-3 top-9 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
-                      >
-                        {showLoginPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
-                      </button>
-                    )}
-
-                    {mode === "login" ? (
-                      loginErrors.password?.message && (
-                        <p className="text-red-400 text-xs mt-1">{loginErrors.password.message}</p>
-                      )
-                    ) : (
-                      registerErrors.username?.message && (
-                        <p className="text-red-400 text-xs mt-1">{registerErrors.username.message}</p>
-                      )
-                    )}
-                  </div>
-
-                  {mode === "register" && (
-                    <>
                       {/* PIN */}
-                      <div className="mb-8 relative">
+                      <div className="relative">
                         <Label className="text-p3 block mb-2.5 font-semibold text-slate-200">
                           PIN
                         </Label>
-
-                        <Input
-                          type={showRegisterPassword ? "text" : "password"}
-                          value={registerForm.watch("password")}
-                          onChange={(e) => registerForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 6))}
-                          maxLength={6}
-                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
-                          style={{
-                            backgroundColor: "var(--input-bg)",
-                            boxShadow: "inset 0 0 0 1px var(--input-border)",
-                          }}
-                          placeholder="Create a 6 digit PIN"
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                          className="absolute right-3 top-9 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
-                        >
-                          {showRegisterPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
-                        </button>
-
+                        <div className="relative">
+                          <Input
+                            type={showRegisterPassword ? "text" : "password"}
+                            {...registerForm.register("password")}
+                            onChange={(e) => registerForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 6))}
+                            maxLength={6}
+                            className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                            style={{
+                              backgroundColor: "var(--input-bg)",
+                              boxShadow: "inset 0 0 0 1px var(--input-border)",
+                            }}
+                            placeholder="Create a 6 digit PIN"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                            className="absolute right-3 top-3 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
+                          >
+                            {showRegisterPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
+                          </button>
+                        </div>
                         {registerErrors.password?.message && (
                           <p className="text-red-400 text-xs mt-1">{registerErrors.password.message}</p>
                         )}
                       </div>
 
                       {/* Confirm PIN */}
-                      <div className="mb-8 relative">
+                      <div className="relative">
                         <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
                           Confirm PIN
                         </Label>
-
-                        <Input
-                          type={showConfirmPassword ? "text" : "password"}
-                          value={registerForm.watch("confirmPassword")}
-                          onChange={(e) => registerForm.setValue("confirmPassword", e.target.value.replace(/\D/g, "").slice(0, 6))}
-                          maxLength={6}
-                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
-                          style={{
-                            backgroundColor: "var(--input-bg)",
-                            boxShadow: "inset 0 0 0 1px var(--input-border)",
-                          }}
-                          placeholder="Confirm your 6 digit PIN"
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-9 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
-                        >
-                          {showConfirmPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
-                        </button>
-
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            {...registerForm.register("confirmPassword")}
+                            onChange={(e) => registerForm.setValue("confirmPassword", e.target.value.replace(/\D/g, "").slice(0, 6))}
+                            maxLength={6}
+                            className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                            style={{
+                              backgroundColor: "var(--input-bg)",
+                              boxShadow: "inset 0 0 0 1px var(--input-border)",
+                            }}
+                            placeholder="Confirm your 6 digit PIN"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-3 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
+                          >
+                            {showConfirmPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
+                          </button>
+                        </div>
                         {registerErrors.confirmPassword?.message && (
                           <p className="text-red-400 text-xs mt-1">{registerErrors.confirmPassword.message}</p>
                         )}
                       </div>
-                    </>
-                  )}
 
-                  {/* Button */}
-                  <Button
-                    className="h-[52px] w-full rounded-2xl text-base font-bold text-white"
-                    style={{
-                      background: "linear-gradient(135deg, var(--landing-primary), var(--landing-secondary))",
-                      boxShadow: brandButtonShadow,
-                    }}
-                    onClick={mode === "login" ? loginForm.handleSubmit(onLoginSubmit) : registerForm.handleSubmit(onRegisterSubmit)}
-                    disabled={loading}
-                  >
-                    {loading ? (mode === "login" ? "Logging in..." : "Creating account...") : (mode === "login" ? "Login" : "Register")}
-                    {!loading && <ArrowRight className="h-5 w-5" />}
-                  </Button>
+                      {/* Register Button */}
+                      <Button
+                        type="submit"
+                        className="h-[52px] w-full rounded-2xl text-base font-bold text-white mt-4"
+                        style={{
+                          background: "linear-gradient(135deg, var(--landing-primary), var(--landing-secondary))",
+                          boxShadow: brandButtonShadow,
+                        }}
+                        disabled={loading}
+                      >
+                        {loading ? "Creating account..." : "Register"}
+                        {!loading && <ArrowRight className="h-5 w-5" />}
+                      </Button>
+                    </form>
+                  )}
                 </CardContent>
               </Card>
             </div>
