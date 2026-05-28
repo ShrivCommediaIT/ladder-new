@@ -85,7 +85,7 @@ export default function AdminClubId() {
     setDeleteDialogOpen(true); // open confirmation dialog
   };
 
-  
+
 
   const handleConfirmDelete = async () => {
     if (!adminToDelete?.id) {
@@ -99,7 +99,7 @@ export default function AdminClubId() {
       const res = await getRequest("/app/user/delete", { id: adminToDelete.id });
 
       if (res?.status === 200 || res?.status === true) {
-         await fetchSubAdmins();
+        await fetchSubAdmins();
       } else {
         toast.error(res?.message || "Delete failed");
       }
@@ -126,45 +126,45 @@ export default function AdminClubId() {
   });
 
   /* --------- FETCH SUB ADMINS --------- */
-const fetchSubAdmins = async () => {
-  const storedUser = sessionStorage.getItem("userData");
-  const userId = storedUser ? JSON.parse(storedUser)?.id : null;
-  if (!userId) return;
+  const fetchSubAdmins = async () => {
+    const storedUser = sessionStorage.getItem("userData");
+    const userId = storedUser ? JSON.parse(storedUser)?.id : null;
+    if (!userId) return;
 
-  setLoading(true);
-  setErrorMessage("");
+    setLoading(true);
+    setErrorMessage("");
 
-  try {
-    const res = await getRequest("/app/user/subadmin", { user_id: userId });
+    try {
+      const res = await getRequest("/app/user/subadmin", { user_id: userId });
 
-    if (res?.status === 200) {
-      const admin = res.admin;
-      const subAdmins = res.data || [];
+      if (res?.status === 200) {
+        const admin = res.admin;
+        const subAdmins = res.data || [];
 
-      setClubIdFixed(admin.login_id);
-      form.setValue("clubId", admin.login_id);
+        setClubIdFixed(admin.login_id);
+        form.setValue("clubId", admin.login_id);
 
-      const mapped = subAdmins.map((item) => ({
-        id: item.id,
-        adminName: item.name,
-        clubId: item.login_id,
-        sportsName: item.sport_name,
-        pin: String(item.password),
-      }));
+        const mapped = subAdmins.map((item) => ({
+          id: item.id,
+          adminName: item.name,
+          clubId: item.login_id,
+          sportsName: item.sport_name,
+          pin: String(item.password),
+        }));
 
-      setData(mapped);
+        setData(mapped);
+      }
+    } catch {
+      setErrorMessage("Server error");
+    } finally {
+      setLoading(false);
     }
-  } catch {
-    setErrorMessage("Server error");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
-useEffect(() => {
-  fetchSubAdmins();
-}, []);
+  useEffect(() => {
+    fetchSubAdmins();
+  }, []);
 
 
 
@@ -205,7 +205,7 @@ useEffect(() => {
       const payload = {
         user_id: userId,
         login_id: values.clubId,
-        password: Number(values.pin),
+        password: String(values.pin),
         user_type: "sub_admin",
         name: values.adminName,
         sport_name: values.sportsName,
@@ -214,20 +214,20 @@ useEffect(() => {
       const res = await postRequest("/app/user/create", payload);
 
 
-   // Login PIN Exist popup
-if (
-  res?.status === 400 &&
-  res?.error_message === "Login pin Exist!"
-) {
-  setLoginPinExistAlert(true);
-  return;
-}
+      // Login PIN Exist popup
+      if (
+        res?.status === 400 &&
+        res?.error_message === "Login pin Exist!"
+      ) {
+        setLoginPinExistAlert(true);
+        return;
+      }
 
 
       if (res?.status === false) {
         setErrorMessage(res?.message || "Section-admin creation failed");
       } else {
-       
+
         await fetchSubAdmins();
 
         setSuccessDialog(true);
@@ -270,12 +270,21 @@ if (
         id: selectedAdmin.id,
         name: selectedAdmin.adminName,
         sport_name: selectedAdmin.sportsName,
-        password: Number(selectedAdmin.pin),
+        password: String(selectedAdmin.pin),
       };
 
       const res = await postRequest("/app/user/update", payload);
 
-      if (res?.status === 200 || res?.status === true) {
+      // Handle duplicate PIN/login error
+      if (
+        res?.status === 400 &&
+        (res?.error_message === "Login pin Exist!" || res?.error_message === "Login PIN Exist!" || res?.error_message === "Login Id Exist!")
+      ) {
+        setLoginPinExistAlert(true);
+        return;
+      }
+
+      if ((res?.status === 200 || res?.status === true) && !res?.error_message) {
         //  update UI after success
         setData((prev) =>
           prev.map((i) =>
@@ -285,7 +294,7 @@ if (
 
         setIsDrawerOpen(false);
       } else {
-        toast.error(res?.message || "Update failed");
+        toast.error(res?.error_message || res?.message || "Update failed");
       }
     } catch (err) {
       console.error("Update error:", err);
@@ -562,15 +571,14 @@ if (
                     required
                   />
                 </div>
-              </div>
-
-              <Button
+                 <Button
                 type="submit"
                 disabled={loading}
                 className="bg-primary hover:bg-primary/95 text-white px-4 py-2 rounded-xl mt-auto shadow-lg transition duration-200"
               >
                 {loading ? "Saving..." : "Save Changes"}
               </Button>
+              </div>
             </form>
           )}
         </div>

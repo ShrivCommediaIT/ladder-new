@@ -64,7 +64,7 @@ export default function BespokeFooter() {
         >
           <div className="relative aspect-[612/267] min-h-[138px] w-full sm:min-h-[175px] md:min-h-[220px] lg:min-h-[250px] xl:h-full xl:min-h-[267px]">
             <Image
-              src={isDark ? "/wtsapp.png" : "/wtsapp-1.png"}
+              src={isDark ? "/wtsapp.PNG" : "/wtsapp-1.png"}
               alt="WhatsApp contact card"
               fill
               sizes="(max-width: 1279px) 100vw, 50vw"

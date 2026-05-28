@@ -321,7 +321,7 @@ export default function AdminPage() {
 
               <div className="space-y-3">
                 <h1 className="text-h1 font-black tracking-tight text-foreground sm:text-h11">
-                  Welcome back Admin Dashboard
+                  Welcome To Admin Dashboard
                 </h1>
                 <p className="max-w-2xl text-p2 leading-7 text-muted-foreground">
                   Manage rosters, launch competitions, and keep your club’s internal
