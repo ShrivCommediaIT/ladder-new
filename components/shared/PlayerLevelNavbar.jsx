@@ -534,7 +534,7 @@ const PlayerLevelNavbar = ({
                         }}
                         className={`flex w-full items-center gap-2 px-4 py-2 text-sm ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                       >
-                        <HelpCircle className="h-4 w-4 text-slate-400" />
+                        <Trophy className="h-4 w-4 text-amber-400" />
                         Submit to Talent Board
                       </button>
                     )}
@@ -639,7 +639,7 @@ const PlayerLevelNavbar = ({
                 }}
                 className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors text-left"
               >
-                <HelpCircle className="h-4 w-4 text-slate-400" />
+                <Trophy className="h-4 w-4 text-amber-400" />
                 Submit to Talent Board
               </button>
             )}
