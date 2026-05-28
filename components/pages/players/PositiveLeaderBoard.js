@@ -263,7 +263,7 @@ const PlayerCard = ({
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {Math.abs(scoreData.displayScore || 0)}
+                        {Math.abs(Number(scoreData.displayScore || 0)).toFixed(2)}
                       </div>
                     );
                   })}
@@ -301,7 +301,7 @@ const PlayerCard = ({
               className="text-sm sm:text-base md:text-[10px] font-black leading-none w-full text-center truncate"
               style={{ color: "var(--best-board-highlight)" }}
             >
-              {Math.abs(player?.total_point || 0)}
+              {Math.abs(Number(player?.total_point || 0)).toFixed(2)}
             </span>
             <span
               className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
