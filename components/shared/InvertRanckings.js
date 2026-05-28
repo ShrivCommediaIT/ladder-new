@@ -169,13 +169,15 @@ export const InvertRanckings = () => {
     <div 
         onClick={handleInvertRanckings} 
         className={`border backdrop-blur-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300 p-2 rounded-md cursor-pointer flex items-center justify-center bg-gradient-to-r ${
-            isInverted 
+            isInverted && type !== 'negative' 
             ? 'border-green-500/50 from-green-900/80 to-emerald-900/80' 
+            : isInverted && type === 'negative'
+            ? 'border-green-500/50 from-green-900/80 to-emerald-900/80'
             : 'border-white/10 bg-zinc-900/70 from-gray-900 to-cyan-900'
         }`}
         title="Invert Rank"
     >   <span className="text-white text-sm"> Invert Rankings</span>
-        <ArrowBigUp  className={`text-white transition-transform duration-300 ${isInverted === true ? "rotate-180" : ""}`} />
+        <ArrowBigUp  className={`text-white transition-transform duration-300 ${isInverted === true ? "" : "rotate-180"}`} />
     </div>
     </>
   );
