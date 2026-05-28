@@ -30,15 +30,31 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import PerformanceDatabase from "@/components/shared/PerformanceDatabase";
+import OnboardingFlow from "@/components/shared/OnboardingFlow";
 
 export default function PlanHeading() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const [isONboardingFlowVisible, setIsONboardingFlowVisible] = useState(false);
+  
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+    // useEffect(() => {
+  //   const hasSeenOnboarding = localStorage.getItem("hasSeenOnboarding");
+  //   if (!hasSeenOnboarding) {
+  //     setIsVisible(true);
+  //   }
+  // }, []);
+
+
+  const handleNavigationToAuth = () => {
+    setIsONboardingFlowVisible(true);
+  }
 
   const sports = useMemo(
     () => ["Badminton", "Squash", "Table Tennis", "Padel", "5-a-side", "+ More"],
@@ -189,7 +205,7 @@ export default function PlanHeading() {
               {mounted && (theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />)}
             </button>
             <Button asChild size="lg" className={`${buttonClass} rounded-full px-8`}>
-              <Link href="/register-page">Start Free Trial</Link>
+              <Link onClick={handleNavigationToAuth} href="#">Start Free Trial</Link>
             </Button>
           </div>
 
@@ -228,7 +244,7 @@ export default function PlanHeading() {
                 </a>
               ))}
               <Button asChild className={`${buttonClass} h-11 rounded-full`}>
-                <Link href="/register-page">Start Free Trial</Link>
+                <Link onClick={handleNavigationToAuth} href="#">Start Free Trial</Link>
               </Button>
             </div>
           </div>
@@ -295,7 +311,7 @@ export default function PlanHeading() {
                 size="lg"
                 className={`${buttonClass} h-14 w-full rounded-full px-8 text-lg sm:w-auto`}
               >
-                <Link href="/register-page">Create Free Account</Link>
+                <Link onClick={handleNavigationToAuth} href="#">Create Free Account</Link>
               </Button>
 
               <Button
@@ -605,6 +621,7 @@ export default function PlanHeading() {
           </div>
         </div>
       </footer>
+      {isONboardingFlowVisible && <OnboardingFlow isVisible={isVisible} setIsVisible={setIsVisible} setIsONboardingFlowVisible={setIsONboardingFlowVisible} />}
     </main>
   );
 }
