@@ -87,13 +87,8 @@ export default function DemoPlayerList({ ladderId }) {
       return;
     }
 
-    if (user?.user_type === "admin" || String(user?.id) === String(playerId)) {
-      setSelectedPlayerId(playerId);
-      setIsModalOpen(true);
-    } else {
-      setDialogMessage("You can only edit your own profile");
-      setIsDialogOpen(true);
-    }
+    setSelectedPlayerId(playerId);
+    setIsModalOpen(true);
   };
 
   // ✅ Reset player rank back to default
@@ -169,14 +164,7 @@ export default function DemoPlayerList({ ladderId }) {
           return (
             <div
               key={player.id}
-              className={`relative flex flex-col gap-2 rounded-md shadow-lg py-3 px-4 transition-all
-                ${bgColor}
-                ${
-                  canEdit
-                    ? "cursor-pointer hover:scale-[1.01]"
-                    : "cursor-not-allowed opacity-100"
-                }
-              `}
+              className={`relative flex flex-col gap-2 rounded-md shadow-lg py-3 px-4 transition-all cursor-pointer hover:scale-[1.01] ${bgColor}`}
               onClick={() => handlePlayerClick(player.id)}
             >
               <PlayerCard
@@ -206,6 +194,7 @@ export default function DemoPlayerList({ ladderId }) {
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           currentId={selectedPlayerId}
+          initialTab="stats"
         />
       )}
 

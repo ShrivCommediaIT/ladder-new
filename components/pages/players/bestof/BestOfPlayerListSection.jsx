@@ -82,14 +82,9 @@ const PlayerAvatar = ({ player, rank }) => {
 const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
   <div
     onClick={() => {
-      if (!canEdit) {
-        toast.warning("You may only tap on your name");
-        return;
-      }
-      onOpenPlayer(player, "result");
+      onOpenPlayer(player, canEdit ? "result" : "stats");
     }}
-    className={`group flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-4 py-4 transition hover:border-[var(--best-board-border-strong)] ${canEdit ? "cursor-pointer" : "cursor-not-allowed"
-      }`}
+    className="group flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-4 py-4 transition hover:border-[var(--best-board-border-strong)] cursor-pointer"
   >
     <div className="flex min-w-0 items-center gap-3">
       <PlayerRankBadge rank={rank} />
@@ -112,14 +107,14 @@ const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
       </div>
     </div>
 
-    <div className="ml-4 flex items-center gap-3">
+    <div className="ml-4 flex items-center gap-3 shrink-0">
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           onChallenge(player);
         }}
-        className="hidden rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-3 py-1.5 text-xs font-medium text-[var(--best-board-text)] transition group-hover:block cursor-pointer"
+        className="block md:hidden md:group-hover:block rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-3 py-1.5 text-xs font-medium text-[var(--best-board-text)] transition cursor-pointer hover:bg-[var(--best-board-border-strong)]/30"
       >
         Challenge
       </button>

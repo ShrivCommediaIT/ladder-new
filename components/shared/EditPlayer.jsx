@@ -42,6 +42,7 @@ export const EditPlayer = ({
   ladder_id: propLadderId = null,
   ladder_type: propLadderType = null,
   userLevel = false,
+  initialTab = null,
 }) => {
   const dispatch = useDispatch();
 
@@ -148,32 +149,44 @@ export const EditPlayer = ({
   }, [activeTab]);
 
 
-  const allTabs = [
+  const allTabs = useMemo(() => [
     { value: "move", label: "Result" },
     { value: "challenge", label: "Challenge" },
     { value: "stats", label: "Stats" },
     { value: "edit", label: "Edit" },
     { value: "load", label: "Upload Avatar" },
-  ];
-  
+  ], []);
 
-  /* If roster → only Edit + Upload */
+  // Check if they are looking at their own profile or if they are admin
+  const isAdmin = localUser?.user_type === "admin" || localUser?.user_type === "sub_admin";
+  const isSelf = Number(localUser?.id || localUser?.user_id) === Number(currentId);
 
-  const tabs =
-    userLevel
-      ? allTabs.filter((t) => t.value === "edit")
-      : ladderType === "roster"
-      ? allTabs.filter((t) => t.value === "edit" || t.value === "load")
-      : allTabs;
+  const tabs = useMemo(() => {
+    if (isAdmin) {
+      return ladderType === "roster"
+        ? allTabs.filter((t) => t.value === "edit" || t.value === "load")
+        : allTabs;
+    }
+    // For userLevel (normal player views)
+    if (isSelf) {
+      // Self: Can view Stats, Edit info, and Upload Avatar
+      return allTabs.filter((t) => t.value === "stats" || t.value === "edit" || t.value === "load");
+    } else {
+      // Other player: Can view Stats and Challenge them
+      return allTabs.filter((t) => t.value === "stats" || t.value === "challenge");
+    }
+  }, [isAdmin, isSelf, ladderType, allTabs]);
 
   // Reset on modal open
   useEffect(() => {
-    if (open) {
-      const defaultVal = tabs[0]?.value || "";
+    if (open && tabs.length > 0) {
+      const defaultVal = initialTab && tabs.some(t => t.value === initialTab)
+        ? initialTab
+        : tabs[0]?.value || "";
       setMobileTab(defaultVal);
       setActiveTab(defaultVal);
     }
-  }, [open, tabs]);
+  }, [open, tabs, initialTab]);
 
   // Also reset mobile when ladderType changes (tabs list changes)
   useEffect(() => {
@@ -181,7 +194,7 @@ export const EditPlayer = ({
     if (tabs.length > 0) {
       setActiveTab(tabs[0].value);
     }
-  }, [ladderType]);
+  }, [ladderType, tabs]);
 
   /* -------------------- UI -------------------- */
 
