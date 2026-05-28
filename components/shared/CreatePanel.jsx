@@ -87,7 +87,7 @@ const CreatePanel = ({
                 Leaderboard (Desc/Asc)
               </option>
               <option className="bg-card text-foreground" value="negative">
-                Leaderboard (Time Desc/Asc)
+                Leaderboard (Time Asc/Desc)
               </option>
             </select>
           </div>
