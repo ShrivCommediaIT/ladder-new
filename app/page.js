@@ -7,7 +7,6 @@ import PerformanceDatabase from "@/components/shared/PerformanceDatabase";
 export default function Home() {
   return (
     <>
-        <OnboardingFlow />
         <div className=" min-h-screen">
           {/* <GameSelect /> */}
             <div>
