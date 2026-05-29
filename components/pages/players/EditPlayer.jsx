@@ -189,7 +189,7 @@ export const EditPlayer = ({
               </TabsContent>
 
               <TabsContent value="edit">
-                <EditPlayerDetails userId={playerId} onClose={onClose} />
+                <EditPlayerDetails userId={playerId} ladderId={ladder_id} onClose={onClose} />
               </TabsContent>
 
               <TabsContent value="load">

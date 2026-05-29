@@ -15,7 +15,7 @@ import {
 } from "../../../shared/ladderUtils";
 
 const SectionBadge = ({ count }) => (
-  <span className="rounded bg-white/5 px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
+  <span className="rounded bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
     {count} players
   </span>
 );
@@ -84,58 +84,55 @@ const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
     onClick={() => {
       onOpenPlayer(player, canEdit ? "result" : "stats");
     }}
-    className="group flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-4 py-4 transition hover:border-[var(--best-board-border-strong)] cursor-pointer"
+    className="group flex flex-col rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] transition hover:border-[var(--best-board-border-strong)] cursor-pointer overflow-hidden"
   >
-    <div className="flex min-w-0 flex-1 items-center gap-3">
-      <PlayerRankBadge rank={rank} />
-      <PlayerAvatar player={player} rank={rank} />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-h5 font-semibold text-[var(--best-board-text)]">{player?.name || "N/A"}</p>
-          {player?.age ? (
-            <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)]">
-              {player.age}
-            </span>
-          ) : null}
-          {player?.gender !== undefined && player?.gender !== null && player?.gender !== "" ? (
-            <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-[var(--best-board-muted)]">
-              {player.gender === "male" || player.gender === "Male" ? "M" : "F"}
-            </span>
-          ) : null}
+    {/* ── TOP STRIP ── */}
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="flex items-center justify-between px-4 py-1.5 gap-2 border-b border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
+    >
+      {/* Active Toggle Button (PlayerStatusToggle) */}
+      <PlayerStatusToggle player={player} user={false} />
+
+      {/* Age and Gender Badges */}
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        {player?.age ? (
+          <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]">
+            Age : {player.age}
+          </span>
+        ) : null}
+        {player?.gender !== undefined && player?.gender !== null && player?.gender !== "" ? (
+          <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]">
+            Gender: {player.gender === "male" || player.gender === "Male" ? "M" : "F"}
+          </span>
+        ) : null}
+      </div>
+    </div>
+
+    {/* ── MAIN BODY ── */}
+    <div className="flex items-center justify-between px-4 py-3 sm:py-4 gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <PlayerRankBadge rank={rank} />
+        <PlayerAvatar player={player} rank={rank} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-h5 font-semibold text-[var(--best-board-text)] mb-0.5">{player?.name || "N/A"}</p>
+          <p className="truncate text-sm text-[var(--best-board-muted)]">{getPhoneText(player?.phone)}</p>
         </div>
-        <p className="truncate text-sm text-[var(--best-board-muted)]">{getPhoneText(player?.phone)}</p>
       </div>
-    </div>
 
-    {/* Tablet & Desktop Middle Challenge Button */}
-    <div className="hidden md:flex items-center justify-center px-4 shrink-0">
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onChallenge(player);
-        }}
-        className="rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-4 py-2 text-xs font-semibold text-[var(--best-board-text)] transition cursor-pointer hover:bg-[var(--best-board-border-strong)]/30"
-      >
-        Challenge
-      </button>
-    </div>
-
-    <div className="ml-4 flex flex-col items-end justify-center gap-2 shrink-0">
-      <div onClick={(e) => e.stopPropagation()}>
-        <PlayerStatusToggle player={player} user={false} />
+      {/* Challenge Button */}
+      <div className="flex items-center shrink-0">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onChallenge(player);
+          }}
+          className="rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-3 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-semibold text-[var(--best-board-text)] transition cursor-pointer hover:bg-[var(--best-board-border-strong)]/30"
+        >
+          Challenge
+        </button>
       </div>
-      {/* Mobile stacked Challenge Button */}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onChallenge(player);
-        }}
-        className="block md:hidden rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-3 py-1 text-[11px] font-medium text-[var(--best-board-text)] transition cursor-pointer hover:bg-[var(--best-board-border-strong)]/30"
-      >
-        Challenge
-      </button>
     </div>
   </div>
 );

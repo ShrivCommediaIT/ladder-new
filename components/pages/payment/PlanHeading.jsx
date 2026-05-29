@@ -66,7 +66,7 @@ export default function PlanHeading() {
       { value: "500+", label: "Active Clubs" },
       { value: "12K+", label: "Players Managed" },
       { value: "98%", label: "Satisfaction Rate" },
-      { value: "GBP 12", label: "Per Player/Year" },
+      { value: "GBP 24", label: "Per Player/Year" },
     ],
     [],
   );
@@ -80,26 +80,24 @@ export default function PlanHeading() {
         description:
           "Real-time updates visible to every member. Creates motivation and competitive buzz.",
       },
-      {
-        icon: ShieldCheck,
-        color: "text-[var(--landing-primary)]",
-        title: "Self-Managing & Tamper-Proof",
-        description:
-          "Players update their own results, no admin needed. Only winners can move up.",
-      },
+     
       {
         icon: PhoneCall,
         color: "text-[var(--landing-secondary)]",
         title: "Comms Made Easy",
         description:
-          "One-click access to contact details for scheduling. Encourages frequent play.",
+          "Enables Admin to message all club and Section admin to message section members via the App alerting members through standard App Notifications.  Always keep members updated.",
       },
       {
         icon: Users,
         color: "text-[var(--landing-primary)]",
-        title: "Club Community Feel",
+        title: "Unique Community Features",
         description:
-          "Players upload avatars and build an identity. Strengthens belonging and engagement.",
+          `- the uploading of avatars gives a visual community feel 
+- activity logs provide members with club activity on a daily basis 
+- the challenge boards set challenges for all club members of all ages and gender and provide a place to store and display records  
+- members achieve activity statuses displayed in their roster information rewarding their participation. 
+`,
       },
       {
         icon: ChartColumn,
@@ -113,7 +111,7 @@ export default function PlanHeading() {
         color: "text-[var(--landing-primary)]",
         title: "Customisable & Flexible",
         description:
-          "Adjust ladder size, challenge rules, and colour themes. Import easily via CSV.",
+          "All solutions fully customisable with many useful options available plus the ability to filter results by age and gender, enabling many sub-competitions to be run within one major competition.",
       },
     ],
     [],
@@ -121,19 +119,19 @@ export default function PlanHeading() {
 
   const pricing = useMemo(
     () => [
-      {
-        name: "STARTER",
-        price: "Free",
-        suffix: "forever",
-        description: "Perfect for trying it out",
-        buttonLabel: "Get Started",
-        buttonHref: "/register-page",
-        featured: false,
-        items: ["Up to 10 players", "1 active ladder", "Basic leaderboard"],
-      },
+      // {
+      //   name: "STARTER",
+      //   price: "Free",
+      //   suffix: "forever",
+      //   description: "Perfect for trying it out",
+      //   buttonLabel: "Get Started",
+      //   buttonHref: "/register-page",
+      //   featured: false,
+      //   items: ["Up to 10 players", "1 active ladder", "Basic leaderboard"],
+      // },
       {
         name: "CLUB",
-        price: "GBP 12",
+        price: "GBP 24",
         suffix: "/yr per player",
         description: "Everything a growing club needs",
         buttonLabel: "Start Free Trial",
@@ -185,7 +183,7 @@ export default function PlanHeading() {
       <nav className="sticky top-0 z-50 border-b border-[var(--landing-border)] bg-[var(--landing-surface)] backdrop-blur-md">
         <div className="mx-auto flex h-20 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center">
-            <Image src={topLogo} alt="Sports Solutions Pro" className="h-10 w-auto" priority />
+            <Image src={topLogo} alt="Sports Solutions Pro" className="md:h-15 h-10 w-auto" priority />
           </Link>
 
           <div className="hidden items-center gap-8 md:flex">
@@ -275,7 +273,7 @@ export default function PlanHeading() {
               }}
             >
               <span className="mr-2 flex h-2 w-2 rounded-full bg-[var(--landing-secondary)]" />
-              The #1 platform for indoor sports clubs
+              The #1 platform for sports clubs
             </motion.div>
 
             <motion.h1
@@ -284,10 +282,10 @@ export default function PlanHeading() {
               transition={{ duration: 0.5, delay: 0.05 }}
               className="mt-6 mb-8 text-5xl font-extrabold leading-[1.1] tracking-tight text-foreground md:text-7xl"
             >
-              Run Your Club
+              PRO SOFTWARE
               <br />
               <span className="bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] bg-clip-text text-transparent">
-                Like a Pro
+                For Clubs and Coaches
               </span>
             </motion.h1>
 
@@ -298,7 +296,7 @@ export default function PlanHeading() {
               className="mx-auto mb-10 max-w-3xl text-xl leading-relaxed text-[var(--landing-muted)] md:text-2xl"
             >
               Automated ladders, mini-leagues, leaderboards and challenge boards, all in one
-              platform built for indoor sports clubs.
+              platform built for sports clubs.
             </motion.p>
 
             <motion.div
@@ -374,7 +372,7 @@ export default function PlanHeading() {
         <PerformanceDatabase />
       </div>
 
-      <section id="features" className="py-24" style={{ background: "var(--landing-section-alt)" }}>
+      <section id="features" className="py-10" style={{ background: "var(--landing-section-alt)" }}>
         <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
@@ -383,29 +381,27 @@ export default function PlanHeading() {
             <p className="text-xl text-[var(--landing-nav-text)]">Everything Your Club Needs</p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => {
               const Icon = feature.icon;
 
               return (
                 <Card
                   key={feature.title}
-                  className="py-0 transition-shadow hover:shadow-md"
+                  className="flex flex-col h-full py-0 transition-shadow hover:shadow-md"
                   style={{
-                    borderColor: "var(--landing-card-border)",
-                    background: "var(--landing-surface-strong)",
-                    boxShadow: "var(--landing-card-shadow)",
+                    borderColor: theme === "light" ? "rgba(0, 0, 0, 0.12)" : "var(--landing-card-border)",
+                    background: theme === "light" ? "#ffffff" : "var(--landing-surface-strong)",
+                    boxShadow: theme === "light" ? "0 4px 12px rgba(0, 0, 0, 0.05)" : "var(--landing-card-shadow)",
                   }}
                 >
-                  <CardHeader className="p-6">
-                    <Icon className={`mb-4 h-10 w-10 ${feature.color}`} />
-                    <CardTitle className="text-xl text-foreground">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-6 pb-6">
-                    <p className="text-base leading-7 text-[var(--landing-nav-text)]">
+                  <CardHeader className="p-5 flex-1 flex flex-col">
+                    <Icon className={`mb-2.5 h-6 w-6 ${feature.color}`} />
+                    <CardTitle className="text-base font-bold text-foreground mb-0.5 leading-tight">{feature.title}</CardTitle>
+                    <p className="text-sm leading-relaxed text-[var(--landing-nav-text)] whitespace-pre-line mt-0">
                       {feature.description}
                     </p>
-                  </CardContent>
+                  </CardHeader>
                 </Card>
               );
             })}
@@ -413,7 +409,7 @@ export default function PlanHeading() {
         </div>
       </section>
 
-      <section id="pricing" className="relative overflow-hidden py-24" style={{ background: "var(--landing-section-soft)" }}>
+      <section id="pricing" className="relative overflow-hidden py-5" style={{ background: "var(--landing-section-soft)" }}>
         <div className="absolute inset-0 opacity-[0.03] [background-image:url('https://www.transparenttextures.com/patterns/cubes.png')]" />
         <div className="relative z-10 mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
@@ -425,65 +421,73 @@ export default function PlanHeading() {
             </p>
           </div>
 
-          <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3 md:items-center">
+          <div className="mx-auto grid max-w-3xl gap-6 md:grid-cols-2 md:items-center">
             {pricing.map((plan) => (
               <Card
                 key={plan.name}
                 className={[
                   "py-0",
-                  plan.featured ? "relative z-10 shadow-xl md:scale-105" : "",
+                  plan.featured ? "relative z-10 shadow-xl md:scale-102" : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}
                 style={{
-                  borderColor: plan.featured ? "var(--landing-secondary)" : "var(--landing-card-border)",
-                  background: "var(--landing-surface-strong)",
-                  boxShadow: "var(--landing-card-shadow)",
+                  borderColor: plan.featured 
+                    ? "var(--landing-secondary)" 
+                    : theme === "light" 
+                      ? "rgba(0, 0, 0, 0.15)" 
+                      : "var(--landing-card-border)",
+                  background: theme === "light" ? "#ffffff" : "var(--landing-surface-strong)",
+                  boxShadow: theme === "light"
+                    ? plan.featured
+                      ? "0 10px 30px -5px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.06)"
+                      : "0 4px 15px -3px rgba(0, 0, 0, 0.08)"
+                    : "var(--landing-card-shadow)",
                 }}
               >
                 {plan.featured && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <span className="rounded-full bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-white">
+                    <span className="rounded-full bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
                       Most Popular
                     </span>
                   </div>
                 )}
 
-                <CardHeader className="p-6 pb-8">
+                <CardHeader className="p-5 pb-5">
                   <CardTitle
                     className={[
-                      "text-xl uppercase tracking-[0.08em]",
+                      "text-base uppercase tracking-[0.08em]",
                       plan.featured ? "text-[var(--landing-primary)]" : "text-[var(--landing-nav-text)]",
                     ].join(" ")}
                   >
                     {plan.name}
                   </CardTitle>
-                  <div className="mt-4 flex items-baseline text-foreground">
-                    <span className={["font-extrabold", plan.featured ? "text-5xl" : "text-4xl"].join(" ")}>
+                  <div className="mt-2 flex items-baseline text-foreground">
+                    <span className={["font-extrabold", plan.featured ? "text-3xl" : "text-2xl"].join(" ")}>
                       {plan.price}
                     </span>
                     {plan.suffix ? (
-                      <span className="ml-1 text-xl font-medium text-[var(--landing-nav-text)]">
+                      <span className="ml-1 text-sm font-medium text-[var(--landing-nav-text)]">
                         {plan.suffix}
                       </span>
                     ) : null}
                   </div>
-                  <CardDescription className={["mt-4", plan.featured ? "text-base" : "text-sm"].join(" ")}>
+                  <CardDescription className="mt-2 text-xs">
                     {plan.description}
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="px-6">
-                  <ul className="space-y-4">
+                <CardContent className="px-5">
+                  <ul className="space-y-2.5">
                     {plan.items.map((item) => (
-                      <li key={item} className="flex items-center gap-3">
+                      <li key={item} className="flex items-center gap-2">
                         <Check
                           className={[
-                            "h-5 w-5 shrink-0",
+                            "h-4 w-4 shrink-0",
                             plan.featured ? "text-[var(--landing-primary)]" : "text-[var(--landing-secondary)]",
                           ].join(" ")}
                         />
-                        <span className={plan.featured ? "font-medium text-foreground" : "text-[var(--landing-nav-text)]"}>
+                        <span className={["text-xs sm:text-sm", plan.featured ? "font-medium text-foreground" : "text-[var(--landing-nav-text)]"].join(" ")}>
                           {item}
                         </span>
                       </li>
@@ -491,12 +495,12 @@ export default function PlanHeading() {
                   </ul>
                 </CardContent>
 
-                <CardFooter className="p-6 pt-8">
+                <CardFooter className="p-5 pt-6">
                   <Button
                     asChild
                     variant={plan.featured ? "default" : "outline"}
                     className={[
-                      "h-12 w-full rounded-lg text-base",
+                      "h-10 w-full rounded-lg text-sm",
                       plan.featured ? buttonClass : "",
                     ]
                       .filter(Boolean)
@@ -521,7 +525,7 @@ export default function PlanHeading() {
       </section>
 
       <section
-        className="py-24"
+        className="py-10"
         style={{
           background: "var(--landing-section-alt)",
           borderBottom: "1px solid var(--landing-border)",

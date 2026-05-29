@@ -527,6 +527,7 @@ const RosterLeaderboard = () => {
         onClose={() => setEditOpen(false)}
         currentId={editPlayerId}
         ladderId={ladderId}
+        ladder_type="roster"
       />
 
       {/* Add / Remove Dialog */}

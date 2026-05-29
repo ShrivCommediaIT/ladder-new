@@ -21,6 +21,9 @@ import {
   Trophy,
   UserRound,
   Users2,
+  Activity,
+  Target,
+  Award,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
@@ -92,11 +95,11 @@ const registerSchema = z
   });
 
 const heroPoints = [
-  { icon: CalendarCheck2, label: "Manage Bookings" },
-  { icon: Users2, label: "Track Players" },
-  { icon: Trophy, label: "Run Tournaments" },
+  { icon: CalendarCheck2, label: "Automate Competitions" },
+  { icon: Activity, label: "Track Activity" },
+  { icon: Target, label: "Set Challenges" },
+  { icon: Award, label: "Create Records" },
 ];
-
 const brandGradient = "var(--background-image-gradient-brand)";
 const brandButtonShadow = "var(--brand-button-shadow)";
 const brandTabShadow = "var(--brand-tab-shadow)";
@@ -110,13 +113,13 @@ function TabButton({ active, children, onClick }) {
       style={
         active
           ? {
-              background: brandGradient,
-              color: "#ffffff",
-              boxShadow: brandTabShadow,
-            }
+            background: brandGradient,
+            color: "#ffffff",
+            boxShadow: brandTabShadow,
+          }
           : {
-              color: "var(--muted-foreground)",
-            }
+            color: "var(--muted-foreground)",
+          }
       }
     >
       {children}
@@ -275,12 +278,12 @@ export default function AuthPage({ initialMode = "login" }) {
   };
 
   return (
-      <div className="min-h-screen overflow-hidden bg-background">
-        {/* Floating Theme Toggle */}
-        <div className="fixed top-4 right-4 z-[60]">
-          <ThemeToggle />
-        </div>
-        <div className="relative min-h-screen">
+    <div className="min-h-screen lg:h-screen lg:overflow-hidden bg-background">
+      {/* Floating Theme Toggle */}
+      <div className="fixed top-4 right-4 z-[60]">
+        <ThemeToggle />
+      </div>
+      <div className="relative min-h-screen lg:h-screen lg:overflow-hidden">
         <div
           className="absolute inset-0"
           style={{
@@ -293,13 +296,13 @@ export default function AuthPage({ initialMode = "login" }) {
           style={{
             backgroundImage:
               "var(--page-grid-overlay)",
-              backgroundSize: "72px 72px",
-              maskImage: "linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.45))",
-            }}
+            backgroundSize: "72px 72px",
+            maskImage: "linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.45))",
+          }}
         />
 
-        <div className="relative z-10 grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
-          <section className="relative min-h-[380px] overflow-hidden px-6 py-10 sm:px-10 lg:min-h-screen lg:px-14 lg:py-14">
+        <div className="relative z-10 grid min-h-screen lg:h-screen lg:grid-cols-[1.15fr_0.85fr]">
+          <section className="relative min-h-[380px] overflow-hidden px-6 py-8 sm:px-8 lg:h-screen lg:px-10 lg:py-6">
             <div className="absolute inset-0">
               <Image
                 src="/login/select-game.3.jpeg"
@@ -314,7 +317,7 @@ export default function AuthPage({ initialMode = "login" }) {
             </div>
 
             <div className="relative z-10 flex h-full max-w-xl flex-col justify-between">
-              <div className="space-y-8 pt-2 lg:pt-10">
+              <div className="space-y-4 pt-1 lg:pt-2">
                 <div
                   className="inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
                   style={{
@@ -331,35 +334,35 @@ export default function AuthPage({ initialMode = "login" }) {
                   Live Platform
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-3 lg:space-y-2">
                   {/* Top Welcome Title */}
-                  <div className="space-y-2">
-                    <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                  <div className="space-y-1.5">
+                    <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
                       Welcome to <br />
                       <span className="text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]">Sports Solutions Pro</span><br />
                       <span className="text-cyan-400 text-h2 drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]">For Clubs and Coaches</span>
                     </h1>
 
-                    <p className="max-w-md text-sm sm:text-base leading-relaxed text-slate-300 mt-2 font-medium">
+                    <p className="max-w-md text-xs sm:text-sm leading-relaxed text-slate-300 mt-1 font-medium">
                       Manage your internal club competitions with real time digital score inputs, live rankings, leaderboards, ladders, mini leagues and more &ndash; perfect for coaching, motivation and self-improvement.
                     </p>
                   </div>
 
                   {/* Horizontal dividing glow separator */}
-                  <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent my-6" />
+                  <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent my-3 lg:my-2" />
 
                   {/* Talent Board promo block */}
-                  <div className="space-y-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/10 p-5 backdrop-blur-sm">
+                  <div className="space-y-2 lg:space-y-1.5 rounded-2xl bg-cyan-950/20 border border-cyan-500/10 p-4 lg:p-3.5 backdrop-blur-sm">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-cyan-400/50 bg-cyan-500/10 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.2)]">
-                        <Star className="h-5 w-5 fill-cyan-400/20" />
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/50 bg-cyan-500/10 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+                        <Star className="h-4 w-4 fill-cyan-400/20" />
                       </div>
-                      <h2 className="text-lg font-extrabold tracking-wide uppercase text-white">
+                      <h2 className="text-base font-extrabold tracking-wide uppercase text-white">
                         The SSP <span className="text-cyan-400">Talent Board</span>
                       </h2>
                     </div>
 
-                    <div className="space-y-3 text-xs sm:text-sm leading-relaxed text-slate-300 font-medium">
+                    <div className="space-y-1.5 text-xs leading-relaxed text-slate-300 font-medium">
                       <p>
                         Please visit the SSP &ldquo;Talent Board&rdquo; and appreciate some of the amazing
                         talent and achievement achieved by dedicated and talented people worldwide.
@@ -370,40 +373,40 @@ export default function AuthPage({ initialMode = "login" }) {
                       </p>
                     </div>
 
-                    <div className="pt-2">
+                    <div className="pt-1.5">
                       <Link
                         href="/#talent-board"
-                        className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-bold border-b border-cyan-400/40 hover:border-cyan-400 transition-all pb-0.5 text-xs sm:text-sm"
+                        className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-bold border-b border-cyan-400/40 hover:border-cyan-400 transition-all pb-0.5 text-xs"
                       >
                         Click Here
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-3 w-3" />
                       </Link>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-10 space-y-4 lg:mb-6">
+              <div className="mt-4 lg:mt-3 space-y-2 lg:space-y-1.5 lg:mb-2">
                 {heroPoints.map(({ icon: Icon, label }) => (
-                  <div key={label} className="flex items-center gap-4 text-slate-100">
+                  <div key={label} className="flex items-center gap-3 text-slate-100">
                     <div
-                      className="flex h-11 w-11 items-center justify-center rounded-2xl border"
+                      className="flex h-8 w-8 items-center justify-center rounded-xl border"
                       style={{
                         borderColor: "var(--brand-badge-border)",
                         backgroundColor: "var(--brand-icon-surface)",
                         boxShadow: "var(--brand-icon-shadow)",
                       }}
                     >
-                      <Icon className="h-5 w-5" style={{ color: "var(--primary)" }} />
+                      <Icon className="h-4 w-4" style={{ color: "var(--primary)" }} />
                     </div>
-                    <span className="text-p1 font-medium tracking-[0.01em]">{label}</span>
+                    <span className="text-sm font-medium tracking-[0.01em]">{label}</span>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className="relative flex items-center justify-center px-4 py-8 sm:px-6 lg:px-10">
+          <section className="relative flex items-center justify-center px-4 py-8 sm:px-6 lg:h-screen lg:overflow-y-auto lg:px-10 lg:py-6">
             <Card
               className="w-full max-w-[470px] gap-0 rounded-[32px] border px-0 py-0 shadow-2xl"
               style={{

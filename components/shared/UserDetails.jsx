@@ -141,16 +141,23 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
               <span className="text-sm font-semibold text-zinc-100 capitalize dark:text-zinc-200">
                 {finalUser?.name || "Guest"}
               </span>
-              <span className="text-xs text-zinc-300">{finalUser?.user_type === "sub_admin"?"Section Admin":"Admin"}</span>
+              <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+                {finalUser?.user_type === "sub_admin" ? "Section Admin" : "Admin"}
+              </span>
             </div>
             <IoIosArrowDown size={18} className="text-zinc-600" />
           </div>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="w-52 mt-2" align="end">
-          <DropdownMenuLabel className="flex items-center gap-2 text-zinc-700 dark:text-zinc-200">
-            <UserCircle2 className="w-4 h-4" />
-            {finalUser?.name || "Guest"}
+          <DropdownMenuLabel className="flex flex-col gap-0.5 text-zinc-700 dark:text-zinc-200">
+            <div className="flex items-center gap-2">
+              <UserCircle2 className="w-4.5 h-4.5 text-zinc-500" />
+              <span>{finalUser?.name || "Guest"}</span>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 ml-6.5">
+              {finalUser?.user_type === "sub_admin" ? "Section Admin" : "Admin"}
+            </span>
           </DropdownMenuLabel>
 
           <DropdownMenuSeparator />
@@ -196,7 +203,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
                 className="cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30"
               >
                 <Shield className="mr-2 h-4 w-4 text-blue-600" />
-                Generate Club ID and Section Administrators
+                Create Club or Coach ID
               </DropdownMenuItem>
 
               <DropdownMenuItem

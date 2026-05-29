@@ -245,7 +245,7 @@ const PlayerLevelNavbar = ({
     user?.user_type === "admin"
       ? "Admin"
       : user?.user_type === "sub_admin"
-      ? "Sub Admin"
+      ? "Section Admin"
       : "Player";
 
   useEffect(() => {
@@ -485,7 +485,7 @@ const PlayerLevelNavbar = ({
                   >
                     <div className="border-b border-white/10 px-4 py-2">
                       <p className="truncate text-sm font-semibold text-white">{displayName}</p>
-                      <p className="text-xs text-slate-400">{roleLabel}</p>
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{roleLabel}</p>
                     </div>
 
                     {!userLevel && (
@@ -495,7 +495,7 @@ const PlayerLevelNavbar = ({
                           className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                         >
                           <Shield className="h-4 w-4 text-blue-400" />
-                          {user?.user_type === "sub_admin" ? "Sub-Admin Dashboard" : "Admin Dashboard"}
+                          {user?.user_type === "sub_admin" ? "Section-Admin Dashboard" : "Admin Dashboard"}
                         </button>
 
                         {user?.user_type === "admin" && (
@@ -507,7 +507,7 @@ const PlayerLevelNavbar = ({
                             className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                           >
                             <UserCircle2 className="h-4 w-4 text-blue-400" />
-                            Generate Club ID
+                           Create Club or Coach ID
                           </button>
                         )}
 
@@ -585,7 +585,7 @@ const PlayerLevelNavbar = ({
             {/* User profile header in mobile menu */}
             <div className="border-b border-white/10 px-3 py-2.5 mb-2">
               <p className="truncate text-sm font-semibold text-white">{displayName}</p>
-              <p className="text-xs text-slate-400">{roleLabel}</p>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{roleLabel}</p>
             </div>
 
             {/* Dashboard / Admin options */}
@@ -611,7 +611,7 @@ const PlayerLevelNavbar = ({
                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors text-left"
                   >
                     <UserCircle2 className="h-4 w-4 text-blue-400" />
-                    Generate Club ID
+                    Create Club or Coach ID
                   </button>
                 )}
 

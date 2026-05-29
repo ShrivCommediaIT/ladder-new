@@ -172,13 +172,13 @@ export default function AccessCodeParts() {
       {/* MAIN CARD */}
       <Card className="md:w-1/2 w-full rounded-3xl border border-border bg-card backdrop-blur-xl text-foreground shadow-2xl transition-all duration-300">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl font-extrabold tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Generate Club ID</CardTitle>
+          <CardTitle className="text-xl font-extrabold tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Create Club or Coach ID</CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div className="space-y-1">
-              <Label className="text-[11px] uppercase text-muted-foreground font-semibold">Club Id</Label>
+              <Label className="text-[11px] uppercase text-muted-foreground font-semibold">Club or Coach ID</Label>
               <Input
                 {...form.register("part1")}
                 maxLength={8}
