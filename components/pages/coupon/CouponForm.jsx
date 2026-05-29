@@ -55,11 +55,17 @@ const countries = [
 ];
 
 import { getRequest, postRequest } from "@/services/apiService";
+import { isValidEmail } from "@/lib/utils";
 
 // ✅ Validation schema
 const formSchema = z.object({
   adminName: z.string().min(3, "Enter admin name"),
-  adminEmail: z.string().email("Enter a valid email"),
+  adminEmail: z
+    .string()
+    .min(1, "Email is required")
+    .refine(isValidEmail, {
+      message: "Invalid email domain or format. Supported domains: .com, .in, .org, .net, .edu, .gov, .co",
+    }),
   couponName: z
     .string()
     .min(5)
@@ -231,7 +237,7 @@ export default function CouponForm() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+            <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-10">
               {/* Coupon Input */}
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-blue-800 border-b pb-2">

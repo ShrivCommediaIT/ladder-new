@@ -13,9 +13,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
+import { isValidEmail } from "@/lib/utils";
+
 //  Validation schema
 const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .refine(isValidEmail, {
+      message: "Invalid email domain or format. Supported domains: .com, .in, .org, .net, .edu, .gov, .co",
+    }),
   password: z.string().min(3, "Enter password"),
 });
 
@@ -76,7 +83,7 @@ export default function CouponLogin() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
+            <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6 mt-4">
               {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
