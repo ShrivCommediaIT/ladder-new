@@ -473,7 +473,7 @@ export default function LoginByClubForm() {
                           href={loginPage}
                           className="text-primary font-semibold hover:underline"
                         >
-                          Access Portal
+                          Login here
                         </Link>
                       </p>
                       <p className="mt-3">

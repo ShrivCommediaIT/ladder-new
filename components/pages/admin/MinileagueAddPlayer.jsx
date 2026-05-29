@@ -77,6 +77,12 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
       return;
     }
 
+    if (phone && phone.trim().length !== 10) {
+      setWelcomeMsg("Phone number must be exactly 10 digits!");
+      setShowDialog(true);
+      return;
+    }
+
     setSubmitting(true);
 
     const formData = new FormData();
@@ -214,9 +220,10 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
               <Label className="text-xs text-slate-300">Phone (Optional)</Label>
               <Input
                 type="tel"
+                maxLength={10}
                 className="h-10 bg-slate-900/60 border-slate-700/80 focus-visible:ring-slate-500 text-sm placeholder:text-slate-500"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
                 placeholder="Enter phone number (Optional)"
               />
             </div>

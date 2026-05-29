@@ -534,7 +534,7 @@ export default function PlanHeading() {
             required.
           </p>
           <Button asChild size="lg" className={`${buttonClass} h-16 rounded-full px-10 text-xl`}>
-            <Link href="/register-page">
+            <Link  onClick={handleNavigationToAuth} href="#">
               Get Started Free <ArrowRight className="h-6 w-6" />
             </Link>
           </Button>

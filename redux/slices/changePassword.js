@@ -12,6 +12,9 @@ export const changePassword = createAsyncThunk(
         old_password,
         password,
       });
+      if (data && (data.status === 400 || data.error_message)) {
+        return rejectWithValue(data);
+      }
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -44,9 +47,10 @@ const changePasswordSlice = createSlice({
         state.success = false;
         state.error = null;
       })
-      .addCase(changePassword.fulfilled, (state) => {
+      .addCase(changePassword.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
+        state.message = action.payload?.success_message || action.payload?.message || "Password changed successfully!";
       })
       .addCase(changePassword.rejected, (state, action) => {
         state.loading = false;

@@ -114,7 +114,11 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "phone") {
+      setForm((prev) => ({ ...prev, [name]: value.replace(/\D/g, "").slice(0, 10) }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -122,6 +126,11 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
 
     if (!form.user_id || !form.id) {
       toast.error("User ID or Player ID is missing.");
+      return;
+    }
+
+    if (form.phone && form.phone.trim().length !== 10) {
+      toast.error("Phone number must be exactly 10 digits!");
       return;
     }
 
@@ -265,6 +274,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                   id="phone"
                   name="phone"
                   type="tel"
+                  maxLength={10}
                   value={form.phone}
                   onChange={handleChange}
                   className="bg-white/10 py-6 border-white/30 text-white focus:ring-2 focus:ring-cyan-400"

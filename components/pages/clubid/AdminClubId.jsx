@@ -51,7 +51,10 @@ import { CheckCircle2, X } from "lucide-react";
 
 /* ---------------- ZOD SCHEMA ---------------- */
 const formSchema = z.object({
-  adminName: z.string().min(2, "Admin name is required"),
+  adminName: z
+    .string()
+    .min(2, "Admin name is required")
+    .max(20, "Admin name must be at most 20 characters"),
   clubId: z
     .string()
     .min(3)
@@ -422,6 +425,7 @@ export default function AdminClubId() {
                     <FormControl>
                       <Input
                         {...field}
+                        maxLength={20}
                         className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold rounded-xl focus:border-primary transition-all duration-200"
                       />
                     </FormControl>
@@ -528,10 +532,11 @@ export default function AdminClubId() {
                   <input
                     type="text"
                     value={selectedAdmin.adminName}
+                    maxLength={20}
                     onChange={(e) =>
                       setSelectedAdmin({
                         ...selectedAdmin,
-                        adminName: e.target.value,
+                        adminName: e.target.value.slice(0, 20),
                       })
                     }
                     className="w-full bg-slate-50 dark:bg-white/5 border border-border rounded-xl px-3 py-2 text-foreground focus:border-primary focus:outline-none transition-all"

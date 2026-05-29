@@ -52,18 +52,39 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import "react-toastify/dist/ReactToastify.css";
+import { isValidEmail, checkPasswordStrength } from "@/lib/utils";
+
+const emailValidation = z
+  .string()
+  .min(1, "Email is required")
+  .max(35, "Email must be at most 35 characters")
+  .refine(isValidEmail, {
+    message: "Invalid email domain or format. Supported domains: .com, .in, .org, .net, .edu, .gov, .co",
+  });
+
+const passwordValidation = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .max(15, "Password must be at most 15 characters")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Password must contain at least one digit")
+  .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
 const loginSchema = z.object({
-  username: z.string().min(1, "Email is required").email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  username: emailValidation,
+  password: passwordValidation,
 });
 
 const registerSchema = z
   .object({
-    name: z.string().min(1, "Full name is required"),
-    username: z.string().min(1, "Email is required").email("Invalid email format"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Confirm your password"),
+    name: z
+      .string()
+      .min(1, "Full name is required")
+      .max(20, "Name must be at most 20 characters"),
+    username: emailValidation,
+    password: passwordValidation,
+    confirmPassword: z.string().min(1, "Confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -141,6 +162,9 @@ export default function AuthPage({ initialMode = "login" }) {
       confirmPassword: "",
     },
   });
+
+  const registerPassword = registerForm.watch("password") || "";
+  const passwordStrength = registerPassword ? checkPasswordStrength(registerPassword) : null;
 
   useEffect(() => {
     setMode(initialMode);
@@ -312,7 +336,8 @@ export default function AuthPage({ initialMode = "login" }) {
                   <div className="space-y-2">
                     <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
                       Welcome to <br />
-                      <span className="text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]">Sports Solutions Pro</span>
+                      <span className="text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]">Sports Solutions Pro</span><br />
+                      <span className="text-cyan-400 text-h2 drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]">For Clubs and Coaches</span>
                     </h1>
 
                     <p className="max-w-md text-sm sm:text-base leading-relaxed text-slate-300 mt-2 font-medium">
@@ -423,7 +448,7 @@ export default function AuthPage({ initialMode = "login" }) {
 
                   {mode === "login" ? (
                     <Form {...loginForm}>
-                      <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
+                      <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} noValidate className="space-y-5">
                         <FormField
                           control={loginForm.control}
                           name="username"
@@ -439,6 +464,7 @@ export default function AuthPage({ initialMode = "login" }) {
                                     type="email"
                                     autoComplete="email"
                                     placeholder="Enter your email address"
+                                    maxLength={35}
                                     {...field}
                                     className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
@@ -468,6 +494,7 @@ export default function AuthPage({ initialMode = "login" }) {
                                     type={showLoginPassword ? "text" : "password"}
                                     autoComplete="current-password"
                                     placeholder="Enter your password"
+                                    maxLength={15}
                                     {...field}
                                     className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
@@ -511,6 +538,7 @@ export default function AuthPage({ initialMode = "login" }) {
                     <Form {...registerForm}>
                       <form
                         onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
+                        noValidate
                         className="space-y-5"
                       >
                         <FormField
@@ -528,6 +556,7 @@ export default function AuthPage({ initialMode = "login" }) {
                                     autoComplete="name"
                                     placeholder="Enter your full name"
                                     {...field}
+                                    maxLength={20}
                                     className="h-[52px] px-11 rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
                                       backgroundColor: "var(--input-bg)",
@@ -556,6 +585,7 @@ export default function AuthPage({ initialMode = "login" }) {
                                     type="email"
                                     autoComplete="email"
                                     placeholder="Enter your email address"
+                                    maxLength={35}
                                     {...field}
                                     className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
@@ -587,6 +617,7 @@ export default function AuthPage({ initialMode = "login" }) {
                                     type={showRegisterPassword ? "text" : "password"}
                                     autoComplete="new-password"
                                     placeholder="Create your password"
+                                    maxLength={15}
                                     {...field}
                                     className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
@@ -608,6 +639,19 @@ export default function AuthPage({ initialMode = "login" }) {
                                 </div>
                               </FormControl>
                               <FormMessage className="text-xs text-red-300" />
+                              {passwordStrength && (
+                                <div className="mt-2.5 space-y-1.5 rounded-xl bg-black/10 p-3 border border-white/10">
+                                  <div className="flex justify-between items-center text-xs">
+                                    <span className="text-muted-foreground">Password Strength:</span>
+                                    <span className={`font-bold transition-all duration-300 ${passwordStrength.color}`}>{passwordStrength.label}</span>
+                                  </div>
+                                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden flex gap-1">
+                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${passwordStrength.score >= 1 ? passwordStrength.bgColor : "bg-white/10"}`} />
+                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${passwordStrength.score >= 2 ? passwordStrength.bgColor : "bg-white/10"}`} />
+                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${passwordStrength.score >= 3 ? passwordStrength.bgColor : "bg-white/10"}`} />
+                                  </div>
+                                </div>
+                              )}
                             </FormItem>
                           )}
                         />
@@ -627,6 +671,7 @@ export default function AuthPage({ initialMode = "login" }) {
                                     type={showConfirmPassword ? "text" : "password"}
                                     autoComplete="new-password"
                                     placeholder="Confirm your password"
+                                    maxLength={15}
                                     {...field}
                                     className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
