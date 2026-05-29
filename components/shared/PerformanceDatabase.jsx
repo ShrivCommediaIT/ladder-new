@@ -651,13 +651,13 @@ export default function PerformanceDatabase() {
               SHOWING <span className="font-bold text-foreground">{Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}</span> - <span className="font-bold text-foreground">{Math.min(currentPage * itemsPerPage, totalCount)}</span> OF <span className="font-bold text-primary">{totalCount}</span> RESULTS
             </div>
 
-            <div className="flex w-full gap-4 sm:w-auto">
-              <div className="flex flex-1 items-center gap-2 sm:flex-none">
+            <div className="flex flex-wrap items-center w-full gap-3 sm:w-auto">
+              <div className="flex flex-1 min-w-[150px] items-center gap-2 sm:flex-none">
                 <span className="whitespace-nowrap text-xs font-bold uppercase tracking-wider text-muted-foreground">Sort By</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="h-10 rounded-lg border border-input bg-[var(--input-bg)] px-3 text-xs font-medium text-foreground transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20"
+                  className="h-10 w-full rounded-lg border border-input bg-[var(--input-bg)] px-3 text-xs font-medium text-foreground transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20"
                 >
                   <option value="newest">Date (Newest First)</option>
                   <option value="oldest">Date (Oldest First)</option>
@@ -667,7 +667,10 @@ export default function PerformanceDatabase() {
                 </select>
               </div>
 
-              <button onClick={handleExportCSV} className={`${subtleButtonClass} h-10 px-4 text-xs font-bold uppercase tracking-wider`}>
+              <button 
+                onClick={handleExportCSV} 
+                className={`${subtleButtonClass} h-10 px-4 text-xs font-bold uppercase tracking-wider flex-shrink-0`}
+              >
                 <Download className="h-3.5 w-3.5" />
                 Export
               </button>
@@ -686,8 +689,10 @@ export default function PerformanceDatabase() {
                   <th className="px-6 py-4">Activity / Event</th>
                   <th className="px-6 py-4 text-center">Result</th>
                   <th className="px-6 py-4">Unit</th>
+                  <th className="px-6 py-4">Date of event</th>
                   <th className="px-6 py-4">Country</th>
                   <th className="px-6 py-4">Club / Team</th>
+                  <th className="px-6 py-4">Email address</th>
                   <th className="px-6 py-4">Coach / Witness</th>
                   <th className="px-6 py-4 text-center">Video</th>
                 </tr>
@@ -697,14 +702,14 @@ export default function PerformanceDatabase() {
                 {loading ? (
                   Array.from({ length: 3 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      <td colSpan={12} className="px-6 py-8 text-center font-medium text-muted-foreground">
+                      <td colSpan={14} className="px-6 py-8 text-center font-medium text-muted-foreground">
                         Loading SSP performance results data...
                       </td>
                     </tr>
                   ))
                 ) : processedData.length === 0 ? (
                   <tr>
-                    <td colSpan={12} className="px-6 py-12 text-center font-medium text-muted-foreground">
+                    <td colSpan={14} className="px-6 py-12 text-center font-medium text-muted-foreground">
                       No athletic performances match your current filters. Try resetting the criteria.
                     </td>
                   </tr>
@@ -719,7 +724,7 @@ export default function PerformanceDatabase() {
                       }`}
                     >
                       <td className="px-6 py-4 font-medium whitespace-nowrap text-muted-foreground">
-                        {formatDate(item.date_of_performance)}
+                        {formatDate(item.created_at || item.date_of_performance)}
                       </td>
                       <td className="px-6 py-4 font-bold capitalize whitespace-nowrap text-foreground">
                         {item.full_name}
@@ -732,6 +737,7 @@ export default function PerformanceDatabase() {
                         {item.result}
                       </td>
                       <td className="px-6 py-4 font-medium text-muted-foreground">{item.unit}</td>
+                      <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">{formatDate(item.date_of_performance)}</td>
                       <td className="px-6 py-4 font-medium whitespace-nowrap text-foreground">
                         <span className="inline-flex items-center gap-2">
                           {getCountryCode(item.country) ? (
@@ -754,6 +760,7 @@ export default function PerformanceDatabase() {
                       <td className="px-6 py-4 max-w-[150px] truncate capitalize text-muted-foreground">
                         {item.club_name || "—"}
                       </td>
+                      <td className="px-6 py-4 text-muted-foreground">{item.email}</td>
                       <td className="px-6 py-4 capitalize text-muted-foreground">{item.coach_name}</td>
                       <td className="px-6 py-4 text-center">
                         {item.video_link && item.video_link.trim() && item.video_link !== "dfgg" ? (

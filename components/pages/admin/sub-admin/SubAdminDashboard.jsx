@@ -541,22 +541,6 @@ export default function SubAdminDashboard() {
                   <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary">
                     Create Solution
                   </p>
-                  <h2 className="mt-2 text-h2 font-bold text-foreground">
-                    Upload your players and start fast
-                  </h2>
-                  <p className="mt-2 text-p2 leading-6 text-muted-foreground">
-                    Add the competition name, upload the CSV, then jump straight into the
-                    player list editor.
-                  </p>
-                </div>
-                <div
-                  className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-2xl"
-                  style={{
-                    background: brandGradient,
-                    boxShadow: "var(--brand-card-shadow)",
-                  }}
-                >
-                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                 </div>
               </div>
 
