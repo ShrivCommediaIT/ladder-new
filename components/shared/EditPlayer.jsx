@@ -162,10 +162,11 @@ export const EditPlayer = ({
   const isSelf = Number(localUser?.id || localUser?.user_id) === Number(currentId);
 
   const tabs = useMemo(() => {
+    if (ladderType === "roster") {
+      return allTabs.filter((t) => t.value === "edit" || t.value === "load");
+    }
     if (isAdmin) {
-      return ladderType === "roster"
-        ? allTabs.filter((t) => t.value === "edit" || t.value === "load")
-        : allTabs;
+      return allTabs;
     }
     // For userLevel (normal player views)
     if (isSelf) {
@@ -200,13 +201,13 @@ export const EditPlayer = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[700px] lg:max-w-[900px] mx-auto bg-gray-900 text-white max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[480px] mx-auto bg-white text-slate-900 border border-slate-200 dark:bg-slate-950 dark:text-white dark:border-slate-800 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
         <DialogTitle>
           <VisuallyHidden>Edit Player</VisuallyHidden>
         </DialogTitle>
 
         {/* HEADER */}
-        <div className="px-4 py-3 border-b border-white/10 text-center font-semibold">
+        <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-center font-bold text-base text-slate-800 dark:text-slate-200">
           Player Control Panel
         </div>
 
@@ -214,12 +215,12 @@ export const EditPlayer = ({
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             {/* DESKTOP */}
             <div className="hidden sm:block mb-4">
-              <TabsList className="w-full flex bg-black/40 rounded-xl p-1">
+              <TabsList className="w-full flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 gap-1 border border-slate-200/50 dark:border-slate-800">
                 {tabs.map((tab) => (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="flex-1 text-white text-sm data-[state=active]:bg-cyan-500 data-[state=active]:text-black"
+                    className="flex-1 text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white text-xs py-1.5 rounded-lg transition-all data-[state=active]:bg-cyan-500 data-[state=active]:text-slate-950 data-[state=active]:font-black"
                   >
                     {tab.label}
                   </TabsTrigger>
@@ -230,10 +231,10 @@ export const EditPlayer = ({
             {/* MOBILE DROPDOWN */}
             <div className="sm:hidden mb-4">
               <Select value={mobileTab} onValueChange={handleMobileTabChange}>
-                <SelectTrigger className="w-full bg-gray-800 text-white">
+                <SelectTrigger className="w-full bg-slate-50 border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white h-10 rounded-xl focus:border-cyan-500">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 text-white">
+                <SelectContent className="bg-white border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white rounded-xl">
                   {tabs.map((tab) => (
                     <SelectItem key={tab.value} value={tab.value}>
                       {tab.label}

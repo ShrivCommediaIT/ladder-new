@@ -27,6 +27,8 @@ import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
 
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice"; // ✅ ADDED FOR MINILEAGUE
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
+import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { format } from "date-fns";
 import { calculateAge, parseDobToDate } from "@/lib/utils";
 
@@ -144,28 +146,23 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
   // ✅ FIXED: Real-time refresh on success (SAME AS IMAGE UPLOAD)
   useEffect(() => {
     if (successMessage) {
-      gsap.to(cardRef.current, {
-        scale: 1.05,
-        duration: 0.2,
-        yoyo: true,
-        repeat: 1,
-      });
+      setShowSkeleton(false); // ✅ Turn off skeleton immediately on success!
 
-      const timer = setTimeout(() => {
-        setShowSkeleton(false);
-        
-        // ✅ REAL-TIME REFRESH - BOTH LEADERBOARD & MINILEAGUE
-        if (ladder_id) {
-          const urlType = searchParams.get("type") || searchParams.get("ladder_type");
+      // ✅ REAL-TIME REFRESH - SUPPORT ALL LADDERS INSTANTLY
+      if (ladder_id) {
+        const urlType = searchParams.get("type") || searchParams.get("ladder_type");
+        if (urlType === "roster") {
+          dispatch(fetchRosterLeaderboard({ ladder_id }));
+        } else if (urlType === "skill") {
+          dispatch(fetchSkillLeaderboard({ ladder_id, type: "skill" }));
+        } else {
           dispatch(fetchLeaderboard({ ladder_id, type: urlType }));
-          dispatch(fetchMiniLeague({ ladder_id, ladderType: "minileague" }));
         }
-        
-        dispatch(resetEditPlayerState());
-        onClose();
-      }, 1200);
-
-      return () => clearTimeout(timer);
+        dispatch(fetchMiniLeague({ ladder_id, ladderType: "minileague" }));
+      }
+      
+      dispatch(resetEditPlayerState());
+      onClose(); // ✅ Close immediately!
     }
 
     if (error) {
