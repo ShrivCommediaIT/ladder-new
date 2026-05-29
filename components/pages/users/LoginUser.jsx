@@ -43,7 +43,10 @@ const loginSchema = z.object({
 
 const registerSchema = z
   .object({
-    name: z.string().min(1, "Full name is required"),
+    name: z
+      .string()
+      .min(1, "Full name is required")
+      .max(20, "Name must be at most 20 characters"),
     dob: z.date().optional(),
     password: z.string().regex(/^\d{6}$/, "PIN must be 6 digits"),
     confirmPassword: z.string().min(1, "Confirm your PIN"),
@@ -387,7 +390,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                     </div>
 
                   {mode === "login" ? (
-                    <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
+                    <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} noValidate className="space-y-6">
                       {/* Username */}
                       <div>
                         <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
@@ -453,7 +456,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                       </Button>
                     </form>
                   ) : (
-                    <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-5">
+                    <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} noValidate className="space-y-5">
                       {/* Name */}
                       <div>
                         <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
@@ -461,6 +464,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                         </Label>
                         <Input
                           {...registerForm.register("name")}
+                          maxLength={20}
                           className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                           style={{
                             backgroundColor: "var(--input-bg)",

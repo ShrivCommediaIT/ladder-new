@@ -65,9 +65,13 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
   const [successData, setSuccessData] = useState(null);
 
   const handleInputChange = (e) => {
+    let { name, value } = e.target;
+    if (name === "phone") {
+      value = value.replace(/\D/g, "").slice(0, 10);
+    }
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
     setError("");
   };
@@ -77,6 +81,11 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
 
     if (!formData.name.trim()) {
       setError("Player name is required!");
+      return;
+    }
+
+    if (formData.phone.trim() && formData.phone.trim().length !== 10) {
+      setError("Phone number must be exactly 10 digits!");
       return;
     }
 
@@ -107,10 +116,10 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
         setFormData({ name: "", phone: "", dob: undefined, gender: "male" });
         onSuccessRefresh?.();
       } else {
-      setError(response?.error_message || "Failed to add player. Please try again.");
+        setError(response?.error_message || "Failed to add player. Please try again.");
       }
     } catch (error) {
-        throw new Error(response?.error_message || "Failed to add player");
+      setError("Failed to add player. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -170,8 +179,9 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
         <div className="relative">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">+91</div>
           <input
-            type="number"
+            type="tel"
             name="phone"
+            maxLength={10}
             placeholder="Enter your phone number (Optional)"
             value={formData.phone}
             onChange={handleInputChange}

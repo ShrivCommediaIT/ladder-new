@@ -75,6 +75,12 @@ const handleSubmit = async () => {
     return;
   }
 
+  if (phone && phone.trim().length !== 10) {
+    setWelcomeMsg("Phone number must be exactly 10 digits!");
+    setShowDialog(true);
+    return;
+  }
+
   setSubmitting(true);
 
   const formData = new FormData();
@@ -185,8 +191,9 @@ const handleSubmit = async () => {
           <Label className="text-white">Phone (Optional)</Label>
           <Input
             type="tel"
+            maxLength={10}
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
             placeholder="Enter phone number (Optional)"
             className="text-white font-semibold"
           />
