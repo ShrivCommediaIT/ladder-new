@@ -406,7 +406,7 @@ export default function AdminClubId() {
       <Card className="md:w-1/2 w-full rounded-3xl border border-border bg-card backdrop-blur-xl shadow-lg text-foreground transition-all duration-300">
         <CardHeader className="text-center">
           <CardTitle className="text-xl font-extrabold tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Generate Section Admin Club ID
+            Generate Section Admin Club ID or Coach Section ID
           </CardTitle>
         </CardHeader>
 
@@ -421,7 +421,7 @@ export default function AdminClubId() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-muted-foreground font-semibold">Section admin Name</FormLabel>
+                    <FormLabel className="text-muted-foreground font-semibold">Section Admin or Coach Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}

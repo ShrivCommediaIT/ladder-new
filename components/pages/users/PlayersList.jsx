@@ -284,7 +284,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
             <span className="best-board-highlight uppercase tracking-[0.18em]">
               {grade.label}
             </span>
-            <span className="rounded bg-white/5 px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
+            <span className="rounded bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
               {grade.players.length} players
             </span>
           </div>
@@ -332,12 +332,12 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate text-h5 font-semibold text-[var(--best-board-text)]">{player?.name || "N/A"}</p>
                         {player.age !== null && player.age !== undefined && player.age !== "" && (
-                          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white border border-white/10">
+                          <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]">
                             Age : {player.age}
                           </span>
                         )}
                         {player.gender && (
-                          <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-white border border-white/10">
+                          <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]">
                             Gender: {player.gender === "male" ? "M" : "F"}
                           </span>
                         )}
@@ -371,13 +371,13 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
 
       {/* NOTICE */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md w-full">
+        <DialogContent className="sm:max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle>Notice</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">Notice</DialogTitle>
           </DialogHeader>
-          <p className="py-2 text-gray-800">{dialogMessage}</p>
-          <DialogFooter>
-            <Button onClick={() => setIsDialogOpen(false)}>OK</Button>
+          <p className="py-2 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">{dialogMessage}</p>
+          <DialogFooter className="mt-4">
+            <Button onClick={() => setIsDialogOpen(false)} className="rounded-xl px-5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold shadow-md transition-all duration-200">OK</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

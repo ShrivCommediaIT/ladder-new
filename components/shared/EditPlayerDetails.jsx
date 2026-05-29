@@ -15,6 +15,7 @@ import {
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
+import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -120,28 +121,25 @@ const EditPlayerDetails = ({
 
   useEffect(() => {
     if (successMessage) {
-      // toast.success("Profile updated successfully!  Refreshing...");
-      const timer = setTimeout(() => {
-        setShowSkeleton(false);
+      setShowSkeleton(false); // ✅ Turn off skeleton immediately on success!
 
-        if (ladderId) {
-          if (ladderTypeFromUrl === "roster") {
-            dispatch(fetchRosterLeaderboard({ ladder_id: ladderId }));
-          } else {
-            dispatch(
-              fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl })
-            );
-          }
+      if (ladderId) {
+        if (ladderTypeFromUrl === "roster") {
+          dispatch(fetchRosterLeaderboard({ ladder_id: ladderId }));
+        } else if (ladderTypeFromUrl === "skill") {
+          dispatch(fetchSkillLeaderboard({ ladder_id: ladderId, type: "skill" }));
+        } else {
           dispatch(
-            fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" })
+            fetchLeaderboard({ ladder_id: ladderId, type: ladderTypeFromUrl })
           );
         }
+        dispatch(
+          fetchMiniLeague({ ladder_id: ladderId, ladderType: "minileague" })
+        );
+      }
 
-        dispatch(resetEditPlayerState());
-        onClose();
-      }, 1200);
-
-      return () => clearTimeout(timer);
+      dispatch(resetEditPlayerState());
+      onClose(); // ✅ Close immediately!
     }
 
     if (error) {
@@ -152,33 +150,33 @@ const EditPlayerDetails = ({
   }, [successMessage, error, dispatch, ladderId, onClose]);
 
   return (
-    <Card className="max-w-md mx-auto mt-6 shadow-xl rounded-2xl bg-gray-800 border border-gray-600">
-      <CardContent className="p-6 space-y-4">
+    <Card className="max-w-md mx-auto mt-2 shadow-none rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/55">
+      <CardContent className="p-4 space-y-3">
         {selectedPlayer?.name && (
-          <div className="text-center bg-blue-900/50 border border-blue-500/50 rounded-lg p-3">
-            <p className="text-blue-200 font-semibold text-lg">
+          <div className="text-center bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200/60 dark:border-cyan-800/50 rounded-lg p-2.5">
+            <p className="text-cyan-800 dark:text-cyan-200 font-semibold text-base">
               Editing: {selectedPlayer.name}
             </p>
-            <p className="text-blue-300 text-sm opacity-90">
+            <p className="text-cyan-600 dark:text-cyan-400 text-xs opacity-90">
               Rank: {selectedPlayer.rank || "N/A"}
             </p>
           </div>
         )}
 
         {showSkeleton ? (
-          <div className="space-y-4">
-            <Skeleton className="h-6 w-full rounded" />
-            <Skeleton className="h-10 w-full rounded" />
-            <Skeleton className="h-6 w-full rounded" />
-            <Skeleton className="h-10 w-full rounded" />
-            <Skeleton className="h-10 w-full rounded" />
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-full rounded bg-slate-200 dark:bg-slate-800" />
+            <Skeleton className="h-9 w-full rounded bg-slate-200 dark:bg-slate-800" />
+            <Skeleton className="h-4 w-full rounded bg-slate-200 dark:bg-slate-800" />
+            <Skeleton className="h-9 w-full rounded bg-slate-200 dark:bg-slate-800" />
+            <Skeleton className="h-9 w-full rounded bg-slate-200 dark:bg-slate-800" />
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div>
               <Label
                 htmlFor="name"
-                className="text-gray-300 font-semibold py-2 text-lg"
+                className="text-slate-700 dark:text-slate-300 font-semibold py-1 text-sm block"
               >
                 Name
               </Label>
@@ -189,7 +187,7 @@ const EditPlayerDetails = ({
                 onChange={handleChange}
                 required
                 placeholder="Enter player name"
-                className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                className="text-slate-900 bg-white border-slate-200 dark:text-white dark:bg-slate-800/50 dark:border-slate-700 focus:border-cyan-500 focus:ring-cyan-500 focus:ring-1 h-10 rounded-xl"
               />
             </div>
 
@@ -198,7 +196,7 @@ const EditPlayerDetails = ({
               <div>
                 <Label
                   htmlFor="dob"
-                  className="text-gray-300 font-semibold py-2 text-lg"
+                  className="text-slate-700 dark:text-slate-300 font-semibold py-1 text-sm block"
                 >
                   Date of Birth
                 </Label>
@@ -212,7 +210,7 @@ const EditPlayerDetails = ({
                       dob: date,
                     }))
                   }
-                  className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                  className="text-slate-900 px-4 bg-white border-slate-200 dark:text-white dark:bg-slate-800/50 dark:border-slate-700 focus:border-cyan-500 focus:ring-cyan-500 focus:ring-1 h-10 rounded-xl w-full"
                 />
               </div>
             )}
@@ -220,7 +218,7 @@ const EditPlayerDetails = ({
             <div>
               <Label
                 htmlFor="phone"
-                className="text-gray-300 font-semibold py-2 text-lg"
+                className="text-slate-700 dark:text-slate-300 font-semibold py-1 text-sm block"
               >
                 Phone Number (Optional)
               </Label>
@@ -230,23 +228,23 @@ const EditPlayerDetails = ({
                 type="tel"
                 value={form.phone}
                 onChange={handleChange}
-                placeholder="Enter phone number (Optional)"
-                className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                placeholder="Enter phone number"
+                className="text-slate-900 bg-white border-slate-200 dark:text-white dark:bg-slate-800/50 dark:border-slate-700 focus:border-cyan-500 focus:ring-cyan-500 focus:ring-1 h-10 rounded-xl"
               />
             </div>
 
             {!userLevel && (
               <div className="w-full">
-                <Label className="text-gray-300 font-semibold py-2 text-lg">Gender</Label>
+                <Label className="text-slate-700 dark:text-slate-300 font-semibold py-1 text-sm block">Gender</Label>
                 <Select
                   key={form.gender}
                   value={form.gender}
                   onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
                 >
-                  <SelectTrigger className="bg-gray-700/50 border-gray-500 w-full text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12">
+                  <SelectTrigger className="bg-white border-slate-200 w-full text-slate-900 dark:bg-slate-800/50 dark:border-slate-700 dark:text-white focus:border-cyan-500 focus:ring-cyan-500 focus:ring-1 h-10 rounded-xl">
                     <SelectValue placeholder="Select Gender" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                  <SelectContent className="bg-white border-slate-200 text-slate-900 dark:bg-slate-800 dark:border-slate-700 dark:text-white">
                     <SelectItem value="male">Male</SelectItem>
                     <SelectItem value="female">Female</SelectItem>
                   </SelectContent>
@@ -256,12 +254,12 @@ const EditPlayerDetails = ({
 
             <Button
               type="submit"
-              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-lg transition-all duration-200"
+              className="w-full h-10 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold shadow-md transition-all duration-200 mt-2"
               disabled={loading || !form.name.trim()}
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Saving...
                 </span>
               ) : (

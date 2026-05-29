@@ -3,7 +3,7 @@
 import React from "react";
 import { X } from "lucide-react";
 
-const AdminImportantInfo = ({ onClose = () => {} }) => {
+const AdminImportantInfo = ({ onClose = () => { } }) => {
   return (
     <div className="relative w-full flex justify-center items-center p-2">
 
@@ -18,7 +18,7 @@ const AdminImportantInfo = ({ onClose = () => {} }) => {
 
       {/* Image */}
       <img
-        src="/poster1.jpg"
+        src="/poster1.png"
         alt="Sports Solutions Pro Guide"
         className="w-full max-w-5xl rounded-lg shadow-lg"
       />
