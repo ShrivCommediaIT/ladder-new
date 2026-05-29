@@ -114,7 +114,7 @@ export default function LoginByClubForm() {
       // ✅ Response check
       if (res?.status !== 200 || !res) {
         setDialogTitle("Login Failed");
-        setDialogMessage(res?.message || "Invalid Club ID or PIN");
+        setDialogMessage(res?.error_message || res?.message || "Invalid Club ID or PIN");
         setOpen(true);
         return;
       }
@@ -143,6 +143,8 @@ export default function LoginByClubForm() {
         message = "Server timeout. Please try again.";
       } else if (!err.response) {
         message = "Network error or CORS blocked the request.";
+      } else if (err.response?.data?.error_message) {
+        message = err.response.data.error_message;
       } else if (err.response?.data?.message) {
         message = err.response.data.message;
       }

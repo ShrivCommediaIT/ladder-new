@@ -411,7 +411,7 @@ export default function SubAdminDashboard() {
                   Welcome back, {subAdminFirstName}
                 </h1>
                 <p className="max-w-2xl text-p2 leading-7 text-muted-foreground">
-                  Manage competitions for your section and keep your club's internal ladder system organized from your sub-admin workspace.
+                  Manage competitions from your section admin dashboard.
                 </p>
               </div>
 
@@ -501,7 +501,7 @@ export default function SubAdminDashboard() {
                   Solutions Available
                 </p>
                 <h2 className="mt-2 text-h2 font-bold text-foreground">
-                  Competition types you can create
+                  DEMO SOLUTIONS (Use to test)
                 </h2>
               </div>
               <LadderInfo ladders={demoLadders} />
