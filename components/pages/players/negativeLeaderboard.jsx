@@ -94,15 +94,16 @@ const PlayerCard = ({
       skillObj?.target !== null && skillObj?.target !== undefined
         ? Number(skillObj.target)
         : null;
+    const bestScoreInSeconds = rawBestScore ? Number(convertTimeToSeconds(rawBestScore)) : 0;
     let isTargetAchieved = false;
     if (
       target !== null &&
       target !== 0 &&
-      score !== 0 &&
+      bestScoreInSeconds !== 0 &&
       !isNaN(target) &&
-      !isNaN(score)
+      !isNaN(bestScoreInSeconds)
     ) {
-      isTargetAchieved = isInverted ? rawBestScore <= target : rawBestScore >= target;
+      isTargetAchieved = isInverted ? bestScoreInSeconds <= target : bestScoreInSeconds >= target;
     }
     return { witnessBy, score, displayScore, target, isTargetAchieved, input_score: rawBestScore };
   };

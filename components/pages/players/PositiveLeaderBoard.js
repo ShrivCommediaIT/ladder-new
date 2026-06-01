@@ -340,7 +340,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const showAgeRank = Number(appliedAge) > 0;
   const isInverted = ladderDetails?.inverted == 0;
   const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
-
+console.log('isInverted', isInverted)
   const currentUser = useSelector((state) => state.user?.user);
   const activityState = useSelector((state) => state.activity);
 
