@@ -170,7 +170,7 @@ export default function InfoSection({
 
   return (
     <>
-      <aside className={`${mobileSection === "info" ? "block" : "hidden"} lg:sticky lg:top-[5.2rem] lg:block lg:self-start`}>
+      <aside className={`${mobileSection === "info" ? "block" : "hidden"} lg:sticky lg:top-[5.2rem] lg:block lg:self-start lg:max-h-[calc(100vh-6.5rem)] lg:overflow-y-auto lg:pr-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}>
         <div className="space-y-4">
           <div className="best-board-card rounded-xl p-4">
             <div className="mb-2 flex items-start justify-between">
