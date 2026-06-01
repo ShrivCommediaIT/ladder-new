@@ -92,7 +92,7 @@ let filteredLadders = [];
 
 if (subAdmin?.user_type === "sub_admin") {
   filteredLadders = allLadders?.filter(
-    (ladder) => ladder.created_by !== "demo"
+    (ladder) => ladder.created_by !== "demo" && ladder.type?.toLowerCase() !== "roster"
   );
 } else if (admin?.user_type === "admin") {    
   filteredLadders = allLadders?.filter(
@@ -201,7 +201,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                     </div>
 
                    {/* Right */}
-                  <div className="flex items-center gap-2 justify-end sm:justify-start">
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-stretch sm:justify-start">
                     <Button
                       size="sm"
                       variant="ghost"

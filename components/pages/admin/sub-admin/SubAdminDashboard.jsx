@@ -376,7 +376,7 @@ export default function SubAdminDashboard() {
   };
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground mt-10">
+    <div className="relative min-h-screen bg-background text-foreground mt-10 overflow-x-hidden">
       {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
       <PlayerLevelNavbar activeTab="dashboard" />
 
@@ -450,51 +450,12 @@ export default function SubAdminDashboard() {
         </motion.section>
 
         <div className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr] items-start">
-          <div className="space-y-6">
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.05 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 sm:p-6 backdrop-blur-xl"
-            >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
-                    Workspace Flow
-                  </p>
-                  <h2 className="mt-2 text-h2 font-bold text-foreground">
-                    How to get a new competition ready
-                  </h2>
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-                  <FolderKanban className="h-4 w-4" />
-                  {activeLadders.length > 0 ? "Section active" : "Fresh setup"}
-                </div>
-              </div>
-
-              <div className="mt-6 grid gap-4 lg:grid-cols-3">
-                {startSteps.map(({ icon: Icon, title, text }) => (
-                  <div
-                    key={title}
-                    className="rounded-[24px] border border-border bg-muted/40 p-5"
-                  >
-                    <div
-                      className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10"
-                    >
-                      <Icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="mt-4 text-lg font-semibold text-foreground">{title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.section>
-
+          <div className="space-y-6 min-w-0">
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.15 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
+              className="overflow-hidden rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 px-1">
                 <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
@@ -511,7 +472,7 @@ export default function SubAdminDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.2 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
+              className="overflow-hidden rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
             >
               <div className="mb-4 px-1">
                 <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
@@ -528,41 +489,12 @@ export default function SubAdminDashboard() {
             </motion.section>
           </div>
 
-          <div className="space-y-6 sticky top-24 z-40">
-            <motion.section
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.45, delay: 0.08 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-primary/10 bg-card p-4 sm:p-6 backdrop-blur-xl"
-              style={{ backgroundColor: "color-mix(in srgb, var(--card), var(--primary) 2%)" }}
-            >
-              <div className="mb-5 flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary">
-                    Create Solution
-                  </p>
-                </div>
-              </div>
-
-              <CreatePanel
-                role="subadmin"
-                ladderName={ladderName}
-                setLadderName={setLadderName}
-                ladderType={ladderType}
-                setLadderType={setLadderType}
-                csvFile={csvFile}
-                handleFileChange={handleFileChange}
-                handleCreate={handleCreateLadder}
-                loading={loading}
-                sportName={subAdmin?.sport_name}
-              />
-            </motion.section>
-
+          <div className="space-y-6 sticky top-24 z-40 min-w-0">
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.12 }}
-              className="rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 sm:p-6 backdrop-blur-xl"
+              className="overflow-hidden rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 sm:p-6 backdrop-blur-xl"
             >
               <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
                 Support
@@ -577,10 +509,10 @@ export default function SubAdminDashboard() {
 
               <a
                 href="mailto:support@sportssolutionspro.com"
-                className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/20"
+                className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-3 sm:px-4 py-3 text-xs sm:text-sm font-semibold text-primary transition hover:bg-primary/20 max-w-full overflow-hidden"
               >
-                <Mail className="h-4 w-4" />
-                support@sportssolutionspro.com
+                <Mail className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">support@sportssolutionspro.com</span>
               </a>
             </motion.section>
 

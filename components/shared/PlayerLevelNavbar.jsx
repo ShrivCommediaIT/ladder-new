@@ -19,7 +19,6 @@ import {
   Trophy,
   Users,
   BarChart3,
-  BookOpen,
   Sun,
   Moon,
   Search,
@@ -69,7 +68,6 @@ const PlayerLevelNavbar = ({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const [quickGuideOpen, setQuickGuideOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [localLogo, setLocalLogo] = useState(null);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -238,7 +236,6 @@ const PlayerLevelNavbar = ({
   };
 
   const isPlayersPage = activeTab === "players" || userLevel;
-  const showQuickGuide = !isPlayersPage && !userLevel;
   const userInitial = user?.name?.trim()?.[0]?.toUpperCase() || "?";
   const displayName = user?.name || "Guest";
   const roleLabel =
@@ -439,20 +436,6 @@ const PlayerLevelNavbar = ({
 
             <div className="flex items-center gap-2">
               
-              {!userLevel && (
-                <button
-                  onClick={() => setQuickGuideOpen(true)}
-                  className="hidden sm:flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-200"
-                  style={{
-                    background: "rgba(41,171,226,0.12)",
-                    border: "1px solid rgba(41,171,226,0.28)",
-                    color: "#7dd3fc",
-                  }}
-                >
-                  <BookOpen className="h-3.5 w-3.5" />
-                  Quick Guide
-                </button>
-              )}
 
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -658,20 +641,6 @@ const PlayerLevelNavbar = ({
               Q &amp; A
             </button>
 
-            {/* Quick Guide (if applicable) */}
-            {showQuickGuide && (
-              <button
-                onClick={() => {
-                  setQuickGuideOpen(true);
-                  setMobileOpen(false);
-                }}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-left"
-                style={{ color: "#7dd3fc" }}
-              >
-                <BookOpen className="h-4 w-4" />
-                Quick Guide
-              </button>
-            )}
 
             <div className="my-1 border-t border-white/10" />
 
@@ -691,33 +660,6 @@ const PlayerLevelNavbar = ({
       </nav>
 
       <div className="h-14 w-full" />
-
-      {quickGuideOpen && (
-        <Dialog open={quickGuideOpen} onOpenChange={setQuickGuideOpen}>
-          <DialogContent className="max-w-xl bg-slate-100 text-slate-900">
-            <DialogTitle className="text-lg font-bold">Quick Guide</DialogTitle>
-            <div className="mt-2 space-y-3 text-sm leading-relaxed text-slate-700">
-              <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="mb-1 font-semibold text-slate-800">Players Tab</p>
-                <p>View and manage all players in this competition. Click any player card to edit details, update scores, or change status.</p>
-              </div>
-              <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="mb-1 font-semibold text-slate-800">Competitions</p>
-                <p>Browse all active competitions. Use the add, remove, and move controls in the sidebar to manage player placement.</p>
-              </div>
-              <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="mb-1 font-semibold text-slate-800">Admin Controls</p>
-                <p>Use the action buttons such as reset, sort, and age filter to manage leaderboard data.</p>
-              </div>
-            </div>
-            <div className="mt-4 flex justify-end">
-              <DialogClose className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-                Got it
-              </DialogClose>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
 
       {isChangePasswordOpen && user && (
         <Dialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen}>

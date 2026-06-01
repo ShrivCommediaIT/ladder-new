@@ -52,7 +52,7 @@ export default function LadderInfo({ ladders }) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-full rounded-2xl border border-border bg-card shadow-sm p-4 sm:p-5"
+      className="w-full"
     >
       {/* Yaha scroll add kar rahe hain */}
       <div
@@ -89,7 +89,10 @@ export default function LadderInfo({ ladders }) {
               {isMobile ? (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="grid place-items-center h-8 w-8 rounded-full bg-primary/10 text-primary hover:scale-110 hover:bg-primary/20 transition">
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="grid place-items-center h-8 w-8 rounded-full bg-primary/10 text-primary hover:scale-110 hover:bg-primary/20 transition"
+                    >
                       <Info className="w-4 h-4" />
                     </button>
                   </PopoverTrigger>
@@ -101,7 +104,10 @@ export default function LadderInfo({ ladders }) {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button className="grid place-items-center h-8 w-8 rounded-full bg-primary/10 text-primary hover:scale-110 hover:bg-primary/20 transition">
+                      <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="grid place-items-center h-8 w-8 rounded-full bg-primary/10 text-primary hover:scale-110 hover:bg-primary/20 transition"
+                      >
                         <Info className="w-4 h-4" />
                       </button>
                     </TooltipTrigger>
