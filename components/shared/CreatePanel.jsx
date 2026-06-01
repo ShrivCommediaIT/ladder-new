@@ -21,7 +21,7 @@ const CreatePanel = ({
   const isAdmin = role === "admin";
 
   return (
-    <div className="lg:col-span-2 bg-card border border-border backdrop-blur-xl p-4 sm:p-6 rounded-3xl">
+    <div className="w-full">
 
       {/* HEADER */}
       <h3 className="text-h3 font-bold text-primary flex items-center gap-2 mb-4">
