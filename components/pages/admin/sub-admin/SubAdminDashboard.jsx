@@ -491,6 +491,35 @@ export default function SubAdminDashboard() {
 
           <div className="space-y-6 sticky top-24 z-40 min-w-0">
             <motion.section
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.45, delay: 0.08 }}
+              className="overflow-hidden rounded-[24px] sm:rounded-[30px] border border-primary/10 bg-card p-4 sm:p-6 backdrop-blur-xl"
+              style={{ backgroundColor: "color-mix(in srgb, var(--card), var(--primary) 2%)" }}
+            >
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary">
+                    Create Solution
+                  </p>
+                </div>
+              </div>
+
+              <CreatePanel
+                role="subadmin"
+                ladderName={ladderName}
+                setLadderName={setLadderName}
+                ladderType={ladderType}
+                setLadderType={setLadderType}
+                csvFile={csvFile}
+                handleFileChange={handleFileChange}
+                handleCreate={handleCreateLadder}
+                loading={loading}
+                sportName={subAdmin?.sport_name}
+              />
+            </motion.section>
+
+            <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.12 }}
