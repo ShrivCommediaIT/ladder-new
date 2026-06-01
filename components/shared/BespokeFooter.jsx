@@ -3,10 +3,21 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogTitle,
+  AlertDialogDescription,
+} from "@/components/ui/alert-dialog";
 
 export default function BespokeFooter() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -19,11 +30,16 @@ export default function BespokeFooter() {
   };
 
   const handleBotClick = () => {
+    setShowWarning(true);
+  };
+
+  const handleConfirmNavigate = () => {
     window.open(
       "https://chatgpt.com/g/g-6a0e2c4800e48191b115f12efef3522b-ai-guide-to-ssp-ask-any-question",
       "_blank",
       "noopener,noreferrer"
     );
+    setShowWarning(false);
   };
 
   return (
@@ -33,15 +49,15 @@ export default function BespokeFooter() {
           type="button"
           onClick={handleBotClick}
           aria-label="Open SSP AI Assistant"
-          className="group relative mx-auto w-full overflow-hidden rounded-[20px] border border-fuchsia-200 bg-white shadow-xl transition-all duration-300 hover:border-fuchsia-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/70 dark:border-fuchsia-500/60 dark:bg-[#070913] dark:shadow-2xl"
+          className="group relative mx-auto w-full overflow-hidden rounded-[20px] border border-fuchsia-200 bg-white shadow-xl transition-all duration-300 hover:border-fuchsia-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/70 dark:border-fuchsia-500/60 dark:bg-[#070913] dark:shadow-2xl p-2"
         >
-          <div className="relative w-full h-[110px] sm:h-[150px] md:h-[185px] lg:h-[220px] xl:h-full xl:min-h-[232px]">
+          <div className="relative w-full h-[120px] xs:h-[140px] sm:h-[175px] md:h-[220px] lg:h-[250px] xl:h-[267px]">
             <Image
               src={isDark ? "/ai.png" : "/ai-1.png"}
               alt="SSP AI Assistant"
               fill
               sizes="(max-width: 1279px) 100vw, 50vw"
-              className="object-cover"
+              className="object-contain"
               priority
             />
           </div>
@@ -53,18 +69,42 @@ export default function BespokeFooter() {
           aria-label="Open WhatsApp chat"
           className="group relative mx-auto w-full overflow-hidden rounded-[20px] border border-emerald-200 bg-white shadow-xl transition-all duration-300 hover:border-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 dark:border-emerald-500/50 dark:bg-[#04090c] dark:shadow-2xl p-2"
         >
-          <div className="relative w-full h-[125px] sm:h-[175px] md:h-[220px] lg:h-[250px] xl:h-full xl:min-h-[267px]">
+          <div className="relative w-full h-[120px] xs:h-[140px] sm:h-[175px] md:h-[220px] lg:h-[250px] xl:h-[267px]">
             <Image
               src={isDark ? "/wtsapp.png" : "/wtsapp-1.png"}
               alt="WhatsApp contact card"
               fill
               sizes="(max-width: 1279px) 100vw, 50vw"
-              className="object-cover"
+              className="object-contain"
               priority
             />
           </div>
         </button>
       </div>
+
+      <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
+        <AlertDialogContent className="rounded-[24px] border border-border bg-card p-6 backdrop-blur-xl shadow-2xl w-[90vw] max-w-sm sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg sm:text-xl font-bold text-foreground">
+              Opening SSP AI Assistant
+            </AlertDialogTitle>
+            <AlertDialogDescription className="mt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground">
+              This link will open the SSP AI Assistant in ChatGPT. Would you like to proceed?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <AlertDialogCancel className="w-full sm:w-auto rounded-xl border border-border bg-transparent text-foreground hover:bg-muted font-medium py-2.5 px-4 transition text-xs sm:text-sm">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmNavigate}
+              className="w-full sm:w-auto rounded-xl bg-fuchsia-600 text-white hover:bg-fuchsia-700 font-semibold py-2.5 px-4 shadow-lg shadow-fuchsia-500/20 transition text-xs sm:text-sm"
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </footer>
   );
 }
