@@ -303,7 +303,7 @@ export default function PlanHeading() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15 }}
-              className="mb-16 flex flex-col items-center justify-center gap-4 sm:flex-row"
+              className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
             >
               <Button
                 asChild
@@ -326,6 +326,78 @@ export default function PlanHeading() {
               >
                 <Link href="/demo-page">Watch Demo</Link>
               </Button>
+            </motion.div>
+
+            {/* App Promotion & Info Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.18 }}
+              className="mx-auto mb-16 max-w-5xl rounded-[28px] bg-[#7c8bfa] text-white p-6 md:p-8 shadow-xl flex flex-col items-center justify-center gap-4 text-center border border-[#939efa]"
+            >
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-base font-bold">
+                <span className="text-[#fff37a] tracking-wide">For SSP International Competitions- Download app from</span>
+                
+                {/* App Store Badge */}
+                <a
+                  href="https://apps.apple.com/il/app/sports-solutions-pro/id6768947773"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-black px-3.5 py-1 text-white hover:opacity-90 transition-opacity border border-white/10"
+                >
+                  <svg className="h-4 w-4 fill-white" viewBox="0 0 24 24">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.5-.63.73-1.18 1.87-1.03 2.97 1.12.09 2.27-.6 2.98-1.41z"/>
+                  </svg>
+                  <div className="text-left leading-tight">
+                    <div className="text-[8px] uppercase tracking-wider text-gray-300">Available on the</div>
+                    <div className="text-[11px] font-bold font-sans">App Store</div>
+                  </div>
+                </a>
+
+                {/* Google Play Badge */}
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.sportssolutions.ssp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-black px-3.5 py-1 text-white hover:opacity-90 transition-opacity border border-white/10"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
+                    <path d="M3.25 3.25c-.14.14-.25.36-.25.64v16.22c0 .28.11.5.25.64l.06.06L12.44 12v-.12L3.31 3.19l-.06.06z" fill="#3bccff" />
+                    <path d="M15.5 15.06l-3.06-3.06v-.12l3.06-3.06.07.04 3.63 2.06c1.04.59 1.04 1.55 0 2.14l-3.63 2.06-.07-.06z" fill="#ffcc00" />
+                    <path d="M12.44 11.94L3.25 21.13c.34.36.91.4 1.55.04l10.76-6.11-3.12-3.12z" fill="#ff3366" />
+                    <path d="M12.44 12.06l3.12-3.12L4.8 2.83c-.64-.36-1.21-.32-1.55.04L12.44 12z" fill="#48ff48" />
+                  </svg>
+                  <div className="text-left leading-tight">
+                    <div className="text-[8px] uppercase tracking-wider text-gray-300">GET IT ON</div>
+                    <div className="text-[11px] font-bold font-sans">Google Play</div>
+                  </div>
+                </a>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-white">Follow us at</span>
+                  <a
+                    href="https://www.facebook.com/profile.php?id=61580051563946"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center hover:scale-110 transition-transform bg-white rounded-full p-1 shadow-md"
+                  >
+                    <svg className="h-5 w-5 fill-[#1877F2] text-[#1877F2]" viewBox="0 0 24 24">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+
+              <div className="text-sm font-semibold tracking-wide text-white/95 leading-relaxed">
+                Log into APP with <span className="font-extrabold text-white">SSPCOMPS</span> and find the competition. Register and Play.{" "}
+                <a
+                  href="/SSP_International_Competitions_Terms_and_Conditions.docx"
+                  download
+                  className="text-[#00ffff] hover:underline font-bold transition-all ml-1"
+                >
+                  Terms and Conditions.
+                </a>
+              </div>
             </motion.div>
 
             <motion.div

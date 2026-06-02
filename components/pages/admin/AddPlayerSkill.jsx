@@ -22,6 +22,7 @@ import { format } from "date-fns";
 import { calculateAge } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
+import CountrySelect from "@/components/shared/CountrySelect";
 
 const SuccessDialog = ({ playerName, ladderId, onCloseAll }) => (
   <Dialog open={true} onOpenChange={() => { }}>
@@ -58,6 +59,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
     phone: "",
     dob: undefined,
     gender: "male",
+    country: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -98,6 +100,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
         name: formData.name.trim(),
         phone: formData.phone.trim() || undefined,
         gender: formData.gender,
+        country: formData.country,
       };
 
       if (formData.dob) {
@@ -113,7 +116,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
           ladderId,
         });
         setShowSuccess(true);
-        setFormData({ name: "", phone: "", dob: undefined, gender: "male" });
+        setFormData({ name: "", phone: "", dob: undefined, gender: "male", country: "" });
         onSuccessRefresh?.();
       } else {
         setError(response?.error_message || "Failed to add player. Please try again.");
@@ -209,6 +212,18 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
             <SelectItem value="female">Female</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      {/* Country Field */}
+      <div className="space-y-2">
+        <label className="text-white font-semibold flex items-center gap-2">
+          Country
+        </label>
+        <CountrySelect
+          value={formData.country}
+          onValueChange={(val) => setFormData({ ...formData, country: val })}
+          className="w-full p-4 bg-white/10 border border-white/30 rounded-xl text-white focus:ring-2 focus:ring-blue-400/50 transition-all h-14"
+        />
       </div>
 
       {/* DOB Field */}

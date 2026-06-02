@@ -522,7 +522,7 @@ export const PlayerLists = () => {
 
       {/* Skill Setup Dialog */}
       <Dialog open={openSkillDialog} onOpenChange={setOpenSkillDialog}>
-        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+        <DialogContent showCloseButton={false} className="bg-transparent border-none shadow-none flex items-center justify-center">
           <BasicLeaderboardSetUpSkill onClose={() => setOpenSkillDialog(false)} onSkillsUpdated={refreshSkillLeaderboard} />
         </DialogContent>
       </Dialog>
