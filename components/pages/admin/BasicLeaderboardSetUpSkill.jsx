@@ -76,12 +76,12 @@ const TargetTimerInput = ({ value, onChange }) => {
     emitChange(m, s, ms);
   };
   return (
-    <div className="flex items-center justify-center gap-[2px] bg-white text-black font-semibold text-md border border-slate-400 rounded-md w-[80px] sm:w-[100px] h-15 px-1 outline-none focus-within:ring-2 focus-within:ring-sky-500">
-      <input className={`w-5 sm:w-6 text-center outline-none bg-transparent p-0 ${activeField === "min" ? "text-sky-600" : ""}`} value={m} onChange={(e) => handleChange("m", e)} onFocus={() => setActiveField("min")} onBlur={handleBlur} placeholder="00" />
+    <div className="flex items-center justify-center gap-[2px] bg-background text-foreground font-semibold text-md border border-input rounded-md w-[80px] sm:w-[100px] h-15 px-1 outline-none focus-within:ring-2 focus-within:ring-primary">
+      <input className={`w-5 sm:w-6 text-center outline-none bg-transparent p-0 ${activeField === "min" ? "text-primary" : ""}`} value={m} onChange={(e) => handleChange("m", e)} onFocus={() => setActiveField("min")} onBlur={handleBlur} placeholder="00" />
       <span className="pb-[2px]">:</span>
-      <input className={`w-5 sm:w-6 text-center outline-none bg-transparent p-0 ${activeField === "sec" ? "text-sky-600" : ""}`} value={s} onChange={(e) => handleChange("s", e)} onFocus={() => setActiveField("sec")} onBlur={handleBlur} placeholder="00" />
+      <input className={`w-5 sm:w-6 text-center outline-none bg-transparent p-0 ${activeField === "sec" ? "text-primary" : ""}`} value={s} onChange={(e) => handleChange("s", e)} onFocus={() => setActiveField("sec")} onBlur={handleBlur} placeholder="00" />
       <span className="pb-[2px]">.</span>
-      <input className={`w-5 sm:w-6 text-center outline-none bg-transparent p-0 ${activeField === "ms" ? "text-sky-600" : ""}`} value={ms} onChange={(e) => handleChange("ms", e)} onFocus={() => setActiveField("ms")} onBlur={handleBlur} placeholder="00" />
+      <input className={`w-5 sm:w-6 text-center outline-none bg-transparent p-0 ${activeField === "ms" ? "text-primary" : ""}`} value={ms} onChange={(e) => handleChange("ms", e)} onFocus={() => setActiveField("ms")} onBlur={handleBlur} placeholder="00" />
     </div>
   );
 };
@@ -169,37 +169,28 @@ export default function BasicLeaderboardSetUpSkill({
         return;
       }
 
-      const minusWithoutTarget = (type !== "negative" && ladderType !== "negative") ? rows.find(
-        (row) =>
-          row.mode === "minus" &&
-          String(row.description || "").trim() !== "" &&
-          String(row.target || "").trim() === "",
-      ) : null;
 
-      if (minusWithoutTarget) {
-        setValidationMessage(
-          `Target is required for negative skill in Skill No. ${minusWithoutTarget.id}`,
-        );
-        setTargetValidation(true);
-        return;
-      }
 
       const skills = rows
         .filter((row) => String(row.description || "").trim() !== "")
         .map((row) => {
           const targetStr = String(row.target || "").trim();
-          let targetNum = targetStr ? Number(targetStr) : null;
+          let finalTarget = "";
 
-          if (targetNum !== null && !isNaN(targetNum)) {
-            targetNum =
-              row.mode === "minus" ? -Math.abs(targetNum) : Math.abs(targetNum);
+          if (targetStr !== "" && targetStr !== "0" && targetStr !== "0.00" && targetStr !== "0.0") {
+            const targetNum = Number(targetStr);
+            if (!isNaN(targetNum)) {
+              finalTarget = row.mode === "minus" ? -Math.abs(targetNum) : Math.abs(targetNum);
+            } else {
+              finalTarget = targetStr;
+            }
           }
 
           return {
             skill_number: row.id,
             skill_description: String(row.description || "").trim(),
             skill_sign: row.mode,
-            target: targetNum !== null && !isNaN(targetNum) ? targetNum : targetStr,
+            target: finalTarget,
             unit: String(row.unit || "").trim(),
           };
         });
@@ -282,48 +273,49 @@ export default function BasicLeaderboardSetUpSkill({
 
   return (
     <>
-      <main className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
-        <Card className="w-full max-w-[350px] sm:max-w-[600px] sm:w-xl bg-[#0f2433] border border-slate-700 rounded-xl overflow-hidden shadow-xl">
-          <div className="bg-[#14283a] text-white py-3 border-b border-white/20 relative">
+      <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+        <Card className="w-full max-w-[350px] sm:max-w-[600px] sm:w-xl bg-card border border-border rounded-xl overflow-hidden shadow-xl text-card-foreground">
+          <div className="bg-muted text-foreground py-3 border-b border-border relative">
             <h2 className="text-md font-semibold text-center">
               {type === "skill" ? "Skills/Performance Set Up" : type === "negative" ? "Set Up" : "LeaderBoard Set Up"}
             </h2>
             <button
               onClick={onClose}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-red-600/50 hover:bg-red-600/60 text-lg font-bold cursor-pointer flex items-center justify-center"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-red-600/55 hover:bg-red-600/70 text-white text-lg font-bold cursor-pointer flex items-center justify-center transition-all duration-200"
             >
               ×
             </button>
           </div>
 
           {loading && (
-            <p className="text-center text-white text-sm py-3">
+            <p className="text-center text-muted-foreground text-sm py-3">
               Loading skills...
             </p>
           )}
 
           {/* FIXED: Single line header with proper alignment */}
-          <div className="sm:px-2 px-8 py-1  border-b border-white/10">
-            <div className="flex items-end gap-2 text-white text-xs font-medium ">
+          <div className="sm:px-2 px-8 py-1 border-b border-border">
+            <div className="flex items-end gap-2 text-foreground text-xs font-medium ">
               {(type !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : (type === "negative") ? <div className="w-20 flex items-center">Activity No.</div> : null}
-              <div className="w-[120px]">Target</div>
+              <div className="w-[120px] flex flex-col justify-end">
+                <span>Target</span>
+                <span className="text-[9px] text-muted-foreground font-normal normal-case leading-none">(Optional)</span>
+              </div>
               <div className="w-[200px]">{(type !== "positive" && type !== "negative") ? "Skill Name" : "Activity"}</div>
               {(type !== "negative") && <div className="w-[120px] translate">Units Of Measurement</div>}
             </div>
           </div>
 
-          <div className="max-h-[25vh] overflow-auto py-2 space-y-1.5">
+          <div className="max-h-[50vh] sm:max-h-[60vh] overflow-y-auto py-2 space-y-1.5 custom-scroll">
             {(type !== "negative") ?
               rows.map((row) => (
-                <div key={row.id} className="flex items-start ">
+                <div key={row.id} className="flex items-start p-3">
 
                   {/* Skill No. + +/- */}
                   <div className="flex flex-col w-20 pt-1">
-
-                    <div className="bg-white text-black font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
+                    <div className="bg-primary/10 text-primary border border-primary/20 font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
                       {row.id}
                     </div>
-
                   </div>
 
                   <div className="flex gap-2 w-[250px] items-start flex-1">
@@ -344,7 +336,7 @@ export default function BasicLeaderboardSetUpSkill({
                             updateRow(row.id, { target: val });
                           }
                         }}
-                        className="bg-white text-black text-xs rounded-md border border-slate-400 w-[100px] h-10 p-2 resize-none leading-tight"
+                        className="bg-background text-foreground text-xs rounded-md border border-input w-[100px] h-10 p-2 resize-none leading-tight"
                       />
                     )}
 
@@ -355,7 +347,7 @@ export default function BasicLeaderboardSetUpSkill({
                       onChange={(e) =>
                         updateRow(row.id, { description: e.target.value })
                       }
-                      className="bg-white text-black text-xs w-[300px] rounded-md border border-slate-400 p-2 resize-none leading-tight"
+                      className="bg-background text-foreground text-xs w-[300px] rounded-md border border-input p-2 resize-none leading-tight"
                     />
 
                     <Textarea
@@ -365,22 +357,24 @@ export default function BasicLeaderboardSetUpSkill({
                       onChange={(e) =>
                         updateRow(row.id, { unit: e.target.value })
                       }
-                      className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
+                      className="bg-background text-foreground text-xs rounded-md border border-input w-[200px] h-10 p-2 resize-none leading-tight"
                     />
                   </div>
-                  {Boolean(row.dbId) && (
+                  {Boolean(row.dbId) ? (
                     <button
-                      className="ml-2 flex items-center justify-center align-items-center rounded-full text-red-400 text-xl shadow hover:scale-105 hover:bg-gradient-to-br cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-gray-900"
+                      className="ml-2 flex items-center justify-center align-items-center rounded-full text-red-500 text-xl shadow hover:scale-105 hover:bg-red-500/10 cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-muted border border-border shrink-0"
                       title="Delete Activity"
                       onClick={() => handleDeleteClick(row.id)}
                       disabled={deletingId === row.id}
                     >
                       {deletingId === row.id ? (
-                        <span className="animate-spin text-sm text-red-400">⌛</span>
+                        <span className="animate-spin text-sm text-red-500">⌛</span>
                       ) : (
                         <FaTrash size={14} />
                       )}
                     </button>
+                  ) : (
+                    <div className="ml-2 w-8 h-8 shrink-0" />
                   )}
                 </div>
               )) :
@@ -388,7 +382,7 @@ export default function BasicLeaderboardSetUpSkill({
                 <div key={row.id} className="flex items-start p-3">
                   {/* Activity No. */}
                   <div className="flex flex-col w-20 pt-1">
-                    <div className="bg-white text-black font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
+                    <div className="bg-primary/10 text-primary border border-primary/20 font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
                       {row.id}
                     </div>
                   </div>
@@ -407,7 +401,7 @@ export default function BasicLeaderboardSetUpSkill({
                       onChange={(e) =>
                         updateRow(row.id, { description: e.target.value })
                       }
-                      className="bg-white text-black text-xs w-[300px] rounded-md border border-slate-400 p-2 resize-none leading-tight"
+                      className="bg-background text-foreground text-xs w-[300px] rounded-md border border-input p-2 resize-none leading-tight"
                     />
 
                     {(type !== "negative" && ladderType !== "negative") && (
@@ -418,22 +412,24 @@ export default function BasicLeaderboardSetUpSkill({
                         onChange={(e) =>
                           updateRow(row.id, { unit: e.target.value })
                         }
-                        className="bg-white text-black text-xs rounded-md border border-slate-400 w-[200px] h-10 p-2 resize-none leading-tight"
+                        className="bg-background text-foreground text-xs rounded-md border border-input w-[200px] h-10 p-2 resize-none leading-tight"
                       />)}
                   </div>
-                  {Boolean(row.dbId) && (
+                  {Boolean(row.dbId) ? (
                     <button
-                      className="ml-2 flex items-center justify-center align-items-center rounded-full text-red-400 text-xl shadow hover:scale-105 hover:bg-gradient-to-br cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-gray-900"
+                      className="ml-2 flex items-center justify-center align-items-center rounded-full text-red-500 text-xl shadow hover:scale-105 hover:bg-red-500/10 cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-muted border border-border shrink-0"
                       title="Delete Activity"
                       onClick={() => handleDeleteClick(row.id)}
                       disabled={deletingId === row.id}
                     >
                       {deletingId === row.id ? (
-                        <span className="animate-spin text-sm text-red-400">⌛</span>
+                        <span className="animate-spin text-sm text-red-500">⌛</span>
                       ) : (
                         <FaTrash size={14} />
                       )}
                     </button>
+                  ) : (
+                    <div className="ml-2 w-8 h-8 shrink-0" />
                   )}
                 </div>
               ))
@@ -442,10 +438,10 @@ export default function BasicLeaderboardSetUpSkill({
           </div>
 
 
-          <div className={`bg-[#14283a] flex ${type === "positive" ||
+          <div className={`bg-muted flex ${type === "positive" ||
             type === "negative" ||
             ladderType === "positive" ||
-            ladderType === "negative" ? "justify-end" : "justify-between"}   items-center w-full px-8 py-3 border-t border-white/20`}>
+            ladderType === "negative" ? "justify-end" : "justify-between"}   items-center w-full px-8 py-3 border-t border-border`}>
             {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ?
               <div className="flex items-center justify-end mx-4">
                 <BasicLeaderboardPrintSkillsSheet
@@ -546,13 +542,13 @@ export default function BasicLeaderboardSetUpSkill({
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="sm:max-w-sm bg-[#0f2433] border border-slate-700 text-white">
+        <DialogContent className="sm:max-w-sm bg-card border border-border text-foreground">
           <DialogHeader>
             <DialogTitle className="text-red-500 flex items-center gap-2">
               <TriangleAlert className="w-6 h-6" />
               Confirm Deletion
             </DialogTitle>
-            <DialogDescription className="text-slate-300">
+            <DialogDescription className="text-muted-foreground">
               Are you sure you want to delete this activity/skill setup? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -564,7 +560,7 @@ export default function BasicLeaderboardSetUpSkill({
                 setDeleteConfirmOpen(false);
                 setRowIdToDelete(null);
               }}
-              className="bg-transparent border border-slate-600 text-white hover:bg-slate-800"
+              className="bg-transparent border border-input text-foreground hover:bg-muted"
             >
               Cancel
             </Button>

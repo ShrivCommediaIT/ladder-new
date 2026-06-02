@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
+import CountrySelect from "@/components/shared/CountrySelect";
 
 
 
@@ -36,6 +37,7 @@ const schema = z
     password: z.string().regex(/^\d{6}$/, "PIN must be 6 digits"),
     confirmPassword: z.string(),
     gender: z.string().optional(),
+    country: z.string().optional(),
   })
   .refine((d) => d.password === d.confirmPassword, {
     message: "PIN does not match",
@@ -58,6 +60,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
       password: "",
       confirmPassword: "",
       gender: "male",
+      country: "",
     },
   });
 
@@ -84,6 +87,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
       age: age,
       dob: dobString,
       gender: ladderType !== "minileague" ? values.gender : undefined,
+      country: values.country,
     };
 
 
@@ -169,6 +173,27 @@ export default function RegisterUser({ ladderId, ladderType }) {
                 </Select>
               </div>
             )}
+
+            {/* COUNTRY */}
+            <div>
+              <Label className="text-p3 text-foreground block mb-2.5">Country</Label>
+              <Controller
+                name="country"
+                control={control}
+                render={({ field }) => (
+                  <CountrySelect
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    className="h-[52px] rounded-2xl border-0 text-foreground focus-visible:ring-2"
+                    style={{
+                      backgroundColor: "var(--input-bg)",
+                      boxShadow: "inset 0 0 0 1px var(--input-border)",
+                    }}
+                  />
+                )}
+              />
+              <p className="text-red-400 text-xs">{errors.country?.message}</p>
+            </div>
 
             {/* DOB PICKER */}
   <div>

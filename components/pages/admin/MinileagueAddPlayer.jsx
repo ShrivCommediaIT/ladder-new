@@ -28,6 +28,7 @@ import {
 import { format } from "date-fns";
 import { calculateAge } from "@/lib/utils";
 import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
+import CountrySelect from "@/components/shared/CountrySelect";
 
 export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
   const dispatch = useDispatch();
@@ -51,6 +52,7 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
   const [showDialog, setShowDialog] = useState(false);
   const [dob, setDob] = useState(undefined);
   const [gender, setGender] = useState("male");
+  const [country, setCountry] = useState("");
 
 
   useEffect(() => {
@@ -95,6 +97,7 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
     if (phone) formData.append("phone", phone);
     if (profileFile) formData.append("file", profileFile);
     formData.append("gender", gender);
+    formData.append("country", country);
     if (dob) {
       formData.append("age", calculateAge(dob));
       formData.append("dob", format(dob, "dd/MM/yyyy"));
@@ -116,6 +119,7 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
           setProfileFile(null);
           setDob(undefined);
           setGender("male");
+          setCountry("");
 
           setLoading(true);
         await dispatch(fetchMiniLeague({ ladder_id }));
@@ -276,6 +280,16 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
                   <SelectItem value="female">Female</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* COUNTRY */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-slate-300 font-semibold">Country</Label>
+              <CountrySelect
+                value={country}
+                onValueChange={setCountry}
+                className="bg-slate-900/60 border-slate-700/80 text-white w-full h-10"
+              />
             </div>
 
             {/* DOB PICKER */}

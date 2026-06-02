@@ -45,7 +45,7 @@ const formSchema = z.object({
     .max(8, "Club ID must be at most 8 letters")
     .regex(/^[A-Z]+$/, "Club ID must contain only uppercase letters (A-Z)"),
 
-  pin: z.string().regex(/^\d{4}$/, "PIN must be exactly 4 digits"),
+  pin: z.string().regex(/^\d{8}$/, "PIN must be exactly 8 digits"),
 
   userType: z.enum(["admin", "sub_admin"], {
     required_error: "Please select login type",
@@ -296,7 +296,7 @@ export default function LoginByClubForm() {
                                   <Shield className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
                                   <Input
                                     {...field}
-                                    placeholder="Enter Club ID (A-Z only)"
+                                    placeholder="Enter Club ID "
                                     maxLength={8}
                                     className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
@@ -323,7 +323,7 @@ export default function LoginByClubForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel className="text-p3 block mb-2.5 font-semibold text-foreground">
-                                4-Digit PIN
+                                8-Digit PIN
                               </FormLabel>
                               <FormControl>
                                 <div className="relative">
@@ -331,17 +331,17 @@ export default function LoginByClubForm() {
                                   <Input
                                     {...field}
                                     type={showPassword ? "text" : "password"}
-                                    maxLength={4}
+                                    maxLength={8}
                                     inputMode="numeric"
                                     onChange={(e) =>
-                                      field.onChange(e.target.value.replace(/\D/g, "").slice(0, 4))
+                                      field.onChange(e.target.value.replace(/\D/g, "").slice(0, 8))
                                     }
                                     className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
                                       backgroundColor: "var(--input-bg)",
                                       boxShadow: "inset 0 0 0 1px var(--input-border)",
                                     }}
-                                    placeholder="Enter 4 digit PIN"
+                                    placeholder="Enter 8 digit PIN"
                                   />
                                   <button
                                     type="button"

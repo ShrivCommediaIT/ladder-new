@@ -448,6 +448,61 @@ export default function AdminPage() {
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.1 }}
+              className="overflow-hidden rounded-[24px] sm:rounded-[30px] border border-cyan-500/30 dark:border-cyan-500/20 bg-card p-4 sm:p-6 backdrop-blur-xl space-y-4"
+            >
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <span className="text-sm font-bold uppercase tracking-[0.15em] text-cyan-500">
+                  Prepare Your Competitions
+                </span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500 text-white shadow-md shadow-cyan-500/25">
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+              </div>
+
+              <div className="space-y-4 text-[13px] leading-relaxed text-muted-foreground">
+                <div className="space-y-1">
+                  <p className="font-semibold text-foreground">1. Create your Club or Coach ID from the drop down menu.</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="font-semibold text-foreground">2. Create your Club Sections or Coaching Groups.</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="font-semibold text-foreground">3. Create Competitions via the Club Section or Coaching Group log ins</p>
+                </div>
+                <div className="space-y-1.5">
+                  <p className="font-semibold text-foreground">4. The Roster will fill automatically as you create competitions</p>
+                  <p className="text-xs">
+                    The roster is the complete list of all your competitors and where they see their activity history and where they can see their token totals and redeem them.
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-border space-y-1.5">
+                  <h4 className="font-bold text-foreground text-xs uppercase tracking-wider">
+                    YOUR CENTRAL DASHBOARD
+                  </h4>
+                  <p className="text-xs">
+                    All the competitions set up under your account will appear here on your central dashboard so that you can see all the competitions in your account at a glance and from where you can edit quickly.
+                  </p>
+                  <p className="text-xs">
+                    You are always in control of all the competitions in your account from your central dashboard.
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-border space-y-1">
+                  <h4 className="font-bold text-foreground text-xs uppercase tracking-wider">
+                    PAYMENT
+                  </h4>
+                  <p className="text-xs">
+                    If, after 30 days, your account is still active, we will email you a service agreement for you to sign and return. We will then email you an invoice based on that agreement payable within 14 days.
+                  </p>
+                </div>
+              </div>
+            </motion.section>
+
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.12 }}
               className="overflow-hidden rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 sm:p-6 backdrop-blur-xl"
             >

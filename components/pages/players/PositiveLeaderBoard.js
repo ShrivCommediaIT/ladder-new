@@ -512,13 +512,13 @@ console.log('isInverted', isInverted)
       )}
 
       <Dialog open={openSkillSetupDialog} onOpenChange={setOpenSkillSetupDialog}>
-        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+        <DialogContent showCloseButton={false} className="bg-transparent border-none shadow-none flex items-center justify-center">
           <BasicLeaderboardSetUpSkill onClose={() => setOpenSkillSetupDialog(false)} onSkillsUpdated={refreshLeaderboard} />
         </DialogContent>
       </Dialog>
 
       <Dialog open={openSkillSortDialog} onOpenChange={setOpenSkillSortDialog}>
-        <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center">
+        <DialogContent showCloseButton={false} className="bg-transparent border-none shadow-none flex items-center justify-center">
           <BasicLeaderboardShort ladderId={ladderId}
             onClose={() => { setOpenSkillSortDialog(false); setIsSorted(false); }}
             onSkillsUpdated={(skillNo) => {

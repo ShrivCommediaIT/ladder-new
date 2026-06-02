@@ -16,7 +16,7 @@ const MasterAdminContent = () => {
       <p className="text-sm text-muted-foreground font-semibold">
         <span className="border-b text-primary border-border text-[14px]">About Coach ID and Section admin</span>
         <br />
-        Coaches should use the Section ID to enable them to run different solutions for different groups of students they may be working either within the same institution or maybe at different institutions 
+        Coaches should use the Section ID to enable them to run different solutions for different groups of students they may be working with, either within the same institution or maybe at different institutions 
       </p>
     </div>
   );
