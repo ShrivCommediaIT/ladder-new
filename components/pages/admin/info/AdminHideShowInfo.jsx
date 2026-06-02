@@ -24,7 +24,7 @@ const AdminHideShowInfo = ({ isModel }) => {
       <div>
         <p className={`font-semibold ${headingText}`}>1. Create Your Club ID</p>
         <p>
-          Using an Excel CSV file with member’s names and phone numbers (phone numbers optional but can help members communicate more easily) 
+          Using an Excel CSV file with member’s names and phone numbers (phone numbers optional but can help members communicate more easily)
           The roster not only lists your membership but also informs you and the members of their token totals and membership status.  You can add or remove members at any time.
         </p>
       </div>
@@ -37,7 +37,7 @@ const AdminHideShowInfo = ({ isModel }) => {
           This is essential for the recording of participation tokens and communications via the app
         </p>
       </div>
-      
+
       <div>
         <p className={`font-semibold ${headingText}`}>3. Create a Sport Section</p>
         <p>

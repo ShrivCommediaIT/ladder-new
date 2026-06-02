@@ -83,7 +83,7 @@ const ContactAdmin = () => {
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--best-board-muted)]">Phone</p>
           <p className="mt-1 text-xl font-semibold text-[var(--best-board-text)]">
-            {adminDetails?.admin_phone || "Not Provided11"}
+            {adminDetails?.admin_phone || "Not Provided"}
           </p>
         </div>
       </div>

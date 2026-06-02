@@ -28,7 +28,7 @@ const clubSchema = z.object({
     .regex(/^[A-Z]+$/, "Capital letters only"), // Strictly Capital as per your requirement
   part2: z
     .string()
-    .length(4, "PIN must be exactly 4 digits")
+    .length(8, "PIN must be exactly 8 digits")
     .regex(/^[0-9]+$/, "Digits only please"),
 });
 
@@ -193,7 +193,7 @@ export default function AccessCodeParts() {
               <Label className="text-[11px] uppercase text-muted-foreground font-semibold">Pin</Label>
               <Input
                 {...form.register("part2")}
-                maxLength={4}
+                maxLength={8}
                 readOnly={!!savedData.clubId}
                 onChange={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, "")}
                 className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold tracking-[0.35em] rounded-xl focus:border-primary focus:ring-primary/20 transition-all read-only:opacity-80"
@@ -248,7 +248,7 @@ export default function AccessCodeParts() {
               <Label className="text-xs uppercase text-muted-foreground font-semibold">Pin</Label>
               <Input
                 {...drawerForm.register("part2")}
-                maxLength={4}
+                maxLength={8}
                 onChange={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, "")}
                 className="bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold h-11 rounded-xl focus:border-primary focus:ring-primary/20 transition-all"
               />

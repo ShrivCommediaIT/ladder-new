@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { useSearchParams } from "next/navigation";
 import { calculateAge, parseDobToDate } from "@/lib/utils";
 import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
+import CountrySelect from "@/components/shared/CountrySelect";
 import {
   Select,
   SelectContent,
@@ -47,6 +48,7 @@ const BasicLeaderboardAgeUserEdit = ({
     dob: null,
     phone: "",
     gender: "",
+    country: "",
   });
 
   const [showSkeleton, setShowSkeleton] = useState(false);
@@ -63,6 +65,7 @@ const BasicLeaderboardAgeUserEdit = ({
         dob: initialDob,
         phone: selectedPlayer.phone || "",
         gender: selectedPlayer.gender || "",
+        country: selectedPlayer.country || "",
       });
   console.log("Selected Player in Edit Form:", selectedPlayer.gender);
 
@@ -74,6 +77,7 @@ const BasicLeaderboardAgeUserEdit = ({
         name: "",
         dob: null,
         phone: "",
+        country: "",
       });
     }
   }, [selectedPlayer, userId]);
@@ -98,6 +102,7 @@ const BasicLeaderboardAgeUserEdit = ({
       age: calculateAge(form.dob),
       phone: form.phone,
       gender: form.gender,
+      country: form.country,
     };
 
     setShowSkeleton(true);
@@ -231,6 +236,15 @@ const BasicLeaderboardAgeUserEdit = ({
                   <SelectItem value="female">Female</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="w-full">
+              <Label className="text-gray-300 font-semibold py-2 text-lg">Country</Label>
+              <CountrySelect
+                value={form.country}
+                onValueChange={(val) => setForm((prev) => ({ ...prev, country: val }))}
+                className="bg-gray-700/50 border-gray-500 text-white w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+              />
             </div>
 
             <Button

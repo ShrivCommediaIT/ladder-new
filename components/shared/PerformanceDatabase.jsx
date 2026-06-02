@@ -180,7 +180,7 @@ export default function PerformanceDatabase() {
     async (pageVal = 1, currentFilters = appliedFilters) => {
       setLoading(true);
       try {
-        const ageMap = { under13: 13, under15: 15, under17: 17, senior: 18 };
+        const ageMap = { under13: 13, under15: 15, under17: 17, senior: 18, over40: 40, over60: 60 };
         const ageValue = currentFilters.ageGroup
           ? ageMap[currentFilters.ageGroup]
           : undefined;
@@ -554,6 +554,8 @@ export default function PerformanceDatabase() {
                 <option value="under15">Under 15s</option>
                 <option value="under17">Under 17s</option>
                 <option value="senior">18 & Over</option>
+                <option value="over40">Over 40s</option>
+                <option value="over60">Over 60s</option>
               </select>
             </div>
 

@@ -102,13 +102,6 @@ function UserPageRedirectRouter() {
   const quickActions = [];
   if (loggedInUserId && currentUser) {
     quickActions.push({
-      id: "edit-profile",
-      label: "Edit Profile",
-      icon: User,
-      onClick: () => setIsEditModalOpen(true),
-    });
-
-    quickActions.push({
       id: "leave-ladder",
       label: "Leave Ladder",
       icon: XCircle,
@@ -219,13 +212,6 @@ function UserPageRedirectRouter() {
 
   const baseActions = [];
   if (loggedInUserId) {
-    baseActions.push({
-      id: "edit-profile",
-      label: "Edit Profile",
-      icon: User,
-      onClick: () => setIsEditModalOpen(true),
-    });
-
     baseActions.push({
       id: "leave-ladder",
       label: "Leave Ladder",

@@ -24,6 +24,7 @@ import {
   resetEditPlayerState,
 } from "@/redux/slices/editdetailSlice";
 import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
+import CountrySelect from "@/components/shared/CountrySelect";
 
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice"; // ✅ ADDED FOR MINILEAGUE
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
@@ -60,6 +61,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
     dob:null,
     phone: "",
     gender: "",
+    country: "",
   });
 
   const [showSkeleton, setShowSkeleton] = useState(false);
@@ -109,6 +111,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
         name: selectedPlayer.name || "",
         phone: selectedPlayer.phone || "",
         gender: selectedPlayer.gender || "",
+        country: selectedPlayer.country || "",
       });
     }
     
@@ -137,7 +140,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
     }
 
     const formData = { id: form.id, name: form.name, phone: form.phone, gender: form.gender, dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
-          age: calculateAge(form.dob), };
+          age: calculateAge(form.dob), country: form.country };
 
     setShowSkeleton(true);
     dispatch(editUserDetails({ user_id: form.user_id, formData }));
@@ -297,6 +300,16 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                   </SelectContent>
                 </Select>
               </motion.div>}
+
+              {/* COUNTRY */}
+              <motion.div whileHover={{ scale: 1.02 }} className="space-y-2 w-full">
+                <Label className="text-blue-200 font-semibold">Country</Label>
+                <CountrySelect
+                  value={form.country}
+                  onValueChange={(val) => setForm((prev) => ({ ...prev, country: val }))}
+                  className="bg-white/10 border-white/30 text-white w-full focus:ring-2 focus:ring-cyan-400 py-6 h-12"
+                />
+              </motion.div>
 
               <motion.div whileTap={{ scale: 0.95 }}>
                   <Button

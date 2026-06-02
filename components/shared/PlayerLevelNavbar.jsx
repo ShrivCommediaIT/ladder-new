@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import topLogo from "@/public/topLogo.png";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { IMAGE_BASE_URL } from "@/constants/api";
 import { postFormData, postWithParams } from "@/services/apiService";
@@ -86,6 +87,8 @@ const PlayerLevelNavbar = ({
   const playerEntry = Object.values(playerEntries)?.[0] || null;
 
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const isSubmitPerformance = pathname === "/submit-performance" || pathname?.includes("/submit-performance");
   const ladderId = searchParams.get("ladder_id");
   const fileInputRef = useRef(null);
 
@@ -332,7 +335,9 @@ const PlayerLevelNavbar = ({
       >
         <div className="mx-auto w-full px-2.5 sm:px-8 lg:px-12 xl:px-16">
           <div className="flex h-14 items-center justify-between gap-3">
-            {isPlayersPage ? (
+            {isSubmitPerformance ? (
+              <div />
+            ) : isPlayersPage ? (
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <input
                   type="file"
@@ -415,21 +420,7 @@ const PlayerLevelNavbar = ({
                 </div>
               </div>
             ) : (
-              <button
-                onClick={handleDashboard}
-                className="flex shrink-0 items-center gap-2 group"
-                aria-label="Go to dashboard"
-              >
-                <div
-                  className="flex h-8 w-8 items-center justify-center rounded-lg transition-transform group-hover:scale-105"
-                  style={{ background: "linear-gradient(135deg,#29abe2,#1a3a8f)" }}
-                >
-                  <span className="text-xs font-black text-white">S</span>
-                </div>
-                <span className="hidden text-sm font-bold text-nav-text sm:block">
-                  Sports <span style={{ color: "#29abe2" }}>Pro</span>
-                </span>
-              </button>
+              <Image src={topLogo} alt="Sports Solutions Pro" className="md:h-10 h-10 w-auto" priority />
             )}
 
 

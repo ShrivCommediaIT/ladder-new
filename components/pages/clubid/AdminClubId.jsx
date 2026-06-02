@@ -61,14 +61,14 @@ const formSchema = z.object({
     .max(8)
     .regex(/^[A-Z]+$/, "Only uppercase letters allowed"),
   sportsName: z.string().min(2, "Sports name is required"),
-  pin: z.string().regex(/^\d{4}$/, "PIN must be exactly 4 digits"),
+  pin: z.string().regex(/^\d{8}$/, "PIN must be exactly 8 digits"),
 });
 
 export default function AdminClubId() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [pinDigits, setPinDigits] = useState(["", "", "", ""]);
+  const [pinDigits, setPinDigits] = useState(["", "", "", "", "", "", "", ""]);
   const [currentPage, setCurrentPage] = useState(1);
   const [clubIdFixed, setClubIdFixed] = useState("");
   const [successDialog, setSuccessDialog] = useState(false);
@@ -178,7 +178,7 @@ export default function AdminClubId() {
     newPin[index] = value;
     setPinDigits(newPin);
 
-    if (value && index < 3)
+    if (value && index < 7)
       document.getElementById(`pin-${index + 1}`)?.focus();
     if (!value && index > 0)
       document.getElementById(`pin-${index - 1}`)?.focus();
@@ -240,7 +240,7 @@ export default function AdminClubId() {
           pin: "",
           clubId: clubIdFixed,
         });
-        setPinDigits(["", "", "", ""]);
+        setPinDigits(["", "", "", "", "", "", "", ""]);
       }
     } catch (err) {
       setErrorMessage("Server error");
@@ -313,7 +313,7 @@ export default function AdminClubId() {
       <Card className="md:w-1/2 w-full rounded-3xl border border-border bg-card backdrop-blur-xl shadow-lg text-foreground transition-all duration-300">
         <div className="px-6 py-4 border-b border-border flex justify-between items-center">
           <span className="text-sm tracking-widest font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Section Admin List
+            Sporting Sections or Coaching Group List
           </span>
           <span className="text-xs font-mono font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
             Club Id: {clubIdFixed}
@@ -329,7 +329,7 @@ export default function AdminClubId() {
                   Section-admin
                 </TableHead>
                 <TableHead className="text-muted-foreground font-semibold">
-                  Section Name
+                  Sporting Sections or Coaching Group Name
                 </TableHead>
                 <TableHead className="text-muted-foreground font-semibold">PIN</TableHead>
                 <TableHead className="text-muted-foreground font-semibold">
@@ -405,8 +405,8 @@ export default function AdminClubId() {
       {/* RIGHT - CREATE FORM */}
       <Card className="md:w-1/2 w-full rounded-3xl border border-border bg-card backdrop-blur-xl shadow-lg text-foreground transition-all duration-300">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl font-extrabold tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Generate Section Admin Club ID or Coach Section ID
+          <CardTitle className="text-md font-extrabold tracking-wide bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Generate Section Admin Club ID or Coaching Group ID
           </CardTitle>
         </CardHeader>
 
@@ -439,7 +439,7 @@ export default function AdminClubId() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-muted-foreground font-semibold">Section Name</FormLabel>
+                    <FormLabel className="text-muted-foreground font-semibold">Sporting Section or Coaching Group Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -456,7 +456,7 @@ export default function AdminClubId() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-muted-foreground font-semibold">Club ID</FormLabel>
+                    <FormLabel className="text-muted-foreground font-semibold">Club or Coach ID</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -469,7 +469,7 @@ export default function AdminClubId() {
               />
 
               <FormItem>
-                <FormLabel className="text-muted-foreground font-semibold">4 Digit PIN</FormLabel>
+                <FormLabel className="text-muted-foreground font-semibold">8 Digit PIN</FormLabel>
                 <div className="flex gap-2 pt-1">
                   {pinDigits.map((d, i) => (
                     <Input
@@ -571,8 +571,8 @@ export default function AdminClubId() {
                       setSelectedAdmin({ ...selectedAdmin, pin: e.target.value })
                     }
                     className="w-full bg-slate-50 dark:bg-white/5 border border-border rounded-xl px-3 py-2 text-foreground font-mono focus:border-primary focus:outline-none transition-all"
-                    maxLength={4}
-                    pattern="\d{4}"
+                    maxLength={8}
+                    pattern="\d{8}"
                     required
                   />
                 </div>
@@ -627,7 +627,7 @@ export default function AdminClubId() {
             </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
               This PIN has already been assigned to another sub-admin. Please
-              use a different 4-digit PIN.
+              use a different 8-digit PIN.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -680,7 +680,7 @@ export default function AdminClubId() {
               Duplicate PIN
             </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
-              This PIN already exists. Please choose a different 4-digit PIN.
+              This PIN already exists. Please choose a different 8-digit PIN.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

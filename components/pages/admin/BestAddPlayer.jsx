@@ -37,6 +37,7 @@ import {
 } from "date-fns";
 import { calculateAge } from "@/lib/utils";
 import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
+import CountrySelect from "@/components/shared/CountrySelect";
 
 export default function BestAddPlayer({ onClose, onSuccessRefresh }) {
   const dispatch = useDispatch();
@@ -52,6 +53,7 @@ export default function BestAddPlayer({ onClose, onSuccessRefresh }) {
   const [rank, setRank] = useState("");
   const [dob, setDob] = useState(undefined);
   const [gender, setGender] = useState("male");
+  const [country, setCountry] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [welcomeMsg, setWelcomeMsg] = useState("");
@@ -91,6 +93,7 @@ const handleSubmit = async () => {
   if (rank) formData.append("rank", rank);
   if (phone) formData.append("phone", phone);
   if (profileFile) formData.append("file", profileFile);
+  formData.append("country", country);
   
   formData.append("gender", gender);
   if (dob) {
@@ -112,6 +115,7 @@ const handleSubmit = async () => {
       setRank("");
       setDob(undefined);
       setGender("male");
+      setCountry("");
       setProfileImage(null);
       setProfileFile(null);
 
@@ -225,6 +229,16 @@ const handleSubmit = async () => {
               <SelectItem value="female">Female</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        {/* COUNTRY */}
+        <div className="space-y-1">
+          <Label className="text-white font-semibold">Country</Label>
+          <CountrySelect
+            value={country}
+            onValueChange={setCountry}
+            className="bg-gray-800/50 border-gray-700 text-white w-full h-10"
+          />
         </div>
 
         {/* DOB PICKER */}

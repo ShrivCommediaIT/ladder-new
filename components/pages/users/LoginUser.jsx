@@ -33,6 +33,7 @@ import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { format } from "date-fns";
 import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
+import CountrySelect from "@/components/shared/CountrySelect";
 import { calculateAge } from "@/lib/utils";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -51,6 +52,7 @@ const registerSchema = z
     password: z.string().regex(/^\d{6}$/, "PIN must be 6 digits"),
     confirmPassword: z.string().min(1, "Confirm your PIN"),
     gender: z.string().optional(),
+    country: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "PINs do not match",
@@ -119,6 +121,7 @@ export default function LoginUser({ ladderId, ladderType }) {
       password: "",
       confirmPassword: "",
       gender: "male",
+      country: "",
     },
   });
   const { errors: loginErrors } = loginForm.formState;
@@ -218,6 +221,7 @@ export default function LoginUser({ ladderId, ladderType }) {
         age: age,
         dob: dobString,
         gender: finalLadderType !== "minileague" ? values.gender : undefined,
+        country: values.country,
       });
 
       toast.success("Account created successfully!");
@@ -506,6 +510,25 @@ export default function LoginUser({ ladderId, ladderType }) {
                           )}
                         </div>
                       )}
+
+                      {/* Country Selection */}
+                      <div>
+                        <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
+                          Country
+                        </Label>
+                        <CountrySelect
+                          value={registerForm.watch("country")}
+                          onValueChange={(val) => registerForm.setValue("country", val)}
+                          className="w-full h-[52px] rounded-2xl border-0 text-foreground focus-visible:ring-2"
+                          style={{
+                            backgroundColor: "var(--input-bg)",
+                            boxShadow: "inset 0 0 0 1px var(--input-border)",
+                          }}
+                        />
+                        {registerErrors.country?.message && (
+                          <p className="text-red-400 text-xs mt-1">{registerErrors.country.message}</p>
+                        )}
+                      </div>
 
                       {/* Date of Birth */}
                       <div>
