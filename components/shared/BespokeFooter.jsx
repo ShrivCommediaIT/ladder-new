@@ -106,7 +106,7 @@ export default function BespokeFooter() {
           type="button"
           onClick={handleBotClick}
           aria-label="Open SSP AI Assistant"
-          className="group relative w-full max-w-[360px] md:max-w-none overflow-hidden rounded-[20px] border border-fuchsia-200 bg-white shadow-xl transition-all duration-300 hover:border-fuchsia-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/70 dark:border-fuchsia-500/60 dark:bg-[#070913] dark:shadow-2xl p-2"
+          className="group relative w-full overflow-hidden rounded-[20px] border border-fuchsia-200 bg-white shadow-xl transition-all duration-300 hover:border-fuchsia-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/70 dark:border-fuchsia-500/60 dark:bg-[#070913] dark:shadow-2xl p-2"
         >
           <div className="relative w-full h-[90px] xs:h-[110px] sm:h-[130px] md:h-[140px] lg:h-[160px] xl:h-[180px]">
             <Image
@@ -124,7 +124,7 @@ export default function BespokeFooter() {
           type="button"
           onClick={handleWhatsAppClick}
           aria-label="Open WhatsApp chat"
-          className="group relative w-full max-w-[360px] md:max-w-none overflow-hidden rounded-[20px] border border-emerald-200 bg-white shadow-xl transition-all duration-300 hover:border-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 dark:border-emerald-500/50 dark:bg-[#04090c] dark:shadow-2xl p-2"
+          className="group relative w-full overflow-hidden rounded-[20px] border border-emerald-200 bg-white shadow-xl transition-all duration-300 hover:border-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 dark:border-emerald-500/50 dark:bg-[#04090c] dark:shadow-2xl p-2"
         >
           <div className="relative w-full h-[90px] xs:h-[110px] sm:h-[130px] md:h-[140px] lg:h-[160px] xl:h-[180px]">
             <Image
@@ -142,7 +142,7 @@ export default function BespokeFooter() {
           type="button"
           onClick={() => setShowPaymentPlans(true)}
           aria-label="View Payment Plans"
-          className="group relative w-full max-w-[240px] sm:max-w-[280px] md:max-w-none overflow-hidden rounded-[20px] border border-cyan-200 bg-white shadow-xl transition-all duration-300 hover:border-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70 dark:border-cyan-500/50 dark:bg-[#020813] dark:shadow-2xl p-2"
+          className="group relative w-full overflow-hidden rounded-[20px] border border-cyan-200 bg-white shadow-xl transition-all duration-300 hover:border-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70 dark:border-cyan-500/50 dark:bg-[#020813] dark:shadow-2xl p-2"
         >
           <div className="relative w-full h-[90px] xs:h-[110px] sm:h-[130px] md:h-[140px] lg:h-[160px] xl:h-[180px] flex flex-col items-center justify-center bg-[#f8fafc] dark:bg-[#0c1020] rounded-[16px] border border-cyan-100 dark:border-cyan-950 transition-all duration-300">
             <div className="text-center transition-transform duration-300 group-hover:scale-105 flex flex-col items-center justify-center">
