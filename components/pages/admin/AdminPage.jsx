@@ -28,15 +28,9 @@ import { fetchLadders } from "@/redux/slices/fetchLadderSlice";
 import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
 import LadderList from "./LadderList";
 import DemoLadder from "./DemoLadder";
-import CreatePanel from "@/components/shared/CreatePanel";
 import AdminImportantInfo from "./info/AdminImportantInfo";
-import AdminHideShowInfo from "./info/AdminHideShowInfo";
 import BespokeFooter from "@/components/shared/BespokeFooter";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import {
   Dialog,
   DialogContent,
@@ -77,7 +71,6 @@ export default function AdminPage() {
   const [duplicateWarning, setDuplicateWarning] = useState(null);
   const [admin, setAdmin] = useState(null);
   const [quickGuideOpen, setQuickGuideOpen] = useState(false);
-  const [solutionsInfoOpen, setSolutionsInfoOpen] = useState(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -340,7 +333,7 @@ export default function AdminPage() {
                   <DialogTrigger asChild>
                     <button
                       type="button"
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/20"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-primary/20"
                     >
                       <CircleHelp className="h-4 w-4" />
                       Quick Guide
@@ -351,24 +344,6 @@ export default function AdminPage() {
                     className="fixed inset-0 top-0 left-0 translate-x-0 translate-y-0 z-[100] m-0 w-screen h-screen max-w-none sm:max-w-none border-none p-0 rounded-none bg-black/95 flex items-center justify-center overflow-auto backdrop-blur-md animate-none"
                   >
                     <AdminImportantInfo onClose={() => setQuickGuideOpen(false)} />
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog open={solutionsInfoOpen} onOpenChange={setSolutionsInfoOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                      type="button"
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-muted/30 px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-muted/50"
-                    >
-                      <Layers3 className="h-4 w-4" />
-                      Competition Types
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent
-                    className="w-[95vw] sm:max-w-lg bg-slate-100 border border-slate-200 text-slate-900 rounded-3xl p-5 md:p-6 shadow-2xl backdrop-blur-xl max-h-[90vh] overflow-y-auto"
-                  >
-                    <DialogTitle className="sr-only">Competition Types</DialogTitle>
-                    <AdminHideShowInfo isModel={false} />
                   </DialogContent>
                 </Dialog>
               </div>

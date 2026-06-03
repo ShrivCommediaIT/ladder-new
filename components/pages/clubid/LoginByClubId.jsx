@@ -45,7 +45,7 @@ const formSchema = z.object({
     .max(8, "Club ID must be at most 8 letters")
     .regex(/^[A-Z]+$/, "Club ID must contain only uppercase letters (A-Z)"),
 
-  pin: z.string().regex(/^\d{8}$/, "PIN must be exactly 8 digits"),
+  pin: z.string().regex(/^\d{4}$/, "PIN must be exactly 4 digits"),
 
   userType: z.enum(["admin", "sub_admin"], {
     required_error: "Please select login type",
@@ -323,7 +323,7 @@ export default function LoginByClubForm() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel className="text-p3 block mb-2.5 font-semibold text-foreground">
-                                8-Digit PIN
+                                4-Digit PIN
                               </FormLabel>
                               <FormControl>
                                 <div className="relative">
@@ -331,17 +331,17 @@ export default function LoginByClubForm() {
                                   <Input
                                     {...field}
                                     type={showPassword ? "text" : "password"}
-                                    maxLength={8}
+                                    maxLength={4}
                                     inputMode="numeric"
                                     onChange={(e) =>
-                                      field.onChange(e.target.value.replace(/\D/g, "").slice(0, 8))
+                                      field.onChange(e.target.value.replace(/\D/g, "").slice(0, 4))
                                     }
                                     className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
                                     style={{
                                       backgroundColor: "var(--input-bg)",
                                       boxShadow: "inset 0 0 0 1px var(--input-border)",
                                     }}
-                                    placeholder="Enter 8 digit PIN"
+                                    placeholder="Enter 4 digit PIN"
                                   />
                                   <button
                                     type="button"

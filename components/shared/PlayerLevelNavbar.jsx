@@ -336,7 +336,18 @@ const PlayerLevelNavbar = ({
         <div className="mx-auto w-full px-2.5 sm:px-8 lg:px-12 xl:px-16">
           <div className="flex h-14 items-center justify-between gap-3">
             {isSubmitPerformance ? (
-              <div />
+              <div className="flex items-center gap-3">
+                <Image
+                  src={topLogo}
+                  alt="Sports Solutions Pro"
+                  className="md:h-10 h-10 w-auto"
+                  priority
+                />
+                <div className="flex items-center text-sm md:text-base font-extrabold uppercase tracking-wide gap-1">
+                  <span className="text-primary">SSP</span>
+                  <span className="text-black dark:text-white">TALENT BOARD</span>
+                </div>
+              </div>
             ) : isPlayersPage ? (
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <input
@@ -481,7 +492,7 @@ const PlayerLevelNavbar = ({
                             className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                           >
                             <UserCircle2 className="h-4 w-4 text-blue-400" />
-                           Create Club or Coach ID
+                           Create Club or Coach ID 
                           </button>
                         )}
 
