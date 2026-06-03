@@ -31,7 +31,6 @@ import {
 import { useTheme } from "next-themes";
 import { clubIdPage, subAdminPage, adminPage, createClubId, submitPerformancePage } from "@/helper/RouteName";
 import { resetUserState } from "@/redux/slices/userSlice";
-import ChangePassword from "@/components/pages/admin/ChangePassword";
 import {
   Dialog,
   DialogContent,
@@ -51,6 +50,17 @@ const formatLadderType = (type) => {
   return map[type] || "";
 };
 
+const getUserImage = (user) => {
+  if (!user || !user.image) return null;
+  if (user.image.startsWith("http") || user.image.startsWith("blob:")) {
+    return user.image;
+  }
+  if (user.image_path) {
+    return `${user.image_path}/${user.image}`;
+  }
+  return `https://ne-games.com/leaderBoard/public/uploads/${user.image}`;
+};
+
 const PlayerLevelNavbar = ({
   activeTab = "players",
   ladderName,
@@ -68,7 +78,6 @@ const PlayerLevelNavbar = ({
   const [user, setUser] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [localLogo, setLocalLogo] = useState(null);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -255,30 +264,43 @@ const PlayerLevelNavbar = ({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    try {
-      const storedAdmin = sessionStorage.getItem("userData");
-      const storedSubAdmin = sessionStorage.getItem("subAdmin");
-      const storedUser = sessionStorage.getItem("user");
-      const admin = storedAdmin ? JSON.parse(storedAdmin) : null;
-      const subAdmin = storedSubAdmin ? JSON.parse(storedSubAdmin) : null;
-      const normalUser = storedUser ? JSON.parse(storedUser) : null;
+    const loadUser = () => {
+      try {
+        const storedAdminDetails = sessionStorage.getItem("adminDetails");
+        const storedSubAdmin = sessionStorage.getItem("subAdmin");
+        const storedAdmin = sessionStorage.getItem("userData");
+        const storedUser = sessionStorage.getItem("user");
 
-      if (admin?.user_type === "admin") {
-        setUser(admin);
-        return;
+        const adminDetails = storedAdminDetails ? JSON.parse(storedAdminDetails) : null;
+        const subAdmin = storedSubAdmin ? JSON.parse(storedSubAdmin) : null;
+        const admin = storedAdmin ? JSON.parse(storedAdmin) : null;
+        const normalUser = storedUser ? JSON.parse(storedUser) : null;
+
+        let mergedUser = null;
+        if (subAdmin?.user_type === "sub_admin") {
+          mergedUser = { ...subAdmin };
+        } else if (admin?.user_type === "admin") {
+          mergedUser = { ...admin, ...adminDetails };
+        } else if (adminDetails?.user_type === "admin") {
+          mergedUser = { ...adminDetails };
+        } else if (normalUser) {
+          mergedUser = { ...normalUser };
+        }
+
+        setUser(mergedUser);
+      } catch {
+        setUser(null);
       }
-      if (subAdmin?.user_type === "sub_admin") {
-        setUser(subAdmin);
-        return;
-      }
-      if (normalUser) {
-        setUser(normalUser);
-        return;
-      }
-      setUser(null);
-    } catch {
-      setUser(null);
-    }
+    };
+
+    loadUser();
+
+    window.addEventListener("storage", loadUser);
+    window.addEventListener("profileUpdate", loadUser);
+    return () => {
+      window.removeEventListener("storage", loadUser);
+      window.removeEventListener("profileUpdate", loadUser);
+    };
   }, []);
 
   useEffect(() => {
@@ -450,14 +472,22 @@ const PlayerLevelNavbar = ({
               <div className="relative hidden md:block" ref={profileRef}>
                 <button
                   onClick={() => setProfileOpen((previous) => !previous)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white transition-all"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white transition-all overflow-hidden border border-white/10"
                   style={{
                     background: "linear-gradient(135deg,#29abe2,#1a3a8f)",
                     boxShadow: profileOpen ? "0 0 0 2px rgba(41,171,226,0.45)" : "none",
                   }}
                   aria-label="User menu"
                 >
-                  {userInitial}
+                  {getUserImage(user) ? (
+                    <img
+                      src={getUserImage(user)}
+                      alt={user.name || "User"}
+                      className="h-full w-full object-cover rounded-full"
+                    />
+                  ) : (
+                    userInitial
+                  )}
                 </button>
 
                 {profileOpen && (
@@ -496,16 +526,16 @@ const PlayerLevelNavbar = ({
                           </button>
                         )}
 
-                        {user?.user_type === "admin" && (
+                        {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
                           <button
                             onClick={() => {
-                              setIsChangePasswordOpen(true);
+                              router.push("/profile");
                               setProfileOpen(false);
                             }}
                             className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                           >
-                            <Key className="h-4 w-4 text-emerald-400" />
-                            Change Password
+                            <UserCircle2 className="h-4 w-4 text-emerald-400" />
+                            Update Profile
                           </button>
                         )}
                       </>
@@ -600,16 +630,16 @@ const PlayerLevelNavbar = ({
                   </button>
                 )}
 
-                {user?.user_type === "admin" && (
+                {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
                   <button
                     onClick={() => {
-                      setIsChangePasswordOpen(true);
+                      router.push("/profile");
                       setMobileOpen(false);
                     }}
                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors text-left"
                   >
-                    <Key className="h-4 w-4 text-emerald-400" />
-                    Change Password
+                    <UserCircle2 className="h-4 w-4 text-emerald-400" />
+                    Update Profile
                   </button>
                 )}
               </>    
@@ -663,21 +693,7 @@ const PlayerLevelNavbar = ({
 
       <div className="h-14 w-full" />
 
-      {isChangePasswordOpen && user && (
-        <Dialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen}>
-          <DialogContent className="w-[400px] rounded-xl p-6">
-            <DialogTitle className="mb-4 text-center text-lg font-semibold">
-              Change Password
-            </DialogTitle>
-            <ChangePassword userId={user.id} />
-            <div className="mt-4 flex justify-center">
-              <DialogClose className="rounded-lg bg-red-500 px-4 py-2 text-white hover:opacity-90">
-                Close
-              </DialogClose>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+
 
       {showConfirmDialog && (
         <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>

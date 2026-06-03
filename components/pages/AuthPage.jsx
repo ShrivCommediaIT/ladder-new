@@ -230,10 +230,10 @@ export default function AuthPage({ initialMode = "login" }) {
       if (res?.status === 200) {
         const userData = {
           ...res.data,
+          image_path: res.image_path,
           subscription: res.subscription || null,
           isLoggedIn: true,
         };
-
         sessionStorage.setItem("userData", JSON.stringify(userData));
         sessionStorage.setItem("adminDetails", JSON.stringify(userData));
         toast.success(res?.success_message || "Login successful!");
