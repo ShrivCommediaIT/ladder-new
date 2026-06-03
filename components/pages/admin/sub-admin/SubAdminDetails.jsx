@@ -70,10 +70,9 @@ const SubAdminDetails = () => {
         let imageUrl = res?.image || res?.data?.image || res?.path;
 
         if (imageUrl) {
-          // ensure full url
-          if (!imageUrl.startsWith("http")) {
-            imageUrl =
-              "https://ne-games.com/leaderBoard/uploads/" + imageUrl;
+          let filename = imageUrl;
+          if (imageUrl.startsWith("http")) {
+            filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
           }
 
           const existing = JSON.parse(
@@ -82,7 +81,8 @@ const SubAdminDetails = () => {
 
           const updatedUser = {
             ...existing,
-            image: imageUrl,
+            image: filename,
+            image_path: res?.image_path || res?.data?.image_path || "https://ne-games.com/leaderBoard/public/uploads"
           };
 
           sessionStorage.setItem(
@@ -107,7 +107,7 @@ const SubAdminDetails = () => {
   };
 
   //  Safe image resolver
-  const IMAGE_BASE = "https://ne-games.com/leaderBoard/uploads/";
+  const IMAGE_BASE = "https://ne-games.com/leaderBoard/public/uploads/";
 
   const getImageSrc = () => {
     if (previewImage) return previewImage;
@@ -119,6 +119,9 @@ const SubAdminDetails = () => {
 
     // if already full URL
     if (img.startsWith("http")) return img;
+
+    // if image_path is present
+    if (user?.image_path) return `${user.image_path}/${img}`;
 
     // if only filename came from API
     return IMAGE_BASE + img;

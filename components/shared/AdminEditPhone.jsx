@@ -63,10 +63,10 @@ const handleEdit = async () => {
     return;
   }
 
-  const cleanPhone = phone.replace(/\D/g, "");
-  if (cleanPhone.length !== 10) {
+  const cleanPhone = phone ? phone.replace(/\D/g, "") : "";
+  if (cleanPhone && cleanPhone.length !== 11) {
     setDialogTitle("Validation Error");
-    setDialogMessage("Phone number must be exactly 10 digits");
+    setDialogMessage("Phone number must be exactly 11 digits");
     setOpen(true);
     return;
   }
@@ -145,13 +145,13 @@ const handleEdit = async () => {
         </div>
 
         <div className="flex-1">
-          <label className="text-sm text-zinc-300">Phone</label>
+          <label className="text-sm text-zinc-300">Phone (Optional)</label>
           <Input
             value={phone}
-            maxLength={10}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+            maxLength={11}
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
             className="bg-zinc-800 text-white"
-            placeholder="Enter 10 digit phone number"
+            placeholder="Enter 11 digit phone number"
           />
         </div>
 
