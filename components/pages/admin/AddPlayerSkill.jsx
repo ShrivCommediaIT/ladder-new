@@ -69,7 +69,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
   const handleInputChange = (e) => {
     let { name, value } = e.target;
     if (name === "phone") {
-      value = value.replace(/\D/g, "").slice(0, 10);
+      value = value.replace(/\D/g, "").slice(0, 11);
     }
     setFormData({
       ...formData,
@@ -86,8 +86,8 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
       return;
     }
 
-    if (formData.phone.trim() && formData.phone.trim().length !== 10) {
-      setError("Phone number must be exactly 10 digits!");
+    if (formData.phone.trim() && formData.phone.trim().replace(/\D/g, "").length !== 11) {
+      setError("Phone number must be exactly 11 digits!");
       return;
     }
 
@@ -184,7 +184,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
           <input
             type="tel"
             name="phone"
-            maxLength={10}
+            maxLength={11}
             placeholder="Enter your phone number (Optional)"
             value={formData.phone}
             onChange={handleInputChange}
@@ -192,7 +192,7 @@ const AddPlayerSkill = ({ ladderId, onClose, onSuccessRefresh }) => {
                        focus:border-teal-400 focus:ring-2 focus:ring-teal-400/50 focus:outline-none transition-all"
           />
         </div>
-        <p className="text-xs text-gray-500">Enter 10-digit number (optional)</p>
+        <p className="text-xs text-gray-500">Enter 11-digit number (optional)</p>
       </div>
 
       {/* Gender Field */}

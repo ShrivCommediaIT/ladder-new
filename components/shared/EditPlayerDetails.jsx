@@ -93,23 +93,34 @@ const EditPlayerDetails = ({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handlePhoneChange = (e) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+    setForm((prev) => ({ ...prev, phone: value }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const targetUserId = form.user_id || form.id || userId;
+
+    const cleanPhone = form.phone ? form.phone.trim().replace(/\D/g, "") : "";
+    if (cleanPhone && cleanPhone.length !== 11) {
+      toast.error("Phone number must be exactly 11 digits");
+      return;
+    }
 
     const formData = userLevel
       ? {
           id: form.id || targetUserId,
           user_id: targetUserId,
           name: form.name,
-          phone: form.phone,
+          phone: cleanPhone,
         }
       : {
           id: form.id || targetUserId,
           user_id: targetUserId,
           name: form.name,
-          phone: form.phone,
+          phone: cleanPhone,
           gender: form.gender,
           dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
           age: calculateAge(form.dob),
@@ -226,9 +237,10 @@ const EditPlayerDetails = ({
                 id="phone"
                 name="phone"
                 type="tel"
+                maxLength={11}
                 value={form.phone}
-                onChange={handleChange}
-                placeholder="Enter phone number"
+                onChange={handlePhoneChange}
+                placeholder="Enter 11 digit phone number (Optional)"
                 className="text-slate-900 bg-white border-slate-200 dark:text-white dark:bg-slate-800/50 dark:border-slate-700 focus:border-cyan-500 focus:ring-cyan-500 focus:ring-1 h-10 rounded-xl"
               />
             </div>

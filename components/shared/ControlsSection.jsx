@@ -92,10 +92,10 @@ export default function ControlsSection({
           ))}
       </div>
 
-      <div className={`${mobileSection === "toolbar" || mobileSection === "players" ? "block" : "hidden"} lg:sticky lg:top-[4.8rem] lg:z-30 lg:block`}>
+       {shouldShowSection ? (<div className={`${mobileSection === "toolbar" || mobileSection === "players" ? "block" : "hidden"} lg:sticky lg:top-[4.8rem] lg:z-30 lg:block`}>
         <div className="z-20 mb-4 flex flex-col gap-4 bg-[var(--best-board-bg)] pb-2 sm:flex-row sm:items-center sm:justify-between">
 
-          {shouldShowSection ? (
+         
             <div className="flex items-center gap-3">
               <span className="text-sm text-[var(--best-board-muted)]">{sectionLabel}</span>
               <Select
@@ -121,9 +121,10 @@ export default function ControlsSection({
                 </SelectContent>
               </Select>
             </div>
-          ) : null}
+         
         </div>
       </div>
+      ) : null}
     </>
   );
 }
