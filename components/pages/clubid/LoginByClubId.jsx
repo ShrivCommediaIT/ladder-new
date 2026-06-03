@@ -129,7 +129,7 @@ export default function LoginByClubForm() {
           : { ...(res.data || {}), isLoggedIn: true };
 
       sessionStorage.setItem(storageKey, JSON.stringify(user));
-      sessionStorage.setItem("adminDetails", JSON.stringify({ ...(res.data || {}), }));
+      sessionStorage.setItem("adminDetails", JSON.stringify({ ...res.data, image_path: res.image_path }));
 
       const route = values.userType === "sub_admin" ? subAdminPage : adminPage;
 
@@ -161,11 +161,11 @@ export default function LoginByClubForm() {
     <>
       <ToastContainer />
       <div className="min-h-screen overflow-y-auto bg-background">
-      {/* Floating Theme Toggle */}
-      <div className="fixed top-4 right-4 z-[60]">
-        <ThemeToggle />
-      </div>
-      <div className="relative min-h-screen">
+        {/* Floating Theme Toggle */}
+        <div className="fixed top-4 right-4 z-[60]">
+          <ThemeToggle />
+        </div>
+        <div className="relative min-h-screen">
           <div
             className="absolute inset-0"
             style={{
@@ -385,13 +385,13 @@ export default function LoginByClubForm() {
                                     style={
                                       field.value === "admin"
                                         ? {
-                          background: "var(--background-image-gradient-brand)",
-                          color: "#ffffff",
-                          boxShadow: brandTabShadow,
-                        }
+                                          background: "var(--background-image-gradient-brand)",
+                                          color: "#ffffff",
+                                          boxShadow: brandTabShadow,
+                                        }
                                         : {
-                                            color: "var(--muted-foreground)",
-                                          }
+                                          color: "var(--muted-foreground)",
+                                        }
                                     }
                                   >
                                     Admin
@@ -403,13 +403,13 @@ export default function LoginByClubForm() {
                                     style={
                                       field.value === "sub_admin"
                                         ? {
-                          background: "var(--background-image-gradient-brand)",
-                          color: "#ffffff",
-                          boxShadow: brandTabShadow,
-                        }
+                                          background: "var(--background-image-gradient-brand)",
+                                          color: "#ffffff",
+                                          boxShadow: brandTabShadow,
+                                        }
                                         : {
-                                            color: "var(--muted-foreground)",
-                                          }
+                                          color: "var(--muted-foreground)",
+                                        }
                                     }
                                   >
                                     Section Admin

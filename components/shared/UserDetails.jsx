@@ -19,23 +19,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import ChangePassword from "@/components/pages/admin/ChangePassword";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogClose,
-} from "@/components/ui/dialog";
-
 import { createClubId } from "@/helper/RouteName";
 import { resetUserState } from "@/redux/slices/userSlice";
+
+const getUserImage = (user) => {
+  if (!user || !user.image) return null;
+  if (user.image.startsWith("http") || user.image.startsWith("blob:")) {
+    return user.image;
+  }
+  if (user.image_path) {
+    return `${user.image_path}/${user.image}`;
+  }
+  return `https://ne-games.com/leaderBoard/public/uploads/${user.image}`;
+};
 
 const UserDetails = ({ user: demoUser, ladderType }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [user, setUser] = useState(null);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
 
 
@@ -45,24 +46,24 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
-        const storedAdmin = sessionStorage.getItem("userData");
+        const storedAdminDetails = sessionStorage.getItem("adminDetails");
         const storedSubAdmin = sessionStorage.getItem("subAdmin");
+        const storedAdmin = sessionStorage.getItem("userData");
 
-        const admin = storedAdmin ? JSON.parse(storedAdmin) : null;
+        const adminDetails = storedAdminDetails ? JSON.parse(storedAdminDetails) : null;
         const subAdmin = storedSubAdmin ? JSON.parse(storedSubAdmin) : null;
+        const admin = storedAdmin ? JSON.parse(storedAdmin) : null;
 
-        // ✅ Pehle role check karo
-        if (admin?.user_type === "admin") {
-          setUser(admin);
-          return;
-        }
-
+        let mergedUser = null;
         if (subAdmin?.user_type === "sub_admin") {
-          setUser(subAdmin);
-          return;
+          mergedUser = { ...subAdmin };
+        } else if (admin?.user_type === "admin") {
+          mergedUser = { ...admin, ...adminDetails };
+        } else if (adminDetails?.user_type === "admin") {
+          mergedUser = { ...adminDetails };
         }
 
-        setUser(null);
+        setUser(mergedUser);
       } catch (err) {
         console.error("Invalid user data in sessionStorage", err);
         setUser(null);
@@ -117,9 +118,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
     router.push(createClubId);
   };
 
-  const handleOpenChangePassword = () => {
-    setIsChangePasswordOpen(true);
-  };
+
 
   const handleSubAdminClick = () => {
     router.push(subAdminPage); // sub-admin dashboard route
@@ -130,13 +129,21 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex justify-end items-center space-x-3 cursor-pointer rounded-md px-3 py-2 transition dark:hover:bg-zinc-800">
-            <Image
-              src={Logo}
-              alt="User"
-              width={32}
-              height={32}
-              className="rounded-full border w-8 h-8 object-cover"
-            />
+            {getUserImage(finalUser) ? (
+              <img
+                src={getUserImage(finalUser)}
+                alt="User"
+                className="rounded-full border w-8 h-8 object-cover"
+              />
+            ) : (
+              <Image
+                src={Logo}
+                alt="User"
+                width={32}
+                height={32}
+                className="rounded-full border w-8 h-8 object-cover"
+              />
+            )}
             <div className="hidden sm:flex flex-col">
               <span className="text-sm font-semibold text-zinc-100 capitalize dark:text-zinc-200">
                 {finalUser?.name || "Guest"}
@@ -161,6 +168,16 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
           </DropdownMenuLabel>
 
           <DropdownMenuSeparator />
+
+          {(finalUser?.user_type === "admin" || finalUser?.user_type === "sub_admin") && (
+            <DropdownMenuItem
+              onClick={() => router.push("/profile")}
+              className="cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/30"
+            >
+              <UserCircle2 className="mr-2 h-4 w-4 text-green-600" />
+              Update Profile
+            </DropdownMenuItem>
+          )}
 
           {finalUser?.user_type === "sub_admin" && (
             <>
@@ -204,14 +221,6 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
               >
                 <Shield className="mr-2 h-4 w-4 text-blue-600" />
                 Create Club or Coach ID
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                onClick={handleOpenChangePassword}
-                className="cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/30"
-              >
-                <Key className="mr-2 h-4 w-4 text-green-600" />
-                Change Password
               </DropdownMenuItem>
 
               {/* {getEncodedLadderId() && (
@@ -273,27 +282,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Change Password Modal */}
-      {isChangePasswordOpen && finalUser && (
-        <Dialog
-          open={isChangePasswordOpen}
-          onOpenChange={setIsChangePasswordOpen}
-        >
-          <DialogContent className="w-[400px] rounded-xl p-6">
-            <DialogTitle className="text-lg font-semibold text-center mb-4">
-              Change Password
-            </DialogTitle>
 
-            <ChangePassword userId={finalUser.id} />
-
-            <div className="mt-4 flex justify-center">
-              <DialogClose className="px-4 py-2 bg-red-500 text-white rounded-lg hover:opacity-90">
-                Close
-              </DialogClose>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };
