@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, HelpCircle, Key, ArrowLeft, UploadCloud, FileSpreadsheet, X, CheckCircle, AlertTriangle } from "lucide-react";
+import { ShieldCheck, HelpCircle, Key, ArrowLeft, UploadCloud, FileSpreadsheet, X, CheckCircle, AlertTriangle, RefreshCw } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -326,16 +326,30 @@ export default function SubmitPerformancePage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8">
         {/* HEADER INFORMATION CARD */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-[#0284C7] to-accent bg-clip-text text-transparent mb-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center mb-8">
+          <div className="lg:col-span-2">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-[#0284C7] to-accent bg-clip-text text-transparent mb-4">
               Submit a Performance Result
             </h1>
-            <p className="text-muted-foreground text-sm sm:text-base max-w-2xl font-semibold">
-              The SSP Talent Board allows clubs to showcase notable sporting performances and emerging talent that may be of interest to coaches, scouts and sporting organisations.
+            <p className="text-muted-foreground text-sm sm:text-base font-semibold leading-relaxed">
+              The SSP Talent Board allows account holders to showcase notable sporting performances and emerging talent that may be of interest to coaches, scouts and sporting organisations.
             </p>
           </div>
-
+          <div className="rounded-2xl border border-blue-500/30 bg-blue-500/5 dark:bg-[#00275c]/10 p-5 flex items-start gap-4 shadow-lg backdrop-blur-sm">
+            <div className="w-14 h-14 rounded-full bg-[#0080FF] flex items-center justify-center shrink-0 text-white font-extrabold text-2xl shadow-md">
+              £5
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-extrabold text-sm md:text-base text-foreground">£5 Annual Submission</h3>
+              <p className="text-[11px] text-muted-foreground font-semibold">£5.00 GBP per submission.</p>
+              <p className="text-[11px] text-muted-foreground font-semibold leading-relaxed">
+                Each submission is valid for 12 months from the date of submission.
+              </p>
+              <p className="text-[11px] text-muted-foreground leading-relaxed mt-1">
+                Your submission can be updated at any time during this 12-month period to keep your performance information current and accurate.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* MAIN FORM */}
@@ -743,34 +757,54 @@ export default function SubmitPerformancePage() {
             </div>
 
             {/* ACTION BUTTONS */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                className="flex-1 h-14 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-border dark:border-white/10 dark:hover:border-white/20 text-slate-700 dark:text-white font-bold rounded-xl shadow-lg transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 h-14 bg-gradient-to-r from-primary via-[#0284C7] to-accent text-white font-extrabold rounded-xl shadow-lg shadow-primary/20 dark:shadow-accent/20 hover:opacity-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <div className="space-y-4 pt-4 border-t border-border">
+              <div className="flex flex-col sm:flex-row gap-4">
+                {/* Update Existing Submission */}
+                <button
+                  type="button"
+                  onClick={() => router.back()}
+                  className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 hover:bg-slate-100 dark:bg-[#0c1628] dark:hover:bg-[#122038] transition-all duration-200 text-left cursor-pointer"
+                >
+                  <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300">
+                    <RefreshCw className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-sm md:text-base text-slate-800 dark:text-slate-200">Update Existing Submission</p>
+                    <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Update a previous submission</p>
+                  </div>
+                </button>
+
+                {/* New Submission (Submit Button) */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all duration-200 text-left shadow-lg shadow-blue-500/15 cursor-pointer"
+                >
+                  <div className="p-3 rounded-xl bg-white/10 text-white">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
-                    Submitting Performance...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Submit Performance
-                  </>
-                )}
-              </button>
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-sm md:text-base text-white">New Submission</p>
+                    <p className="text-[10px] md:text-xs text-blue-100/90 mt-0.5">
+                      {loading ? "Submitting performance..." : "Create a new performance submission"}
+                    </p>
+                  </div>
+                </button>
+              </div>
+
+              {/* Secure Footer */}
+              <div className="flex items-center justify-center gap-2 pt-2 text-[10px] md:text-xs text-slate-500 dark:text-slate-400/80 font-medium">
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span>Secure • Trusted • International</span>
+                <span className="mx-1 opacity-40">|</span>
+                <span>SSP Talent Board</span>
+                <span className="mx-1 opacity-40">|</span>
+                <span>Showcasing Sporting Talent Worldwide</span>
+              </div>
             </div>
 
           </div>

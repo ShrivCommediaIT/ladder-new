@@ -500,7 +500,7 @@ export default function SubAdminDashboard() {
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
                   <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary">
-                    Create Solution
+                    Create Solution  
                   </p>
                 </div>
               </div>

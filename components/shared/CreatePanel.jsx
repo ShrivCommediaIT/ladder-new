@@ -40,7 +40,7 @@ const CreatePanel = ({
             {!isAdmin && (
               <Input
                 value={sportName}
-                className="mt-1 w-28 h-11 rounded-xl bg-card border-border text-foreground"
+                className="mt-1 w-60 h-11 rounded-xl bg-card border-border text-foreground"
                 readOnly
               />
             )}
@@ -141,9 +141,7 @@ const CreatePanel = ({
         >
           {loading
             ? "Creating..."
-            : isAdmin
-              ? "Create a Roster"
-              : "Create Solution"}
+            : "Create Solution"}
         </Button>
       </div>
     </div>

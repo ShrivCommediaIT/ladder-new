@@ -282,56 +282,7 @@ export default function BespokeFooter() {
               </div>
             </div>
 
-            {/* SECTION 2: AD-HOC LICENSES */}
-            <div className="space-y-3">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-                <Award className="h-3.5 w-3.5 text-primary" /> One-Off Licenses & Competitions
-              </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Competition Product */}
-                <div className="rounded-[20px] border border-border p-5 bg-card flex flex-col space-y-4 hover:border-primary/30 transition-all duration-300">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-block text-[10px] font-extrabold tracking-widest uppercase bg-primary/10 text-primary px-2.5 py-1 rounded-full">
-                        Competition Card
-                      </span>
-                      <span className="text-lg font-black text-foreground">£2</span>
-                    </div>
-                    <h4 className="font-extrabold text-foreground text-sm sm:text-base leading-snug">
-                      SSP International Competitions
-                    </h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Instant competition listing license. Only single purchases allowed.
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-center min-h-[48px] w-full bg-background rounded-xl p-2.5 border border-border">
-                    <div id="paypal-container-XT89PWWRFSPNQ" className="w-full text-center"></div>
-                  </div>
-                </div>
-
-                {/* Talent Board Product */}
-                <div className="rounded-[20px] border border-border p-5 bg-card flex flex-col justify-between space-y-4 hover:border-secondary/30 transition-all duration-300">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-block text-[10px] font-extrabold tracking-widest uppercase bg-secondary/10 text-secondary px-2.5 py-1 rounded-full">
-                        Leaderboard Card
-                      </span>
-                      <span className="text-lg font-black text-foreground">£5</span>
-                    </div>
-                    <h4 className="font-extrabold text-foreground text-sm sm:text-base leading-snug">
-                      SSP Talent Board
-                    </h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Talent leaderboard list upload. Multiple purchases available.
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-center min-h-[48px] w-full bg-background rounded-xl p-2.5 border border-border">
-                    <div id="paypal-container-HXX74PMDL43FE" className="w-full text-center"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* Support Note */}
             <div className="rounded-[16px] bg-primary/5 border border-primary/15 p-4 flex items-start gap-3">

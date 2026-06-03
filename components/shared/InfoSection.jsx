@@ -68,7 +68,7 @@ export default function InfoSection({
       const params = new URLSearchParams(window.location.search);
       if (params.get("demo") === "true") return true;
     }
-    const createdBy = 
+    const createdBy =
       state.player?.players?.[propLadderId]?.ladderDetails?.created_by ||
       state.player?.players?.[Number(propLadderId)]?.ladderDetails?.created_by ||
       state.skillLeaderboard?.ladderDetails?.created_by ||
@@ -125,11 +125,11 @@ export default function InfoSection({
 
   const isSubAdmin = sessionUser?.user_type === "sub_admin" || sessionUser?.role === "sub_admin" || (typeof window !== "undefined" && !!sessionStorage.getItem("subAdmin"));
   const contactTitle = userLevel ? "Admin Contact" : isSubAdmin ? "Sub-Admin Contact" : "Admin Contact";
-  const displayName = userLevel 
-    ? adminDetails?.admin_name || "Admin" 
+  const displayName = userLevel
+    ? adminDetails?.admin_name || "Admin"
     : sessionUser?.name || user?.name || (isSubAdmin ? "Sub-Admin" : "Admin");
-  const displayPhone = userLevel 
-    ? adminDetails?.admin_phone || "Not Provided" 
+  const displayPhone = userLevel
+    ? adminDetails?.admin_phone || "Not Provided"
     : sessionUser?.phone || user?.phone || "N/A";
 
   const handleCopy = async () => {
@@ -224,11 +224,10 @@ export default function InfoSection({
                 type="button"
                 onClick={handleCopy}
                 disabled={!inviteUrl}
-                className={`best-board-action-surface mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  copied 
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" 
+                className={`best-board-action-surface mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 ${copied
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                     : ""
-                }`}
+                  }`}
               >
                 <Copy className={`h-4 w-4 transition-transform duration-200 ${copied ? "scale-110" : ""}`} />
                 {copied ? "Copied!" : "Copy Link"}
@@ -276,7 +275,7 @@ export default function InfoSection({
           <DialogHeader>
             <DialogTitle>Edit Admin Contact</DialogTitle>
           </DialogHeader>
-          <AdminEditPhone />
+          <AdminEditPhone onClose={() => setContactOpen(false)} />
         </DialogContent>
       </Dialog>
 
