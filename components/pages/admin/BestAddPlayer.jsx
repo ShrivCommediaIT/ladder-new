@@ -77,8 +77,8 @@ const handleSubmit = async () => {
     return;
   }
 
-  if (phone && phone.trim().length !== 10) {
-    setWelcomeMsg("Phone number must be exactly 10 digits!");
+  if (phone && phone.trim().replace(/\D/g, "").length !== 11) {
+    setWelcomeMsg("Phone number must be exactly 11 digits!");
     setShowDialog(true);
     return;
   }
@@ -195,10 +195,10 @@ const handleSubmit = async () => {
           <Label className="text-white">Phone (Optional)</Label>
           <Input
             type="tel"
-            maxLength={10}
+            maxLength={11}
             value={phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-            placeholder="Enter phone number (Optional)"
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
+            placeholder="Enter 11 digit phone number (Optional)"
             className="text-white font-semibold"
           />
         </div>

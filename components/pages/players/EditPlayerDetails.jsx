@@ -120,7 +120,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "phone") {
-      setForm((prev) => ({ ...prev, [name]: value.replace(/\D/g, "").slice(0, 10) }));
+      setForm((prev) => ({ ...prev, [name]: value.replace(/\D/g, "").slice(0, 11) }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
@@ -134,8 +134,8 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
       return;
     }
 
-    if (form.phone && form.phone.trim().length !== 10) {
-      toast.error("Phone number must be exactly 10 digits!");
+    if (form.phone && form.phone.trim().replace(/\D/g, "").length !== 11) {
+      toast.error("Phone number must be exactly 11 digits!");
       return;
     }
 
@@ -274,11 +274,11 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                   id="phone"
                   name="phone"
                   type="tel"
-                  maxLength={10}
+                  maxLength={11}
                   value={form.phone}
                   onChange={handleChange}
                   className="bg-white/10 py-6 border-white/30 text-white focus:ring-2 focus:ring-cyan-400"
-                  placeholder="Enter phone number (Optional)"
+                  placeholder="Enter 11 digit phone number (Optional)"
                 />
               </motion.div>
 
