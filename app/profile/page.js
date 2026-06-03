@@ -461,7 +461,7 @@ export default function ProfilePage() {
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-400 dark:text-zinc-500" />
                     <Input
-                      value={user?.user_id || user?.email || ""}
+                      value={user?.user_id || ""}
                       disabled
                       className="h-11 pl-10 rounded-xl w-full bg-slate-100 dark:bg-zinc-800/40 border border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-500 cursor-not-allowed"
                     />

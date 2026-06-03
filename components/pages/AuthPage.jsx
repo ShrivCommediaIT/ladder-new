@@ -24,6 +24,7 @@ import {
   Activity,
   Target,
   Award,
+  Phone,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
@@ -86,6 +87,13 @@ const registerSchema = z
       .min(1, "Full name is required")
       .max(20, "Name must be at most 20 characters"),
     username: emailValidation,
+    phone: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || /^\d{11}$/.test(val),
+        "Phone number must be exactly 11 digits"
+      ),
     password: passwordValidation,
     confirmPassword: z.string().min(1, "Confirm your password"),
   })
@@ -161,6 +169,7 @@ export default function AuthPage({ initialMode = "login" }) {
     defaultValues: {
       name: "",
       username: "",
+      phone: "",
       password: "",
       confirmPassword: "",
     },
@@ -250,6 +259,7 @@ export default function AuthPage({ initialMode = "login" }) {
       password: values.password.trim(),
       name: values.name.trim(),
       user_type: "admin",
+      phone: values.phone || undefined,
     };
 
     try {
@@ -603,7 +613,38 @@ export default function AuthPage({ initialMode = "login" }) {
                           )}
                         />
 
-
+                        <FormField
+                          control={registerForm.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-p3 font-semibold text-foreground">
+                                Phone Number (Optional)
+                              </FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
+                                  <Input
+                                    type="text"
+                                    placeholder="Enter 11-digit phone number"
+                                    maxLength={11}
+                                    {...field}
+                                    onChange={(e) => {
+                                      const cleanVal = e.target.value.replace(/\D/g, "").slice(0, 11);
+                                      field.onChange(cleanVal);
+                                    }}
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                                    style={{
+                                      backgroundColor: "var(--input-bg)",
+                                      boxShadow: "inset 0 0 0 1px var(--input-border)",
+                                    }}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage className="text-xs text-red-300" />
+                            </FormItem>
+                          )}
+                        />
 
                         <FormField
                           control={registerForm.control}

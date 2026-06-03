@@ -87,6 +87,11 @@ const BasicLeaderboardAgeUserEdit = ({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handlePhoneChange = (e) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+    setForm((prev) => ({ ...prev, phone: value }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -95,12 +100,18 @@ const BasicLeaderboardAgeUserEdit = ({
       return;
     }
 
+    const cleanPhone = form.phone ? form.phone.trim().replace(/\D/g, "") : "";
+    if (cleanPhone && cleanPhone.length !== 11) {
+      toast.error("Phone number must be exactly 11 digits");
+      return;
+    }
+
     const formData = {
       id: form.id,
       name: form.name,
       dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
       age: calculateAge(form.dob),
-      phone: form.phone,
+      phone: cleanPhone,
       gender: form.gender,
       country: form.country,
     };
@@ -214,9 +225,10 @@ const BasicLeaderboardAgeUserEdit = ({
                 id="phone"
                 name="phone"
                 type="tel"
+                maxLength={11}
                 value={form.phone}
-                onChange={handleChange}
-                placeholder="Enter phone number (Optional)"
+                onChange={handlePhoneChange}
+                placeholder="Enter 11 digit phone number (Optional)"
                 className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
               />
             </div>

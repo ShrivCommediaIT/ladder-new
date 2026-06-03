@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { User, ArrowRight, Eye, EyeOff, Phone } from "lucide-react";
 import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 
@@ -34,6 +34,13 @@ const schema = z
   .object({
     name: z.string().min(1, "Name is required"),
     dob: z.date().optional(), // optional now
+    phone: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || /^\d{11}$/.test(val),
+        "Phone number must be exactly 11 digits"
+      ),
     password: z.string().regex(/^\d{6}$/, "PIN must be 6 digits"),
     confirmPassword: z.string(),
     gender: z.string().optional(),
@@ -57,6 +64,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
     defaultValues: {
       name: "",
       dob: undefined,
+      phone: "",
       password: "",
       confirmPassword: "",
       gender: "male",
@@ -88,6 +96,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
       dob: dobString,
       gender: ladderType !== "minileague" ? values.gender : undefined,
       country: values.country,
+      phone: values.phone || undefined,
     };
 
 
@@ -149,6 +158,35 @@ export default function RegisterUser({ ladderId, ladderType }) {
                 )}
               />
               <p className="text-red-400 text-xs">{errors.name?.message}</p>
+            </div>
+
+            {/* PHONE */}
+            <div>
+              <Label className="text-p3 text-foreground block mb-2.5">Phone Number (Optional)</Label>
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <div className="relative">
+                    <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
+                    <Input
+                      placeholder="Enter 11-digit phone number"
+                      maxLength={11}
+                      {...field}
+                      onChange={(e) => {
+                        const cleanVal = e.target.value.replace(/\D/g, "").slice(0, 11);
+                        field.onChange(cleanVal);
+                      }}
+                      className="h-[52px] rounded-2xl border-0 pl-11 pr-4 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                      style={{
+                        backgroundColor: "var(--input-bg)",
+                        boxShadow: "inset 0 0 0 1px var(--input-border)",
+                      }}
+                    />
+                  </div>
+                )}
+              />
+              <p className="text-red-400 text-xs">{errors.phone?.message}</p>
             </div>
 
             {/* GENDER */}
