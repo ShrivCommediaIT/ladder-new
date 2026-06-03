@@ -28,7 +28,7 @@ const clubSchema = z.object({
     .regex(/^[A-Z]+$/, "Capital letters only"), // Strictly Capital as per your requirement
   part2: z
     .string()
-    .length(8, "PIN must be exactly 8 digits")
+    .length(4, "PIN must be exactly 4 digits")
     .regex(/^[0-9]+$/, "Digits only please"),
 });
 
@@ -61,30 +61,31 @@ export default function AccessCodeParts() {
     defaultValues: { part1: "", part2: "" },
   });
 
-  useEffect(() => {
-    const fetchSavedClub = async () => {
-      const storedUser = sessionStorage.getItem("userData");
-      const id = storedUser ? JSON.parse(storedUser)?.id : null;
-      if (!id) return;
-      setUserId(id);
+  const fetchSavedClub = async () => {
+    const storedUser = sessionStorage.getItem("userData");
+    const id = storedUser ? JSON.parse(storedUser)?.id : null;
+    if (!id) return;
+    setUserId(id);
 
-      try {
-        const res = await getRequest("/app/user/subadmin", { user_id: id });
+    try {
+      const res = await getRequest("/app/user/subadmin", { user_id: id });
 
-        if (res?.status === 200 && res?.admin) {
-          const admin = res.admin;
-          const data = {
-            clubId: admin.login_id,
-            clubPin: String(admin.password),
-          };
-          setSavedData(data);
-          form.reset({ part1: data.clubId, part2: data.clubPin });
-          drawerForm.reset({ part1: data.clubId, part2: data.clubPin });
-        }
-      } catch (err) {
-        console.error("Failed to fetch saved club:", err);
+      if (res?.status === 200 && res?.admin) {
+        const admin = res.admin;
+        const data = {
+          clubId: admin.login_id,
+          clubPin: String(admin.password),
+        };
+        setSavedData(data);
+        form.reset({ part1: data.clubId, part2: data.clubPin });
+        drawerForm.reset({ part1: data.clubId, part2: data.clubPin });
       }
-    };
+    } catch (err) {
+      console.error("Failed to fetch saved club:", err);
+    }
+  };
+
+  useEffect(() => {
     fetchSavedClub();
   }, [form, drawerForm]);
 
@@ -121,6 +122,7 @@ export default function AccessCodeParts() {
 
       setSuccessDialog(true);
       form.reset({ part1: values.part1, part2: values.part2 });
+      await fetchSavedClub();
 
     } catch (err) {
       setErrorMessage("Server error occurred");
@@ -157,6 +159,7 @@ export default function AccessCodeParts() {
         setIsDrawerOpen(false);
         setSuccessDialog(true);
         drawerForm.reset(values);
+        await fetchSavedClub();
       }
     } catch (err) {
       setDrawerErrorMessage("Server error");
@@ -166,7 +169,7 @@ export default function AccessCodeParts() {
   };
 
   return (
-    <div className="flex flex-col px-4 py-8 justify-center md:flex-row gap-8 items-center md:items-stretch transition-all duration-300">
+    <div className="flex flex-col px-4 pt-8 pb-28 justify-center md:flex-row gap-8 items-center md:items-stretch transition-all duration-300">
       <MasterAdminContent />
 
       {/* MAIN CARD */}
@@ -193,7 +196,7 @@ export default function AccessCodeParts() {
               <Label className="text-[11px] uppercase text-muted-foreground font-semibold">Pin</Label>
               <Input
                 {...form.register("part2")}
-                maxLength={8}
+                maxLength={4}
                 readOnly={!!savedData.clubId}
                 onChange={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, "")}
                 className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold tracking-[0.35em] rounded-xl focus:border-primary focus:ring-primary/20 transition-all read-only:opacity-80"
@@ -248,7 +251,7 @@ export default function AccessCodeParts() {
               <Label className="text-xs uppercase text-muted-foreground font-semibold">Pin</Label>
               <Input
                 {...drawerForm.register("part2")}
-                maxLength={8}
+                maxLength={4}
                 onChange={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, "")}
                 className="bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold h-11 rounded-xl focus:border-primary focus:ring-primary/20 transition-all"
               />

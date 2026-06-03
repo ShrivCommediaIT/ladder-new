@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/dialog";
 import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import { toast } from "react-toastify";
 
-const AdminEditPhone = () => {
+const AdminEditPhone = ({ onClose }) => {
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
@@ -62,6 +63,14 @@ const handleEdit = async () => {
     return;
   }
 
+  const cleanPhone = phone.replace(/\D/g, "");
+  if (cleanPhone.length !== 10) {
+    setDialogTitle("Validation Error");
+    setDialogMessage("Phone number must be exactly 10 digits");
+    setOpen(true);
+    return;
+  }
+
   setLoading(true);
 
   try {
@@ -72,11 +81,11 @@ const handleEdit = async () => {
         id: user.id,
         user_id: user.user_id,
         name,
-        phone,
+        phone: cleanPhone,
         role: user.user_type,
       };
     } else {
-      payload = { id: user.id, name, phone };
+      payload = { id: user.id, name, phone: cleanPhone };
     }
 
     const endpoint = user.user_type === "admin"
@@ -87,7 +96,7 @@ const handleEdit = async () => {
 
     if (res.status == 200 || res.status === "success") {
       // update sessionStorage
-      const updated = { ...user, name, phone };
+      const updated = { ...user, name, phone: cleanPhone };
 
       if (sessionStorage.getItem("subAdmin")) {
         sessionStorage.setItem("subAdmin", JSON.stringify(updated));
@@ -95,20 +104,27 @@ const handleEdit = async () => {
         sessionStorage.setItem("userData", JSON.stringify(updated));
       }
 
-      setDialogTitle("Success");
-      setDialogMessage(res.data.message || "Updated successfully");
+      toast.success("Updated successfully");
+      if (onClose) {
+        onClose();
+      } else {
+        setDialogTitle("Success");
+        setDialogMessage(res.data?.message || "Updated successfully");
+        setOpen(true);
+      }
     } else {
       setDialogTitle("API Error");
-      setDialogMessage(res.data.message || "Update failed");
+      setDialogMessage(res.data?.message || "Update failed");
+      setOpen(true);
     }
   } catch (err) {
     setDialogTitle("Error");
     setDialogMessage(
       err.response?.data?.message || err.message || "Something wrong",
     );
+    setOpen(true);
   } finally {
     setLoading(false);
-    setOpen(true);
   }
 };
 
@@ -129,12 +145,13 @@ const handleEdit = async () => {
         </div>
 
         <div className="flex-1">
-          <label className="text-sm text-zinc-300">Phone (Optional)</label>
+          <label className="text-sm text-zinc-300">Phone</label>
           <Input
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            maxLength={10}
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
             className="bg-zinc-800 text-white"
-            placeholder="Enter phone number (Optional)"
+            placeholder="Enter 10 digit phone number"
           />
         </div>
 
