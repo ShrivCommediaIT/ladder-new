@@ -16,6 +16,12 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const brandGradient = "var(--background-image-gradient-brand)";
 const shellClass =
@@ -173,6 +179,12 @@ export default function PerformanceDatabase() {
   const itemsPerPage = 10;
   const [activeVideo, setActiveVideo] = useState(null);
   const [sportsOptions, setSportsOptions] = useState([]);
+
+  // Performance history log states
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [activitiesOptions, setActivitiesOptions] = useState([]);
   const [countriesOptions, setCountriesOptions] = useState([]);
 
@@ -298,7 +310,26 @@ export default function PerformanceDatabase() {
     setAppliedFilters(clearedFilters);
     setCurrentPage(1);
     fetchResults(1, clearedFilters);
-    toast.success("Filters reset successfully");
+  };
+
+  const handleRowClick = async (item) => {
+    setSelectedItem(item);
+    setHistoryModalOpen(true);
+    setHistoryLoading(true);
+    setHistoryData([]);
+    try {
+      const response = await getRequest("/getPerformanceHistory", { id: item.id });
+      if (response && (response.status === 200 || response.status === true) && response.data) {
+        setHistoryData(response.data);
+      } else {
+        toast.error(response?.message || "Failed to fetch performance history.");
+      }
+    } catch (error) {
+      console.error("Error fetching history:", error);
+      toast.error(error.message || "An error occurred while fetching history.");
+    } finally {
+      setHistoryLoading(false);
+    }
   };
 
   const getProcessedData = () => {
@@ -525,7 +556,7 @@ export default function PerformanceDatabase() {
         </div>
 
         <form onSubmit={handleSearch} className={`${panelClass} space-y-6 p-6 sm:p-8`}>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
             <div className="space-y-1.5">
               <label className={mutedLabelClass}>Sport</label>
               <select value={sport} onChange={(e) => setSport(e.target.value)} className={selectClass}>
@@ -536,7 +567,7 @@ export default function PerformanceDatabase() {
               </select>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 sm:col-span-2 md:col-span-2 lg:col-span-2">
               <label className={mutedLabelClass}>Activity / Event</label>
               <select value={activity} onChange={(e) => setActivity(e.target.value)} className={selectClass}>
                 <option value="">All Activities</option>
@@ -630,14 +661,14 @@ export default function PerformanceDatabase() {
               </div>
             </div>
 
-            <div className="flex w-full gap-3 lg:w-auto">
-              <button type="button" onClick={handleReset} className={`${subtleButtonClass} h-11 flex-1 px-3 lg:flex-none`}>
+            <div className="flex flex-col sm:flex-row w-full gap-3 lg:w-auto shrink-0">
+              <button type="button" onClick={handleReset} className={`${subtleButtonClass} h-11 w-full sm:w-auto justify-center px-4`}>
                 <RotateCcw className="h-4 w-4" />
                 Reset Filters
               </button>
               <button
                 type="submit"
-                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl px-8 text-sm font-semibold uppercase tracking-wide text-white shadow-lg transition-all hover:-translate-y-0.5 lg:flex-none"
+                className="flex h-11 w-full sm:w-auto items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold uppercase tracking-wide text-white shadow-lg transition-all hover:-translate-y-0.5"
                 style={{ backgroundImage: brandGradient, boxShadow: "var(--brand-button-shadow)" }}
               >
                 <Search className="h-4 w-4" />
@@ -654,6 +685,8 @@ export default function PerformanceDatabase() {
             </div>
 
             <div className="flex flex-wrap items-center w-full gap-3 sm:w-auto">
+
+              
               <div className="flex flex-1 min-w-[150px] items-center gap-2 sm:flex-none">
                 <span className="whitespace-nowrap text-xs font-bold uppercase tracking-wider text-muted-foreground">Sort By</span>
                 <select
@@ -719,7 +752,8 @@ export default function PerformanceDatabase() {
                   processedData.map((item, idx) => (
                     <tr
                       key={item.id || idx}
-                      className={`transition-colors ${
+                      onClick={() => handleRowClick(item)}
+                      className={`cursor-pointer transition-colors ${
                         idx % 2 === 0
                           ? "bg-card hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_6%)]"
                           : "bg-[color:color-mix(in_srgb,var(--card),var(--primary)_3%)] hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_8%)]"
@@ -767,7 +801,10 @@ export default function PerformanceDatabase() {
                       <td className="px-6 py-4 text-center">
                         {item.video_link && item.video_link.trim() && item.video_link !== "dfgg" ? (
                           <button
-                            onClick={() => handlePlayVideo(item.video_link)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePlayVideo(item.video_link);
+                            }}
                             className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-primary shadow-md transition-all hover:scale-110 hover:bg-primary hover:text-white active:scale-95"
                           >
                             <Play className="h-3.5 w-3.5 fill-current" />
@@ -847,6 +884,171 @@ export default function PerformanceDatabase() {
             </div>
           </div>
         )}
+
+        {/* Performance History Dialog */}
+        <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+          <DialogContent className="w-[95vw] sm:max-w-2xl bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header Banner */}
+            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between gap-4">
+              <div className="space-y-1 min-w-0">
+                <div className="inline-flex items-center gap-1 bg-primary/15 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
+                  <Activity className="h-3.5 w-3.5" /> Performance History
+                </div>
+                <DialogTitle className="text-xl font-black text-foreground truncate">
+                  {selectedItem ? `${selectedItem.full_name}'s Record Timeline` : "Performance History"}
+                </DialogTitle>
+              </div>
+              {selectedItem && (selectedItem.submited_id || (historyData[0] && historyData[0].submited_id)) && (
+                <div className="h-9 px-3 rounded-lg bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-mono text-xs font-bold shrink-0">
+                  ID: {selectedItem.submited_id || historyData[0].submited_id}
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 custom-scroll">
+              {historyLoading ? (
+                <div className="flex flex-col items-center justify-center py-12 space-y-3">
+                  <div className="w-8 h-8 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+                  <p className="text-xs text-muted-foreground font-semibold">Loading history logs...</p>
+                </div>
+              ) : historyData.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground text-sm font-medium">
+                  No historical updates found for this performance record.
+                </div>
+              ) : (
+                <div className="relative border-l border-border pl-4 sm:pl-6 ml-2 sm:ml-3 space-y-8">
+                  {historyData.map((record, index) => (
+                    <div key={record.id || index} className="relative">
+                      {/* Timeline Dot */}
+                      <span className="absolute -left-[24px] sm:-left-[32px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-primary bg-background shadow-sm">
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      </span>
+
+                      {/* Card container */}
+                      <div className="rounded-2xl border border-border bg-card/60 p-4 sm:p-5 space-y-4 shadow-sm backdrop-blur-sm">
+                        {/* Header Row */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border/60 pb-3">
+                          <div>
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                              {record.sport || "Other Sport"}
+                            </span>
+                            <h4 className="text-base font-bold text-foreground mt-0.5">
+                              {record.activity || "Performance Event"}
+                            </h4>
+                          </div>
+                          <div className="text-left sm:text-right shrink-0">
+                            <span className="text-xs text-muted-foreground font-semibold block">
+                              Logged: {formatDate(record.created_at || record.date_of_performance)}
+                            </span>
+                            <span className="text-[11px] text-muted-foreground/80 mt-0.5 block">
+                              Perf Date: {formatDate(record.date_of_performance)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-semibold">
+                          <div>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Result</span>
+                            <span className="text-primary font-black text-sm">{record.result} {record.unit}</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Age & Gender</span>
+                            <span className="text-foreground capitalize">{record.age} yrs • {record.gender}</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Country</span>
+                            <span className="text-foreground flex items-center gap-1.5 truncate" title={record.country}>
+                              {getCountryCode(record.country) && (
+                                <img
+                                  src={`https://flagcdn.com/20x15/${getCountryCode(record.country)}.png`}
+                                  alt=""
+                                  width={16}
+                                  height={12}
+                                  className="rounded-[2px] shrink-0"
+                                />
+                              )}
+                              <span className="truncate">{record.country}</span>
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Club / Team</span>
+                            <span className="text-foreground truncate block">{record.club_name || "—"}</span>
+                          </div>
+                        </div>
+
+                        {/* Submitter details, venue & notes */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-border/40 text-xs">
+                          <div className="space-y-1">
+                            <div>
+                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Coach/Submitter:</span>{" "}
+                              <span className="text-foreground font-semibold">{record.coach_name}</span>
+                            </div>
+                            <div className="truncate">
+                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Email:</span>{" "}
+                              <span className="text-foreground font-medium break-all">{record.email}</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Submitted ID:</span>{" "}
+                              <span className="text-foreground font-mono font-medium">{record.submited_id || "—"}</span>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <div>
+                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Venue:</span>{" "}
+                              <span className="text-foreground font-semibold">{record.venue || "—"}</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Wind/Conditions:</span>{" "}
+                              <span className="text-foreground font-semibold">{record.wind || "—"}</span>
+                            </div>
+                            {record.video_link && record.video_link.trim() && record.video_link !== "dfgg" && (
+                              <div className="flex items-center gap-1.5 pt-1">
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Video Evidence:</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePlayVideo(record.video_link);
+                                  }}
+                                  className="inline-flex h-5 items-center gap-1 px-2 rounded-full border border-primary/20 bg-primary/10 text-primary text-[10px] font-bold hover:bg-primary hover:text-white transition-all cursor-pointer"
+                                >
+                                  <Play className="h-2 w-2 fill-current" /> Play Video
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Additional Notes */}
+                        {record.aditional_notes && (
+                          <div className="bg-muted/40 rounded-xl p-3 border border-border/40 text-xs">
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold block mb-1">
+                              Additional Notes
+                            </span>
+                            <p className="text-foreground/95 font-medium leading-relaxed italic">
+                              "{record.aditional_notes}"
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-border flex justify-end">
+              <button
+                type="button"
+                onClick={() => setHistoryModalOpen(false)}
+                className="py-2.5 px-6 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-sm transition-all cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </section>
   );
