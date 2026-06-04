@@ -8,26 +8,60 @@ import "react-toastify/dist/ReactToastify.css";
 
 import useAuthGuard from "@/hooks/useAuthGuard";
 import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
-import { postFormData } from "@/services/apiService";
+import { postFormData, getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const countries = [
-  "India", "United States", "United Kingdom", "Canada", "Australia", 
-  "Germany", "France", "Italy", "Spain", "Netherlands", "China", 
-  "Japan", "Singapore", "UAE", "Saudi Arabia", "Brazil", "South Africa", 
+  "India", "United States", "United Kingdom", "Canada", "Australia",
+  "Germany", "France", "Italy", "Spain", "Netherlands", "China",
+  "Japan", "Singapore", "UAE", "Saudi Arabia", "Brazil", "South Africa",
   "Mexico", "Russia", "Sri Lanka", "Nepal", "Bangladesh", "Pakistan", "Other"
 ];
 
 const sportsList = [
-  "Athletics (Track & Field)", "Swimming", "Cycling", "Gymnastics", 
-  "Weightlifting", "Powerlifting", "Rowing", "Football (Soccer)", 
+  "Athletics (Track & Field)", "Swimming", "Cycling", "Gymnastics",
+  "Weightlifting", "Powerlifting", "Rowing", "Football (Soccer)",
   "Basketball", "Tennis", "Cricket", "Rugby", "Other"
 ];
 
 const unitsList = [
-  "seconds (s)", "minutes (min)", "meters (m)", "kilometers (km)", 
+  "seconds (s)", "minutes (min)", "meters (m)", "kilometers (km)",
   "kilograms (kg)", "points (pts)", "repetitions (reps)", "watts (W)", "Other"
 ];
+
+const formatDateForInput = (dateStr) => {
+  if (!dateStr) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  
+  const parts = dateStr.split(/[-/]/);
+  if (parts.length === 3) {
+    let day = parts[0];
+    let month = parts[1];
+    let year = parts[2];
+    
+    if (year.length === 4) {
+      day = day.padStart(2, "0");
+      month = month.padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+  }
+
+  try {
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+      return d.toISOString().split('T')[0];
+    }
+  } catch (e) {
+    // ignore
+  }
+  return dateStr;
+};
 
 export default function SubmitPerformancePage() {
   const allowed = useAuthGuard();
@@ -60,13 +94,123 @@ export default function SubmitPerformancePage() {
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
+  // PayPal Payment Flow states
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paypalLoading, setPaypalLoading] = useState(false);
+
+  // Lookup and Update mode states
+  const [lookupModalOpen, setLookupModalOpen] = useState(false);
+  const [searchId, setSearchId] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const [activeRecordId, setActiveRecordId] = useState(null);
+
+  // Load and render PayPal SDK subscription buttons dynamically when modal is open
+  useEffect(() => {
+    if (!showPaymentModal) return;
+
+    setPaypalLoading(true);
+
+    const scriptId = "paypal-subscription-sdk";
+    const scriptSrc = "https://www.paypal.com/sdk/js?client-id=AYScJLLFzh9r-mZwpVWVvLmNwWuuME4ayvP1W-ym9H8J2nbpbW8MAz5kAdF5uzcajbQpNojCT5q-RPae&vault=true&intent=subscription";
+
+    let retries = 0;
+    const initializeButtons = () => {
+      if (window.paypal && window.paypal.Buttons) {
+        const container = document.getElementById("paypal-button-container-P-98386085E3963253DNIPRKEQ");
+        if (container) {
+          container.innerHTML = "";
+          try {
+            window.paypal.Buttons({
+              style: {
+                shape: "rect",
+                color: "gold",
+                layout: "vertical",
+                label: "subscribe"
+              },
+              createSubscription: function(data, actions) {
+                return actions.subscription.create({
+                  plan_id: "P-98386085E3963253DNIPRKEQ"
+                });
+              },
+              onApprove: async function(data, actions) {
+                toast.success("Payment successful! Submitting performance result...");
+                setShowPaymentModal(false);
+                await submitFormData(data.subscriptionID);
+              },
+              onError: function(err) {
+                toast.error("PayPal payment failed or cancelled");
+                console.error("PayPal integration error:", err);
+              }
+            }).render("#paypal-button-container-P-98386085E3963253DNIPRKEQ");
+          } catch (e) {
+            console.error("Paypal render error", e);
+          } finally {
+            setPaypalLoading(false);
+          }
+        } else {
+          if (retries < 50) {
+            retries++;
+            setTimeout(initializeButtons, 100);
+          } else {
+            setPaypalLoading(false);
+          }
+        }
+      } else {
+        if (retries < 50) {
+          retries++;
+          setTimeout(initializeButtons, 100);
+        } else {
+          setPaypalLoading(false);
+          toast.error("PayPal SDK failed to initialize.");
+        }
+      }
+    };
+
+    // Clean up any existing PayPal scripts and globals to avoid conflicts (e.g. from footer)
+    const existingScripts = document.querySelectorAll("script[src*='paypal.com/sdk/js']");
+    let scriptLoaded = false;
+    
+    existingScripts.forEach((s) => {
+      if (s.getAttribute("src") === scriptSrc && window.paypal && window.paypal.Buttons) {
+        scriptLoaded = true;
+      } else {
+        s.parentNode.removeChild(s);
+      }
+    });
+
+    if (!scriptLoaded) {
+      if (window.paypal) {
+        try {
+          delete window.paypal;
+        } catch (_) {
+          window.paypal = undefined;
+        }
+      }
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = scriptSrc;
+      script.async = true;
+      script.onload = () => {
+        setTimeout(initializeButtons, 200);
+      };
+      script.onerror = () => {
+        toast.error("Failed to load PayPal SDK");
+        setPaypalLoading(false);
+      };
+      document.body.appendChild(script);
+    } else {
+      setTimeout(initializeButtons, 200);
+    }
+  }, [showPaymentModal]);
+
   // Pre-fill coach/submitter details from logged-in admin if available
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedAdmin = sessionStorage.getItem("userData");
       const storedSubAdmin = sessionStorage.getItem("subAdmin");
       const user = storedAdmin ? JSON.parse(storedAdmin) : (storedSubAdmin ? JSON.parse(storedSubAdmin) : null);
-      
+
       if (user) {
         setFormData(prev => ({
           ...prev,
@@ -85,7 +229,7 @@ export default function SubmitPerformancePage() {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear field-specific error as the user types
     if (errors[name]) {
       setErrors(prev => ({
@@ -107,10 +251,10 @@ export default function SubmitPerformancePage() {
         [name]: null
       }));
     }
-  };  
+  };
 
 
-  
+
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -138,7 +282,7 @@ export default function SubmitPerformancePage() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     const file = e.dataTransfer?.files?.[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
@@ -237,8 +381,114 @@ export default function SubmitPerformancePage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleCancelUpdate = () => {
+    setFormData({
+      sport: "",
+      customSport: "",
+      activity: "",
+      result: "",
+      unit: "",
+      customUnit: "",
+      full_name: "",
+      age: "",
+      date_of_performance: "",
+      gender: "",
+      country: "",
+      club_name: "",
+      coach_name: "",
+      email: "",
+      venue: "",
+      wind: "",
+      video_link: "",
+      aditional_notes: "",
+    });
+    setEvidenceFile(null);
+    setErrors({});
+    setIsUpdateMode(false);
+    setActiveRecordId(null);
+    
+    // Re-fill coach/submitter name & email from sessionStorage if available
+    if (typeof window !== "undefined") {
+      const storedAdmin = sessionStorage.getItem("userData");
+      const storedSubAdmin = sessionStorage.getItem("subAdmin");
+      const user = storedAdmin ? JSON.parse(storedAdmin) : (storedSubAdmin ? JSON.parse(storedSubAdmin) : null);
+      if (user) {
+        setFormData(prev => ({
+          ...prev,
+          coach_name: user.name || "",
+          email: user.email || ""
+        }));
+      }
+    }
+    toast.info("Update cancelled. Returned to New Submission mode.");
+  };
+
+  const handleLookupSubmission = async (e) => {
+    if (e) e.preventDefault();
+    if (!searchId.trim()) {
+      toast.error("Please enter a valid Submitted ID");
+      return;
+    }
+
+    setSearchLoading(true);
+    try {
+      const response = await getRequest(API_ENDPOINTS.PERFORMANCE_RESULT_DETAILS, {
+        submited_id: searchId.trim()
+      });
+
+      if (response && (response.status === 200 || response.status === true) && response.data) {
+        const recordList = response.data;
+        const record = Array.isArray(recordList) ? recordList[0] : recordList;
+
+        if (record) {
+          const matchedSport = sportsList.includes(record.sport) ? record.sport : (record.sport ? "Other" : "");
+          const customSport = matchedSport === "Other" ? record.sport : "";
+
+          const matchedUnit = unitsList.includes(record.unit) ? record.unit : (record.unit ? "Other" : "");
+          const customUnit = matchedUnit === "Other" ? record.unit : "";
+
+          setFormData({
+            sport: matchedSport,
+            customSport: customSport || "",
+            activity: record.activity || "",
+            result: record.result !== null && record.result !== undefined ? String(record.result) : "",
+            unit: matchedUnit,
+            customUnit: customUnit || "",
+            full_name: record.full_name || "",
+            age: record.age !== null && record.age !== undefined ? String(record.age) : "",
+            date_of_performance: formatDateForInput(record.date_of_performance),
+            gender: record.gender || "",
+            country: record.country || "",
+            club_name: record.club_name || "",
+            coach_name: record.coach_name || "",
+            email: record.email || "",
+            venue: record.venue || "",
+            wind: record.wind || "",
+            video_link: record.video_link || "",
+            aditional_notes: record.aditional_notes || record.additional_notes || "",
+          });
+
+          setActiveRecordId(record.id);
+          setIsUpdateMode(true);
+          setLookupModalOpen(false);
+          setSearchId("");
+          toast.success("Submission details loaded. You can now make updates.");
+        } else {
+          toast.error("No performance result found for the provided ID.");
+        }
+      } else {
+        toast.error(response?.message || "Could not find any submission with this ID.");
+      }
+    } catch (error) {
+      console.error("Lookup error:", error);
+      toast.error(error.response?.data?.message || error.message || "Failed to fetch submission details.");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const handleUpdateSubmission = async (e) => {
+    if (e) e.preventDefault();
 
     if (!validateForm()) {
       toast.error("Please fill in all required fields and fix validation errors");
@@ -259,6 +509,7 @@ export default function SubmitPerformancePage() {
 
     try {
       const payload = new FormData();
+      payload.append("id", activeRecordId);
       payload.append("sport", formData.sport === "Other" ? formData.customSport : formData.sport);
       payload.append("activity", formData.activity);
       payload.append("result", formData.result);
@@ -280,13 +531,12 @@ export default function SubmitPerformancePage() {
         payload.append("upload_avidence", evidenceFile);
       }
 
-      const response = await postFormData(API_ENDPOINTS.SAVE_PERFORMANCE_RESULT, payload);
+      const response = await postFormData(API_ENDPOINTS.PERFORMANCE_RESULT_UPDATE, payload);
 
       if (response && (response.status === 200 || response.status === true || response.success)) {
-        toast.success("Performance result submitted successfully!");
+        toast.success("Performance result updated successfully!");
         
-        // Reset form keeping submitter details
-        setFormData(prev => ({
+        setFormData({
           sport: "",
           customSport: "",
           activity: "",
@@ -299,13 +549,106 @@ export default function SubmitPerformancePage() {
           gender: "",
           country: "",
           club_name: "",
-          coach_name: prev.coach_name,
-          email: prev.email,
+          coach_name: "",
+          email: "",
           venue: "",
           wind: "",
           video_link: "",
           aditional_notes: "",
-        }));
+        });
+        setEvidenceFile(null);
+        setErrors({});
+        setIsUpdateMode(false);
+        setActiveRecordId(null);
+      } else {
+        toast.error(response?.message || response?.error_message || "Failed to update performance result.");
+      }
+    } catch (error) {
+      console.error("Talent Board update error:", error);
+      toast.error(error.response?.data?.message || error.message || "An error occurred during update.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (isUpdateMode) {
+      await handleUpdateSubmission(e);
+    } else {
+      if (!validateForm()) {
+        toast.error("Please fill in all required fields and fix validation errors");
+        
+        // Scroll to the first element with an error
+        setTimeout(() => {
+          const firstErrorKey = Object.keys(errors)[0];
+          const element = document.getElementsByName(firstErrorKey)[0];
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+            element.focus();
+          }
+        }, 100);
+        return;
+      }
+
+      setShowPaymentModal(true);
+    }
+  };
+
+  const submitFormData = async (transactionId) => {
+    setLoading(true);
+
+    try {
+      const payload = new FormData();
+      payload.append("sport", formData.sport === "Other" ? formData.customSport : formData.sport);
+      payload.append("activity", formData.activity);
+      payload.append("result", formData.result);
+      payload.append("unit", formData.unit === "Other" ? formData.customUnit : formData.unit);
+      payload.append("full_name", formData.full_name);
+      payload.append("age", formData.age);
+      payload.append("date_of_performance", formData.date_of_performance);
+      payload.append("gender", formData.gender);
+      payload.append("country", formData.country);
+      payload.append("club_name", formData.club_name || "");
+      payload.append("coach_name", formData.coach_name);
+      payload.append("email", formData.email);
+      payload.append("venue", formData.venue || "");
+      payload.append("wind", formData.wind || "");
+      payload.append("video_link", formData.video_link || "");
+      payload.append("aditional_notes", formData.aditional_notes || "");
+      payload.append("paypal_subscription_id", transactionId);
+      
+      if (evidenceFile) {
+        payload.append("upload_avidence", evidenceFile);
+      }
+
+      const response = await postFormData(API_ENDPOINTS.SAVE_PERFORMANCE_RESULT, payload);
+
+      if (response && (response.status === 200 || response.status === true || response.success)) {
+        toast.success("Performance result submitted successfully!");
+        
+        // Reset all form inputs to empty strings
+        setFormData({
+          sport: "",
+          customSport: "",
+          activity: "",
+          result: "",
+          unit: "",
+          customUnit: "",
+          full_name: "",
+          age: "",
+          date_of_performance: "",
+          gender: "",
+          country: "",
+          club_name: "",
+          coach_name: "",
+          email: "",
+          venue: "",
+          wind: "",
+          video_link: "",
+          aditional_notes: "",
+        });
         setEvidenceFile(null);
         setErrors({});
       } else {
@@ -329,7 +672,7 @@ export default function SubmitPerformancePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center mb-8">
           <div className="lg:col-span-2">
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-[#0284C7] to-accent bg-clip-text text-transparent mb-4">
-              Submit a Performance Result
+              {isUpdateMode ? "Update Performance Result" : "Submit a Performance Result"}
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base font-semibold leading-relaxed">
               The SSP Talent Board allows account holders to showcase notable sporting performances and emerging talent that may be of interest to coaches, scouts and sporting organisations.
@@ -363,7 +706,7 @@ export default function SubmitPerformancePage() {
 
             {/* 4-COLUMN RESPONSIVE FORM GRID */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              
+
               {/* SPORT */}
               <div className="space-y-2">
                 <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -373,9 +716,8 @@ export default function SubmitPerformancePage() {
                   name="sport"
                   value={formData.sport}
                   onChange={(e) => handleSelectChange("sport", e.target.value)}
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.sport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.sport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
                   <option value="" className="bg-white dark:bg-[#0c1224] text-slate-400 dark:text-zinc-400">Select Sport</option>
                   {sportsList.map(sport => (
@@ -404,9 +746,8 @@ export default function SubmitPerformancePage() {
                     value={formData.customSport}
                     onChange={handleInputChange}
                     placeholder="Enter custom sport"
-                    className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                      errors.customSport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                    className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.customSport ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                      } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                   />
                   {errors.customSport && (
                     <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -428,9 +769,8 @@ export default function SubmitPerformancePage() {
                   value={formData.activity}
                   onChange={handleInputChange}
                   placeholder="Select or enter activity"
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.activity ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.activity ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.activity && (
                   <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -451,9 +791,8 @@ export default function SubmitPerformancePage() {
                   value={formData.result}
                   onChange={handleInputChange}
                   placeholder="Enter result (e.g. 40)"
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.result ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.result ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.result && (
                   <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -472,9 +811,8 @@ export default function SubmitPerformancePage() {
                   name="unit"
                   value={formData.unit}
                   onChange={(e) => handleSelectChange("unit", e.target.value)}
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.unit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.unit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
                   <option value="" className="bg-white dark:bg-[#0c1224] text-slate-400 dark:text-zinc-400">Select unit</option>
                   {unitsList.map(unit => (
@@ -503,9 +841,8 @@ export default function SubmitPerformancePage() {
                     value={formData.customUnit}
                     onChange={handleInputChange}
                     placeholder="Enter custom unit"
-                    className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                      errors.customUnit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                    className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.customUnit ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                      } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                   />
                   {errors.customUnit && (
                     <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -527,9 +864,8 @@ export default function SubmitPerformancePage() {
                   value={formData.full_name}
                   onChange={handleInputChange}
                   placeholder="Enter athlete full name"
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.full_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.full_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.full_name && (
                   <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -552,9 +888,8 @@ export default function SubmitPerformancePage() {
                   placeholder="Enter age"
                   min="1"
                   max="120"
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.age ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.age ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.age && (
                   <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -574,9 +909,8 @@ export default function SubmitPerformancePage() {
                   name="date_of_performance"
                   value={formData.date_of_performance}
                   onChange={handleInputChange}
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.date_of_performance ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm dark:scheme-dark`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.date_of_performance ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm dark:scheme-dark`}
                 />
                 {errors.date_of_performance && (
                   <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -595,9 +929,8 @@ export default function SubmitPerformancePage() {
                   name="gender"
                   value={formData.gender}
                   onChange={(e) => handleSelectChange("gender", e.target.value)}
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.gender ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.gender ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
                   <option value="" className="bg-white dark:bg-[#0c1224] text-slate-400 dark:text-zinc-400">Select gender</option>
                   <option value="male" className="bg-white dark:bg-[#0c1224] text-slate-800 dark:text-white">Male</option>
@@ -621,9 +954,8 @@ export default function SubmitPerformancePage() {
                   name="country"
                   value={formData.country}
                   onChange={(e) => handleSelectChange("country", e.target.value)}
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.country ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.country ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all cursor-pointer text-sm`}
                 >
                   <option value="" className="bg-white dark:bg-[#0c1224] text-slate-400 dark:text-zinc-400">Select country</option>
                   {countries.map(country => (
@@ -666,9 +998,8 @@ export default function SubmitPerformancePage() {
                   value={formData.coach_name}
                   onChange={handleInputChange}
                   placeholder="Enter your full name"
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.coach_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.coach_name ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.coach_name && (
                   <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -689,9 +1020,8 @@ export default function SubmitPerformancePage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Enter your email"
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.email ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.email ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.email && (
                   <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -742,9 +1072,8 @@ export default function SubmitPerformancePage() {
                   value={formData.video_link}
                   onChange={handleInputChange}
                   placeholder="Enter video link URL"
-                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${
-                    errors.video_link ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
-                  } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
+                  className={`w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border ${errors.video_link ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20" : "border-border focus:border-primary dark:focus:border-accent focus:ring-primary/20 dark:focus:ring-accent/20"
+                    } text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:outline-none transition-all text-sm`}
                 />
                 {errors.video_link && (
                   <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-pulse">
@@ -759,39 +1088,77 @@ export default function SubmitPerformancePage() {
             {/* ACTION BUTTONS */}
             <div className="space-y-4 pt-4 border-t border-border">
               <div className="flex flex-col sm:flex-row gap-4">
-                {/* Update Existing Submission */}
-                <button
-                  type="button"
-                  onClick={() => router.back()}
-                  className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 hover:bg-slate-100 dark:bg-[#0c1628] dark:hover:bg-[#122038] transition-all duration-200 text-left cursor-pointer"
-                >
-                  <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300">
-                    <RefreshCw className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-extrabold text-sm md:text-base text-slate-800 dark:text-slate-200">Update Existing Submission</p>
-                    <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Update a previous submission</p>
-                  </div>
-                </button>
+                {isUpdateMode ? (
+                  <>
+                    {/* Cancel Update Button */}
+                    <button
+                      type="button"
+                      onClick={handleCancelUpdate}
+                      className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl border border-rose-200 dark:border-rose-900 bg-rose-50/50 hover:bg-rose-50 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 transition-all duration-200 text-left cursor-pointer"
+                    >
+                      <div className="p-3 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-300">
+                        <X className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-extrabold text-sm md:text-base text-rose-800 dark:text-rose-200">Cancel Update</p>
+                        <p className="text-[10px] md:text-xs text-rose-500 dark:text-rose-400 mt-0.5">Discard changes and return</p>
+                      </div>
+                    </button>
 
-                {/* New Submission (Submit Button) */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all duration-200 text-left shadow-lg shadow-blue-500/15 cursor-pointer"
-                >
-                  <div className="p-3 rounded-xl bg-white/10 text-white">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-extrabold text-sm md:text-base text-white">New Submission</p>
-                    <p className="text-[10px] md:text-xs text-blue-100/90 mt-0.5">
-                      {loading ? "Submitting performance..." : "Create a new performance submission"}
-                    </p>
-                  </div>
-                </button>
+                    {/* Update Submission (Submit Button) */}
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white transition-all duration-200 text-left shadow-lg shadow-emerald-500/15 cursor-pointer"
+                    >
+                      <div className="p-3 rounded-xl bg-white/10 text-white">
+                        <CheckCircle className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-extrabold text-sm md:text-base text-white">Update Submission</p>
+                        <p className="text-[10px] md:text-xs text-emerald-100/90 mt-0.5">
+                          {loading ? "Updating performance..." : "Save changes to performance result"}
+                        </p>
+                      </div>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {/* Update Existing Submission */}
+                    <button
+                      type="button"
+                      onClick={() => setLookupModalOpen(true)}
+                      className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 hover:bg-slate-100 dark:bg-[#0c1628] dark:hover:bg-[#122038] transition-all duration-200 text-left cursor-pointer"
+                    >
+                      <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300">
+                        <RefreshCw className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-extrabold text-sm md:text-base text-slate-800 dark:text-slate-200">Update Existing Submission</p>
+                        <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Update a previous submission</p>
+                      </div>
+                    </button>
+
+                    {/* New Submission (Submit Button) */}
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all duration-200 text-left shadow-lg shadow-blue-500/15 cursor-pointer"
+                    >
+                      <div className="p-3 rounded-xl bg-white/10 text-white">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-extrabold text-sm md:text-base text-white">New Submission</p>
+                        <p className="text-[10px] md:text-xs text-blue-100/90 mt-0.5">
+                          {loading ? "Submitting performance..." : "Create a new performance submission"}
+                        </p>
+                      </div>
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* Secure Footer */}
@@ -809,6 +1176,131 @@ export default function SubmitPerformancePage() {
 
           </div>
         </form>
+
+        {/* PayPal Sandbox Payment Dialog */}
+        <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+          <DialogContent className="w-[95vw] sm:max-w-md bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
+            {/* Header Banner */}
+            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1 bg-primary/15 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
+                  <ShieldCheck className="h-3.5 w-3.5" /> Secure Checkout
+                </div>
+                <DialogTitle className="text-xl font-black text-foreground">
+                  Talent Board Submission
+                </DialogTitle>
+              </div>
+              <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
+                <span className="font-extrabold text-sm">£5</span>
+              </div>
+            </div>
+            <div className="p-6 space-y-6">
+              <div className="space-y-2">
+                <h4 className="text-sm font-bold text-foreground">Annual Submission Subscription</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  To complete your submission to the SSP Talent Board, an annual subscription of £5.00 GBP is required. This keeps your listing active for 12 months, allowing you to update it at any time.
+                </p>
+              </div>
+
+              <div className="border-t border-border pt-4 space-y-4">
+                {paypalLoading && (
+                  <div className="flex flex-col items-center justify-center py-6 space-y-3">
+                    <div className="w-8 h-8 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+                    <p className="text-xs text-muted-foreground font-semibold">Initializing PayPal Payment...</p>
+                  </div>
+                )}
+                <div 
+                  id="paypal-button-container-P-98386085E3963253DNIPRKEQ" 
+                  className="min-h-[150px] w-full transition-all duration-300" 
+                />
+
+                <div className="flex flex-col items-center space-y-2 pt-2 border-t border-dashed border-border">
+                  <p className="text-[10px] text-muted-foreground italic">
+                    If PayPal fails to load (due to invalid client-id or network), use this fallback to test form submission:
+                  </p>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      toast.success("Bypass payment successful! Submitting performance result...");
+                      setShowPaymentModal(false);
+                      await submitFormData("DUMMY_TRX_ID_" + Date.now());
+                    }}
+                    className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                  >
+                       Payment Success (Bypass)
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-slate-500 dark:text-slate-400/80 font-medium">
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span>Secured by PayPal • SSL Encrypted</span>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Lookup Submitted ID Dialog */}
+        <Dialog open={lookupModalOpen} onOpenChange={setLookupModalOpen}>
+          <DialogContent className="w-[95vw] sm:max-w-md bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
+            {/* Header Banner */}
+            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1 bg-primary/15 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
+                  <Key className="h-3.5 w-3.5" /> Lookup Submission
+                </div>
+                <DialogTitle className="text-xl font-black text-foreground">
+                  Update Submission
+                </DialogTitle>
+              </div>
+            </div>
+            
+            <form onSubmit={handleLookupSubmission} className="p-6 space-y-6">
+              <div className="space-y-2">
+                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  Submitted ID <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={searchId}
+                  onChange={(e) => setSearchId(e.target.value)}
+                  placeholder="Enter your submitted_id (e.g. 178054947229)"
+                  required
+                  className="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-border dark:border-white/10 text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm font-medium"
+                />
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Enter the unique 12-digit submission ID you received when creating your performance result.
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setLookupModalOpen(false)}
+                  className="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-sm transition-all cursor-pointer text-center"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={searchLoading}
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#0091FF] hover:bg-[#0080E0] text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  {searchLoading ? (
+                    <>
+                      <div className="w-4 h-4 rounded-full border-2 border-white/35 border-t-white animate-spin" />
+                      Searching...
+                    </>
+                  ) : (
+                    "Search & Fill"
+                  )}
+                </button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

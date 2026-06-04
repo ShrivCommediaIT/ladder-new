@@ -61,16 +61,6 @@ export default function PlanHeading() {
     [],
   );
 
-  const stats = useMemo(
-    () => [
-      { value: "500+", label: "Active Clubs" },
-      { value: "12K+", label: "Players Managed" },
-      { value: "98%", label: "Satisfaction Rate" },
-      { value: "GBP 24", label: "Per Player/Year" },
-    ],
-    [],
-  );
-
   const features = useMemo(
     () => [
       {
@@ -420,26 +410,6 @@ export default function PlanHeading() {
         </div>
       </section>
 
-      <section
-        id="clubs"
-        className="bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] py-12 text-white"
-      >
-        <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="border-white/20 px-4 md:border-l first:md:border-l-0"
-              >
-                <div className="mb-2 text-4xl font-bold">{stat.value}</div>
-                <div className="text-sm font-medium md:text-base" style={{ color: "var(--landing-stat-text)" }}>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
       <div id="talent-board" className="relative z-10 border-y border-border bg-background scroll-mt-20">
         <PerformanceDatabase />
       </div>
