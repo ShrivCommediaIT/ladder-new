@@ -447,7 +447,7 @@ export default function ProfilePage() {
                   {name || "User Profile"}
                 </h3>
                 <span className="text-xs font-semibold text-primary uppercase tracking-widest mt-1 bg-blue-500/10 px-3 py-1 rounded-full">
-                  {user?.user_type === "sub_admin" ? "Section Admin" : "Super Admin"}
+                  {user?.user_type === "sub_admin" ? "Section Admin" : " Admin"}
                 </span>
               </div>
 
