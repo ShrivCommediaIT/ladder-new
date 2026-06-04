@@ -509,6 +509,22 @@ export default function SubmitPerformancePage() {
 
     try {
       const payload = new FormData();
+      
+      // Get admin_id from sessionStorage key "adminDetails"
+      if (typeof window !== "undefined") {
+        const adminDetailsStr = sessionStorage.getItem("adminDetails");
+        if (adminDetailsStr) {
+          try {
+            const adminDetails = JSON.parse(adminDetailsStr);
+            if (adminDetails && adminDetails.id) {
+              payload.append("admin_id", adminDetails.id);
+            }
+          } catch (e) {
+            console.error("Error parsing adminDetails:", e);
+          }
+        }
+      }
+
       payload.append("id", activeRecordId);
       payload.append("sport", formData.sport === "Other" ? formData.customSport : formData.sport);
       payload.append("activity", formData.activity);
@@ -601,6 +617,22 @@ export default function SubmitPerformancePage() {
 
     try {
       const payload = new FormData();
+      
+      // Get admin_id from sessionStorage key "adminDetails"
+      if (typeof window !== "undefined") {
+        const adminDetailsStr = sessionStorage.getItem("adminDetails");
+        if (adminDetailsStr) {
+          try {
+            const adminDetails = JSON.parse(adminDetailsStr);
+            if (adminDetails && adminDetails.id) {
+              payload.append("admin_id", adminDetails.id);
+            }
+          } catch (e) {
+            console.error("Error parsing adminDetails:", e);
+          }
+        }
+      }
+
       payload.append("sport", formData.sport === "Other" ? formData.customSport : formData.sport);
       payload.append("activity", formData.activity);
       payload.append("result", formData.result);
@@ -1232,7 +1264,7 @@ export default function SubmitPerformancePage() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-slate-500 dark:text-slate-400/80 font-medium">
+              <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-muted-foreground/60 font-medium">
                 <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
@@ -1259,7 +1291,7 @@ export default function SubmitPerformancePage() {
             
             <form onSubmit={handleLookupSubmission} className="p-6 space-y-6">
               <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                <label className="text-xs sm:text-sm font-semibold text-foreground/80">
                   Submitted ID <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -1268,7 +1300,7 @@ export default function SubmitPerformancePage() {
                   onChange={(e) => setSearchId(e.target.value)}
                   placeholder="Enter your submitted_id (e.g. 178054947229)"
                   required
-                  className="w-full h-12 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-border dark:border-white/10 text-foreground placeholder-slate-400 dark:placeholder-zinc-500 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm font-medium"
+                  className="w-full h-12 px-4 rounded-xl bg-input-theme-bg border border-input-theme-border text-foreground placeholder-muted-foreground/60 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm font-medium"
                 />
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Enter the unique 12-digit submission ID you received when creating your performance result.
@@ -1279,7 +1311,7 @@ export default function SubmitPerformancePage() {
                 <button
                   type="button"
                   onClick={() => setLookupModalOpen(false)}
-                  className="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-sm transition-all cursor-pointer text-center"
+                  className="flex-1 py-3 px-4 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-sm transition-all cursor-pointer text-center"
                 >
                   Cancel
                 </button>
