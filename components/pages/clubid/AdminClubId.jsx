@@ -443,6 +443,7 @@ export default function AdminClubId() {
                       <Input
                         {...field}
                         className="h-10 bg-slate-50 dark:bg-white/5 border border-border text-foreground font-bold rounded-xl focus:border-primary transition-all duration-200"
+                        maxLength={8}
                       />
                     </FormControl>
                     <FormMessage />
