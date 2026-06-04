@@ -153,7 +153,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
       setSaving(true);
       const witnessValue =
-      witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
+        witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
       const params = new URLSearchParams();
       params.append("user_id", String(playerId));
       params.append("skill_activity_id", String(skillActivityId));
@@ -164,13 +164,13 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("user_name", playerName);
 
 
-  console.log("cuurentScore", currentScore)
-      
+      console.log("cuurentScore", currentScore)
+
       if (bestScore !== undefined && bestScore !== null) {
         let bestToSubmit;
-        if (value > bestScore  ){
+        if (value > bestScore) {
           bestToSubmit = value;
-        }else{
+        } else {
           bestToSubmit = bestScore;
         }
         params.append("best_result", String(bestToSubmit));
@@ -178,9 +178,9 @@ export default function BasicLeaderboardActivityEntryCard({
       const skillsPost = await postUrlEncoded(API_ENDPOINTS.POST_RESULT_SKILLBOARD, params);
       if ((skillsPost.status === 200)) {
         setOpenSuccess(true);
-        toast.success("Result posted successfully! ");  
-          if(skillsPost?.eligible_for_token == 1){
-            updateLadderToken({
+        toast.success("Result posted successfully! ");
+        if (skillsPost?.eligible_for_token == 1) {
+          updateLadderToken({
             user_id: playerName,
             ladder_id: ladderId,
             ladder_type: "skill",
@@ -218,7 +218,7 @@ export default function BasicLeaderboardActivityEntryCard({
       return;
     }
 
-    const finalScore =  num;
+    const finalScore = num;
 
     // ✅ If topScore is 0, send the current value as the best result
     const bestResultToSubmit = (topScore === 0 || topScore === "0") ? finalScore : topScore;
@@ -310,28 +310,28 @@ export default function BasicLeaderboardActivityEntryCard({
               </>
             )}
           </div>
-          
+
           <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
             <div className="flex-1 sm:flex-none flex flex-col items-center">
               <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
                 Today's Result
               </label>
-                <input
-                  className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
-                  value={value}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (/^\d*\.?\d{0,2}$/.test(val) || val === "-") {
-                      setValue(val);
-                      setHasEditedToday(true);
-                    }
-                  }}
-                />
+              <input
+                className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
+                value={value}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (/^\d*\.?\d{0,2}$/.test(val) || val === "-") {
+                    setValue(val);
+                    setHasEditedToday(true);
+                  }
+                }}
+              />
             </div>
-            
+
             <div className="flex-1 sm:flex-none flex flex-col items-center">
               <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
-                Best Result 
+                Best Result
               </label>
               <input
                 className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
@@ -451,38 +451,38 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
       <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto bg-background text-foreground border border-border">
 
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b">
-            <h2 className="text-lg font-semibold text-emerald-600">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <h2 className="text-lg font-semibold text-emerald-600 dark:text-emerald-500">
               Enter Result
             </h2>
           </div>
 
           {/* Body */}
           <div className="px-5 py-4 space-y-4">
-            <div className="flex items-center justify-between text-lg font-bold">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-base sm:text-lg font-bold gap-3">
               <div className="flex items-center gap-2">
                 <span>Today’s Result</span>
-                <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
+                <span className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-bold">
                   {value}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <span>Your Best Result</span>
-                <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
+                <span className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-bold">
                    {(topScore === 0 || topScore === "0") ? value : topScore}
                 </span>
               </div>
             </div>
 
-            <p className="text-sm text-gray-600 font-bold">Note: Results posted without a witness will not qualify for a token.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 font-bold">Note: Results posted without a witness will not qualify for a token.</p>
 
             {/* Witness */}
             <div>
-              <label className="text-md font-medium">Witness: <span className="ml-3 font-bold"> {witnessBy || "—"} </span></label>
+              <label className="text-md font-medium text-foreground">Witness: <span className="ml-3 font-bold text-foreground"> {witnessBy || "—"} </span></label>
             </div>
 
             {/* Button */}
@@ -493,7 +493,7 @@ export default function BasicLeaderboardActivityEntryCard({
                   handleSuccessCloseResult();
                 }
               }}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-md"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-semibold py-2 rounded-md transition-colors"
             >
               Confirm
             </Button>
@@ -503,23 +503,23 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
       <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto p-0 overflow-hidden rounded-md border border-border bg-background text-foreground shadow-xl [&>button]:hidden max-h-[90vh] overflow-y-auto">
 
           {/* HEADER BAR (like system popup) */}
-          <div className="flex items-center justify-between bg-white px-3 py-2 border-b">
+          <div className="flex items-center justify-between bg-background px-3 py-2 border-b border-border">
             <span className="font-semibold text-sm"> </span>
 
             {/* Single Close Button */}
             <button
               onClick={() => setOpenZeroAlert(false)}
-              className="text-gray-600 hover:text-black text-lg font-bold"
+              className="text-muted-foreground hover:text-foreground text-lg font-bold"
             >
               ✕
             </button>
           </div>
 
           {/* BODY */}
-          <div className="flex justify-between gap-4 p-4">
+          <div className="flex justify-between gap-4 p-4 text-foreground">
 
             {/* TEXT */}
             <div className="text-sm leading-relaxed">

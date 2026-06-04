@@ -1016,11 +1016,11 @@ export default function BasicLeaderboardActivityEntryCard({
       </Dialog>
 
       <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto bg-background text-foreground border border-border">
 
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b">
-            <h2 className="text-lg font-semibold text-emerald-600">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+            <h2 className="text-lg font-semibold text-emerald-600 dark:text-emerald-500">
               Enter Result
             </h2>
           </div>
@@ -1028,17 +1028,17 @@ export default function BasicLeaderboardActivityEntryCard({
           {/* Body */}
           <div className="px-5 py-4 space-y-4">
             {/* Scores Row */}
-            <div className="flex items-center justify-between text-lg font-bold">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-base sm:text-lg font-bold gap-3">
               <div className="flex items-center gap-2">
                 <span>Today’s Result</span>
-                <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
+                <span className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-bold">
                   {(type === "negative" || ladderType === "negative") ? formatTimeInfo() : value}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <span>Your Best Result</span>
-                <span className="px-2 py-0.5 border rounded bg-gray-100 font-bold">
+                <span className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-bold">
                   {(() => {
                     const current = (type === "negative" || ladderType === "negative") ? formatTimeInfo() : value;
                     if (isEmptyBestResult(topScore)) return current;
@@ -1049,10 +1049,10 @@ export default function BasicLeaderboardActivityEntryCard({
                 </span>
               </div>
             </div>
-            <p className="text-sm text-gray-600 font-bold">Note: Results posted without a witness will not qualify for a token.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 font-bold">Note: Results posted without a witness will not qualify for a token.</p>
             {/* Witness */}
             <div>
-              <label className="text-md font-medium">Witness: <span className="ml-3 font-bold"> {witnessBy || "—"} </span></label>
+              <label className="text-md font-medium text-foreground">Witness: <span className="ml-3 font-bold text-foreground"> {witnessBy || "—"} </span></label>
             </div>
 
             {/* Button */}
@@ -1063,7 +1063,7 @@ export default function BasicLeaderboardActivityEntryCard({
                   handleSuccessCloseResult();
                 }
               }}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-md"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-semibold py-2 rounded-md transition-colors"
             >
               Confirm
             </Button>
@@ -1074,23 +1074,23 @@ export default function BasicLeaderboardActivityEntryCard({
       {/* ZERO SCORE ALERT */}
 
       <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto p-0 overflow-hidden rounded-md border shadow-xl [&>button]:hidden max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto p-0 overflow-hidden rounded-md border border-border bg-background text-foreground shadow-xl [&>button]:hidden max-h-[90vh] overflow-y-auto">
 
           {/* HEADER BAR (like system popup) */}
-          <div className="flex items-center justify-between bg-white px-3 py-2 border-b">
+          <div className="flex items-center justify-between bg-background px-3 py-2 border-b border-border">
             <span className="font-semibold text-sm"> </span>
 
             {/* Single Close Button */}
             <button
               onClick={() => setOpenZeroAlert(false)}
-              className="text-gray-600 hover:text-black text-lg font-bold"
+              className="text-muted-foreground hover:text-foreground text-lg font-bold"
             >
               ✕
             </button>
           </div>
 
           {/* BODY */}
-          <div className="flex justify-between gap-4 p-4">
+          <div className="flex justify-between gap-4 p-4 text-foreground">
 
             {/* TEXT */}
             <div className="text-sm leading-relaxed">
