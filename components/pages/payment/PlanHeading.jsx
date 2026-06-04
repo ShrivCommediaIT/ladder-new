@@ -574,10 +574,12 @@ export default function PlanHeading() {
         }}
       >
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="mb-6 text-4xl font-extrabold text-foreground">Ready to Elevate Your Club?</h2>
+          <h2 className="mb-6 text-4xl font-extrabold text-foreground">Ready to  Inspaire?</h2>
           <p className="mx-auto mb-10 max-w-2xl text-xl text-[var(--landing-nav-text)]">
-            Join 500+ clubs already using Sports Solutions Pro. Set up in minutes, no credit card
-            required.
+           Competition - Participation - Rewords
+          </p>
+           <p className="mx-auto mb-10 max-w-2xl text-xl text-[var(--landing-nav-text)]">
+           Set up in minutes - Demos Provided - No Cost - Free trail
           </p>
           <Button asChild size="lg" className={`${buttonClass} h-16 rounded-full px-10 text-xl`}>
             <Link  onClick={handleNavigationToAuth} href="#">
