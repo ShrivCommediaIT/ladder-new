@@ -218,57 +218,58 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                       Edit 
                     </Button>
 
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm cursor-pointer
-                            ${
-                              isDemo
-                                ? "text-red-400 border border-red-500 hover:bg-red-300"
-                                : "text-red-400 border border-red-400/30 hover:bg-red-400/50"
-                            }`}
-                          onClick={() => {
-                            setDeleteLadderId(ladder.id);
-                            setDeleteLadderName(ladder.name);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-
-                      <AlertDialogContent className="w-[90%] max-w-md bg-card border border-border text-foreground rounded-lg">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Delete{" "}
-                            <span className="text-red-400 font-bold">
-                              {deleteLadderName}
-                            </span>
-                            ?
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel
-                            className="text-black"
-                            onClick={() => setDeleteLadderId(null)}
-                          >
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() =>
-                              handleDelete(deleteLadderId)
-                            }
-                            className="bg-red-600 hover:bg-red-700"
+                    {ladder.type !== "roster" && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm cursor-pointer
+                              ${
+                                isDemo
+                                  ? "text-red-400 border border-red-500 hover:bg-red-300"
+                                  : "text-red-400 border border-red-400/30 hover:bg-red-400/50"
+                              }`}
+                            onClick={() => {
+                              setDeleteLadderId(ladder.id);
+                              setDeleteLadderName(ladder.name);
+                            }}
                           >
                             Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="w-[90%] max-w-md bg-card border border-border text-foreground rounded-lg">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Delete{" "}
+                              <span className="text-red-400 font-bold">
+                                {deleteLadderName}
+                              </span>
+                              ?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel
+                              className="text-black"
+                              onClick={() => setDeleteLadderId(null)}
+                            >
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() =>
+                                handleDelete(deleteLadderId)
+                              }
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                   </div>
 
                   </motion.div>
