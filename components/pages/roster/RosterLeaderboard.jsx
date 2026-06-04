@@ -356,18 +356,6 @@ const RosterLeaderboard = () => {
 
   const quickActions = [
     {
-      id: "reset",
-      label: "Reset",
-      icon: RotateCcw,
-      onClick: () => setResetOpen(true),
-    },
-    {
-      id: "add-remove",
-      label: "Add / Remove",
-      icon: Plus,
-      onClick: () => setAddRemoveOpen(true),
-    },
-    {
       id: "age-filter",
       node: (
         <AgeFilter
