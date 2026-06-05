@@ -469,7 +469,7 @@ const PlayerLevelNavbar = ({
                 {mounted && (theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />)}
               </button>
 
-              <div className="relative hidden md:block" ref={profileRef}>
+              <div className="relative hidden lg:block" ref={profileRef}>
                 <button
                   onClick={() => setProfileOpen((previous) => !previous)}
                   className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white transition-all overflow-hidden border border-white/10"
@@ -581,7 +581,7 @@ const PlayerLevelNavbar = ({
               {!userLevel && (
                 <button
                   onClick={() => setMobileOpen((previous) => !previous)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white md:hidden"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white lg:hidden"
                   aria-label="Toggle mobile menu"
                 >
                   {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -594,7 +594,7 @@ const PlayerLevelNavbar = ({
         {mobileOpen && (
           <div
             ref={mobileMenuRef}
-            className="border-t border-nav-border px-4 pb-4 pt-2 md:hidden flex flex-col gap-1"
+            className="border-t border-nav-border px-4 pb-4 pt-2 lg:hidden flex flex-col gap-1"
             style={{ background: "var(--navbar-bg)" }}
           >
             {/* User profile header in mobile menu */}
