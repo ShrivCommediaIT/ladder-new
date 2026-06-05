@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import PerformanceDatabase from "@/components/shared/PerformanceDatabase";
 
 const countries = [
   "India", "United States", "United Kingdom", "Canada", "Australia",
@@ -104,6 +105,7 @@ export default function SubmitPerformancePage() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [activeRecordId, setActiveRecordId] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Load and render PayPal SDK subscription buttons dynamically when modal is open
   useEffect(() => {
@@ -574,6 +576,7 @@ export default function SubmitPerformancePage() {
         setErrors({});
         setIsUpdateMode(false);
         setActiveRecordId(null);
+        setRefreshKey(prev => prev + 1);
       } else {
         toast.error(response?.message || response?.error_message || "Failed to update performance result.");
       }
@@ -681,6 +684,7 @@ export default function SubmitPerformancePage() {
         });
         setEvidenceFile(null);
         setErrors({});
+        setRefreshKey(prev => prev + 1);
       } else {
         toast.error(response?.message || response?.error_message || "Failed to submit performance result.");
       }
@@ -1332,6 +1336,7 @@ export default function SubmitPerformancePage() {
           </DialogContent>
         </Dialog>
       </div>
+      <PerformanceDatabase refreshTrigger={refreshKey} />
     </div>
   );
 }

@@ -144,7 +144,7 @@ const formatDate = (dateStr) => {
   }
 };
 
-export default function PerformanceDatabase() {
+export default function PerformanceDatabase({ refreshTrigger }) {
   const [dbData, setDbData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
@@ -261,7 +261,7 @@ export default function PerformanceDatabase() {
 
   useEffect(() => {
     fetchResults(currentPage);
-  }, [currentPage, fetchResults]);
+  }, [currentPage, fetchResults, refreshTrigger]);
 
   const handleSearch = (e) => {
     e.preventDefault();

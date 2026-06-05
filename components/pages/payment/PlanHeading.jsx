@@ -177,6 +177,7 @@ export default function PlanHeading() {
 
   const navItems = useMemo(
     () => [
+      { label: "SSP International Competitions", href: "#ssp-international-competitions" },
       { label: "SSP Talent Board", href: "#talent-board" },
       { label: "Features", href: "#features" },
       { label: "Pricing", href: "#pricing" },
@@ -200,10 +201,10 @@ export default function PlanHeading() {
       <nav className="sticky top-0 z-50 border-b border-[var(--landing-border)] bg-[var(--landing-surface)] backdrop-blur-md">
         <div className="mx-auto flex h-20 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center">
-            <Image src={topLogo} alt="Sports Solutions Pro" className="md:h-15 h-10 w-auto" priority />
+            <Image src={topLogo} alt="Sports Solutions Pro" className="lg:h-15 h-10 w-auto" priority />
           </Link>
 
-          <div className="hidden items-center gap-8 md:flex">
+          <div className="hidden items-center gap-8 lg:flex">
             {navItems.map((item) => (
               <a key={item.label} href={item.href} className={navLinkClass}>
                 {item.label}
@@ -211,7 +212,7 @@ export default function PlanHeading() {
             ))}
           </div>
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-3 lg:flex">
             <button
               type="button"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -225,7 +226,7 @@ export default function PlanHeading() {
             </Button>
           </div>
 
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-2 lg:hidden">
             <button
               type="button"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -247,7 +248,7 @@ export default function PlanHeading() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="border-t border-[var(--landing-border)] bg-[var(--landing-surface-strong)] md:hidden">
+          <div className="border-t border-[var(--landing-border)] bg-[var(--landing-surface-strong)] lg:hidden">
             <div className="mx-auto flex max-w-full flex-col gap-4 px-4 py-5 sm:px-6">
               {navItems.map((item) => (
                 <a
@@ -351,6 +352,7 @@ export default function PlanHeading() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.18 }}
+              id={"ssp-international-competitions"}
               className="mx-auto mb-16 max-w-5xl flex flex-col select-none relative"
             >
               {/* Unified Banner & Bottom Bar Container */}
@@ -374,7 +376,7 @@ export default function PlanHeading() {
                 </button>
 
                 {/* Custom HTML/CSS Bottom Bar (Directly overlaying on the image at the bottom) */}
-                <div className="relative mx-4 mb-4 mt-2 md:mt-0 md:mx-0 md:absolute md:bottom-4 md:left-4 md:right-4 w-[calc(100%-2rem)] md:w-auto bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] rounded-[24px] border border-cyan-500/40 p-4 md:py-4 md:px-7 shadow-[0_0_30px_rgba(6,182,212,0.22)] flex flex-wrap md:flex-nowrap items-center justify-around md:justify-between gap-4 md:gap-3 text-white z-10">
+                <div className="relative mx-4 mb-4 mt-2 md:mt-0 md:mx-0 md:absolute md:bottom-4 md:left-4 md:right-4 w-[calc(100%-2rem)] md:w-auto bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] rounded-[24px] border border-cyan-500/40 p-4 md:py-4 md:px-7 shadow-[0_0_30px_rgba(6,182,212,0.22)] flex flex-wrap md:flex-nowrap items-center justify-around md:justify-between gap-4 md:gap-3 text-white">
                   
                   {/* 1. Download The App */}
                   <div className="flex items-center gap-3.5">

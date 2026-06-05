@@ -181,10 +181,10 @@ export default function TermsAndConditions() {
         <nav className="sticky top-0 z-50 border-b border-[var(--landing-border)] bg-[var(--landing-surface)] backdrop-blur-md">
           <div className="mx-auto flex h-20 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">
             <Link href="/" className="flex items-center">
-              <Image src={topLogo} alt="Sports Solutions Pro" className="md:h-15 h-10 w-auto" priority />
+              <Image src={topLogo} alt="Sports Solutions Pro" className="lg:h-15 h-10 w-auto" priority />
             </Link>
 
-            <div className="hidden items-center gap-8 md:flex">
+            <div className="hidden items-center gap-8 lg:flex">
               {navItems.map((item) => (
                 <Link key={item.label} href={item.href} className={navLinkClass}>
                   {item.label}
@@ -192,7 +192,7 @@ export default function TermsAndConditions() {
               ))}
             </div>
 
-            <div className="hidden items-center gap-3 md:flex">
+            <div className="hidden items-center gap-3 lg:flex">
               <button
                 type="button"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -206,7 +206,7 @@ export default function TermsAndConditions() {
               </Button>
             </div>
 
-            <div className="flex items-center gap-2 md:hidden">
+            <div className="flex items-center gap-2 lg:hidden">
               <button
                 type="button"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -228,7 +228,7 @@ export default function TermsAndConditions() {
           </div>
 
           {mobileMenuOpen && (
-            <div className="border-t border-[var(--landing-border)] bg-[var(--landing-surface-strong)] md:hidden">
+            <div className="border-t border-[var(--landing-border)] bg-[var(--landing-surface-strong)] lg:hidden">
               <div className="mx-auto flex max-w-full flex-col gap-4 px-4 py-5 sm:px-6">
                 {navItems.map((item) => (
                   <Link
