@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import PerformanceDatabase from "@/components/shared/PerformanceDatabase";
 
 const countries = [
   "India", "United States", "United Kingdom", "Canada", "Australia",
@@ -104,6 +105,7 @@ export default function SubmitPerformancePage() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [activeRecordId, setActiveRecordId] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Load and render PayPal SDK subscription buttons dynamically when modal is open
   useEffect(() => {
@@ -111,38 +113,36 @@ export default function SubmitPerformancePage() {
 
     setPaypalLoading(true);
 
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    const hostedButtonId = process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID;
+
     const scriptId = "paypal-subscription-sdk";
-    const scriptSrc = "https://www.paypal.com/sdk/js?client-id=AYScJLLFzh9r-mZwpVWVvLmNwWuuME4ayvP1W-ym9H8J2nbpbW8MAz5kAdF5uzcajbQpNojCT5q-RPae&vault=true&intent=subscription";
+    const scriptSrc = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=GBP`;
 
     let retries = 0;
     const initializeButtons = () => {
-      if (window.paypal && window.paypal.Buttons) {
-        const container = document.getElementById("paypal-button-container-P-98386085E3963253DNIPRKEQ");
+      if (window.paypal && window.paypal.HostedButtons) {
+        const container = document.getElementById(`paypal-container-${hostedButtonId}`);
         if (container) {
           container.innerHTML = "";
           try {
-            window.paypal.Buttons({
-              style: {
-                shape: "rect",
-                color: "gold",
-                layout: "vertical",
-                label: "subscribe"
-              },
-              createSubscription: function(data, actions) {
-                return actions.subscription.create({
-                  plan_id: "P-98386085E3963253DNIPRKEQ"
-                });
+            window.paypal.HostedButtons({
+              hostedButtonId: hostedButtonId,
+              onPaymentCompleted: async function(data, actions) {
+                toast.success("Payment successful! Submitting performance result...");
+                setShowPaymentModal(false);
+                await submitFormData(data.orderID || data.paymentID || "PAYPAL_HOSTED_BUTTON_" + Date.now());
               },
               onApprove: async function(data, actions) {
                 toast.success("Payment successful! Submitting performance result...");
                 setShowPaymentModal(false);
-                await submitFormData(data.subscriptionID);
+                await submitFormData(data.orderID || data.paymentID || "PAYPAL_HOSTED_BUTTON_" + Date.now());
               },
               onError: function(err) {
                 toast.error("PayPal payment failed or cancelled");
                 console.error("PayPal integration error:", err);
               }
-            }).render("#paypal-button-container-P-98386085E3963253DNIPRKEQ");
+            }).render(`#paypal-container-${hostedButtonId}`);
           } catch (e) {
             console.error("Paypal render error", e);
           } finally {
@@ -172,7 +172,7 @@ export default function SubmitPerformancePage() {
     let scriptLoaded = false;
     
     existingScripts.forEach((s) => {
-      if (s.getAttribute("src") === scriptSrc && window.paypal && window.paypal.Buttons) {
+      if (s.getAttribute("src") === scriptSrc && window.paypal && window.paypal.HostedButtons) {
         scriptLoaded = true;
       } else {
         s.parentNode.removeChild(s);
@@ -576,6 +576,7 @@ export default function SubmitPerformancePage() {
         setErrors({});
         setIsUpdateMode(false);
         setActiveRecordId(null);
+        setRefreshKey(prev => prev + 1);
       } else {
         toast.error(response?.message || response?.error_message || "Failed to update performance result.");
       }
@@ -683,6 +684,7 @@ export default function SubmitPerformancePage() {
         });
         setEvidenceFile(null);
         setErrors({});
+        setRefreshKey(prev => prev + 1);
       } else {
         toast.error(response?.message || response?.error_message || "Failed to submit performance result.");
       }
@@ -1242,7 +1244,7 @@ export default function SubmitPerformancePage() {
                   </div>
                 )}
                 <div 
-                  id="paypal-button-container-P-98386085E3963253DNIPRKEQ" 
+                  id={`paypal-container-${process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`} 
                   className="min-h-[150px] w-full transition-all duration-300" 
                 />
 
@@ -1334,6 +1336,7 @@ export default function SubmitPerformancePage() {
           </DialogContent>
         </Dialog>
       </div>
+      <PerformanceDatabase refreshTrigger={refreshKey} />
     </div>
   );
 }
