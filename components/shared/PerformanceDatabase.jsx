@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { getRequest } from "@/services/apiService";
+import { getRequest, putRequest, deleteRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import {
   Search,
@@ -14,6 +14,9 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Eye,
+  EyeOff,
+  Trash2,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import {
@@ -187,6 +190,13 @@ export default function PerformanceDatabase({ refreshTrigger }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [activitiesOptions, setActivitiesOptions] = useState([]);
   const [countriesOptions, setCountriesOptions] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [confirmModalConfig, setConfirmModalConfig] = useState({
+    title: "",
+    message: "",
+    onConfirm: () => {},
+  });
 
   const fetchResults = useCallback(
     async (pageVal = 1, currentFilters = appliedFilters) => {
@@ -196,6 +206,21 @@ export default function PerformanceDatabase({ refreshTrigger }) {
         const ageValue = currentFilters.ageGroup
           ? ageMap[currentFilters.ageGroup]
           : undefined;
+
+        let adminId = undefined;
+        if (typeof window !== "undefined") {
+          const adminDetailsStr = sessionStorage.getItem("adminDetails");
+          if (adminDetailsStr) {
+            try {
+              const adminDetails = JSON.parse(adminDetailsStr);
+              if (adminDetails && adminDetails.id) {
+                adminId = adminDetails.id;
+              }
+            } catch (e) {
+              console.error("Error parsing adminDetails:", e);
+            }
+          }
+        }
 
         const params = {
           page: pageVal,
@@ -211,6 +236,10 @@ export default function PerformanceDatabase({ refreshTrigger }) {
           date_from: currentFilters.dateFrom || undefined,
           date_to: currentFilters.dateTo || undefined,
         };
+
+        if (adminId) {
+          params.admin_id = adminId;
+        }
 
         const response = await getRequest(
           API_ENDPOINTS.GET_PERFORMANCE_RESULT_LIST,
@@ -261,6 +290,20 @@ export default function PerformanceDatabase({ refreshTrigger }) {
 
   useEffect(() => {
     fetchResults(currentPage);
+
+    if (typeof window !== "undefined") {
+      const adminDetailsStr = sessionStorage.getItem("adminDetails");
+      if (adminDetailsStr) {
+        try {
+          const adminDetails = JSON.parse(adminDetailsStr);
+          setIsAdmin(!!(adminDetails && adminDetails.id));
+        } catch {
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    }
   }, [currentPage, fetchResults, refreshTrigger]);
 
   const handleSearch = (e) => {
@@ -310,6 +353,61 @@ export default function PerformanceDatabase({ refreshTrigger }) {
     setAppliedFilters(clearedFilters);
     setCurrentPage(1);
     fetchResults(1, clearedFilters);
+  };
+
+  const handleToggleStatus = async (record) => {
+    const isCurrentlyVisible = record.status == 1;
+    const confirmMessage = isCurrentlyVisible
+      ? "This performance will no longer be visible publicly. Are you sure you want to hide it?"
+      : "Are you sure you want to make this performance visible publicly?";
+
+    setConfirmModalConfig({
+      title: "Confirm Status Change",
+      message: confirmMessage,
+      onConfirm: async () => {
+        setConfirmModalOpen(false);
+        try {
+          const response = await putRequest(`/changeStatusPerformanceResult/${record.id}`, {
+            status: record.status == 1 ? 0 : 1,
+          });
+          if (response && (response.status === 200 || response.status === true || response.success)) {
+            toast.success(response.message || "Status changed successfully!");
+            setHistoryModalOpen(false);
+            fetchResults(currentPage);
+          } else {
+            toast.error(response?.message || "Failed to change status.");
+          }
+        } catch (error) {
+          console.error("Error toggling status:", error);
+          toast.error(error.message || "An error occurred while toggling status.");
+        }
+      }
+    });
+    setConfirmModalOpen(true);
+  };
+
+  const handleDeletePerformance = async (record) => {
+    setConfirmModalConfig({
+      title: "Confirm Deletion",
+      message: "This performance will be permanently deleted and will no longer show publicly. Are you sure you want to proceed?",
+      onConfirm: async () => {
+        setConfirmModalOpen(false);
+        try {
+          const response = await deleteRequest(`/PerformanceResultdelete/${record.id}`);
+          if (response && (response.status === 200 || response.status === true || response.success)) {
+            toast.success(response.message || "Performance record deleted successfully!");
+            setHistoryModalOpen(false);
+            fetchResults(currentPage);
+          } else {
+            toast.error(response?.message || "Failed to delete performance record.");
+          }
+        } catch (error) {
+          console.error("Error deleting performance record:", error);
+          toast.error(error.message || "An error occurred while deleting performance record.");
+        }
+      }
+    });
+    setConfirmModalOpen(true);
   };
 
   const handleRowClick = async (item) => {
@@ -754,9 +852,11 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                       key={item.id || idx}
                       onClick={() => handleRowClick(item)}
                       className={`cursor-pointer transition-colors ${
-                        idx % 2 === 0
-                          ? "bg-card hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_6%)]"
-                          : "bg-[color:color-mix(in_srgb,var(--card),var(--primary)_3%)] hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_8%)]"
+                        item.status == 0
+                          ? "opacity-60 bg-amber-500/5 hover:bg-amber-500/10 border-l-2 border-amber-500"
+                          : idx % 2 === 0
+                            ? "bg-card hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_6%)]"
+                            : "bg-[color:color-mix(in_srgb,var(--card),var(--primary)_3%)] hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_8%)]"
                       }`}
                     >
                       <td className="px-6 py-4 font-medium whitespace-nowrap text-muted-foreground">
@@ -768,7 +868,16 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                       <td className="px-6 py-4 font-semibold text-muted-foreground">{item.age}</td>
                       <td className="px-6 py-4 capitalize text-muted-foreground">{item.gender}</td>
                       <td className="px-6 py-4 font-medium text-primary">{item.sport}</td>
-                      <td className="px-6 py-4 font-semibold text-foreground">{item.activity}</td>
+                      <td className="px-6 py-4 font-semibold text-foreground">
+                        <span className="flex items-center gap-2">
+                          {item.activity}
+                          {item.status == 0 && (
+                            <span className="inline-flex items-center rounded bg-amber-500/15 border border-amber-500/20 px-1.5 py-0.5 text-[9px] font-black uppercase text-amber-500 tracking-wider">
+                              Hidden
+                            </span>
+                          )}
+                        </span>
+                      </td>
                       <td className="px-6 py-4 text-center font-sans text-[15px] font-extrabold tracking-wide text-primary">
                         {item.result}
                       </td>
@@ -925,24 +1034,63 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                       </span>
 
                       {/* Card container */}
-                      <div className="rounded-2xl border border-border bg-card/60 p-4 sm:p-5 space-y-4 shadow-sm backdrop-blur-sm">
+                      <div className={`history-card rounded-2xl border p-4 sm:p-5 space-y-4 shadow-sm backdrop-blur-sm ${record.status == 0 ? "border-amber-500/20 opacity-75" : ""}`}>
                         {/* Header Row */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border/60 pb-3">
                           <div>
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-primary flex items-center gap-2">
                               {record.sport || "Other Sport"}
+                              {record.status == 0 && (
+                                <span className="inline-flex items-center gap-1 rounded bg-amber-500/15 border border-amber-500/20 px-1.5 py-0.5 text-[9px] font-black uppercase text-amber-500 tracking-wider">
+                                  Hidden
+                                </span>
+                              )}
                             </span>
                             <h4 className="text-base font-bold text-foreground mt-0.5">
                               {record.activity || "Performance Event"}
                             </h4>
                           </div>
-                          <div className="text-left sm:text-right shrink-0">
-                            <span className="text-xs text-muted-foreground font-semibold block">
-                              Logged: {formatDate(record.created_at || record.date_of_performance)}
-                            </span>
-                            <span className="text-[11px] text-muted-foreground/80 mt-0.5 block">
-                              Perf Date: {formatDate(record.date_of_performance)}
-                            </span>
+                          <div className="flex items-center gap-3 sm:text-right shrink-0">
+                            <div className="text-left sm:text-right">
+                              <span className="text-xs text-muted-foreground font-semibold block">
+                                Logged: {formatDate(record.created_at || record.date_of_performance)}
+                              </span>
+                              <span className="text-[11px] text-muted-foreground/80 mt-0.5 block">
+                                Perf Date: {formatDate(record.date_of_performance)}
+                              </span>
+                            </div>
+
+                            {/* Admin Actions: Hide/Show & Delete */}
+                            {isAdmin && (
+                              <div className="flex items-center gap-1.5 border-l border-border pl-3 ml-1">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleStatus(record);
+                                  }}
+                                  title={record.status == 1 ? "Hide Performance" : "Show Performance"}
+                                  className={`flex h-8 w-8 items-center justify-center rounded-xl border transition-all active:scale-95 cursor-pointer ${
+                                    record.status == 1
+                                      ? "border-amber-500/25 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white"
+                                      : "border-slate-500/25 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"
+                                  }`}
+                                >
+                                  {record.status == 1 ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeletePerformance(record);
+                                  }}
+                                  title="Delete Performance"
+                                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-rose-500/25 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white active:scale-95 transition-all cursor-pointer"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -1046,6 +1194,41 @@ export default function PerformanceDatabase({ refreshTrigger }) {
               >
                 Close
               </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Custom Premium Confirmation Dialog */}
+        <Dialog open={confirmModalOpen} onOpenChange={setConfirmModalOpen}>
+          <DialogContent className="w-[95vw] sm:max-w-md bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
+            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent">
+              <DialogTitle className="text-xl font-black text-foreground">
+                {confirmModalConfig.title}
+              </DialogTitle>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <p className="text-sm text-muted-foreground leading-relaxed font-semibold">
+                {confirmModalConfig.message}
+              </p>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmModalOpen(false)}
+                  className="flex-1 py-3 px-4 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-sm transition-all cursor-pointer text-center"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmModalConfig.onConfirm}
+                  className="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm shadow-md transition-all cursor-pointer text-center bg-[#0091FF] hover:bg-[#0080E0]"
+                  style={{ backgroundImage: brandGradient, boxShadow: "var(--brand-button-shadow)" }}
+                >
+                  Confirm
+                </button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

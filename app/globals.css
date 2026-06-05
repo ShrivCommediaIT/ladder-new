@@ -768,3 +768,37 @@ body {
     transform: translateY(0);
   }
 }
+
+/* ─────────────────────────────────────────────
+   GLOBAL DIALOG / MODAL THEME OVERRIDES
+   - Dynamically styles modals based on active theme
+   ───────────────────────────────────────────── */
+[role="dialog"], 
+.DialogContent,
+div[class*="DialogContent"] {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(24px) !important;
+}
+
+.dark [role="dialog"],
+.dark .DialogContent,
+.dark div[class*="DialogContent"] {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Card container inside history dialog */
+.history-card {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  border-color: var(--border) !important;
+}
+
+.dark .history-card {
+  background-color: rgba(13, 31, 53, 0.6) !important;
+  border-color: var(--border) !important;
+}
