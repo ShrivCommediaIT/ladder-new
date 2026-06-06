@@ -1,7 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,14 +8,14 @@ import { fetchLeaderboard, uploadCSV } from "@/redux/slices/leaderboardSlice";
 import { UploadCloud } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
+const UploadPlayerLists = ({ onSuccessClose, ladderId, ladderType }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
-  const ladderTypeFromUrl = searchParams.get("type") || searchParams.get("ladder_type");
+  const ladderTypeFromUrl = ladderType || searchParams.get("type") || searchParams.get("ladder_type");
 
   /* ---------------- REDUX STATE ---------------- */
 
-  const leaderboard = useSelector((state) => state.leaderboard || {});
+  const leaderboard = useSelector((state) => state.player || {});
   const loading = leaderboard.loading || false;
   const reduxUser = useSelector((state) => state.user?.user);
 
@@ -49,6 +48,7 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
 
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
+  const fileInputRef = useRef(null);
 
   /* ---------------- FETCH LEADERBOARD ---------------- */
 
@@ -71,7 +71,9 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
       return;
     }
 
-    if (file.type !== "text/csv") {
+    const isCsvFile = file.type === "text/csv" || file.name?.toLowerCase().endsWith(".csv");
+
+    if (!isCsvFile) {
       toast.error("Only CSV files are allowed.");
       return;
     }
@@ -90,7 +92,7 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
       }, 300);
 
       await dispatch(
-        uploadCSV({ file, ladder_id: effectiveLadderId })
+        uploadCSV({ file, ladder_id: effectiveLadderId, type: ladderTypeFromUrl })
       ).unwrap();
 
       clearInterval(interval);
@@ -109,6 +111,22 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
     }
   };
 
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files?.[0];
+    const isCsvFile =
+      selectedFile?.type === "text/csv" ||
+      selectedFile?.name?.toLowerCase().endsWith(".csv");
+
+    if (selectedFile && !isCsvFile) {
+      toast.error("Please upload a valid CSV file.");
+      setFile(null);
+      e.target.value = "";
+      return;
+    }
+
+    setFile(selectedFile || null);
+  };
+
   /* ---------------- UI ---------------- */
 
   return (
@@ -125,9 +143,14 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
 
       {/* HEADER */}
       <div className="flex flex-col items-center text-center space-y-2 mb-6">
-        <div className="p-4 bg-blue-50 rounded-full shadow-inner">
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="p-4 bg-blue-50 rounded-full shadow-inner transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          aria-label="Select CSV file"
+        >
           <UploadCloud className="w-10 h-10 text-blue-600" />
-        </div>
+        </button>
         <h2 className="text-xl font-bold text-gray-800">
           Upload Player List (CSV)
         </h2>
@@ -137,22 +160,20 @@ const UploadPlayerLists = ({ onSuccessClose, ladderId }) => {
       </div>
 
       {/* ADMIN ONLY */}
-      {user?.user_type === "admin" || user?.user_type === "sub_admin" && (
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <Input
+      {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
+        <div className="flex flex-col items-center gap-3">
+          <input
+            ref={fileInputRef}
             type="file"
             accept=".csv"
-            onChange={(e) => {
-              const selectedFile = e.target.files?.[0];
-              if (selectedFile && selectedFile.type !== "text/csv") {
-                toast.error("Please upload a valid CSV file.");
-                setFile(null);
-              } else {
-                setFile(selectedFile);
-              }
-            }}
-            className="w-full sm:w-56 rounded-lg shadow-sm border border-blue-300 font-mono text-sm"
+            onChange={handleFileChange}
+            className="hidden"
           />
+          {file && (
+            <p className="max-w-full truncate rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
+              {file.name}
+            </p>
+          )}
 
           <Button
             onClick={handleUpload}

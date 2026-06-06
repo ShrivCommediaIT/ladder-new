@@ -44,31 +44,47 @@ const PlayerCard = ({
       ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}`
       : Logo;
 
+  const getFirstScoreValue = (...values) =>
+    values.find((value) => value !== null && value !== undefined && value !== "");
+
+  const getNegativeScoreInSeconds = (value) => {
+    if (value === null || value === undefined || value === "") return 0;
+
+    const numericValue = Number(value);
+    if (!Number.isNaN(numericValue)) return numericValue;
+
+    const convertedValue = Number(convertTimeToSeconds(value));
+    return Number.isNaN(convertedValue) ? 0 : convertedValue;
+  };
+
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const skillNumberKey = String(skillNumber);
     const scoreObj = scores?.find((s) => String(s.skill_number) === skillNumberKey);
     const skillObj = skills?.find((s) => String(s.skill_number) === skillNumberKey);
     const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
-    const rawNegativeScore = scoreObj?.negative_ladder_score;
-    const score = scoreObj && rawNegativeScore ? Number(convertTimeToSeconds(rawNegativeScore)) : 0;
-    const rawBestScore = scoreObj?.negative_ladder_bestscore || "";
-    const displayScore = rawBestScore ? convertTimeToSeconds(rawBestScore) : "0";
+    const rawNegativeScore = getFirstScoreValue(
+      scoreObj?.negative_ladder_bestscore,
+      scoreObj?.negative_ladder_score,
+      scoreObj?.best_score,
+      scoreObj?.input_score
+    );
+    const score = getNegativeScoreInSeconds(rawNegativeScore);
+    const displayScore = score.toFixed(2);
     const target =
       skillObj?.target !== null && skillObj?.target !== undefined
         ? Number(skillObj.target)
         : null;
-    const bestScoreInSeconds = rawBestScore ? Number(convertTimeToSeconds(rawBestScore)) : 0;
     let isTargetAchieved = false;
     if (
       target !== null &&
       target !== 0 &&
-      bestScoreInSeconds !== 0 &&
+      score !== 0 &&
       !isNaN(target) &&
-      !isNaN(bestScoreInSeconds)
+      !isNaN(score)
     ) {
-      isTargetAchieved = isInverted ? bestScoreInSeconds <= target : bestScoreInSeconds >= target;
+      isTargetAchieved = isInverted ? score <= target : score >= target;
     }
-    return { witnessBy, score, displayScore, target, isTargetAchieved, input_score: rawBestScore };
+    return { witnessBy, score, displayScore, target, isTargetAchieved, input_score: rawNegativeScore };
   };
 
   const achievedTargets =
@@ -240,7 +256,7 @@ const PlayerCard = ({
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {scoreData.displayScore !== "0" ? Number(scoreData.displayScore || 0).toFixed(2) : Number(scoreData.displayScore).toFixed(2)}
+                        {scoreData.displayScore}
                       </div>
                     );
                   })}               

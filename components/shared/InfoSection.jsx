@@ -51,7 +51,10 @@ export default function InfoSection({
   resetOpen,
   handleResetBoard,
   quickActions = [],
+  resetTitle = "Reset leaderboard?",
   resetDescription = "This will reset the current ladder data.",
+  resetConfirmLabel = "Confirm",
+  resetConfirmDisabled = false,
   userLevel = false,
 }) {
   const [copied, setCopied] = useState(false);
@@ -282,7 +285,7 @@ export default function InfoSection({
       <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
         <AlertDialogContent className="best-board-card border-[var(--best-board-border)] text-white">
           <AlertDialogHeader>
-            <AlertDialogTitle>Reset leaderboard?</AlertDialogTitle>
+            <AlertDialogTitle>{resetTitle}</AlertDialogTitle>
             <AlertDialogDescription className="text-[var(--best-board-muted)]">
               {resetDescription}
             </AlertDialogDescription>
@@ -293,9 +296,10 @@ export default function InfoSection({
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleResetBoard}
+              disabled={resetConfirmDisabled}
               className="border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] text-white hover:bg-[var(--best-board-accent-soft)]"
             >
-              Confirm
+              {resetConfirmLabel}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
