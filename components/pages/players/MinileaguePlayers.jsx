@@ -343,13 +343,13 @@ const MinileaguePlayers = () => {
 
   const handleResetBoard = useCallback(async () => {
     try {
-      await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, {
+      await getRequest(API_ENDPOINTS.RESET_SKILLBOARD, {
         ladder_id: ladderId,
       });
       setResetOpen(false);
       refreshLeaderboard();
     } catch (error) {
-      console.error("Failed to reset leaderboard", error);
+      console.error("Failed to reset minileague", error);
     }
   }, [ladderId, refreshLeaderboard]);
 
