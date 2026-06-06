@@ -16,6 +16,7 @@ import { getRequest, postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { EditPlayer } from "./EditPlayer";
 import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
+import UploadPlayerLists from "@/components/pages/uploadCsv/UploadPlayerLists";
 import {
   Dialog,
   DialogContent,
@@ -78,6 +79,8 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
   const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
   const [resetOpen, setResetOpen] = useState(false);
   const [addRemoveOpen, setAddRemoveOpen] = useState(false);
+  const [openUploadDialog, setOpenUploadDialog] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const isRefreshingRef = useRef(false);
@@ -256,13 +259,17 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
   };
 
   const handleResetBoard = async () => {
+    setResetLoading(true);
     try {
       await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
-      toast.success("Leaderboard reset successfully.");
       setResetOpen(false);
+      setOpenUploadDialog(true);
+      toast.success("Leaderboard reset successfully.");
       refreshLeaderboard();
     } catch {
       toast.error("Failed to reset leaderboard.");
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -375,6 +382,10 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
           contactOpen={contactOpen}
           resetOpen={resetOpen}
           handleResetBoard={handleResetBoard}
+          resetTitle="Do you want to reset ?"
+          resetDescription="This will completely DELETE the entire leaderboard. All data will be lost !"
+          resetConfirmLabel={resetLoading ? "Processing..." : "Confirm"}
+          resetConfirmDisabled={resetLoading}
           quickActions={quickActions}
         />
       }
@@ -424,6 +435,22 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
             onSuccessRefresh={() => {
               setAddRemoveOpen(false);
               refreshLeaderboard();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload CSV after reset */}
+      <Dialog open={openUploadDialog} onOpenChange={setOpenUploadDialog}>
+        <DialogContent className="bg-gray-400 rounded-lg border border-[#313546] sm:max-w-xl">
+          <UploadPlayerLists
+            ladderId={ladderId}
+            ladderType={ladderType}
+            onSuccessClose={() => {
+              setOpenUploadDialog(false);
+              refreshLeaderboard();
+              dispatch(fetchGradebars(ladderId));
+              toast.success("Players uploaded successfully!");
             }}
           />
         </DialogContent>
