@@ -524,16 +524,16 @@ export default function BasicLeaderboardActivityEntryCard({
 
       if (bestScore !== undefined && bestScore !== null) {
         let bestToSubmit;
-        if (type === "negative" || ladderType === "negative"){
+        if (type === "negative" || ladderType === "negative") {
           const currentSeconds = convertTimeToSeconds(finalScore);
           const bestSeconds = convertTimeToSeconds(bestScore);
-          console.log("Current seconds:",  Number(currentSeconds), "Best seconds:", Number(bestSeconds));    
+          console.log("Current seconds:", Number(currentSeconds), "Best seconds:", Number(bestSeconds));
           if (Number(currentSeconds) < (Number(bestSeconds))) {
-            bestToSubmit = String(finalScore) ;
+            bestToSubmit = String(finalScore);
           } else {
             bestToSubmit = bestScore;
           }
-        }else{
+        } else {
           if (value > bestScore) {
             bestToSubmit = value;
           } else {
@@ -637,9 +637,9 @@ export default function BasicLeaderboardActivityEntryCard({
 
   return (
     <>
-      <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
+      <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-card border border-border text-card-foreground rounded-2xl shadow-2xl p-3">
         {/* HEADER - FIXED */}
-        <div className="mb-2 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 bg-slate-800 p-2 rounded-lg">
+        <div className="mb-2 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 bg-muted p-2 rounded-lg">
           <div className="flex flex-col gap-1">
             {type != "positive" &&
               type != "negative" &&
@@ -652,7 +652,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
             {/* SKILL NAME */}
             {loadingSkill ? (
-              <p className="text-xs text-slate-400">Loading skill...</p>
+              <p className="text-xs text-muted-foreground">Loading skill...</p>
             ) : (
               <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
                 Skill Name : {skillDesc || "No skill description"}
@@ -661,7 +661,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
             {/* SKILL TARGET */}
             {loadingSkill ? (
-              <p className="text-xs text-slate-400">Loading target...</p>
+              <p className="text-xs text-muted-foreground">Loading target...</p>
             ) : (
               <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium break-words break-all whitespace-normal overflow-hidden leading-relaxed">
                 Target : {skillTarget ? Math.abs(skillTarget) : "No target"}
@@ -669,63 +669,63 @@ export default function BasicLeaderboardActivityEntryCard({
             )}
           </div>
 
-          <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
+          <div className="flex gap-4 sm:gap-6 bg-background p-2 rounded-md border border-border w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
             <div className="flex-1 sm:flex-none flex flex-col items-center"
               onClick={() => setBestInputFocused(false)}
             >
-              <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
+              <label className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold whitespace-nowrap">
                 Today's Result
               </label>
               {(type === "negative" || ladderType === "negative") ? (
                 editingCurrent ? (
-                <div className="flex items-center justify-center gap-[2px] mt-1 font-bold text-black bg-white rounded h-8 w-full sm:w-28 focus-within:ring-2 focus-within:ring-sky-500 overflow-hidden border border-gray-300 px-1">
-                  <input
-                    className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${activeField === "min" ? "text-sky-500" : ""}`}
-                    value={minStr}
-                    onChange={handleMinChange}
-                    onFocus={() => handleFocus("min")}
-                    onClick={() => handleFocus("min")}
-                    onBlur={handleTimeBlur}
-                    placeholder="MM"
-                  />
-                  <span>:</span>
-                  <input
-                    className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${activeField === "sec" ? "text-sky-500" : ""}`}
-                    value={secStr}
-                    onChange={handleSecChange}
-                    onFocus={() => handleFocus("sec")}
-                    onClick={() => handleFocus("sec")}
-                    onBlur={handleTimeBlur}
-                    placeholder="SS"
-                  />
-                  <span>.</span>
-                  <input
-                    className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${activeField === "ms" ? "text-sky-500" : ""}`}
-                    value={msStr}
-                    onChange={handleMsChange}
-                    onFocus={() => handleFocus("ms")}
-                    onClick={() => handleFocus("ms")}
-                    onBlur={handleTimeBlur}
-                    placeholder="MS"
-                  />
-                </div>
-              ) : 
-                (
-                  <div
-                    className="w-full sm:w-28 h-8 flex items-center justify-center rounded text-slate-700 font-bold mt-1 bg-slate-300 cursor-pointer hover:bg-slate-200 text-sm"
-                    onClick={() => {
-                      setEditingCurrent(true);
-                      setBestInputFocused(true);
-                      setBestActiveField("min");
-                      setBestFieldKeystrokes(0);
-                    }}
-                    title="Click to edit best result"
-                  >
-                    {loadingTopScore ? "..." :
-                      convertTimeToSeconds(selectedPlayer?.scores?.[initialActivity - 1]?.negative_ladder_bestscore) || "0"
-                    }
+                  <div className="flex items-center justify-center gap-[2px] mt-1 font-bold text-black bg-white rounded h-8 w-full sm:w-28 focus-within:ring-2 focus-within:ring-sky-500 overflow-hidden border border-gray-300 px-1">
+                    <input
+                      className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${activeField === "min" ? "text-sky-500" : ""}`}
+                      value={minStr}
+                      onChange={handleMinChange}
+                      onFocus={() => handleFocus("min")}
+                      onClick={() => handleFocus("min")}
+                      onBlur={handleTimeBlur}
+                      placeholder="MM"
+                    />
+                    <span>:</span>
+                    <input
+                      className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${activeField === "sec" ? "text-sky-500" : ""}`}
+                      value={secStr}
+                      onChange={handleSecChange}
+                      onFocus={() => handleFocus("sec")}
+                      onClick={() => handleFocus("sec")}
+                      onBlur={handleTimeBlur}
+                      placeholder="SS"
+                    />
+                    <span>.</span>
+                    <input
+                      className={`w-6 text-center outline-none bg-transparent p-0 text-sm ${activeField === "ms" ? "text-sky-500" : ""}`}
+                      value={msStr}
+                      onChange={handleMsChange}
+                      onFocus={() => handleFocus("ms")}
+                      onClick={() => handleFocus("ms")}
+                      onBlur={handleTimeBlur}
+                      placeholder="MS"
+                    />
                   </div>
-                ) )
+                ) :
+                  (
+                    <div
+                      className="w-full sm:w-28 h-8 flex items-center justify-center rounded text-foreground font-bold mt-1 bg-muted cursor-pointer hover:bg-accent text-sm"
+                      onClick={() => {
+                        setEditingCurrent(true);
+                        setBestInputFocused(true);
+                        setBestActiveField("min");
+                        setBestFieldKeystrokes(0);
+                      }}
+                      title="Click to edit best result"
+                    >
+                      {loadingTopScore ? "..." :
+                        convertTimeToSeconds(selectedPlayer?.scores?.[initialActivity - 1]?.negative_ladder_bestscore) || "0"
+                      }
+                    </div>
+                  ))
                 : (
                   <input
                     className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
@@ -737,7 +737,7 @@ export default function BasicLeaderboardActivityEntryCard({
             </div>
 
             <div className="flex-1 sm:flex-none flex flex-col items-center">
-              <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
+              <label className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold whitespace-nowrap">
                 Best Result
               </label>
 
@@ -777,7 +777,7 @@ export default function BasicLeaderboardActivityEntryCard({
                   </div>
                 ) : (
                   <div
-                    className="w-full sm:w-28 h-8 flex items-center justify-center rounded text-slate-700 font-bold mt-1 bg-slate-300 cursor-pointer hover:bg-slate-200 text-sm"
+                    className="w-full sm:w-28 h-8 flex items-center justify-center rounded text-foreground font-bold mt-1 bg-muted cursor-pointer hover:bg-accent text-sm"
                     onClick={() => {
                       setEditingBest(true);
                       setBestInputFocused(true);
@@ -794,7 +794,7 @@ export default function BasicLeaderboardActivityEntryCard({
               ) : (
                 /* POSITIVE / SKILL: plain input, numpad routes here when focused */
                 <input
-                  className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full sm:w-16 h-8 text-center rounded text-foreground font-bold mt-1 bg-muted outline-none focus:ring-2 focus:ring-primary"
                   value={loadingTopScore ? "..." : topScore}
                   onChange={(e) => setTopScore(e.target.value)}
                   onFocus={() => setBestInputFocused(true)}
@@ -820,8 +820,8 @@ export default function BasicLeaderboardActivityEntryCard({
                   }}
                   className={`w-7 h-7 rounded-md border text-[11px] transition-all duration-200
                 ${selectedActivity === n
-                      ? "bg-sky-400 text-black border-white scale-110 shadow-md"
-                      : "bg-slate-800 border-slate-600 hover:bg-slate-700 hover:scale-105"
+                      ? "bg-sky-400 text-black border-border scale-110 shadow-md"
+                      : "bg-muted border-border text-foreground hover:bg-accent hover:scale-105"
                     }`}
                 >
                   {n}
@@ -834,7 +834,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
         <div
           className={`flex items-center gap-2 w-full ${type === "negative" || ladderType === "negative"
-            ? "justify-center bg-slate-800"
+            ? "justify-center bg-muted"
             : "justify-start"
             }`}
         >
@@ -843,20 +843,20 @@ export default function BasicLeaderboardActivityEntryCard({
               <Input
                 value={value}
                 readOnly
-                className="text-center text-lg text-black font-semibold bg-slate-200"
+                className="text-center text-lg text-foreground font-semibold bg-muted border-border"
               />
               <Input
                 placeholder="Witness by (optional)"
                 value={witnessBy}
                 onChange={(e) => setWitnessBy(e.target.value)}
-                className="text-start text-sm text-black font-semibold bg-slate-200"
+                className="text-start text-sm text-foreground font-semibold bg-muted border-border"
               />
             </div>
           )}
 
           {(type === "negative" || ladderType === "negative") && (
             <div className="flex items-center gap-2  w-full">
-              <div className="w-1/2 flex items-center justify-center gap-1 text-sm md:text-2xl text-black font-semibold bg-slate-200 rounded-md h-[40px] px-1 sm:px-3 shadow-inner min-w-[120px]">
+              <div className="w-1/2 flex items-center justify-center gap-1 text-sm md:text-2xl text-foreground font-semibold bg-muted rounded-md h-[40px] px-1 sm:px-3 shadow-inner min-w-[120px]">
                 <input
                   className={`w-8 text-center bg-transparent outline-none p-0 ${activeField === "min" ? "text-sky-600" : ""}`}
                   value={minStr}
@@ -892,7 +892,7 @@ export default function BasicLeaderboardActivityEntryCard({
                   placeholder="Witness by (optional)"
                   value={witnessBy}
                   onChange={(e) => setWitnessBy(e.target.value)}
-                  className="w-full text-start text-sm text-black font-semibold bg-slate-200 h-[40px]"
+                  className="w-full text-start text-sm text-foreground font-semibold bg-muted border-border h-[40px]"
                 />
               </div>
             </div>
@@ -906,7 +906,7 @@ export default function BasicLeaderboardActivityEntryCard({
               key={d}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit(String(d))}
-              className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all"
+              className="h-9 bg-card text-card-foreground border border-border rounded hover:bg-accent active:scale-95 transition-all"
             >
               {d}
             </button>
@@ -928,7 +928,7 @@ export default function BasicLeaderboardActivityEntryCard({
               <button
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleDigit(".")}
-                className="col-span-4 h-9 bg-white text-black rounded"
+                className="col-span-4 h-9 bg-card text-card-foreground border border-border rounded hover:bg-accent active:scale-95"
               >
                 .
               </button>
@@ -945,7 +945,7 @@ export default function BasicLeaderboardActivityEntryCard({
               <button
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleDigit("0")}
-                className="h-9 bg-white text-black rounded font-bold"
+                className="h-9 bg-card text-card-foreground border border-border rounded font-bold hover:bg-accent active:scale-95 transition-all"
               >
                 0
               </button>
@@ -953,7 +953,7 @@ export default function BasicLeaderboardActivityEntryCard({
               <button
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleDigit("-")}
-                className="h-9 bg-white text-black rounded font-bold"
+                className="h-9 bg-card text-card-foreground border border-border rounded font-bold hover:bg-accent active:scale-95 transition-all"
               >
                 -
               </button>
@@ -963,7 +963,7 @@ export default function BasicLeaderboardActivityEntryCard({
             (<button
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit("0")}
-              className="h-9 bg-white text-black rounded font-bold"
+              className="h-9 bg-card text-card-foreground border border-border rounded font-bold hover:bg-accent active:scale-95 transition-all"
             >
               0
             </button>
@@ -1031,14 +1031,14 @@ export default function BasicLeaderboardActivityEntryCard({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between text-base sm:text-lg font-bold gap-3">
               <div className="flex items-center gap-2">
                 <span>Today’s Result</span>
-                <span className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-bold">
+                <span className="px-2 py-0.5 border border-border rounded bg-muted text-foreground font-bold">
                   {(type === "negative" || ladderType === "negative") ? formatTimeInfo() : value}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <span>Your Best Result</span>
-                <span className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-bold">
+                <span className="px-2 py-0.5 border border-border rounded bg-muted text-foreground font-bold">
                   {(() => {
                     const current = (type === "negative" || ladderType === "negative") ? formatTimeInfo() : value;
                     if (isEmptyBestResult(topScore)) return current;
@@ -1049,7 +1049,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 </span>
               </div>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 font-bold">Note: Results posted without a witness will not qualify for a token.</p>
+            <p className="text-sm text-muted-foreground font-bold">Note: Results posted without a witness will not qualify for a token.</p>
             {/* Witness */}
             <div>
               <label className="text-md font-medium text-foreground">Witness: <span className="ml-3 font-bold text-foreground"> {witnessBy || "—"} </span></label>
@@ -1063,7 +1063,7 @@ export default function BasicLeaderboardActivityEntryCard({
                   handleSuccessCloseResult();
                 }
               }}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-semibold py-2 rounded-md transition-colors"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-md transition-colors"
             >
               Confirm
             </Button>

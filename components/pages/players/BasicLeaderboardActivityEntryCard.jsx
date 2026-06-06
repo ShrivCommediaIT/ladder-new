@@ -291,14 +291,14 @@ export default function BasicLeaderboardActivityEntryCard({
 
   return (
     <>
-      <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-3">
-        <div className="mb-2 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 bg-slate-800 p-2 rounded-lg">
+      <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-card border border-border text-card-foreground rounded-2xl shadow-2xl p-3">
+        <div className="mb-2 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 bg-muted p-2 rounded-lg">
           <div className="flex flex-col gap-1">
-            <p className="text-[11px] uppercase tracking-wide text-sky-300">
+            <p className="text-[11px] uppercase tracking-wide text-sky-500">
               Skill Selected Number : {selectedActivity}
             </p>
             {loadingSkill ? (
-              <p className="text-xs text-slate-400">Loading skill...</p>
+              <p className="text-xs text-muted-foreground">Loading skill...</p>
             ) : (
               <>
                 <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words leading-relaxed">
@@ -311,9 +311,9 @@ export default function BasicLeaderboardActivityEntryCard({
             )}
           </div>
 
-          <div className="flex gap-4 sm:gap-6 bg-slate-900 p-2 rounded-md border border-slate-700 w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
+          <div className="flex gap-4 sm:gap-6 bg-background p-2 rounded-md border border-border w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
             <div className="flex-1 sm:flex-none flex flex-col items-center">
-              <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
+              <label className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold whitespace-nowrap">
                 Today's Result
               </label>
               <input
@@ -330,7 +330,7 @@ export default function BasicLeaderboardActivityEntryCard({
             </div>
 
             <div className="flex-1 sm:flex-none flex flex-col items-center">
-              <label className="text-[10px] text-slate-400 uppercase tracking-widest font-bold whitespace-nowrap">
+              <label className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold whitespace-nowrap">
                 Best Result
               </label>
               <input
@@ -354,8 +354,8 @@ export default function BasicLeaderboardActivityEntryCard({
               }}
               className={`w-7 h-7 rounded-md border text-[11px] transition-all
                 ${selectedActivity === n
-                  ? "bg-sky-400 text-black border-white scale-110 shadow-md"
-                  : "bg-slate-800 border-slate-600 hover:bg-slate-700"}`}
+                  ? "bg-sky-400 text-black border-border scale-110 shadow-md"
+                  : "bg-muted border-border text-foreground hover:bg-accent"}`}
             >
               {n}
             </button>
@@ -366,13 +366,13 @@ export default function BasicLeaderboardActivityEntryCard({
           <Input
             value={value}
             readOnly
-            className="text-center text-lg text-black font-semibold bg-slate-200"
+            className="text-center text-lg text-foreground font-semibold bg-muted border-border"
           />
           <Input
             placeholder="Witness by (optional)"
             value={witnessBy}
             onChange={(e) => setWitnessBy(e.target.value)}
-            className="text-start text-sm text-black font-semibold bg-slate-200"
+            className="text-start text-sm text-foreground font-semibold bg-muted border-border"
           />
         </div>
 
@@ -382,7 +382,7 @@ export default function BasicLeaderboardActivityEntryCard({
               key={d}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit(String(d))}
-              className="h-9 bg-white text-black rounded hover:bg-gray-100 active:scale-95 transition-all font-bold"
+              className="h-9 bg-card text-card-foreground border border-border rounded hover:bg-accent active:scale-95 transition-all font-bold"
             >
               {d}
             </button>
@@ -402,7 +402,7 @@ export default function BasicLeaderboardActivityEntryCard({
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit("0")}
-              className="h-9 bg-white text-black rounded font-bold"
+              className="h-9 bg-card text-card-foreground border border-border rounded font-bold hover:bg-accent active:scale-95 transition-all"
             >
               0
             </button>
@@ -410,7 +410,7 @@ export default function BasicLeaderboardActivityEntryCard({
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleDigit("-")}
-              className="h-9 bg-white text-black rounded font-bold"
+              className="h-9 bg-card text-card-foreground border border-border rounded font-bold hover:bg-accent active:scale-95 transition-all"
             >
               -
             </button>

@@ -122,7 +122,7 @@ const BasicLeaderboardAgeUserEdit = ({
 
   useEffect(() => {
     if (successMessage) {
-      // toast.success("Profile updated successfully!  Refreshing...");
+      toast.success("Profile updated successfully!");
       const timer = setTimeout(() => {
         setShowSkeleton(false);
 
@@ -148,18 +148,15 @@ const BasicLeaderboardAgeUserEdit = ({
   }, [successMessage, error, dispatch, ladderId, onClose]);
 
 
-      console.log("Selected Player in Edit Form:==>1", form);
-
-
   return (
-    <Card className="max-w-full mx-auto mt-6 shadow-xl rounded-2xl bg-gray-800 border border-gray-600">
+    <Card className="max-w-full mx-auto mt-6 shadow-xl rounded-2xl bg-card border border-border">
       <CardContent className="p-6 space-y-4">
         {selectedPlayer?.name && (
-          <div className="text-center bg-blue-900/50 border border-blue-500/50 rounded-lg p-3">
-            <p className="text-blue-200 font-semibold text-lg">
+          <div className="text-center bg-accent border border-border rounded-lg p-3">
+              <p className="text-dark font-semibold text-lg">
               Editing: {selectedPlayer.name}
             </p>
-            <p className="text-blue-300 text-sm opacity-90">
+              <p className="text-dark/70 text-sm opacity-90">
               Rank: {selectedPlayer.rank || "N/A"}
             </p>
           </div>
@@ -178,7 +175,7 @@ const BasicLeaderboardAgeUserEdit = ({
             <div>
               <Label
                 htmlFor="name"
-                className="text-gray-300 font-semibold py-2 text-lg"
+                className="text-foreground font-semibold py-2 text-lg"
               >
                 Name
               </Label>
@@ -189,14 +186,14 @@ const BasicLeaderboardAgeUserEdit = ({
                 onChange={handleChange}
                 required
                 placeholder="Enter player name"
-                className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                className="text-foreground bg-muted border-border focus:border-primary focus:ring-2 focus:ring-primary/50 h-12"
               />
             </div>
 
             <div>
               <Label
                 htmlFor="dob"
-                className="text-gray-300 font-semibold py-2 text-lg"
+                className="text-foreground font-semibold py-2 text-lg"
               >
                 Date of Birth
               </Label>
@@ -210,14 +207,14 @@ const BasicLeaderboardAgeUserEdit = ({
                     dob: date,
                   }))
                 }
-                className="text-white px-4 bg-white border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                className="text-foreground px-4 bg-muted border-border focus:border-primary focus:ring-2 focus:ring-primary/50 h-12"
               />
             </div>
 
             <div>
               <Label
                 htmlFor="phone"
-                className="text-gray-300 font-semibold py-2 text-lg"
+                className="text-foreground font-semibold py-2 text-lg"
               >
                 Phone Number (Optional)
               </Label>
@@ -229,21 +226,21 @@ const BasicLeaderboardAgeUserEdit = ({
                 value={form.phone}
                 onChange={handlePhoneChange}
                 placeholder="Enter 11 digit phone number (Optional)"
-                className="text-white bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                className="text-foreground bg-muted border-border focus:border-primary focus:ring-2 focus:ring-primary/50 h-12"
               />
             </div>
 
             <div className="w-full">
-              <Label className="text-gray-300 font-semibold py-2 text-lg">Gender</Label>
+              <Label className="text-foreground font-semibold py-2 text-lg">Gender</Label>
               <Select
                 key={form.gender}
                 value={form.gender}
                 onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
               >
-                <SelectTrigger className="bg-gray-700/50 border-gray-500 text-white w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12">
+                <SelectTrigger className="bg-muted border-border text-foreground w-full focus:border-primary focus:ring-2 focus:ring-primary/50 h-12">
                   <SelectValue placeholder="Select Gender" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                <SelectContent className="bg-popover border-border text-popover-foreground">
                   <SelectItem value="male">Male</SelectItem>
                   <SelectItem value="female">Female</SelectItem>
                 </SelectContent>
@@ -251,11 +248,11 @@ const BasicLeaderboardAgeUserEdit = ({
             </div>
 
             <div className="w-full">
-              <Label className="text-gray-300 font-semibold py-2 text-lg">Country</Label>
+              <Label className="text-foreground font-semibold py-2 text-lg">Country</Label>
               <CountrySelect
                 value={form.country}
                 onValueChange={(val) => setForm((prev) => ({ ...prev, country: val }))}
-                className="bg-gray-700/50 border-gray-500 text-white w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                className="bg-muted border-border text-foreground w-full focus:border-primary focus:ring-2 focus:ring-primary/50 h-12"
               />
             </div>
 
