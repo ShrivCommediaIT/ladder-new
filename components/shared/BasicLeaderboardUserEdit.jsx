@@ -104,8 +104,8 @@ export const BasicLeaderboardUserEdit = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[480px] mx-auto bg-white text-slate-900 border border-slate-200 dark:bg-slate-950 dark:text-white dark:border-slate-800 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
-        <DialogTitle className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-center font-bold text-base text-slate-800 dark:text-slate-200">
+      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[480px] mx-auto bg-background text-foreground border border-border shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogTitle className="px-4 py-3 border-b border-border text-center font-bold text-base text-foreground">
           Player Control Panel
         </DialogTitle>
 
@@ -113,12 +113,12 @@ export const BasicLeaderboardUserEdit = ({
           <Tabs value={selectedTab} onValueChange={setSelectedTab}>
             {/* DESKTOP TABS */}
             <div className="hidden sm:block mb-4">
-              <TabsList className="w-full flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 gap-1 border border-slate-200/50 dark:border-slate-800">
+              <TabsList className="w-full flex bg-muted rounded-xl p-1 gap-1 border border-border">
                 {tabs.map((tab) => (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="flex-1 text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white text-xs py-1.5 rounded-lg transition-all data-[state=active]:bg-cyan-500 data-[state=active]:text-slate-950 data-[state=active]:font-black"
+                    className="flex-1 text-muted-foreground hover:text-foreground text-xs py-1.5 rounded-lg transition-all data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:font-black"
                   >
                     {tab.label}
                   </TabsTrigger>
@@ -129,10 +129,10 @@ export const BasicLeaderboardUserEdit = ({
             {/* MOBILE DROPDOWN */}
             <div className="sm:hidden mb-4">
               <Select value={mobileTab} onValueChange={handleMobileTabChange}>
-                <SelectTrigger className="w-full bg-slate-50 border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white h-10 rounded-xl focus:border-cyan-500">
+                <SelectTrigger className="w-full bg-muted border-border text-foreground h-10 rounded-xl focus:border-primary">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white rounded-xl">
+                <SelectContent className="bg-popover border-border text-popover-foreground rounded-xl">
                   {tabs.map((tab) => (
                     <SelectItem key={tab.value} value={tab.value}>
                       {tab.label}
@@ -172,8 +172,8 @@ export const BasicLeaderboardUserEdit = ({
               <TabsContent value="edit">
                 {showEditSkeleton ? (
                   <div className="space-y-3">
-                    <Skeleton className="h-10 w-full bg-white/10" />
-                    <Skeleton className="h-10 w-full bg-white/10" />
+                    <Skeleton className="h-10 w-full bg-muted" />
+                    <Skeleton className="h-10 w-full bg-muted" />
                   </div>
                 ) : (
                   <BasicLeaderboardAgeUserEdit
