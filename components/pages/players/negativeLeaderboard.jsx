@@ -479,11 +479,12 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
   const handleResetBoard = useCallback(async () => {
     try {
-      await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
+      await getRequest(API_ENDPOINTS.RESET_SKILLBOARD, { ladder_id: ladderId });
       setResetOpen(false);
+      setOpenSkillSetupDialog(true);
       refreshLeaderboard();
     } catch (error) {
-      console.error("Failed to reset leaderboard", error);
+      console.error("Failed to reset skill leaderboard", error);
     }
   }, [ladderId, refreshLeaderboard]);
 
@@ -492,7 +493,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const quickActions = [
     {
       id: "reset",
-      label: "Reset",
+      label: "Zero All",
       icon: RotateCcw,
       onClick: () => setResetOpen(true),
     },
