@@ -179,7 +179,7 @@ const PlayerImage = ({ userId, ladderId, ladderType, onClose = () => { } }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <Card className="shadow-xl border border-blue-100 bg-gradient-to-br from-[#0f172a]/90 to-[#1e3a8a]/80 rounded-2xl overflow-hidden">
+      <Card className="shadow-xl border border-border bg-card rounded-2xl overflow-hidden">
         <CardContent className="space-y-4 flex flex-col items-center py-6 ">
           <motion.label
             htmlFor="fileInput"
@@ -192,7 +192,7 @@ const PlayerImage = ({ userId, ladderId, ladderType, onClose = () => { } }) => {
               alt="Selected Profile"
               width={120}
               height={120}
-              className="rounded-full w-28 h-28 object-cover border-4 border-blue-200 shadow-lg transition-all duration-300 group-hover:border-blue-500"
+              className="rounded-full w-28 h-28 object-cover border-4 border-border shadow-lg transition-all duration-300 group-hover:border-primary"
             />
             <motion.div
               className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -225,7 +225,7 @@ const PlayerImage = ({ userId, ladderId, ladderType, onClose = () => { } }) => {
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
                   transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="relative w-[90vw] h-[60vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
+                  className="relative w-[90vw] h-[60vh] bg-card rounded-2xl shadow-2xl overflow-hidden"
                 >
                   <Cropper
                     image={preview}
@@ -249,7 +249,7 @@ const PlayerImage = ({ userId, ladderId, ladderType, onClose = () => { } }) => {
                   <Button
                     onClick={() => setCropping(false)}
                     variant="secondary"
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-5"
+                    className="bg-muted hover:bg-muted-foreground/20 text-foreground px-5"
                   >
                     Cancel
                   </Button>
