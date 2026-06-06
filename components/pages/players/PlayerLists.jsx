@@ -135,8 +135,10 @@ export const PlayerLists = () => {
   const handleZeroScore = async () => {
     setZeroLoading(true);
     try {
-      const res = await getRequest(API_ENDPOINTS.RESET_SCORE, { ladder_id: ladderId });
-      if (res?.status === 200) { dispatch(clearActivityState()); refreshLeaderboard(); toast.success("All scores reset to ZERO!"); }
+      await getRequest(API_ENDPOINTS.RESET_SKILLBOARD, { ladder_id: ladderId });
+      dispatch(clearActivityState());
+      refreshLeaderboard();
+      toast.success("All scores reset to ZERO!");
     } catch { toast.error("Failed to reset scores"); }
     finally { setZeroLoading(false); }
   };
@@ -275,7 +277,7 @@ export const PlayerLists = () => {
   } else if (isSkill || isPositive || isNegative) {
     quickActions.push({
       id: "reset-skill",
-      label: resetLoading ? "Resetting..." : "Reset",
+      label: resetLoading ? "Resetting..." : "Zero All",
       icon: XCircle,
       onClick: () => { setConfirmType("reset_skill"); setConfirmOpen(true); },
       disabled: resetLoading,

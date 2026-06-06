@@ -518,11 +518,12 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const handleResetBoard = useCallback(
     async () => {
       try {
-        await getRequest(API_ENDPOINTS.RESET_LEADERBOARD, { ladder_id: ladderId });
+        await getRequest(API_ENDPOINTS.RESET_SKILLBOARD, { ladder_id: ladderId });
         setResetOpen(false);
+        setOpenSkillSetupDialog(true);
         refreshLeaderboard();
       } catch (error) {
-        console.error("Failed to reset leaderboard", error);
+        console.error("Failed to reset skill leaderboard", error);
       }
     },
     [ladderId, refreshLeaderboard],
@@ -545,7 +546,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   };
 
   const quickActions = [
-    { id: "reset", label: "Reset", icon: RotateCcw, onClick: () => setResetOpen(true) },
+    { id: "reset", label: "Zero All", icon: RotateCcw, onClick: () => setResetOpen(true) },
     { id: "add-remove", label: "Add / Remove", icon: Plus, onClick: () => setAddRemoveOpen(true) },
     { id: "skill-sort", label: isSorted ? "Sorted" : "Skill Sort", icon: Funnel, onClick: () => setOpenSkillSortDialog(true) },
     { id: "setup", label: "Setup", icon: Zap, onClick: () => setOpenSkillSetupDialog(true) },
