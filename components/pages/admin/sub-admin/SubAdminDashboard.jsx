@@ -90,7 +90,7 @@ export default function SubAdminDashboard() {
   const router = useRouter();
 
   const activeLadders = useMemo(
-    () => allLadders.filter((ladder) => ladder.created_by !== "demo"),
+    () => allLadders.filter((ladder) => ladder.created_by !== "demo" && ladder.type !== "roster" ),
     [allLadders],
   );
 
@@ -114,12 +114,12 @@ export default function SubAdminDashboard() {
         activeLadders.length > 0 ? "Ready to edit and manage" : "Create your first competition",
       icon: Layers,
     },
-    {
-      title: "Roster Boards",
-      value: rosterCount,
-      detail: rosterCount > 0 ? "Player lists uploaded" : "Awaiting first upload",
-      icon: Users,
-    },
+    // {
+    //   title: "Roster Boards",
+    //   value: rosterCount,
+    //   detail: rosterCount > 0 ? "Player lists uploaded" : "Awaiting first upload",
+    //   icon: Users,
+    // },
     {
       title: "Demo Templates",
       value: demoLadders.length,

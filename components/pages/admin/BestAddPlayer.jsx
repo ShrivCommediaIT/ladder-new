@@ -156,7 +156,7 @@ const handleSubmit = async () => {
   }
 
   return (
-    <Card className=" bg-white/5 backdrop-blur-md border border-white/20 shadow-lg rounded-xl ">
+    <Card className="bg-card border-border shadow-lg rounded-xl">
       {/* Profile Upload */}
       <CardHeader className="flex flex-col items-center gap-2 pt-4">
         <div className="relative w-24 h-24 rounded-full border-4 border-cyan-400 overflow-hidden">
@@ -173,38 +173,46 @@ const handleSubmit = async () => {
             className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
           />
         </div>
-        <p className="text-sm text-white/80">Click to upload avatar</p>
+        <p className="text-sm text-muted-foreground">Click to upload avatar</p>
       </CardHeader>
 
       {/* Form Fields */}
       <CardContent className="space-y-3">
         {/* NAME */}
         <div className="space-y-1">
-          <Label className="text-white">Name <span className="text-red-500">*</span></Label>
+          <Label className="text-foreground">Name <span className="text-red-500">*</span></Label>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter name"
-            className="text-white font-semibold"
+            className="text-foreground font-semibold border-0"
+            style={{
+              backgroundColor: "var(--input-bg)",
+              boxShadow: "inset 0 0 0 1px var(--input-border)",
+            }}
           />
         </div>
 
         {/* EMAIL INPUT REMOVED FROM HERE */}
 
         <div className="space-y-1">
-          <Label className="text-white">Phone (Optional)</Label>
+          <Label className="text-foreground">Phone (Optional)</Label>
           <Input
             type="tel"
             maxLength={11}
             value={phone}
             onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
             placeholder="Enter 11 digit phone number (Optional)"
-            className="text-white font-semibold"
+            className="text-foreground font-semibold border-0"
+            style={{
+              backgroundColor: "var(--input-bg)",
+              boxShadow: "inset 0 0 0 1px var(--input-border)",
+            }}
           />
         </div>
 
         <div className="space-y-1">
-          <Label className="text-white">Place Number to Add New Player<span className="text-red-500">*</span></Label>
+          <Label className="text-foreground">Place Number to Add New Player<span className="text-red-500">*</span></Label>
           <Input
             type="text"
             inputMode="numeric"
@@ -222,40 +230,54 @@ const handleSubmit = async () => {
               }
             }}
             placeholder="Enter rank"
-            className="text-white font-semibold"
+            className="text-foreground font-semibold border-0"
+            style={{
+              backgroundColor: "var(--input-bg)",
+              boxShadow: "inset 0 0 0 1px var(--input-border)",
+            }}
           />
         </div>
 
         {/* GENDER */}
         <div className="space-y-1">
-          <Label className="text-white font-semibold">Gender</Label>
+          <Label className="text-foreground font-semibold">Gender</Label>
           <Select
             value={gender}
             onValueChange={setGender}
           >
-            <SelectTrigger className="bg-gray-800/50 border-gray-700 text-white w-full h-10">
+            <SelectTrigger
+              className="w-full h-10 border-0 text-foreground"
+              style={{
+                backgroundColor: "var(--input-bg)",
+                boxShadow: "inset 0 0 0 1px var(--input-border)",
+              }}
+            >
               <SelectValue placeholder="Select Gender" />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-700 text-white">
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
+            <SelectContent className="bg-popover border-border text-foreground">
+              <SelectItem className="cursor-pointer text-foreground" value="male">Male</SelectItem>
+              <SelectItem className="cursor-pointer text-foreground" value="female">Female</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* COUNTRY */}
         <div className="space-y-1">
-          <Label className="text-white font-semibold">Country</Label>
+          <Label className="text-foreground font-semibold">Country</Label>
           <CountrySelect
             value={country}
             onValueChange={setCountry}
-            className="bg-gray-800/50 border-gray-700 text-white w-full h-10"
+            className="w-full h-10 border-0 text-foreground"
+            style={{
+              backgroundColor: "var(--input-bg)",
+              boxShadow: "inset 0 0 0 1px var(--input-border)",
+            }}
           />
         </div>
 
         {/* DOB PICKER */}
         <div className="space-y-1">
-          <Label className="text-white font-semibold">
+          <Label className="text-foreground font-semibold">
             Date of Birth
           </Label>
 
@@ -263,7 +285,11 @@ const handleSubmit = async () => {
             id="dob"
             value={dob}
             onChange={setDob}
-            className="bg-gray-800/50 border-gray-700 text-white h-10"
+            className="w-full h-10 border-0 text-foreground"
+            style={{
+              backgroundColor: "var(--input-bg)",
+              boxShadow: "inset 0 0 0 1px var(--input-border)",
+            }}
           />
         </div>
       </CardContent>
@@ -276,18 +302,18 @@ const handleSubmit = async () => {
         >
           {submitting ? "Adding..." : "Add Player"}
         </Button>
-        <p className="text-xs text-white/60 text-center mt-2">
+        <p className="text-xs text-muted-foreground text-center mt-2">
           <span className="text-red-500">*</span> Required Fields
         </p>
       </CardFooter>
 
       {/* Confirmation Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-white/5 backdrop-blur-md border border-white/20 text-white rounded-xl">
+        <DialogContent className="bg-card border-border text-foreground rounded-xl">
           <DialogHeader>
-            <DialogTitle>Player Added</DialogTitle>
+            <DialogTitle className="text-foreground">Player Added</DialogTitle>
           </DialogHeader>
-          <p className="text-center py-2 font-semibold">{welcomeMsg}</p>
+          <p className="text-center py-2 font-semibold text-foreground">{welcomeMsg}</p>
           <DialogFooter>
             <Button
               className="bg-cyan-500 hover:bg-cyan-600"

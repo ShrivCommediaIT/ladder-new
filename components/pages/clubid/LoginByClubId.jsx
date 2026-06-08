@@ -297,7 +297,7 @@ export default function LoginByClubForm() {
                                     {...field}
                                     placeholder="Enter Club ID "
                                     maxLength={8}
-                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2"
                                     style={{
                                       backgroundColor: "var(--input-bg)",
                                       boxShadow: "inset 0 0 0 1px var(--input-border)",
@@ -335,7 +335,7 @@ export default function LoginByClubForm() {
                                     onChange={(e) =>
                                       field.onChange(e.target.value.replace(/\D/g, "").slice(0, 4))
                                     }
-                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                                    className="h-[52px] rounded-2xl border-0 px-11 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2"
                                     style={{
                                       backgroundColor: "var(--input-bg)",
                                       boxShadow: "inset 0 0 0 1px var(--input-border)",

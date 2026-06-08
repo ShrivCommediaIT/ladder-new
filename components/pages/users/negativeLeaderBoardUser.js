@@ -247,7 +247,7 @@ const PlayerCard = ({
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {scoreData.displayScore !== "0" ? Number(scoreData.displayScore || 0).toFixed(2) : ""}
+                        {Number(scoreData.displayScore || 0).toFixed(2)}
                       </div>
                     );
                   })}

@@ -332,7 +332,15 @@ const PlayerLevelNavbar = ({
       router.push(clubIdPage);
       return;
     }
-    router.push("/login-user");
+
+    const ladderId = searchParams.get("ladder_id");
+    const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
+
+    if (ladderId && ladderType) {
+      router.push(`/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`);
+    } else {
+      router.push("/login-user");
+    }
   };
 
   const handleDashboard = () => {
