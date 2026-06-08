@@ -11,8 +11,21 @@ import {
 import { COUNTRIES } from "@/constants/countries";
 
 export default function CountrySelect({ value, onValueChange, className = "", placeholder = "Select Country", style }) {
+  const selectedValue = (() => {
+    const normalizedValue = String(value || "").trim().toLowerCase();
+    if (!normalizedValue) return "";
+
+    const matchedCountry = COUNTRIES.find(
+      (country) =>
+        country.name.toLowerCase() === normalizedValue ||
+        country.code.toLowerCase() === normalizedValue,
+    );
+
+    return matchedCountry?.name || value;
+  })();
+
   return (
-    <Select value={value} onValueChange={onValueChange}>
+    <Select key={selectedValue} value={selectedValue} onValueChange={onValueChange}>
       <SelectTrigger className={className} style={style}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
