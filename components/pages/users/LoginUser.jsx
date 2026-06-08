@@ -270,7 +270,7 @@ export default function LoginUser({ ladderId, ladderType }) {
             }}
           />
 
-          <div className="relative z-10 grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="relative z-10 grid min-h-screen lg:h-screen lg:overflow-hidden lg:grid-cols-[1.15fr_0.85fr]">
             {/* Left Side - Image and Text */}
             <div className="relative min-h-[380px] overflow-hidden px-6 py-10 sm:px-10 lg:min-h-screen lg:px-14 lg:py-14">
               <div className="absolute inset-0">
@@ -310,7 +310,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                       <span>TO YOUR </span> <br />
                       <span>COMPETATION </span>
                     </h1>
-                    <p>Register - <span className="text-primary"> Login </span> - Enjoy</p>
+                    <p className="text-slate-200">Register - <span className="text-primary"> Login </span> - Enjoy</p>
                   </div>
                 </div>
 
@@ -339,9 +339,9 @@ export default function LoginUser({ ladderId, ladderType }) {
             </div>
 
             {/* Right Side - Login Card */}
-            <div className="flex min-h-screen items-center justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14">
+            <div className="flex min-h-screen lg:h-screen items-center justify-center px-6 py-10 sm:px-10 lg:px-14 lg:py-14 lg:overflow-y-auto custom-scroll">
               <Card
-                className="w-full max-w-[470px] gap-0 rounded-[32px] border px-0 py-0 shadow-2xl"
+                className="w-full max-w-[470px] gap-0 rounded-[32px] border px-0 py-0 shadow-2xl my-auto"
                 style={{
                   background: "var(--auth-card-bg)",
                   borderColor: "var(--auth-card-border)",
@@ -398,16 +398,16 @@ export default function LoginUser({ ladderId, ladderType }) {
                       {/* Username */}
                       <div>
                         <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
-                          Username
+                          Name
                         </Label>
                         <Input
                           {...loginForm.register("username")}
-                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2"
                           style={{
                             backgroundColor: "var(--input-bg)",
                             boxShadow: "inset 0 0 0 1px var(--input-border)",
                           }}
-                          placeholder="Enter your username"
+                          placeholder="Enter your Name"
                         />
                         {loginErrors.username?.message && (
                           <p className="text-red-400 text-xs mt-1">{loginErrors.username.message}</p>
@@ -425,7 +425,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                             {...loginForm.register("password")}
                             onChange={(e) => loginForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 6))}
                             maxLength={6}
-                            className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                            className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2 pr-12"
                             style={{
                               backgroundColor: "var(--input-bg)",
                               boxShadow: "inset 0 0 0 1px var(--input-border)",
@@ -469,7 +469,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                         <Input
                           {...registerForm.register("name")}
                           maxLength={20}
-                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                          className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2"
                           style={{
                             backgroundColor: "var(--input-bg)",
                             boxShadow: "inset 0 0 0 1px var(--input-border)",
@@ -501,8 +501,8 @@ export default function LoginUser({ ladderId, ladderType }) {
                               <SelectValue placeholder="Select Gender" />
                             </SelectTrigger>
                             <SelectContent className="bg-popover border-border text-foreground">
-                              <SelectItem className="focus:bg-accent focus:text-accent-foreground text-foreground cursor-pointer" value="male">Male</SelectItem>
-                              <SelectItem className="focus:bg-accent focus:text-accent-foreground text-foreground cursor-pointer" value="female">Female</SelectItem>
+                              <SelectItem className="cursor-pointer text-foreground" value="male">Male</SelectItem>
+                              <SelectItem className="cursor-pointer text-foreground" value="female">Female</SelectItem>
                             </SelectContent>
                           </Select>
                           {registerErrors.gender?.message && (
@@ -510,6 +510,31 @@ export default function LoginUser({ ladderId, ladderType }) {
                           )}
                         </div>
                       )}
+
+                                            {/* Date of Birth */}
+                      <div>
+                        <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
+                          Date of Birth
+                        </Label>
+                        <DateOfBirthInput
+                          id="dob"
+                          value={registerForm.watch("dob")}
+                          onChange={(date) =>
+                            registerForm.setValue("dob", date ?? undefined, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            })
+                          }
+                          className="h-[52px] w-full rounded-2xl border-0 focus-visible:ring-2"
+                          style={{
+                            backgroundColor: "var(--input-bg)",
+                            boxShadow: "inset 0 0 0 1px var(--input-border)",
+                          }}
+                        />
+                        {registerErrors.dob?.message && (
+                          <p className="text-red-400 text-xs mt-1">{registerErrors.dob.message}</p>
+                        )}
+                      </div>
 
                       {/* Country Selection */}
                       <div>
@@ -530,30 +555,11 @@ export default function LoginUser({ ladderId, ladderType }) {
                         )}
                       </div>
 
-                      {/* Date of Birth */}
-                      <div>
-                        <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
-                          Date of Birth
-                        </Label>
-                        <DateOfBirthInput
-                          id="dob"
-                          value={registerForm.watch("dob")}
-                          onChange={(date) =>
-                            registerForm.setValue("dob", date ?? undefined, {
-                              shouldValidate: true,
-                              shouldDirty: true,
-                            })
-                          }
-                          className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
-                        />
-                        {registerErrors.dob?.message && (
-                          <p className="text-red-400 text-xs mt-1">{registerErrors.dob.message}</p>
-                        )}
-                      </div>
+
 
                       {/* PIN */}
                       <div className="relative">
-                        <Label className="text-p3 block mb-2.5 font-semibold text-slate-200">
+                        <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
                           PIN
                         </Label>
                         <div className="relative">
@@ -562,7 +568,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                             {...registerForm.register("password")}
                             onChange={(e) => registerForm.setValue("password", e.target.value.replace(/\D/g, "").slice(0, 6))}
                             maxLength={6}
-                            className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                            className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2 pr-12"
                             style={{
                               backgroundColor: "var(--input-bg)",
                               boxShadow: "inset 0 0 0 1px var(--input-border)",
@@ -593,7 +599,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                             {...registerForm.register("confirmPassword")}
                             onChange={(e) => registerForm.setValue("confirmPassword", e.target.value.replace(/\D/g, "").slice(0, 6))}
                             maxLength={6}
-                            className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                            className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2 pr-12"
                             style={{
                               backgroundColor: "var(--input-bg)",
                               boxShadow: "inset 0 0 0 1px var(--input-border)",

@@ -40,14 +40,12 @@ export default function DateOfBirthInput({
         onChange={(event) => onChange?.(parseDateInputValue(event.target.value))}
         disabled={disabled}
         className={cn(
-          "[color-scheme:dark] !bg-white/10 border-cyan-500/30 text-white accent-cyan-400",
-          "focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40",
-          "hover:border-cyan-400/50",
+          "bg-[var(--input-bg)] border-[var(--input-border)] text-foreground accent-primary",
+          "focus:border-primary focus:ring-2 focus:ring-primary/20",
+          "hover:border-primary/50",
           "[&::-webkit-calendar-picker-indicator]:cursor-pointer",
-          "[&::-webkit-calendar-picker-indicator]:opacity-90",
-          "[&::-webkit-calendar-picker-indicator]:filter",
-          "[&::-webkit-calendar-picker-indicator]:brightness-0",
-          "[&::-webkit-calendar-picker-indicator]:invert",
+          "[&::-webkit-calendar-picker-indicator]:opacity-70 hover:[&::-webkit-calendar-picker-indicator]:opacity-100",
+          "dark:[&::-webkit-calendar-picker-indicator]:brightness-0 dark:[&::-webkit-calendar-picker-indicator]:invert",
           className,
         )}
         {...props}

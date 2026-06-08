@@ -29,9 +29,9 @@ export default function CountrySelect({ value, onValueChange, className = "", pl
       <SelectTrigger className={className} style={style}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className="max-h-[300px] overflow-y-auto bg-slate-800 border-white/20 text-white">
+      <SelectContent className="max-h-[300px] overflow-y-auto bg-popover border-border text-foreground">
         {COUNTRIES.map((country) => (
-          <SelectItem key={country.code} value={country.name} className="focus:bg-violet-600 focus:text-white cursor-pointer">
+          <SelectItem key={country.code} value={country.name} className="cursor-pointer text-foreground">
             {country.name}
           </SelectItem>
         ))}
