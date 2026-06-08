@@ -17,8 +17,8 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
   const [calculatedAge, setCalculatedAge] = useState("");
   const [gender, setGender] = useState("");
   const [ageType, setAgeType] = useState("");
-    const searchParams = useSearchParams();
-    const ladderType = searchParams.get("type")
+  const searchParams = useSearchParams();
+  const ladderType = searchParams.get("type");
 
   useEffect(() => {
     if (resetSignal !== undefined) {
@@ -92,69 +92,73 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
         <Button
           className={`${
             isActive
-              ? "border border-emerald-500/45 bg-emerald-500/12 text-[var(--best-board-text)] hover:bg-emerald-500/18"
+              ? "border border-emerald-500/45 bg-emerald-500/10 text-foreground hover:bg-emerald-500/15"
               : user
-                ? "border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] text-[var(--best-board-text)] hover:bg-[var(--best-board-surface)]"
-                : "best-board-card-soft border border-[var(--best-board-border)] text-[var(--best-board-text)] hover:bg-[var(--best-board-surface)]"
+                ? "border border-primary/40 bg-accent text-foreground hover:bg-muted"
+                : "border border-border bg-card text-foreground hover:bg-muted"
           } flex h-full w-full flex-col items-center justify-center gap-1 rounded-xl px-4 py-3 text-[10px] font-bold uppercase leading-tight shadow-none transition-all active:scale-95`}
         >
           <Filter className="h-5 w-5" />
-          {ladderType !== "minileague" ? <span>AGE/
-            <br/>
-            GENDER</span> : <span>AGE</span>}
+          {ladderType !== "minileague" ? (
+            <span>AGE/<br />GENDER</span>
+          ) : (
+            <span>AGE</span>
+          )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="best-board-card text-[var(--best-board-text)] border border-[var(--best-board-border)] rounded-xl max-w-sm w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto flex flex-col items-center p-4 gap-0">
-        <DialogTitle className="text-xl font-bold uppercase tracking-wide text-center w-full mt-0">
+
+      <DialogContent className="bg-card text-foreground border border-border rounded-xl max-w-sm w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto flex flex-col items-center p-4 gap-0">
+        <DialogTitle className="text-xl font-bold uppercase tracking-wide text-center w-full mt-0 text-foreground">
           AGE/GENDER FILTER
         </DialogTitle>
         <div className="w-full flex justify-center mt-1 mb-2">
-          <span className="h-1 w-16 bg-[var(--best-board-accent)] rounded-full"></span>
+          <span className="h-1 w-16 bg-primary rounded-full"></span>
         </div>
 
-        {ladderType !== "minileague" && <>
+        {/* Gender Section — hidden for minileague */}
+        {ladderType !== "minileague" && (
+          <>
+            <p className="text-base font-semibold text-primary mb-1">
+              Select Gender
+            </p>
 
-        <p className="text-base font-semibold text-[var(--best-board-accent)]">
-          Select Gender
-        </p>
-        
-        {/* Gender Filter Tabs */}
-        <div className="flex w-full justify-center gap-2 mb-3 mt-1">
-          <button
-            onClick={() => setGender(gender === "male" ? "" : "male")}
-            className={`flex-1 py-1.5 rounded font-semibold transition-all border text-sm ${
-              gender === "male"
-                ? "border-[var(--best-board-accent)] bg-[var(--best-board-accent)] text-black shadow-[0_0_10px_rgba(37,99,235,0.35)]"
-                : "border-[var(--best-board-border)] bg-transparent text-[var(--best-board-muted)] hover:border-[var(--best-board-accent)] hover:text-[var(--best-board-text)]"
-            }`}
-          >
-            Male
-          </button>
-          <button
-            onClick={() => setGender(gender === "female" ? "" : "female")}
-            className={`flex-1 py-1.5 rounded font-semibold transition-all border text-sm ${
-              gender === "female"
-                ? "border-[var(--best-board-accent)] bg-[var(--best-board-accent)] text-black shadow-[0_0_10px_rgba(37,99,235,0.35)]"
-                : "border-[var(--best-board-border)] bg-transparent text-[var(--best-board-muted)] hover:border-[var(--best-board-accent)] hover:text-[var(--best-board-text)]"
-            }`}
-          >
-            Female
-          </button>
-        </div>
-        </>}
+            <div className="flex w-full justify-center gap-2 mb-3 mt-1">
+              <button
+                onClick={() => setGender(gender === "male" ? "" : "male")}
+                className={`flex-1 py-1.5 rounded font-semibold transition-all border text-sm ${
+                  gender === "male"
+                    ? "border-primary bg-primary text-primary-foreground shadow-[0_0_10px_rgba(14,165,233,0.35)]"
+                    : "border-border bg-transparent text-muted-foreground hover:border-primary hover:text-foreground"
+                }`}
+              >
+                Male
+              </button>
+              <button
+                onClick={() => setGender(gender === "female" ? "" : "female")}
+                className={`flex-1 py-1.5 rounded font-semibold transition-all border text-sm ${
+                  gender === "female"
+                    ? "border-primary bg-primary text-primary-foreground shadow-[0_0_10px_rgba(14,165,233,0.35)]"
+                    : "border-border bg-transparent text-muted-foreground hover:border-primary hover:text-foreground"
+                }`}
+              >
+                Female
+              </button>
+            </div>
+          </>
+        )}
 
-        <p className="text-base font-semibold text-[var(--best-board-accent)]">
+        {/* Age Type Section */}
+        <p className="text-base font-semibold text-primary mb-1">
           Select Age Type
         </p>
 
-        {/* Under/Over Age Filter Tabs */}
-        <div className="flex w-full justify-center gap-2 mb-3 mt-1 bg-[var(--best-board-surface-soft)] p-1 rounded-lg">
+        <div className="flex w-full justify-center gap-2 mb-3 mt-1 bg-muted p-1 rounded-lg">
           <button
             onClick={() => setAgeType(ageType === "under" ? "" : "under")}
             className={`flex-1 py-1.5 rounded-md font-bold text-sm transition-all ${
               ageType === "under"
-                ? "bg-[var(--best-board-accent)] text-black shadow-md"
-                : "bg-transparent text-[var(--best-board-muted)] hover:text-[var(--best-board-text)]"
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "bg-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             Under Age
@@ -163,32 +167,40 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
             onClick={() => setAgeType(ageType === "over" ? "" : "over")}
             className={`flex-1 py-1.5 rounded-md font-bold text-sm transition-all ${
               ageType === "over"
-                ? "bg-[var(--best-board-accent)] text-black shadow-md"
-                : "bg-transparent text-[var(--best-board-muted)] hover:text-[var(--best-board-text)]"
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "bg-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             Over Age
           </button>
         </div>
 
+        {/* Age Input */}
         <div className="flex flex-col items-center w-full gap-2 relative">
-          <span className="font-semibold text-sm text-[var(--best-board-muted)] text-center">
-            {ageType === "under" ? "that's under" : ageType === "over" ? "that's over" : "Enter Age"}
+          <span className="font-semibold text-sm text-muted-foreground text-center">
+            {ageType === "under"
+              ? "that's under"
+              : ageType === "over"
+              ? "that's over"
+              : "Enter Age"}
           </span>
-          <div className="text-[var(--best-board-text)] text-base flex items-center justify-center gap-2">
+
+          <div className="text-foreground text-base flex items-center justify-center gap-2">
             <div className="flex items-center">
-              <span className="mr-[1px] w-4 border-b-2 border-[var(--best-board-text)] text-[var(--best-board-text)]"></span>
+              <span className="mr-[1px] w-4 border-b-2 border-foreground"></span>
               <input
                 type="text"
                 value={calculatedAge}
                 onChange={handleAgeChange}
-                className="bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] outline-none text-center text-lg w-14 py-1 text-[var(--best-board-text)] transition-colors"
+                className="bg-muted border border-border outline-none text-center text-lg w-14 py-1 text-foreground transition-colors rounded"
               />
-              <span className="ml-[1px] w-4 border-b-2 border-[var(--best-board-text)] text-[var(--best-board-text)]"></span>
+              <span className="ml-[1px] w-4 border-b-2 border-foreground"></span>
             </div>
           </div>
 
-          <span className="font-semibold text-sm text-[var(--best-board-muted)]">Re-type in full</span>
+          <span className="font-semibold text-sm text-muted-foreground">
+            Re-type in full
+          </span>
 
           <div className="flex w-full justify-center">
             <input
@@ -196,11 +208,12 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
               value={dobInput}
               onChange={handleDobChange}
               placeholder="DD/MM/YYYY"
-              className="bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] outline-none text-center px-2 py-1.5 text-lg w-40 tracking-widest text-[var(--best-board-text)] transition-colors rounded"
+              className="bg-muted border border-border outline-none text-center px-2 py-1.5 text-lg w-40 tracking-widest text-foreground placeholder:text-muted-foreground transition-colors rounded"
             />
           </div>
         </div>
 
+        {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-2 w-full mt-4">
           <Button
             onClick={() => {
@@ -210,13 +223,13 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
               setGender("");
               setAgeType("");
             }}
-            className="h-10 rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] text-sm font-bold text-[var(--best-board-text)] hover:bg-[var(--best-board-surface)]"
+            className="h-10 rounded-xl border border-border bg-muted text-sm font-bold text-foreground hover:bg-accent transition-colors"
           >
             Cancel
           </Button>
           <Button
             onClick={applyAgeFilter}
-            className="h-10 rounded-xl bg-[var(--best-board-accent)] text-sm font-bold text-white hover:brightness-110"
+            className="h-10 rounded-xl bg-primary text-sm font-bold text-primary-foreground hover:brightness-110 transition-all"
           >
             Search
           </Button>
