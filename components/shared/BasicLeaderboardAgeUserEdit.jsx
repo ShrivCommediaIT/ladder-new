@@ -12,13 +12,15 @@ import {
 } from "@/redux/slices/editdetailSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { useSearchParams } from "next/navigation";
 import { calculateAge, parseDobToDate } from "@/lib/utils";
 import DateOfBirthInput from "@/components/shared/DateOfBirthInput";
 import CountrySelect from "@/components/shared/CountrySelect";
+import { createPortal } from "react-dom";
+import { COUNTRIES } from "@/constants/countries";
 import {
   Select,
   SelectContent,
@@ -26,6 +28,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+const EDIT_FORM_TOAST_CONTAINER_ID = "basic-leaderboard-age-user-edit";
+const editFormToastOptions = { containerId: EDIT_FORM_TOAST_CONTAINER_ID };
+
+const normalizeCountry = (countryValue) => {
+  const normalizedCountry = String(countryValue || "").trim().toLowerCase();
+  if (!normalizedCountry) return "";
+
+  const matchedCountry = COUNTRIES.find(
+    (country) =>
+      country.name.toLowerCase() === normalizedCountry ||
+      country.code.toLowerCase() === normalizedCountry,
+  );
+
+  return matchedCountry?.name || countryValue;
+};
 
 const BasicLeaderboardAgeUserEdit = ({
   userId,
@@ -52,7 +70,13 @@ const BasicLeaderboardAgeUserEdit = ({
   });
 
   const [showSkeleton, setShowSkeleton] = useState(false);
+  const [toastPortalReady, setToastPortalReady] = useState(false);
   console.log("Selected Player in Edit Form:", selectedPlayer);
+
+  useEffect(() => {
+    setToastPortalReady(true);
+  }, []);
+
   // Auto-fill strictly from selectedPlayer (id/user_id/name/phone/dob)
   useEffect(() => {
     if (selectedPlayer) {
@@ -65,9 +89,8 @@ const BasicLeaderboardAgeUserEdit = ({
         dob: initialDob,
         phone: selectedPlayer.phone || "",
         gender: selectedPlayer.gender || "",
-        country: selectedPlayer.country || "",
+        country: normalizeCountry(selectedPlayer.country),
       });
-  console.log("Selected Player in Edit Form:", selectedPlayer.gender);
 
     } else if (userId) {
       // Fallback if somehow selectedPlayer missing
@@ -80,7 +103,16 @@ const BasicLeaderboardAgeUserEdit = ({
         country: "",
       });
     }
-  }, [selectedPlayer, userId]);
+  }, [
+    selectedPlayer?.country,
+    selectedPlayer?.dob,
+    selectedPlayer?.gender,
+    selectedPlayer?.id,
+    selectedPlayer?.name,
+    selectedPlayer?.phone,
+    selectedPlayer?.user_id,
+    userId,
+  ]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,13 +128,17 @@ const BasicLeaderboardAgeUserEdit = ({
     e.preventDefault();
 
     if (!form.user_id || !form.id) {
-      toast.error("User ID or Player ID is missing.");
+      toast.error("User ID or Player ID is missing.", editFormToastOptions);
       return;
     }
 
-    const cleanPhone = form.phone ? form.phone.trim().replace(/\D/g, "") : "";
+    const cleanPhone = String(form.phone || "").trim().replace(/\D/g, "");
     if (cleanPhone && cleanPhone.length !== 11) {
-      toast.error("Phone number must be exactly 11 digits");
+      toast.error("Phone number must be exactly 11 digits", {
+        ...editFormToastOptions,
+        toastId: "phone-number-length-error",
+      });
+      document.getElementById("phone")?.focus();
       return;
     }
 
@@ -122,7 +158,7 @@ const BasicLeaderboardAgeUserEdit = ({
 
   useEffect(() => {
     if (successMessage) {
-      toast.success("Profile updated successfully!");
+      toast.success("Profile updated successfully!", editFormToastOptions);
       const timer = setTimeout(() => {
         setShowSkeleton(false);
 
@@ -142,14 +178,27 @@ const BasicLeaderboardAgeUserEdit = ({
 
     if (error) {
       setShowSkeleton(false);
-      toast.error(error);
+      toast.error(error, editFormToastOptions);
       dispatch(resetEditPlayerState());
     }
   }, [successMessage, error, dispatch, ladderId, onClose]);
 
 
   return (
-    <Card className="max-w-full mx-auto mt-6 shadow-xl rounded-2xl bg-card border border-border">
+    <>
+      {toastPortalReady &&
+        createPortal(
+          <ToastContainer
+            containerId={EDIT_FORM_TOAST_CONTAINER_ID}
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar
+            theme="colored"
+            style={{ zIndex: 100000 }}
+          />,
+          document.body,
+        )}
+      <Card className="max-w-full mx-auto mt-6 shadow-xl rounded-2xl bg-card border border-border">
       <CardContent className="p-6 space-y-4">
         {selectedPlayer?.name && (
           <div className="text-center bg-accent border border-border rounded-lg p-3">
@@ -171,7 +220,7 @@ const BasicLeaderboardAgeUserEdit = ({
             <Skeleton className="h-10 w-full rounded" />
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
               <Label
                 htmlFor="name"
@@ -238,11 +287,11 @@ const BasicLeaderboardAgeUserEdit = ({
                 onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
               >
                 <SelectTrigger className="bg-muted border-border text-foreground w-full focus:border-primary focus:ring-2 focus:ring-primary/50 h-12">
-                  <SelectValue placeholder="Select Gender" />
+                  <SelectValue className="text-foreground" placeholder="Select Gender" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border text-popover-foreground">
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem className="text-popover-foreground focus:text-accent-foreground" value="male">Male</SelectItem>
+                  <SelectItem className="text-popover-foreground focus:text-accent-foreground" value="female">Female</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -273,7 +322,8 @@ const BasicLeaderboardAgeUserEdit = ({
           </form>
         )}
       </CardContent>
-    </Card>
+      </Card>
+    </>
   );
 };
 
