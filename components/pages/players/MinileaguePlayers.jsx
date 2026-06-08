@@ -343,7 +343,7 @@ const MinileaguePlayers = () => {
 
   const handleResetBoard = useCallback(async () => {
     try {
-      await getRequest(API_ENDPOINTS.RESET_SKILLBOARD, {
+      await getRequest(API_ENDPOINTS.RESET_MINILEAGUE_SCORE, {
         ladder_id: ladderId,
       });
       setResetOpen(false);

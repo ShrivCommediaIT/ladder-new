@@ -65,6 +65,7 @@ export const API_ENDPOINTS = {
   MINILEAGUE_ADD_BY_ADMIN:         "/user/minileagueaddbyadmin",
   REMOVE_USER_MINILEAGUE:          "/user/removeUserminileague",
   MINILEAGUE_UPDATE_GRADEBAR_NAME: "/user/minileagueupdateGradebarName",
+  RESET_MINILEAGUE_SCORE:          "/user/resetscore",
 
   // ── Skill Leaderboard ────────────────────────
   GET_SKILL_SETUP:         "/user/getskillsetup",
