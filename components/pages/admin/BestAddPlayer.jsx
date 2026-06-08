@@ -206,9 +206,21 @@ const handleSubmit = async () => {
         <div className="space-y-1">
           <Label className="text-white">Place Number to Add New Player<span className="text-red-500">*</span></Label>
           <Input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={rank}
-            onChange={(e) => setRank(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, "");
+              if (val === "") {
+                setRank("");
+              } else {
+                const num = parseInt(val, 10);
+                if (num >= 1) {
+                  setRank(num);
+                }
+              }
+            }}
             placeholder="Enter rank"
             className="text-white font-semibold"
           />

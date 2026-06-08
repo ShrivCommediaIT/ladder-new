@@ -274,30 +274,30 @@ export default function InfoSection({
       </aside>
 
       <Dialog open={contactOpen} onOpenChange={setContactOpen}>
-        <DialogContent className="best-board-card border-[var(--best-board-border)] text-white sm:max-w-2xl">
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Edit Admin Contact</DialogTitle>
+            <DialogTitle className="text-foreground">Edit Admin Contact</DialogTitle>
           </DialogHeader>
           <AdminEditPhone onClose={() => setContactOpen(false)} />
         </DialogContent>
       </Dialog>
 
       <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
-        <AlertDialogContent className="best-board-card border-[var(--best-board-border)] text-white">
+        <AlertDialogContent className="bg-card border border-border text-foreground">
           <AlertDialogHeader>
-            <AlertDialogTitle>{resetTitle}</AlertDialogTitle>
-            <AlertDialogDescription className="text-[var(--best-board-muted)]">
+            <AlertDialogTitle className="text-foreground">{resetTitle}</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               {resetDescription}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] text-white hover:bg-[var(--best-board-surface)]">
+            <AlertDialogCancel className="border border-border bg-muted text-foreground hover:bg-accent hover:text-foreground">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleResetBoard}
               disabled={resetConfirmDisabled}
-              className="border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] text-white hover:bg-[var(--best-board-accent-soft)]"
+              className="border border-primary/40 bg-primary text-primary-foreground hover:brightness-110 disabled:opacity-50"
             >
               {resetConfirmLabel}
             </AlertDialogAction>
