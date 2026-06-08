@@ -241,8 +241,7 @@ export default function LoginByClubForm() {
                         />
                       </div>
                       <p className="text-sm text-slate-300">
-                        Join <span className="font-semibold text-white">10,000+</span> clubs
-                        worldwide
+                        Join our SSP Eco-Reward Community
                       </p>
                     </div>
                   </div>

@@ -306,11 +306,11 @@ export default function LoginUser({ ladderId, ladderType }) {
 
                   <div className="space-y-6">
                     <h1 className="text-h11 font-bold text-white">
-                      Welcome Back,
+                      <span>WELCOME </span> <br />
+                      <span>TO YOUR </span> <br />
+                      <span>COMPETATION </span>
                     </h1>
-                    <p className="text-p2 text-slate-300">
-                      Manage your sports club with ease. Access ladders, players, and competitions all in one place.
-                    </p>
+                    <p>Register - <span className="text-primary"> Login </span> - Enjoy</p>
                   </div>
                 </div>
 
@@ -331,7 +331,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                       />
                     </div>
                     <p className="text-sm text-slate-300">
-                      Join <span className="font-semibold text-white">50,000+</span> players worldwide
+                      Join our SSP Eco-Reward Community
                     </p>
                   </div>
                 </div>
