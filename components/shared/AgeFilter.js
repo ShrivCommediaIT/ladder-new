@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { calculateAge } from "@/lib/utils";
 import { Filter } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
   const [open, setOpen] = useState(false);
@@ -16,6 +17,8 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
   const [calculatedAge, setCalculatedAge] = useState("");
   const [gender, setGender] = useState("");
   const [ageType, setAgeType] = useState("");
+    const searchParams = useSearchParams();
+    const ladderType = searchParams.get("type")
 
   useEffect(() => {
     if (resetSignal !== undefined) {
@@ -96,9 +99,9 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
           } flex h-full w-full flex-col items-center justify-center gap-1 rounded-xl px-4 py-3 text-[10px] font-bold uppercase leading-tight shadow-none transition-all active:scale-95`}
         >
           <Filter className="h-5 w-5" />
-          <span>AGE/
+          {ladderType !== "minileague" ? <span>AGE/
             <br/>
-            GENDER</span>
+            GENDER</span> : <span>AGE</span>}
         </Button>
       </DialogTrigger>
       <DialogContent className="best-board-card text-[var(--best-board-text)] border border-[var(--best-board-border)] rounded-xl max-w-sm w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto flex flex-col items-center p-4 gap-0">
@@ -108,6 +111,9 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
         <div className="w-full flex justify-center mt-1 mb-2">
           <span className="h-1 w-16 bg-[var(--best-board-accent)] rounded-full"></span>
         </div>
+
+        {ladderType !== "minileague" && <>
+
         <p className="text-base font-semibold text-[var(--best-board-accent)]">
           Select Gender
         </p>
@@ -135,6 +141,7 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
             Female
           </button>
         </div>
+        </>}
 
         <p className="text-base font-semibold text-[var(--best-board-accent)]">
           Select Age Type
