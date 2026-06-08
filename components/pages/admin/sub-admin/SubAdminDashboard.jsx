@@ -72,6 +72,7 @@ export default function SubAdminDashboard() {
   const [ladderType, setLadderType] = useState("winlose");
   const [duplicateWarning, setDuplicateWarning] = useState(null);
   const [showDemo, setShowDemo] = useState(true);
+  const [withoutCsv, setWithoutCsv] = useState(false);
 
 
 
@@ -80,7 +81,20 @@ export default function SubAdminDashboard() {
       ? JSON.parse(sessionStorage.getItem("subAdmin") || "null")
       : null;
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = sessionStorage.getItem("userData");
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          return parsed.user || parsed;
+        } catch (err) {
+          return null;
+        }
+      }
+    }
+    return null;
+  });
 
   const { allLadders } = useSelector((state) => state.fetchLadder);
 
@@ -139,23 +153,8 @@ export default function SubAdminDashboard() {
       const storedUser = sessionStorage.getItem("userData");
       if (storedUser) {
         try {
-          setUser(JSON.parse(storedUser));
-        } catch (err) {
-          setUser(null);
-        }
-      }
-    }
-  }, []);
-
-
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = sessionStorage.getItem("userData");
-      if (storedUser) {
-        try {
           const parsed = JSON.parse(storedUser);
-          const finalUser = parsed.user || parsed; // Get direct user object
+          const finalUser = parsed.user || parsed;
           setUser(finalUser);
         } catch (err) {
           console.error(err);
@@ -239,23 +238,27 @@ export default function SubAdminDashboard() {
   };
 
   const handleCreateLadder = async () => {
-    if (duplicateWarning) {
+    if (!withoutCsv && duplicateWarning) {
       toast.warn("Please remove duplicate names first");
       return;
     }
 
-    let cleanName = subAdmin?.sport_name + " " + ladderName.trim();
+    let cleanName = ladderName.trim();
 
-    if (!subAdmin?.id || !cleanName || !csvFile) {
-      toast.warn("Please enter solution name, upload CSV, and ensure login.");
+    if (!subAdmin?.id || !cleanName || (!withoutCsv && !csvFile)) {
+      toast.warn(
+        withoutCsv
+          ? "Please enter solution name and ensure login."
+          : "Please enter solution name, upload CSV, and ensure login."
+      );
       return;
     }
 
-    if (ladderExists(cleanName)) {
-      toast.error(`${cleanName} name already exists — choose another`);
+    const fullnameToCheck = subAdmin?.sport_name + " " + cleanName;
+    if (ladderExists(fullnameToCheck)) {
+      toast.error(`${fullnameToCheck} name already exists — choose another`);
       return;
     }
-    cleanName =  ladderName.trim();
 
     try {
       // CREATE LADDER
@@ -291,45 +294,47 @@ export default function SubAdminDashboard() {
       toast.success("Solution created!");
 
       // IMPORT CSV BASED ON TYPE
-      if (ladderType === "minileague") {
-        await dispatch(
-          importMiniLeague({
-            file: csvFile,
-            ladder_id: createdLadderId,
-            name: cleanName,
-            type: ladderType,
-          }),
-        ).unwrap();
+      if (!withoutCsv) {
+        if (ladderType === "minileague") {
+          await dispatch(
+            importMiniLeague({
+              file: csvFile,
+              ladder_id: createdLadderId,
+              name: cleanName,
+              type: ladderType,
+            }),
+          ).unwrap();
 
-        toast.success("MiniLeague users imported!");
-      } else if (ladderType === "skill") {
-        await dispatch(
-          importSkillLeaderboard({
-            file: csvFile,
-            ladder_id: createdLadderId,
-          }),
-        ).unwrap();
+          toast.success("MiniLeague users imported!");
+        } else if (ladderType === "skill") {
+          await dispatch(
+            importSkillLeaderboard({
+              file: csvFile,
+              ladder_id: createdLadderId,
+            }),
+          ).unwrap();
 
-        toast.success("Skill leaderboard imported!");
-      } else if (ladderType === "roster") {
-        await dispatch(
-          importRoster({
-            file: csvFile,
-            ladder_id: createdLadderId,
-          }),
-        ).unwrap();
+          toast.success("Skill leaderboard imported!");
+        } else if (ladderType === "roster") {
+          await dispatch(
+            importRoster({
+              file: csvFile,
+              ladder_id: createdLadderId,
+            }),
+          ).unwrap();
 
-        toast.success("Roster imported!");
-      } else {
-        await dispatch(
-          uploadCSV({
-            file: csvFile,
-            ladder_id: createdLadderId,
-            type: ladderType,
-          }),
-        ).unwrap();
+          toast.success("Roster imported!");
+        } else {
+          await dispatch(
+            uploadCSV({
+              file: csvFile,
+              ladder_id: createdLadderId,
+              type: ladderType,
+            }),
+          ).unwrap();
 
-        toast.success("Users imported successfully!");
+          toast.success("Users imported successfully!");
+        }
       }
 
       // refresh ladder list (correct params)
@@ -344,6 +349,7 @@ export default function SubAdminDashboard() {
       setLadderName("");
       setCsvFile(null);
       setLadderType("winlose");
+      setWithoutCsv(false);
 
       // redirect
       setTimeout(() => {
@@ -497,16 +503,18 @@ export default function SubAdminDashboard() {
               className="overflow-hidden rounded-[24px] sm:rounded-[30px] border border-primary/10 bg-card p-4 sm:p-6 backdrop-blur-xl"
               style={{ backgroundColor: "color-mix(in srgb, var(--card), var(--primary) 2%)" }}
             >
-              <div className="mb-5 flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary">
-                    Create Solution  
-                  </p>
+              {user?.user_type !== "admin" && user?.role !== "admin" && (
+                <div className="mb-5 flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary">
+                      Create Solution  
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <CreatePanel
-                role="subadmin"
+                role={user?.user_type || user?.role || "subadmin"}
                 ladderName={ladderName}
                 setLadderName={setLadderName}
                 ladderType={ladderType}
@@ -516,6 +524,8 @@ export default function SubAdminDashboard() {
                 handleCreate={handleCreateLadder}
                 loading={loading}
                 sportName={subAdmin?.sport_name}
+                withoutCsv={withoutCsv}
+                setWithoutCsv={setWithoutCsv}
               />
             </motion.section>
 

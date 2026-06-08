@@ -1168,8 +1168,7 @@ export default function SubmitPerformancePage() {
                         <RefreshCw className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="font-extrabold text-sm md:text-base text-slate-800 dark:text-slate-200">Update Existing Submission</p>
-                        <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Update a previous submission</p>
+                        <p className="font-extrabold text-sm md:text-base text-slate-800 dark:text-slate-200">Click on result to update</p>
                       </div>
                     </button>
 

@@ -116,8 +116,12 @@ export default function RegisterUser({ ladderId, ladderType }) {
     } else {
       toast.error(res?.error_message || "Registration failed");
     }
-  } catch {
-    toast.error("Server error");
+  } catch (err) {
+    toast.error(
+      err?.response?.data?.error_message ||
+      err?.response?.data?.message ||
+      "Server error"
+    );
   } finally {
     setLoading(false);
   }

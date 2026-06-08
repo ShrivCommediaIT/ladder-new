@@ -92,16 +92,16 @@ export const EditPlayer = ({
     }
   }, [result, moveError, dispatch, ladder_id]);
 
-  const [selectedTab, setSelectedTab] = useState("result");
-  const [mobileTab, setMobileTab] = useState(""); // empty = shows placeholder
+  const [selectedTab, setSelectedTab] = useState(initialTab || "result");
+  const [mobileTab, setMobileTab] = useState(initialTab || ""); // empty = shows placeholder
 
   // Reset tabs to initial state every time the modal opens
   useEffect(() => {
     if (open) {
-      setSelectedTab("result");
-      setMobileTab("");
+      setSelectedTab(initialTab || "result");
+      setMobileTab(initialTab || "");
     }
-  }, [open]);
+  }, [open, initialTab]);
 
   const handleMobileTabChange = (val) => {
     setMobileTab(val);
