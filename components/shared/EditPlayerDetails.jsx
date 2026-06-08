@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,13 +18,7 @@ import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { toast } from "react-toastify";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { useSearchParams } from "next/navigation";
 import { format } from "date-fns";
 import { calculateAge, parseDobToDate } from "@/lib/utils";
@@ -55,6 +49,18 @@ const EditPlayerDetails = ({
   });
 
   const [showSkeleton, setShowSkeleton] = useState(false);
+  const [genderOpen, setGenderOpen] = useState(false);
+  const genderRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (genderRef.current && !genderRef.current.contains(e.target)) {
+        setGenderOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Prefill form strictly from selectedPlayer (id/user_id/name/phone/dob)
   useEffect(() => {
@@ -168,7 +174,7 @@ const EditPlayerDetails = ({
             <p className="text-foreground font-semibold text-base">
               Editing: {selectedPlayer.name}
             </p>
-            <p className="text-muted-foreground text-xs opacity-90">
+            <p className="text-foreground text-xs ">
               Rank: {selectedPlayer.rank || "N/A"}
             </p>
           </div>
@@ -246,21 +252,61 @@ const EditPlayerDetails = ({
             </div>
 
             {!userLevel && (
-              <div className="w-full">
+              <div className="w-full" ref={genderRef}>
                 <Label className="text-foreground font-semibold py-1 text-sm block">Gender</Label>
-                <Select
-                  key={form.gender}
-                  value={form.gender}
-                  onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
-                >
-                  <SelectTrigger className="bg-muted border-border w-full text-foreground focus:border-primary focus:ring-primary focus:ring-1 h-10 rounded-xl">
-                    <SelectValue placeholder="Select Gender" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover border-border text-popover-foreground">
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                  </SelectContent>
-                </Select>
+
+                {/* Custom theme-aware gender dropdown */}
+                <div className="relative mt-1">
+                  {/* Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => setGenderOpen((o) => !o)}
+                    className="h-10 w-full rounded-xl border border-border bg-muted px-3 text-left text-sm flex items-center justify-between gap-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  >
+                    <span className={form.gender ? "text-foreground" : "text-muted-foreground"}>
+                      {form.gender === "male" ? "Male" : form.gender === "female" ? "Female" : "Select Gender"}
+                    </span>
+                    {/* Chevron */}
+                    <svg
+                      className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200 ${genderOpen ? "rotate-180" : ""}`}
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+
+                  {/* Dropdown panel */}
+                  {genderOpen && (
+                    <div className="absolute z-50 mt-1 w-full rounded-xl border border-border bg-card shadow-lg overflow-hidden">
+                      {[
+                        { value: "", label: "Select Gender", placeholder: true },
+                        { value: "male", label: "Male" },
+                        { value: "female", label: "Female" },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            setForm((prev) => ({ ...prev, gender: opt.value }));
+                            setGenderOpen(false);
+                          }}
+                          className={`w-full px-3 py-2.5 text-left text-sm flex items-center justify-between transition-colors hover:bg-muted
+                            ${opt.placeholder ? "text-muted-foreground" : "text-foreground"}
+                          `}
+                        >
+                          {opt.label}
+                          {form.gender === opt.value && !opt.placeholder && (
+                            <svg className="w-4 h-4 text-primary shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

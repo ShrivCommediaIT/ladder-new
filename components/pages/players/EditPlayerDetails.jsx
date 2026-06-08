@@ -9,13 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
@@ -63,6 +57,19 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
     gender: "",
     country: "",
   });
+
+  const [genderOpen, setGenderOpen] = useState(false);
+  const genderRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (genderRef.current && !genderRef.current.contains(e.target)) {
+        setGenderOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const [showSkeleton, setShowSkeleton] = useState(false);
   const cardRef = useRef(null);
@@ -283,22 +290,62 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
               </motion.div>
 
               {/* GENDER */}
-              { ladderType !== "minileague" && <motion.div whileHover={{ scale: 1.02 }} className="space-y-2 w-full">
+              { ladderType !== "minileague" && <motion.div whileHover={{ scale: 1.02 }} className="space-y-2 w-full" ref={genderRef}>
                 <Label className="text-blue-200 font-semibold">Gender</Label>
-                <Select
-                  key={form.gender}
-                  value={form.gender}
-                  onValueChange={(val) => setForm((prev) => ({ ...prev, gender: val }))}
-                  disabled={isReadOnly}
-                >
-                  <SelectTrigger className="bg-white/10 border-white/30 text-white w-full focus:ring-2 focus:ring-cyan-400 py-6 h-12">
-                    <SelectValue placeholder="Select Gender" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-white/20 text-white">
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                  </SelectContent>
-                </Select>
+
+                {/* Custom theme-aware gender dropdown */}
+                <div className="relative">
+                  {/* Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => !isReadOnly && setGenderOpen((o) => !o)}
+                    disabled={isReadOnly}
+                    className={`h-12 w-full rounded-xl border border-white/30 bg-white/10 px-4 text-left text-sm flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all text-white ${isReadOnly ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                  >
+                    <span className={form.gender ? "text-white" : "text-white/50"}>
+                      {form.gender === "male" ? "Male" : form.gender === "female" ? "Female" : "Select Gender"}
+                    </span>
+                    {/* Chevron */}
+                    <svg
+                      className={`w-4 h-4 text-white/60 shrink-0 transition-transform duration-200 ${genderOpen ? "rotate-180" : ""}`}
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+
+                  {/* Dropdown panel */}
+                  {genderOpen && (
+                    <div className="absolute z-50 mt-1 w-full rounded-xl border border-white/20 bg-slate-800 shadow-lg overflow-hidden">
+                      {[
+                        { value: "", label: "Select Gender", placeholder: true },
+                        { value: "male", label: "Male" },
+                        { value: "female", label: "Female" },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            setForm((prev) => ({ ...prev, gender: opt.value }));
+                            setGenderOpen(false);
+                          }}
+                          className={`w-full px-4 py-3 text-left text-sm flex items-center justify-between transition-colors hover:bg-white/10
+                            ${opt.placeholder ? "text-white/40" : "text-white"}
+                          `}
+                        >
+                          {opt.label}
+                          {form.gender === opt.value && !opt.placeholder && (
+                            <svg className="w-4 h-4 text-cyan-400 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </motion.div>}
 
               {/* COUNTRY */}
