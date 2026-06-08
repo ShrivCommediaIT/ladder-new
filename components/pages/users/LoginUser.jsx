@@ -211,7 +211,7 @@ export default function LoginUser({ ladderId, ladderType }) {
     const dobString = format(values.dob, "dd/MM/yyyy");
 
     try {
-      await postRequest(API_ENDPOINTS.REGISTER, {
+     const res = await postRequest(API_ENDPOINTS.REGISTER, {
         user_id: values.name,
         password: values.password,
         name: values.name,
@@ -223,12 +223,19 @@ export default function LoginUser({ ladderId, ladderType }) {
         gender: finalLadderType !== "minileague" ? values.gender : undefined,
         country: values.country,
       });
-
-      toast.success("Account created successfully!");
-      registerForm.reset();
-      switchMode("login");
+      if(res.status == 200){
+        toast.success("Account created successfully!");
+        registerForm.reset();
+        switchMode("login");
+      }else{
+        toast.error(res?.error_message || "Registration failed.");
+      }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Registration failed.");
+      toast.error(
+        err?.response?.data?.error_message ||
+        err?.response?.data?.message ||
+        "Registration failed."
+      );
     }
 
     setLoading(false);
