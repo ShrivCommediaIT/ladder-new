@@ -149,7 +149,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
                   <Input
                     placeholder="Enter your name"
                     {...field}
-                    className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                    className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2"
                     style={{
                       backgroundColor: "var(--input-bg)",
                       boxShadow: "inset 0 0 0 1px var(--input-border)",
@@ -177,7 +177,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
                         const cleanVal = e.target.value.replace(/\D/g, "").slice(0, 11);
                         field.onChange(cleanVal);
                       }}
-                      className="h-[52px] rounded-2xl border-0 pl-11 pr-4 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2"
+                      className="h-[52px] rounded-2xl border-0 pl-11 pr-4 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2"
                       style={{
                         backgroundColor: "var(--input-bg)",
                         boxShadow: "inset 0 0 0 1px var(--input-border)",
@@ -235,7 +235,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
 
             {/* DOB PICKER */}
   <div>
-    <Label className="text-p3 text-slate-200 block mb-2.5">
+    <Label className="text-p3 text-foreground block mb-2.5">
       Date of Birth:(for age related solutions)
     </Label>
 
@@ -248,7 +248,11 @@ export default function RegisterUser({ ladderId, ladderType }) {
           shouldDirty: true,
         })
       }
-      className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+      className="h-[52px] w-full rounded-2xl border-0 focus-visible:ring-2"
+      style={{
+        backgroundColor: "var(--input-bg)",
+        boxShadow: "inset 0 0 0 1px var(--input-border)",
+      }}
     />
 
     <p className="text-red-400 text-xs">{errors.dob?.message}</p>
@@ -264,7 +268,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
                     maxLength={6}
                     inputMode="numeric"
                     {...register("password")}
-                    className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                    className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2 pr-12"
                     style={{
                       backgroundColor: "var(--input-bg)",
                       boxShadow: "inset 0 0 0 1px var(--input-border)",
@@ -279,9 +283,9 @@ export default function RegisterUser({ ladderId, ladderType }) {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-0.5 bg-gray-700 text-white p-1 rounded-full cursor-pointer"
+                  className="absolute right-3 top-3 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
                 >
-                  {showPassword ? <EyeOff /> : <Eye />}
+                  {showPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
                 </button>
               </div>
               <p className="text-red-400 text-xs">{errors.password?.message}</p>
@@ -297,7 +301,7 @@ export default function RegisterUser({ ladderId, ladderType }) {
                   maxLength={6}
                   inputMode="numeric"
                   {...register("confirmPassword")}
-                  className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-2 pr-12"
+                  className="h-[52px] rounded-2xl border-0 text-foreground placeholder:text-muted-foreground/85 focus-visible:ring-2 pr-12"
                   style={{
                     backgroundColor: "var(--input-bg)",
                     boxShadow: "inset 0 0 0 1px var(--input-border)",
@@ -312,9 +316,9 @@ export default function RegisterUser({ ladderId, ladderType }) {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-0.5 bg-gray-700 text-white p-1 rounded-full cursor-pointer"
+                  className="absolute right-3 top-3 bg-muted h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors"
                 >
-                  {showConfirmPassword ? <EyeOff /> : <Eye />}
+                  {showConfirmPassword ? <EyeOff size={14} className="text-muted-foreground" /> : <Eye size={14} className="text-muted-foreground" />}
                 </button>
               </div>
               <p className="text-red-400 text-xs">
