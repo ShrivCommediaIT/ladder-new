@@ -1,6 +1,11 @@
 "use client";
 import PlayerRankBadge from "@/components/shared/PlayerRankBadge";
 import { IMAGE_BASE_URL } from "@/constants/api";
+import {
+  PLAYER_COLOR_CLASSES,
+  getPlayerInitials,
+  getPhoneText,
+} from "@/components/shared/ladderUtils";
 import Image from "next/image";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -86,6 +91,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [initialTab, setInitialTab] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [showRemove, setShowRemove] = useState(false);
@@ -118,7 +124,11 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
     }
   }, [resetSignal, onActionsChanged, dispatch, appliedAge, appliedGender]);
 
-  const currentUser = players.find((p) => Number(p.id) === Number(loggedInUserId));
+  const currentUser = players.find(
+    (p) =>
+      Number(p.id) === Number(loggedInUserId) ||
+      (p.user_id && Number(p.user_id) === Number(loggedInUserId))
+  );
   const myRank = currentUser?.rank || "-";
 
   /* ------------------ FETCH DATA ------------------ */
@@ -200,21 +210,29 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
     }
 
     const isCurrentUser =
-      String(loggedInUserId) === String(player.id);
+      String(loggedInUserId) === String(player.id) ||
+      (player.user_id && String(loggedInUserId) === String(player.user_id));
 
-    if (!isCurrentUser) {
-      setDialogMessage("You can only edit your own profile");
+    setSelectedPlayerId(player.id);
+    setInitialTab(isCurrentUser ? null : "stats");
+    setIsModalOpen(true);
+  };
+
+  const handleChallengeClick = (player) => {
+    if (!loggedInUserId) {
+      setDialogMessage("Please login first");
       setIsDialogOpen(true);
       return;
     }
-
     setSelectedPlayerId(player.id);
+    setInitialTab("challenge");
     setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedPlayerId(null);
+    setInitialTab(null);
     setTimeout(() => {
       refreshData();
     }, 500);
@@ -262,12 +280,14 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
 
           <div className="space-y-3">
             {grade.players.map((player, pidx) => {
+              const rank = player.rank || gradeIndex * preset + pidx + 1;
               const playerImageUrl = player.image
                 ? `${IMAGE_BASE_URL}/${player.image}?t=${cacheBuster}`
-                : "/logo.jpg";
+                : null;
 
               const isCurrentUser =
-                String(loggedInUserId) === String(player.id);
+                String(loggedInUserId) === String(player.id) ||
+                (player.user_id && String(loggedInUserId) === String(player.user_id));
 
               return (
                 <motion.div
@@ -275,50 +295,77 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: pidx * 0.03 }}
-                  onClick={() => handlePlayerClick(player)}
-                  className={`group flex items-center justify-between rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] px-4 py-4 transition hover:border-[var(--best-board-border-strong)] ${
-                    isCurrentUser ? "cursor-pointer" : "cursor-not-allowed opacity-60"
-                  }`}
                 >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <PlayerRankBadge rank={player.rank || pidx + 1} sizeClass="h-12 w-12 sm:h-16 sm:w-16 shrink-0" imgSize={64} textClass="text-xs sm:text-sm" />
-                    
-                    {/* Avatar */}
-                    {player.image ? (
-                      <Image
-                        src={playerImageUrl}
-                        alt={player.name}
-                        width={64}
-                        height={64}
-                        className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shrink-0"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-sm sm:text-base font-bold text-white shrink-0">
-                        {player.name ? player.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "P"}
-                      </div>
-                    )}
+                  <div
+                    onClick={() => handlePlayerClick(player)}
+                    className="group flex flex-col rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] transition hover:border-[var(--best-board-border-strong)] cursor-pointer overflow-hidden"
+                  >
+                    {/* ── TOP STRIP ── */}
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-between px-4 py-1.5 gap-2 border-b border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
+                    >
+                      {/* Active Toggle Button (PlayerStatusToggle) */}
+                      <PlayerStatusToggle player={player} user={true} />
 
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="truncate text-h5 font-semibold text-[var(--best-board-text)]">{player?.name || "N/A"}</p>
-                        {player.age !== null && player.age !== undefined && player.age !== "" && (
+                      {/* Age and Gender Badges */}
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {player?.age ? (
                           <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]">
                             Age : {player.age}
                           </span>
-                        )}
-                        {player.gender && (
+                        ) : null}
+                        {player?.gender !== undefined && player?.gender !== null && player?.gender !== "" ? (
                           <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]">
-                            Gender: {player.gender === "male" ? "M" : "F"}
+                            Gender: {player.gender === "male" || player.gender === "Male" ? "M" : "F"}
                           </span>
-                        )}
+                        ) : null}
                       </div>
-                      <p className="truncate text-sm text-[var(--best-board-muted)]">{player?.phone || "N/A"}</p>
                     </div>
-                  </div>
 
-                  <div className="ml-4 flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                    <PlayerStatusToggle player={player} user={true} />
+                    {/* ── MAIN BODY ── */}
+                    <div className="flex items-center justify-between px-4 py-3 sm:py-4 gap-3">
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <PlayerRankBadge rank={rank} />
+                        
+                        {/* Avatar */}
+                        {player.image ? (
+                          <Image
+                            src={playerImageUrl}
+                            alt={player.name}
+                            width={64}
+                            height={64}
+                            className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shrink-0"
+                            unoptimized
+                          />
+                        ) : (
+                          <div className={`flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br ${PLAYER_COLOR_CLASSES[(Number(rank) - 1) % PLAYER_COLOR_CLASSES.length]} text-sm sm:text-base font-bold text-white shrink-0`}>
+                            {getPlayerInitials(player?.name)}
+                          </div>
+                        )}
+
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-h5 font-semibold text-[var(--best-board-text)] mb-0.5">{player?.name || "N/A"}</p>
+                          <p className="truncate text-sm text-[var(--best-board-muted)]">{getPhoneText(player?.phone)}</p>
+                        </div>
+                      </div>
+
+                      {/* Challenge Button */}
+                      {!isCurrentUser && (
+                        <div className="flex items-center shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleChallengeClick(player);
+                            }}
+                            className="rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-3 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-semibold text-[var(--best-board-text)] transition cursor-pointer hover:bg-[var(--best-board-border-strong)]/30"
+                          >
+                            Challenge
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -336,6 +383,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
           ladder_id={ladderId}
           ladder_type={ladderType}
           userLevel={true}
+          initialTab={initialTab}
         />
       )}
 
