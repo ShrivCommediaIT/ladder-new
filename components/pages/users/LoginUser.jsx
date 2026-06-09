@@ -315,7 +315,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                     <h1 className="text-h11 font-bold text-white">
                       <span>WELCOME </span> <br />
                       <span>TO YOUR </span> <br />
-                      <span>COMPETATION </span>
+                      <span>COMPETITION </span>
                     </h1>
                     <p className="text-slate-200">Register - <span className="text-primary"> Login </span> - Enjoy</p>
                   </div>

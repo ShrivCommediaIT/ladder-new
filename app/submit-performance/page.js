@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, HelpCircle, Key, ArrowLeft, UploadCloud, FileSpreadsheet, X, CheckCircle, AlertTriangle, RefreshCw } from "lucide-react";
+import { ShieldCheck, HelpCircle, Key, ArrowLeft, UploadCloud, FileSpreadsheet, X, CheckCircle, AlertTriangle, RefreshCw, Copy } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -39,13 +39,13 @@ const unitsList = [
 const formatDateForInput = (dateStr) => {
   if (!dateStr) return "";
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
-  
+
   const parts = dateStr.split(/[-/]/);
   if (parts.length === 3) {
     let day = parts[0];
     let month = parts[1];
     let year = parts[2];
-    
+
     if (year.length === 4) {
       day = day.padStart(2, "0");
       month = month.padStart(2, "0");
@@ -94,6 +94,8 @@ export default function SubmitPerformancePage() {
   const [evidenceFile, setEvidenceFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [accessCodeModalOpen, setAccessCodeModalOpen] = useState(false);
+  const [submittedAccessCode, setSubmittedAccessCode] = useState("");
 
   // PayPal Payment Flow states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -106,6 +108,49 @@ export default function SubmitPerformancePage() {
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const [activeRecordId, setActiveRecordId] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [admin, setAdmin] = useState(null);
+  const [subAdmin, setSubAdmin] = useState(null);
+  const [dbData, setDbData] = useState([]);
+  
+
+
+useEffect(() => {
+  const fetchData = async () => {
+    if (typeof window !== "undefined") {
+      const adminDetailsStr = sessionStorage.getItem("adminDetails");
+      const subDetailsStr = sessionStorage.getItem("subAdmin");
+
+      const adminDetails = adminDetailsStr
+        ? JSON.parse(adminDetailsStr)
+        : null;
+
+      const subDetails = subDetailsStr
+        ? JSON.parse(subDetailsStr)
+        : null;
+
+      setAdmin(adminDetails);
+      setSubAdmin(subDetails);
+
+      const requestParams = {};
+
+      if (adminDetails) {
+        requestParams.admin_id = adminDetails.id;
+      }
+
+      const response = await getRequest(
+        API_ENDPOINTS.GET_PERFORMANCE_RESULT_LIST,
+        requestParams
+      );
+
+      if (response?.status === 200 && response?.data) {
+        const pageData = response.data.data || [];
+        setDbData(pageData);
+      }
+    }
+  };
+
+  fetchData();
+}, []);
 
   // Load and render PayPal SDK subscription buttons dynamically when modal is open
   useEffect(() => {
@@ -128,17 +173,17 @@ export default function SubmitPerformancePage() {
           try {
             window.paypal.HostedButtons({
               hostedButtonId: hostedButtonId,
-              onPaymentCompleted: async function(data, actions) {
+              onPaymentCompleted: async function (data, actions) {
                 toast.success("Payment successful! Submitting performance result...");
                 setShowPaymentModal(false);
                 await submitFormData(data.orderID || data.paymentID || "PAYPAL_HOSTED_BUTTON_" + Date.now());
               },
-              onApprove: async function(data, actions) {
+              onApprove: async function (data, actions) {
                 toast.success("Payment successful! Submitting performance result...");
                 setShowPaymentModal(false);
                 await submitFormData(data.orderID || data.paymentID || "PAYPAL_HOSTED_BUTTON_" + Date.now());
               },
-              onError: function(err) {
+              onError: function (err) {
                 toast.error("PayPal payment failed or cancelled");
                 console.error("PayPal integration error:", err);
               }
@@ -170,7 +215,7 @@ export default function SubmitPerformancePage() {
     // Clean up any existing PayPal scripts and globals to avoid conflicts (e.g. from footer)
     const existingScripts = document.querySelectorAll("script[src*='paypal.com/sdk/js']");
     let scriptLoaded = false;
-    
+
     existingScripts.forEach((s) => {
       if (s.getAttribute("src") === scriptSrc && window.paypal && window.paypal.HostedButtons) {
         scriptLoaded = true;
@@ -253,50 +298,6 @@ export default function SubmitPerformancePage() {
     }
   };
 
-
-
-
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error("File size must be less than 10MB");
-        return;
-      }
-      setEvidenceFile(file);
-      toast.success(`File "${file.name}" selected`);
-    }
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    const file = e.dataTransfer?.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error("File size must be less than 10MB");
-        return;
-      }
-      setEvidenceFile(file);
-      toast.success(`File "${file.name}" dropped successfully`);
-    }
-  };
-
-  const clearFile = () => {
-    setEvidenceFile(null);
-  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -406,7 +407,7 @@ export default function SubmitPerformancePage() {
     setErrors({});
     setIsUpdateMode(false);
     setActiveRecordId(null);
-    
+
     // Re-fill coach/submitter name & email from sessionStorage if available
     if (typeof window !== "undefined") {
       const storedAdmin = sessionStorage.getItem("userData");
@@ -492,7 +493,7 @@ export default function SubmitPerformancePage() {
 
     if (!validateForm()) {
       toast.error("Please fill in all required fields and fix validation errors");
-      
+
       // Scroll to the first element with an error
       setTimeout(() => {
         const firstErrorKey = Object.keys(errors)[0];
@@ -509,7 +510,7 @@ export default function SubmitPerformancePage() {
 
     try {
       const payload = new FormData();
-      
+
       // Get admin_id from sessionStorage key "adminDetails"
       if (typeof window !== "undefined") {
         const adminDetailsStr = sessionStorage.getItem("adminDetails");
@@ -542,7 +543,7 @@ export default function SubmitPerformancePage() {
       payload.append("wind", formData.wind || "");
       payload.append("video_link", formData.video_link || "");
       payload.append("aditional_notes", formData.aditional_notes || "");
-      
+
       if (evidenceFile) {
         payload.append("upload_avidence", evidenceFile);
       }
@@ -551,7 +552,7 @@ export default function SubmitPerformancePage() {
 
       if (response && (response.status === 200 || response.status === true || response.success)) {
         toast.success("Performance result updated successfully!");
-        
+
         setFormData({
           sport: "",
           customSport: "",
@@ -588,6 +589,8 @@ export default function SubmitPerformancePage() {
     }
   };
 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -596,7 +599,7 @@ export default function SubmitPerformancePage() {
     } else {
       if (!validateForm()) {
         toast.error("Please fill in all required fields and fix validation errors");
-        
+
         // Scroll to the first element with an error
         setTimeout(() => {
           const firstErrorKey = Object.keys(errors)[0];
@@ -609,31 +612,52 @@ export default function SubmitPerformancePage() {
         return;
       }
 
-      setShowPaymentModal(true);
+      if(dbData.length >= 50){
+          setShowPaymentModal(true);
+      }
+      await submitFormData()
+    }
+  };
+
+  const copyAccessCode = async () => {
+    if (!submittedAccessCode) return;
+
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(submittedAccessCode);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = submittedAccessCode;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      toast.success("Access code copied to clipboard!");
+    } catch (error) {
+      console.error("Access code copy error:", error);
+      toast.error("Unable to copy access code.");
     }
   };
 
   const submitFormData = async (transactionId) => {
-    setLoading(true);
 
+    setLoading(true);
     try {
       const payload = new FormData();
-      
-      // Get admin_id from sessionStorage key "adminDetails"
-      if (typeof window !== "undefined") {
-        const adminDetailsStr = sessionStorage.getItem("adminDetails");
-        if (adminDetailsStr) {
-          try {
-            const adminDetails = JSON.parse(adminDetailsStr);
-            if (adminDetails && adminDetails.id) {
-              payload.append("admin_id", adminDetails.id);
-            }
-          } catch (e) {
-            console.error("Error parsing adminDetails:", e);
-          }
-        }
+      if (subAdmin == null) {
+        payload.append("admin_id", admin.id);
+        payload.append("user_id", admin.id);
+        payload.append("user_type", admin.user_type);
+      } else {
+        payload.append("admin_id", admin.id);
+        payload.append("user_id", subAdmin.id);
+        payload.append("user_type", subAdmin.user_type);
       }
-
       payload.append("sport", formData.sport === "Other" ? formData.customSport : formData.sport);
       payload.append("activity", formData.activity);
       payload.append("result", formData.result);
@@ -650,8 +674,11 @@ export default function SubmitPerformancePage() {
       payload.append("wind", formData.wind || "");
       payload.append("video_link", formData.video_link || "");
       payload.append("aditional_notes", formData.aditional_notes || "");
-      payload.append("paypal_subscription_id", transactionId);
-      
+
+      if (transactionId) {
+        payload.append("paypal_subscription_id", transactionId);
+      }
+
       if (evidenceFile) {
         payload.append("upload_avidence", evidenceFile);
       }
@@ -659,8 +686,24 @@ export default function SubmitPerformancePage() {
       const response = await postFormData(API_ENDPOINTS.SAVE_PERFORMANCE_RESULT, payload);
 
       if (response && (response.status === 200 || response.status === true || response.success)) {
+        const performanceResult =
+          response?.performance_result ||
+          response?.data?.performance_result ||
+          response?.data?.data?.performance_result ||
+          null;
+        const accessCode =
+          performanceResult?.submited_id ||
+          response?.submited_id ||
+          response?.data?.submited_id ||
+          "";
+
+        if (accessCode) {
+          setSubmittedAccessCode(String(accessCode));
+          setAccessCodeModalOpen(true);
+        }
+
         toast.success("Performance result submitted successfully!");
-        
+
         // Reset all form inputs to empty strings
         setFormData({
           sport: "",
@@ -1242,9 +1285,9 @@ export default function SubmitPerformancePage() {
                     <p className="text-xs text-muted-foreground font-semibold">Initializing PayPal Payment...</p>
                   </div>
                 )}
-                <div 
-                  id={`paypal-container-${process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`} 
-                  className="min-h-[150px] w-full transition-all duration-300" 
+                <div
+                  id={`paypal-container-${process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`}
+                  className="min-h-[150px] w-full transition-all duration-300"
                 />
 
                 <div className="flex flex-col items-center space-y-2 pt-2 border-t border-dashed border-border">
@@ -1260,16 +1303,81 @@ export default function SubmitPerformancePage() {
                     }}
                     className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
                   >
-                       Payment Success (Bypass)
+                    Payment Success (Bypass)
                   </button>
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-muted-foreground/60 font-medium">
                 <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 <span>Secured by PayPal • SSL Encrypted</span>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Submitted Access Code Dialog */}
+        <Dialog open={accessCodeModalOpen} onOpenChange={setAccessCodeModalOpen}>
+          <DialogContent className="w-[95vw] sm:max-w-md bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
+            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-emerald-500/10 via-primary/5 to-transparent flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
+                  <CheckCircle className="h-3.5 w-3.5" /> Submitted
+                </div>
+                <DialogTitle className="text-xl font-black text-foreground">
+                  Copy Access Code
+                </DialogTitle>
+              </div>
+              <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-300">
+                <Key className="h-5 w-5" />
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Keep this code safe. You will need it to find and update this performance result later.
+                </p>
+                <div className="flex items-center gap-3 rounded-2xl border border-border bg-muted/60 p-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Access Code
+                    </p>
+                    <p className="mt-1 break-all font-mono text-lg font-black text-foreground">
+                      {submittedAccessCode || "-"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={copyAccessCode}
+                    disabled={!submittedAccessCode}
+                    className="h-11 w-11 shrink-0 rounded-xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all cursor-pointer flex items-center justify-center shadow-md"
+                    title="Copy access code"
+                  >
+                    <Copy className="h-4.5 w-4.5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setAccessCodeModalOpen(false)}
+                  className="flex-1 py-3 px-4 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-sm transition-all cursor-pointer text-center"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={copyAccessCode}
+                  disabled={!submittedAccessCode}
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copy Code
+                </button>
               </div>
             </div>
           </DialogContent>
@@ -1289,7 +1397,7 @@ export default function SubmitPerformancePage() {
                 </DialogTitle>
               </div>
             </div>
-            
+
             <form onSubmit={handleLookupSubmission} className="p-6 space-y-6">
               <div className="space-y-2">
                 <label className="text-xs sm:text-sm font-semibold text-foreground/80">
