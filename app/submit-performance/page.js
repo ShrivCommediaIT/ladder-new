@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, HelpCircle, Key, ArrowLeft, UploadCloud, FileSpreadsheet, X, CheckCircle, AlertTriangle, RefreshCw } from "lucide-react";
+import { ShieldCheck, HelpCircle, Key, ArrowLeft, UploadCloud, FileSpreadsheet, X, CheckCircle, AlertTriangle, RefreshCw, Copy } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -94,6 +94,8 @@ export default function SubmitPerformancePage() {
   const [evidenceFile, setEvidenceFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [accessCodeModalOpen, setAccessCodeModalOpen] = useState(false);
+  const [submittedAccessCode, setSubmittedAccessCode] = useState("");
 
   // PayPal Payment Flow states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -617,6 +619,31 @@ useEffect(() => {
     }
   };
 
+  const copyAccessCode = async () => {
+    if (!submittedAccessCode) return;
+
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(submittedAccessCode);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = submittedAccessCode;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      toast.success("Access code copied to clipboard!");
+    } catch (error) {
+      console.error("Access code copy error:", error);
+      toast.error("Unable to copy access code.");
+    }
+  };
+
   const submitFormData = async (transactionId) => {
 
     setLoading(true);
@@ -659,6 +686,22 @@ useEffect(() => {
       const response = await postFormData(API_ENDPOINTS.SAVE_PERFORMANCE_RESULT, payload);
 
       if (response && (response.status === 200 || response.status === true || response.success)) {
+        const performanceResult =
+          response?.performance_result ||
+          response?.data?.performance_result ||
+          response?.data?.data?.performance_result ||
+          null;
+        const accessCode =
+          performanceResult?.submited_id ||
+          response?.submited_id ||
+          response?.data?.submited_id ||
+          "";
+
+        if (accessCode) {
+          setSubmittedAccessCode(String(accessCode));
+          setAccessCodeModalOpen(true);
+        }
+
         toast.success("Performance result submitted successfully!");
 
         // Reset all form inputs to empty strings
@@ -1270,6 +1313,71 @@ useEffect(() => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 <span>Secured by PayPal • SSL Encrypted</span>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Submitted Access Code Dialog */}
+        <Dialog open={accessCodeModalOpen} onOpenChange={setAccessCodeModalOpen}>
+          <DialogContent className="w-[95vw] sm:max-w-md bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
+            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-emerald-500/10 via-primary/5 to-transparent flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
+                  <CheckCircle className="h-3.5 w-3.5" /> Submitted
+                </div>
+                <DialogTitle className="text-xl font-black text-foreground">
+                  Copy Access Code
+                </DialogTitle>
+              </div>
+              <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-300">
+                <Key className="h-5 w-5" />
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Keep this code safe. You will need it to find and update this performance result later.
+                </p>
+                <div className="flex items-center gap-3 rounded-2xl border border-border bg-muted/60 p-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Access Code
+                    </p>
+                    <p className="mt-1 break-all font-mono text-lg font-black text-foreground">
+                      {submittedAccessCode || "-"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={copyAccessCode}
+                    disabled={!submittedAccessCode}
+                    className="h-11 w-11 shrink-0 rounded-xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all cursor-pointer flex items-center justify-center shadow-md"
+                    title="Copy access code"
+                  >
+                    <Copy className="h-4.5 w-4.5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setAccessCodeModalOpen(false)}
+                  className="flex-1 py-3 px-4 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-sm transition-all cursor-pointer text-center"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={copyAccessCode}
+                  disabled={!submittedAccessCode}
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copy Code
+                </button>
               </div>
             </div>
           </DialogContent>
