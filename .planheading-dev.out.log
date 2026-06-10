@@ -1,0 +1,15 @@
+
+> players@0.1.0 dev
+> next dev --turbopack --hostname 127.0.0.1 --port 3000
+
+   ▲ Next.js 15.5.12 (Turbopack)
+   - Local:        http://127.0.0.1:3000
+   - Network:      http://127.0.0.1:3000
+   - Environments: .env
+
+ ✓ Starting...
+Creating turbopack project { dir: 'C:\\Users\\SCMS-PC-06\\ladder-new', testMode: true }
+ ✓ Ready in 2.2s
+ ○ Compiling / ...
+ ✓ Compiled / in 7.4s
+ GET / 200 in 223ms
