@@ -228,8 +228,8 @@ export default function InfoSection({
                 onClick={handleCopy}
                 disabled={!inviteUrl}
                 className={`best-board-action-surface mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 ${copied
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                    : ""
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                  : ""
                   }`}
               >
                 <Copy className={`h-4 w-4 transition-transform duration-200 ${copied ? "scale-110" : ""}`} />
