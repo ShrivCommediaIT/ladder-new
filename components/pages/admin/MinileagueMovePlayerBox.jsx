@@ -85,9 +85,8 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
   };
 
   return (
-
-    <div className="max-w-sm max-h-[60vh] overflow-y-auto bg-gray-800 p-4 rounded-md">
-      <h2 className="text-center font-semibold mb-4 text-gray-300 text-base sm:text-lg">
+    <div className="max-w-sm max-h-[60vh] overflow-y-auto bg-[var(--best-board-surface)] border border-[var(--best-board-border)] p-5 rounded-xl shadow-xl">
+      <h2 className="text-center font-bold mb-4 text-[var(--best-board-text)] text-base sm:text-lg tracking-wide">
         Enter Minileague Move Details
       </h2>
 
@@ -96,11 +95,13 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
         <select
           value={moveFromSection}
           onChange={(e) => setMoveFromSection(e.target.value)}
-          className="flex-1 border rounded-md py-1 px-2 text-gray-300 bg-gray-800 text-sm"
+          className="w-full min-w-0 flex-1 border border-[var(--best-board-border)] rounded-lg py-2 px-3 text-sm text-[var(--best-board-text)] bg-[var(--best-board-surface-soft)] focus:outline-none focus:border-[var(--best-board-border-strong)] transition-all duration-200"
         >
-          <option value="">From Section</option>
+          <option className="bg-[var(--best-board-surface)] text-[var(--best-board-text)]" value="">
+            From Section
+          </option>
           {sectionOptions.map((sec, i) => (
-            <option key={i} value={sec.value}>
+            <option key={i} className="bg-[var(--best-board-surface)] text-[var(--best-board-text)]" value={sec.value}>
               {sec.label}
             </option>
           ))}
@@ -109,11 +110,13 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
         <select
           value={moveToSection}
           onChange={(e) => setMoveToSection(e.target.value)}
-          className="flex-1 border rounded-md py-2 px-2 text-sm text-gray-300 bg-gray-800"
+          className="w-full min-w-0 flex-1 border border-[var(--best-board-border)] rounded-lg py-2 px-3 text-sm text-[var(--best-board-text)] bg-[var(--best-board-surface-soft)] focus:outline-none focus:border-[var(--best-board-border-strong)] transition-all duration-200"
         >
-          <option value="">To Section</option>
+          <option className="bg-[var(--best-board-surface)] text-[var(--best-board-text)]" value="">
+            To Section
+          </option>
           {sectionOptions.map((sec, i) => (
-            <option key={i} value={sec.value}>
+            <option key={i} className="bg-[var(--best-board-surface)] text-[var(--best-board-text)]" value={sec.value}>
               {sec.label}
             </option>
           ))}
@@ -127,8 +130,10 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
           value={fromRank}
           placeholder="From Rank"
           onFocus={() => setActiveInput("from")}
-          className={`max-w-36 flex-1 border rounded-md text-center py-2 text-gray-300 text-base ${
-            activeInput === "from" ? "border-purple-300" : "border-gray-300"
+          className={`w-full min-w-0 flex-1 border rounded-lg text-center py-2.5 text-[var(--best-board-text)] bg-[var(--best-board-surface-soft)] placeholder:text-[var(--best-board-muted)] text-base font-semibold focus:outline-none transition-all duration-200 ${
+            activeInput === "from"
+              ? "border-[var(--best-board-border-strong)] ring-1 ring-[var(--best-board-border-strong)]"
+              : "border-[var(--best-board-border)]"
           }`}
         />
 
@@ -137,19 +142,21 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
           value={toRank}
           placeholder="To Rank"
           onFocus={() => setActiveInput("to")}
-          className={`max-w-36 flex-1 border rounded-md text-center py-2 text-gray-300 text-base ${
-            activeInput === "to" ? "border-purple-300" : "border-gray-300"
+          className={`w-full min-w-0 flex-1 border rounded-lg text-center py-2.5 text-[var(--best-board-text)] bg-[var(--best-board-surface-soft)] placeholder:text-[var(--best-board-muted)] text-base font-semibold focus:outline-none transition-all duration-200 ${
+            activeInput === "to"
+              ? "border-[var(--best-board-border-strong)] ring-1 ring-[var(--best-board-border-strong)]"
+              : "border-[var(--best-board-border)]"
           }`}
         />
       </div>
 
       {/* ✅ NUMBER PAD */}
-      <div className="grid grid-cols-3 gap-2 mb-4 ">
+      <div className="grid grid-cols-3 gap-2 mb-4">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((num) => (
           <button
             key={num}
             onClick={() => handleDigit(num.toString())}
-            className="py-3 bg-gray-300 rounded-md font-medium hover:bg-gray-200 text-base"
+            className="py-3 border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] hover:bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] rounded-xl font-bold transition-all duration-200 text-base shadow-sm active:scale-95"
           >
             {num}
           </button>
@@ -160,14 +167,14 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
       <div className="flex flex-col sm:flex-row gap-2">
         <button
           onClick={handleBackspace}
-          className="w-full py-2 bg-gray-300 rounded-md text-base"
+          className="w-full py-2.5 border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] hover:bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] rounded-xl font-bold transition-all duration-200 text-base shadow-sm active:scale-95"
         >
           ⬅ Backspace
         </button>
 
         <button
           onClick={onCancel}
-          className="w-full py-2 bg-red-500 text-white rounded-md text-base"
+          className="w-full py-2.5 bg-[var(--best-board-danger)] text-white hover:brightness-110 rounded-xl font-bold transition-all duration-200 text-base shadow-sm active:scale-95"
         >
           ✖ Cancel
         </button>
@@ -175,7 +182,7 @@ const MinileagueMovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
         <button
           onClick={handleMove}
           disabled={loading}
-          className="w-full py-2 bg-green-600 text-white rounded-md text-base disabled:opacity-60"
+          className="w-full py-2.5 bg-[var(--best-board-success)] text-white hover:brightness-110 rounded-xl font-bold transition-all duration-200 text-base shadow-sm active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
         >
           {loading ? "Moving..." : "✔ Move"}
         </button>

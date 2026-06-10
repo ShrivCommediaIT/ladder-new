@@ -369,7 +369,7 @@ const MinileaguePlayers = () => {
     },
     {
       id: "add-remove",
-      label: "Add / Move",
+      label: "Add / Remove / Move",
       icon: Plus,
       onClick: () => setAddRemoveOpen(true),
     },
