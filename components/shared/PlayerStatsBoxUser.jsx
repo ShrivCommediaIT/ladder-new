@@ -119,7 +119,7 @@ export default function PlayerStatsBoxUser({ userId, ladderId }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="rounded-xl overflow-hidden border border-gray-700 shadow-inner bg-black/30"
+            className="rounded-xl overflow-x-auto border border-gray-700 shadow-inner bg-black/30 w-full"
           >
             <Table className="w-full text-xs sm:text-sm md:text-base">
               <TableHeader className="bg-gradient-to-r from-gray-800 to-gray-900">

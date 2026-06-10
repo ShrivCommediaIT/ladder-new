@@ -217,7 +217,7 @@ export default function PlanHeading() {
       { label: "SSP Talent Board", href: "#talent-board" },
       { label: "Features", href: "#features" },
       { label: "Pricing", href: "#pricing" },
-      { label: "Clubs", href: "#clubs" },
+      { label: "Clubs/Coaches", href: "#clubs" },
       { label: "Contact", href: "#contact" },
     ],
     [],

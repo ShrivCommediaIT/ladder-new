@@ -61,8 +61,8 @@ const PlayerInfo = () => {
 
   const filteredPlayers = searchQuery
     ? playerList.filter((player) =>
-        player.name?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      player.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : playerList;
 
   const uniqueFilteredPlayers = Array.from(
@@ -174,17 +174,15 @@ const PlayerInfo = () => {
                             setIsOpen(true);
                           }}
                           className={`flex flex-col gap-2 items-center rounded-md shadow-md py-3 px-4 transition-all
-                            ${
-                              player.player_status === 1
-                                ? "bg-green-300"
-                                : isActive
+                            ${player.player_status === 1
+                              ? "bg-green-300"
+                              : isActive
                                 ? "bg-yellow-300"
                                 : "bg-blue-100 dark:bg-gray-800"
                             }
-                            ${
-                              isAllowed && canEdit
-                                ? "cursor-pointer hover:scale-[1.01]"
-                                : "cursor-not-allowed opacity-50"
+                            ${isAllowed && canEdit
+                              ? "cursor-pointer hover:scale-[1.01]"
+                              : "cursor-not-allowed opacity-50"
                             }`}
                         >
                           <div className="flex items-center w-full gap-3">

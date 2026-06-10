@@ -57,7 +57,12 @@ export const EditPlayer = ({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = JSON.parse(sessionStorage.getItem("user") || "null");
+      const storedUser = JSON.parse(
+        sessionStorage.getItem("user") ||
+        sessionStorage.getItem("userData") ||
+        sessionStorage.getItem("subAdmin") ||
+        "null"
+      );
       setLocalUser(storedUser);
     }
   }, []);
@@ -170,8 +175,8 @@ export const EditPlayer = ({
     }
     // For userLevel (normal player views)
     if (isSelf) {
-      // Self: Can view Stats, Edit info, and Upload Avatar
-      return allTabs.filter((t) => t.value === "stats" || t.value === "edit" || t.value === "load");
+      // Self: Can view Result, Challenge, Stats, Edit, and Upload Avatar
+      return allTabs;
     } else {
       // Other player: Can view Stats and Challenge them
       return allTabs.filter((t) => t.value === "stats" || t.value === "challenge");
@@ -201,7 +206,7 @@ export const EditPlayer = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[480px] mx-auto bg-white text-slate-900 border border-slate-200 dark:bg-slate-950 dark:text-white dark:border-slate-800 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[95vw] sm:max-w-[540px] md:max-w-[720px] lg:max-w-[900px] mx-auto bg-white text-slate-900 border border-slate-200 dark:bg-slate-950 dark:text-white dark:border-slate-800 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
         <DialogTitle>
           <VisuallyHidden>Edit Player</VisuallyHidden>
         </DialogTitle>
