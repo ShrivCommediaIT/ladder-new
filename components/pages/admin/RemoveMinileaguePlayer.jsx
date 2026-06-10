@@ -85,18 +85,20 @@ const RemoveMinileaguePlayer = ({ onClose, onSuccessRefresh }) => {
       animate="visible"
       variants={fadeIn}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-md mx-auto p-6 rounded-2xl shadow-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950 border border-gray-700"
+      className="w-full max-w-md mx-auto p-6 rounded-2xl shadow-2xl bg-[var(--best-board-surface)] border border-[var(--best-board-border)] text-[var(--best-board-text)]"
     >
-      <h2 className="text-xl font-bold text-white mb-4">Remove Player from Minileague</h2>
+      <h2 className="text-xl font-bold text-[var(--best-board-text)] mb-4">Remove Player from Minileague</h2>
 
       <select
         value={selectedSection}
         onChange={(e) => setSelectedSection(e.target.value)}
-        className="mb-4 w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+        className="mb-4 w-full min-w-0 px-3 py-2 rounded-lg bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] text-[var(--best-board-text)] focus:outline-none focus:border-[var(--best-board-border-strong)] focus:ring-1 focus:ring-[var(--best-board-border-strong)] transition-all duration-200"
       >
-        <option value="">Select Section</option>
+        <option className="bg-[var(--best-board-surface)] text-[var(--best-board-text)]" value="">
+          Select Section
+        </option>
         {miniLeagueSections.map((sec) => (
-          <option key={sec.section} value={sec.section}>
+          <option key={sec.section} className="bg-[var(--best-board-surface)] text-[var(--best-board-text)]" value={sec.section}>
             {sec.section}
           </option>
         ))}
@@ -107,33 +109,33 @@ const RemoveMinileaguePlayer = ({ onClose, onSuccessRefresh }) => {
         value={rank}
         onChange={(e) => setRank(Number(e.target.value))}
         placeholder="Enter rank to remove"
-        className="mb-4 bg-gray-800 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"
+        className="mb-4 w-full min-w-0 bg-[var(--best-board-surface-soft)] text-[var(--best-board-text)] border border-[var(--best-board-border)] rounded-lg focus-visible:ring-[var(--best-board-border-strong)] focus-visible:border-[var(--best-board-border-strong)] placeholder:text-[var(--best-board-muted)] transition-all duration-200"
       />
 
       {/* Confirm Remove Button */}
       <AlertDialog open={openConfirm} onOpenChange={setOpenConfirm}>
         <button
           onClick={() => setOpenConfirm(true)}
-          className="w-full py-2 rounded-lg bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold hover:scale-105 transition-transform"
+          className="w-full py-2.5 rounded-xl bg-[var(--best-board-danger)] text-white font-semibold hover:brightness-110 shadow-sm active:scale-95 transition-all duration-200"
         >
           Remove Player
         </button>
 
-        <AlertDialogContent className="bg-gray-900 border border-gray-700 rounded-2xl shadow-xl text-white">
+        <AlertDialogContent className="bg-[var(--best-board-surface)] border border-[var(--best-board-border)] rounded-2xl shadow-xl text-[var(--best-board-text)]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-lg font-bold">Confirm Removal</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-300">
+            <AlertDialogTitle className="text-lg font-bold text-[var(--best-board-text)]">Confirm Removal</AlertDialogTitle>
+            <AlertDialogDescription className="text-[var(--best-board-muted)]">
               This action cannot be undone. The player will be removed permanently.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex justify-end gap-2 mt-4">
-            <AlertDialogCancel disabled={isLoading} className="px-4 py-2 rounded-lg border border-gray-600 hover:bg-gray-300 text-black transition">
+            <AlertDialogCancel disabled={isLoading} className="px-4 py-2 rounded-lg border border-[var(--best-board-border)] hover:bg-[var(--best-board-surface-soft)] text-[var(--best-board-text)] transition bg-transparent">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRemove}
               disabled={isLoading}
-              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition"
+              className="px-4 py-2 rounded-lg bg-[var(--best-board-danger)] text-white hover:brightness-110 transition"
             >
               {isLoading ? "Removing..." : "Confirm Remove"}
             </AlertDialogAction>
@@ -143,15 +145,15 @@ const RemoveMinileaguePlayer = ({ onClose, onSuccessRefresh }) => {
 
       {/* Global Alert for Success/Error */}
       <AlertDialog open={alertInfo.open} onOpenChange={() => setAlertInfo({ ...alertInfo, open: false })}>
-        <AlertDialogContent className={`bg-gray-800 border rounded-2xl ${alertInfo.type === "error" ? "border-red-600" : "border-green-600"} shadow-lg`}>
+        <AlertDialogContent className={`bg-[var(--best-board-surface)] border rounded-2xl ${alertInfo.type === "error" ? "border-[var(--best-board-danger)]" : "border-[var(--best-board-success)]"} shadow-lg text-[var(--best-board-text)]`}>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-lg text-white font-bold">{alertInfo.title}</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-300">{alertInfo.description}</AlertDialogDescription>
+            <AlertDialogTitle className="text-lg text-[var(--best-board-text)] font-bold">{alertInfo.title}</AlertDialogTitle>
+            <AlertDialogDescription className="text-[var(--best-board-muted)]">{alertInfo.description}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4">
             <AlertDialogAction
               onClick={() => setAlertInfo({ ...alertInfo, open: false })}
-              className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition"
+              className="px-4 py-2 rounded-lg bg-[var(--best-board-accent)] text-white hover:brightness-110 transition"
             >
               OK
             </AlertDialogAction>

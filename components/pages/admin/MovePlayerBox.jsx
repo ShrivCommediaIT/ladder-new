@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import MinileagueMovePlayerBox from "./MinileagueMovePlayerBox";
 import Best5MovePlayerBox from "./Best5MovePlayerBox";
 
-const MovePlayerBox = ({ onSuccessRefresh }) => {
+const MovePlayerBox = ({ onCancel, onSuccessRefresh }) => {
 
   const [open, setOpen] = useState(true);
 
@@ -33,7 +33,7 @@ const MovePlayerBox = ({ onSuccessRefresh }) => {
   /* ========== RENDER ACCORDING TO TYPE ========== */
 
   if (ladderType === "minileague") {
-    return <MinileagueMovePlayerBox onSuccessRefresh={onSuccessRefresh} />;
+    return <MinileagueMovePlayerBox onCancel={onCancel} onSuccessRefresh={onSuccessRefresh} />;
   }
 
   // best5 + winlose + best3 => Best5MovePlayerBox

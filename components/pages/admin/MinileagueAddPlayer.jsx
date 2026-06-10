@@ -141,13 +141,13 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
 
   if (loading) {
     return (
-      <div className="space-y-4 p-4 w-full max-w-sm">
-        <Skeleton className="h-24 w-full rounded-xl" />
-        <Skeleton className="h-10 w-full rounded-md" />
-        <Skeleton className="h-10 w-full rounded-md" />
-        <Skeleton className="h-10 w-full rounded-md" />
-        <Skeleton className="h-10 w-full rounded-md" />
-        <Skeleton className="h-10 w-[40%] rounded-md" />
+      <div className="space-y-4 p-4 w-full max-w-sm bg-[var(--best-board-surface)] border border-[var(--best-board-border)] rounded-2xl shadow-xl">
+        <Skeleton className="h-24 w-full rounded-xl bg-[var(--best-board-surface-soft)]/50" />
+        <Skeleton className="h-10 w-full rounded-md bg-[var(--best-board-surface-soft)]/50" />
+        <Skeleton className="h-10 w-full rounded-md bg-[var(--best-board-surface-soft)]/50" />
+        <Skeleton className="h-10 w-full rounded-md bg-[var(--best-board-surface-soft)]/50" />
+        <Skeleton className="h-10 w-full rounded-md bg-[var(--best-board-surface-soft)]/50" />
+        <Skeleton className="h-10 w-[40%] rounded-md bg-[var(--best-board-surface-soft)]/50" />
       </div>
     );
   }
@@ -159,21 +159,21 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
           className="
             max-w-sm w-full mx-auto
             rounded-2xl
-            border border-white/10
-            bg-gradient-to-br from-slate-900/80 via-slate-900/60 to-slate-950/80
-            shadow-[0_0_40px_rgba(15,23,42,0.8)]
+            border border-[var(--best-board-border)]
+            bg-[var(--best-board-surface)]
+            shadow-2xl
             backdrop-blur-xl
             p-5
-            text-slate-100
+            text-[var(--best-board-text)]
             max-h-[80vh]
             overflow-auto
             scrollbar-thin
           "
         >
           {/* Header */}
-          <div className="flex items-center justify-center mb-3 sticky top-0 backdrop-blur-md pb-2">
+          <div className="flex items-center justify-center mb-3 sticky top-0 bg-[var(--best-board-surface)]/95 backdrop-blur-md pb-2 z-10 border-b border-[var(--best-board-border)]">
             <div>
-              <h2 className="text-lg font-semibold text-center tracking-tight">
+              <h2 className="text-lg font-bold text-center tracking-tight text-[var(--best-board-text)]">
                 Add Player
               </h2>
             </div>
@@ -182,7 +182,7 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
           {/* Profile Upload */}
           <div className="flex items-center gap-4 pt-1">
             <div className="relative flex-shrink-0">
-              <div className="h-14 w-14 rounded-full border border-slate-700 bg-slate-900/80 overflow-hidden shadow-lg">
+              <div className="h-14 w-14 rounded-full border border-[var(--best-board-border-strong)] bg-[var(--best-board-surface-soft)] overflow-hidden shadow-lg">
                 <Image
                   src={profileImage || "/logo.jpg"}
                   alt="Profile"
@@ -191,13 +191,13 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <label className="absolute -bottom-1 -right-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-xs hover:bg-slate-800 cursor-pointer">
-                <span className="text-slate-200">✚</span>
+              <label className="absolute -bottom-1 -right-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[var(--best-board-border-strong)] bg-[var(--best-board-surface)] text-xs hover:bg-[var(--best-board-surface-soft)] cursor-pointer">
+                <span className="text-[var(--best-board-text)]">✚</span>
                 <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
               </label>
             </div>
-            <div className="text-xs text-slate-400">
-              <p className="font-medium text-slate-300">Player avatar (optional)</p>
+            <div className="text-xs text-[var(--best-board-muted)]">
+              <p className="font-medium text-[var(--best-board-text)]">Player avatar (optional)</p>
               <p>PNG, JPG up to 2MB.</p>
             </div>
           </div>
@@ -205,12 +205,12 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
           {/* Form Fields */}
           <div className="space-y-3 pt-3">
             <div className="space-y-1.5">
-              <Label className="flex items-center gap-1 text-xs text-slate-300">
-                <span className="text-red-500">*</span>
+              <Label className="flex items-center gap-1 text-xs text-[var(--best-board-muted)]">
+                <span className="text-[var(--best-board-danger)]">*</span>
                 Name
               </Label>
               <Input
-                className="h-10 bg-slate-900/60 border-slate-700/80 focus-visible:ring-slate-500 text-sm placeholder:text-slate-500"
+                className="h-10 bg-[var(--best-board-surface-soft)] border-[var(--best-board-border)] focus-visible:ring-[var(--best-board-border-strong)] focus-visible:border-[var(--best-board-border-strong)] text-[var(--best-board-text)] placeholder:text-[var(--best-board-muted)] text-sm"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter player name"
@@ -221,11 +221,11 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
             {/* ✅ EMAIL INPUT REMOVED FROM UI */}
 
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-300">Phone (Optional)</Label>
+              <Label className="text-xs text-[var(--best-board-muted)]">Phone (Optional)</Label>
               <Input
                 type="tel"
                 maxLength={11}
-                className="h-10 bg-slate-900/60 border-slate-700/80 focus-visible:ring-slate-500 text-sm placeholder:text-slate-500"
+                className="h-10 bg-[var(--best-board-surface-soft)] border-[var(--best-board-border)] focus-visible:ring-[var(--best-board-border-strong)] focus-visible:border-[var(--best-board-border-strong)] text-[var(--best-board-text)] placeholder:text-[var(--best-board-muted)] text-sm"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
                 placeholder="Enter 11 digit phone number (Optional)"
@@ -233,31 +233,31 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="flex items-center gap-1 text-xs text-slate-300">
-                <span className="text-red-500">*</span>
+              <Label className="flex items-center gap-1 text-xs text-[var(--best-board-muted)]">
+                <span className="text-[var(--best-board-danger)]">*</span>
                 Section
               </Label>
               <select
-                className="w-full h-10 rounded-md border border-slate-700/80 bg-slate-900/60 text-sm text-slate-100 px-2.5 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                className="w-full h-10 rounded-lg border border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)] text-sm text-[var(--best-board-text)] px-2.5 focus:outline-none focus:border-[var(--best-board-border-strong)] focus:ring-1 focus:ring-[var(--best-board-border-strong)] transition-all duration-200"
                 value={selectedSection}
                 onChange={(e) => setSelectedSection(e.target.value)}
                 required
               >
-                <option className="bg-slate-900" value="">Select section</option>
+                <option className="bg-[var(--best-board-surface)] text-[var(--best-board-text)]" value="">Select section</option>
                 {miniLeagueSections.map((sec, idx) => (
-                  <option key={idx} value={sec.section} className="bg-slate-900">{sec.section}</option>
+                  <option key={idx} value={sec.section} className="bg-[var(--best-board-surface)] text-[var(--best-board-text)]">{sec.section}</option>
                 ))}
               </select>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="flex items-center gap-1 text-xs text-slate-300">
-                <span className="text-red-500">*</span>
+              <Label className="flex items-center gap-1 text-xs text-[var(--best-board-muted)]">
+                <span className="text-[var(--best-board-danger)]">*</span>
                 Position
               </Label>
               <Input
                 type="number"
-                className="h-10 bg-slate-900/60 border-slate-700/80 focus-visible:ring-slate-500 text-sm placeholder:text-slate-500"
+                className="h-10 bg-[var(--best-board-surface-soft)] border-[var(--best-board-border)] focus-visible:ring-[var(--best-board-border-strong)] focus-visible:border-[var(--best-board-border-strong)] text-[var(--best-board-text)] placeholder:text-[var(--best-board-muted)] text-sm"
                 value={rank}
                 onChange={(e) => setRank(e.target.value)}
                 placeholder="Enter ladder position"
@@ -267,15 +267,15 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
 
             {/* GENDER */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-300 font-semibold">Gender</Label>
+              <Label className="text-xs text-[var(--best-board-muted)] font-semibold">Gender</Label>
               <Select
                 value={gender}
                 onValueChange={setGender}
               >
-                <SelectTrigger className="bg-slate-900/60 border-slate-700/80 text-white w-full h-10">
+                <SelectTrigger className="bg-[var(--best-board-surface-soft)] border-[var(--best-board-border)] text-[var(--best-board-text)] w-full h-10 focus:ring-1 focus:ring-[var(--best-board-border-strong)] focus:border-[var(--best-board-border-strong)]">
                   <SelectValue placeholder="Select Gender" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                <SelectContent className="bg-[var(--best-board-surface)] border-[var(--best-board-border)] text-[var(--best-board-text)] shadow-lg z-50">
                   <SelectItem value="male">Male</SelectItem>
                   <SelectItem value="female">Female</SelectItem>
                 </SelectContent>
@@ -284,17 +284,17 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
 
             {/* COUNTRY */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-300 font-semibold">Country</Label>
+              <Label className="text-xs text-[var(--best-board-muted)] font-semibold">Country</Label>
               <CountrySelect
                 value={country}
                 onValueChange={setCountry}
-                className="bg-slate-900/60 border-slate-700/80 text-white w-full h-10"
+                className="bg-[var(--best-board-surface-soft)] border-[var(--best-board-border)] text-[var(--best-board-text)] w-full h-10 focus:ring-1 focus:ring-[var(--best-board-border-strong)] focus:border-[var(--best-board-border-strong)]"
               />
             </div>
 
             {/* DOB PICKER */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-300 font-semibold">
+              <Label className="text-xs text-[var(--best-board-muted)] font-semibold">
                 Date of Birth
               </Label>
 
@@ -302,20 +302,20 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
                 id="dob"
                 value={dob}
                 onChange={setDob}
-                className="bg-slate-900/60 border-slate-700/80 text-white h-10"
+                className="bg-[var(--best-board-surface-soft)] border-[var(--best-board-border)] text-[var(--best-board-text)] w-full h-10 focus:ring-1 focus:ring-[var(--best-board-border-strong)] focus:border-[var(--best-board-border-strong)]"
               />
             </div>
           </div>
 
           {/* Footer actions */}
           <div className="flex items-center justify-between pt-4">
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-              <span className="text-red-500 text-base leading-none">*</span>
+            <div className="flex items-center gap-1.5 text-[11px] text-[var(--best-board-muted)]">
+              <span className="text-[var(--best-board-danger)] text-base leading-none">*</span>
               <span>Required fields</span>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" className="h-9 text-xs text-gray-900" onClick={onClose}>Cancel</Button>
-              <Button onClick={handleSubmit} disabled={submitting} className="h-9 bg-emerald-500 hover:bg-emerald-600 text-xs font-semibold text-slate-950 px-4">
+              <Button variant="outline" className="h-9 text-xs text-[var(--best-board-text)] border-[var(--best-board-border)] hover:bg-[var(--best-board-surface-soft)]" onClick={onClose}>Cancel</Button>
+              <Button onClick={handleSubmit} disabled={submitting} className="h-9 bg-[var(--best-board-success)] hover:bg-[var(--best-board-success)]/90 text-xs font-semibold text-white px-4 hover:brightness-110 rounded-lg transition-all">
                 {submitting ? "Adding..." : "Add Player"}
               </Button>
             </div>
@@ -325,13 +325,13 @@ export default function MinileagueAddPlayer({ onClose, onSuccessRefresh }) {
 
       {/* Confirmation Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-slate-900 border-slate-700 text-slate-100 w-full max-w-[calc(100%-2rem)] sm:max-w-md">
+        <DialogContent className="bg-[var(--best-board-surface)] border border-[var(--best-board-border)] text-[var(--best-board-text)] w-full max-w-[calc(100%-2rem)] sm:max-w-md shadow-2xl rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="text-slate-100">Player Added</DialogTitle>
+            <DialogTitle className="text-[var(--best-board-text)] font-bold">Player Added</DialogTitle>
           </DialogHeader>
-          <p className="font-medium text-sm text-center py-2 text-slate-200">{welcomeMsg}</p>
+          <p className="font-medium text-sm text-center py-2 text-[var(--best-board-text)]">{welcomeMsg}</p>
           <DialogFooter>
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 w-full sm:w-auto" onClick={() => { setShowDialog(false); onClose(); }}>
+            <Button className="bg-[var(--best-board-success)] text-white hover:brightness-110 w-full sm:w-auto rounded-lg" onClick={() => { setShowDialog(false); onClose(); }}>
               OK
             </Button>
           </DialogFooter>
