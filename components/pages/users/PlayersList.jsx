@@ -32,6 +32,8 @@ import AgeFilter from "@/components/shared/AgeFilter";
 
 
 
+import { Funnel } from "lucide-react";
+
 export default function PlayersList({ ladderId: propLadderId, ladderType: propLadderType, onActionsChanged }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -52,8 +54,9 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       if (storedUser) {
         try {
           const parsed = JSON.parse(storedUser);
-          if (parsed && parsed.id) {
-            setCurrentUserId(Number(parsed.id));
+          const uid = parsed?.id || parsed?.user_id;
+          if (uid) {
+            setCurrentUserId(Number(uid));
           }
         } catch (err) {
           console.error("Failed to parse user from session", err);
@@ -62,7 +65,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
     }
   }, []);
 
-  const loggedInUserId = reduxUser?.id ? Number(reduxUser.id) : currentUserId;
+  const loggedInUserId = reduxUser?.id || reduxUser?.user_id ? Number(reduxUser.id || reduxUser.user_id) : currentUserId;
 
   /* ------------------ REDUX ------------------ */
 
@@ -101,10 +104,26 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
     dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
   }, [dispatch]);
 
+  const handleClearFilters = useCallback(() => {
+    setSearchTerm("");
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+    setResetSignal((p) => p + 1);
+  }, [dispatch]);
+
   useEffect(() => {
     if (onActionsChanged) {
       const actions = [];
       
+      if (appliedAge > 0 || Boolean(appliedGender)) {
+        actions.push({
+          id: "clear-all-filters",
+          label: "Clear All Filters",
+          icon: Funnel,
+          onClick: handleClearFilters,
+          tone: "danger",
+        });
+      }
+
       actions.push({
         id: "age-filter",
         node: (
@@ -122,7 +141,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
 
       onActionsChanged(actions);
     }
-  }, [resetSignal, onActionsChanged, dispatch, appliedAge, appliedGender]);
+  }, [resetSignal, onActionsChanged, dispatch, appliedAge, appliedGender, handleClearFilters]);
 
   const currentUser = players.find(
     (p) =>
@@ -213,8 +232,14 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       String(loggedInUserId) === String(player.id) ||
       (player.user_id && String(loggedInUserId) === String(player.user_id));
 
+    if (!isCurrentUser) {
+      setDialogMessage("You cannot view or edit other players' control panels. You can only manage your own card.");
+      setIsDialogOpen(true);
+      return;
+    }
+
     setSelectedPlayerId(player.id);
-    setInitialTab(isCurrentUser ? null : "stats");
+    setInitialTab(null);
     setIsModalOpen(true);
   };
 
@@ -351,7 +376,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                       </div>
 
                       {/* Challenge Button */}
-                      {!isCurrentUser && (
+                      {loggedInUserId && isCurrentUser && (
                         <div className="flex items-center shrink-0">
                           <button
                             type="button"

@@ -383,22 +383,22 @@ const MoveNumberInput = ({
       </div>
 
 
-      <div className="flex gap-3">
-        <Button onClick={handleBackspace} className="flex-1 bg-gray-700">
-          <ArrowLeft />Back
+      <div className="flex gap-2 sm:gap-3">
+        <Button onClick={handleBackspace} className="flex-1 bg-gray-700 px-2 sm:px-4 text-xs sm:text-sm">
+          <ArrowLeft className="h-4 w-4 mr-1 inline" />Back
         </Button>
-        <Button variant="destructive" onClick={onClose} className="flex-1">
-          <X />Cancel
+        <Button variant="destructive" onClick={onClose} className="flex-1 px-2 sm:px-4 text-xs sm:text-sm">
+          <X className="h-4 w-4 mr-1 inline" />Cancel
         </Button>
         <Button
           onClick={handleEnter}
           disabled={!isFormValid}
-          className={`flex-1 text-white ${isFormValid
+          className={`flex-1 text-white px-2 sm:px-4 text-xs sm:text-sm ${isFormValid
               ? "bg-green-500 hover:bg-green-600"
               : "bg-gray-600 cursor-not-allowed"
             }`}
         >
-          <CheckCircle />POST 
+          <CheckCircle className="h-4 w-4 mr-1 inline" />POST 
         </Button>
       </div>
 

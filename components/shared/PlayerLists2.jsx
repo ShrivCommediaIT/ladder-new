@@ -63,8 +63,8 @@ const PlayerLists2 = () => {
 
   const filteredPlayers = searchQuery
     ? playerList.filter((player) =>
-        player.name?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      player.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : playerList;
 
   const uniqueFilteredPlayers = Array.from(
@@ -146,9 +146,8 @@ const PlayerLists2 = () => {
                     const isAllowed = isSubscribed || index < 10;
 
                     const playerImageUrl = player.image
-                      ? `${IMAGE_BASE_URL}/${
-                          player.image
-                        }?t=${Date.now()}`
+                      ? `${IMAGE_BASE_URL}/${player.image
+                      }?t=${Date.now()}`
                       : Logo;
 
                     return (
@@ -180,17 +179,15 @@ const PlayerLists2 = () => {
                             setIsOpen(true);
                           }}
                           className={`flex flex-col gap-2 items-center rounded-md shadow-md py-3 px-4 transition-all
-                            ${
-                              player.player_status === 1
-                                ? "bg-green-300"
-                                : isActive
+                            ${player.player_status === 1
+                              ? "bg-green-300"
+                              : isActive
                                 ? "bg-yellow-300"
                                 : "bg-blue-100 dark:bg-gray-800"
                             }
-                            ${
-                              isAllowed && canEdit
-                                ? "cursor-pointer hover:scale-[1.01]"
-                                : "cursor-not-allowed opacity-40 grayscale"
+                            ${isAllowed && canEdit
+                              ? "cursor-pointer hover:scale-[1.01]"
+                              : "cursor-not-allowed opacity-40 grayscale"
                             }`}
                         >
                           <div className="flex items-center w-full gap-3">
@@ -205,15 +202,15 @@ const PlayerLists2 = () => {
                               alt={`Player ${player.name}`}
                             />
                             <div className="flex flex-col flex-1 min-w-0">
-                               <div className="flex justify-between items-center w-full">
-                                  <p
-                                    className="text-sm font-semibold truncate text-gray-900"
-                                    title={player.name}
-                                  >
-                                    {player.name}
-                                  </p>
-                                  <PlayerStatusToggle player={player} user={user} />
-                               </div>
+                              <div className="flex justify-between items-center w-full">
+                                <p
+                                  className="text-sm font-semibold truncate text-gray-900"
+                                  title={player.name}
+                                >
+                                  {player.name}
+                                </p>
+                                <PlayerStatusToggle player={player} user={user} />
+                              </div>
                               <p
                                 className="text-xs text-gray-600 truncate"
                                 title={player.phone}

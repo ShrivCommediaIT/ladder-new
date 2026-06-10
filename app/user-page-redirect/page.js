@@ -154,7 +154,7 @@ function UserPageRedirectRouter() {
       );
     }
 
-    if ( isNegative) {
+    if (isNegative) {
       return (
         <NegativeLeaderboardUser
           ladderId={ladderId}

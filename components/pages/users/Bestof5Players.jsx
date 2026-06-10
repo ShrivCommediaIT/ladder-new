@@ -1,6 +1,11 @@
 "use client";
 import PlayerRankBadge from "@/components/shared/PlayerRankBadge";
 import { IMAGE_BASE_URL } from "@/constants/api";
+import {
+  PLAYER_COLOR_CLASSES,
+  getPlayerInitials,
+  getPhoneText,
+} from "@/components/shared/ladderUtils";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -42,7 +47,7 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
-          if (parsed && parsed.id) {
+          if (parsed && (parsed.id || parsed.user_id)) {
             setCurrentUser(parsed);
           }
         } catch (e) {
@@ -52,7 +57,8 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
     }
   }, []);
 
-  const user = reduxUser?.id ? reduxUser : currentUser;
+  const user = reduxUser?.id || reduxUser?.user_id ? reduxUser : currentUser;
+  const loggedInUserId = user?.id || user?.user_id || null;
   const loggedInUser = user; // for toggle context
 
   // ✅ redux data
@@ -71,11 +77,13 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
 
   const ladderType = ladderTypeFromParams || ladderDetails?.type;
 
+  const [cacheBuster, setCacheBuster] = useState(Date.now());
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+  const [initialTab, setInitialTab] = useState("stats");
   const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.player || {});
 
   const hasFiltersApplied =
@@ -136,7 +144,30 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
       return;
     }
 
+    const isCurrentUser =
+      String(user?.id) === String(player.id) ||
+      (player.user_id && String(user?.id) === String(player.user_id));
+
+    if (!isCurrentUser) {
+      setDialogMessage("You cannot view or edit other players' control panels. You can only manage your own card.");
+      setIsDialogOpen(true);
+      return;
+    }
+
     setSelectedPlayerId(player.id);
+    setInitialTab(null);
+    setIsModalOpen(true);
+  };
+
+  const handleChallengeClick = (player) => {
+    if (!user?.id) {
+      setDialogMessage("Please login first");
+      setIsDialogOpen(true);
+      return;
+    }
+
+    setSelectedPlayerId(player.id);
+    setInitialTab("challenge");
     setIsModalOpen(true);
   };
 
@@ -183,66 +214,93 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
 
           <div className="space-y-3">
             {grade.players.map((player, pidx) => {
-              const isAdmin = user?.user_type?.toLowerCase() === "admin";
-              const isCurrentUser = String(user?.id) === String(player.id);
-              const canEdit = isAdmin || isCurrentUser;
-
+              const rank = player.rank || gradeIndex * Number(preset) + pidx + 1;
               const playerImageUrl = player.image
-                ? `${IMAGE_BASE_URL}/${player.image}`
-                : "/logo.jpg";
+                ? `${IMAGE_BASE_URL}/${player.image}?t=${cacheBuster}`
+                : null;
+
+              const isCurrentUser =
+                loggedInUserId &&
+                (String(loggedInUserId) === String(player.id) ||
+                 (player.user_id && String(loggedInUserId) === String(player.user_id)));
 
               return (
                 <motion.div
-                  key={player.id || pidx}
+                  key={`${player.id}-${cacheBuster}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  onClick={() => handlePlayerClick(player)}
-                  className="flex items-center justify-between px-2 py-2 mb-3 rounded-lg shadow transition-all relative cursor-pointer hover:bg-[#143238]"
-                  style={{
-                    background: "#223848",
-                    border: "2px solid #4eb0a2",
-                  }}
+                  transition={{ duration: 0.3, delay: pidx * 0.03 }}
                 >
                   <div
-                    className="flex justify-between items-center px-4 py-2"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={() => handlePlayerClick(player)}
+                    className="group flex flex-col rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] transition hover:border-[var(--best-board-border-strong)] cursor-pointer overflow-hidden"
                   >
-                    <PlayerStatusToggle player={player} user={true} />
-                  </div>
-                  <div className="flex-1 min-w-0 p-3 group">
-                    <div className="flex w-full items-center mb-2">
-                      <PlayerRankBadge rank={player.rank || (gradeIndex * (Number(preset) || 7) + pidx + 1)} />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white flex items-center gap-2 text-sm sm:text-base font-semibold truncate">
-                          {player?.name || "N/A"}
-                          {player.age !== null && player.age !== undefined && player.age !== "" && (
-                            <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-8">
-                              {player.age}
-                            </p>
-                          )}
-                          {player.gender && (
-                            <p className="text-white border border-white px-2 py-0.5 text-xs font-semibold rounded shrink-0 w-fit ml-1">
-                              {player.gender == "male" ? "M" : "F"}
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-[#d4e5e8] text-xs truncate">
-                          {player?.phone || "N/A"}
-                        </div>
+                    {/* ── TOP STRIP ── */}
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-between px-4 py-1.5 gap-2 border-b border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
+                    >
+                      {/* Active Toggle Button (PlayerStatusToggle) */}
+                      <PlayerStatusToggle player={player} user={true} />
+
+                      {/* Age and Gender Badges */}
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {player?.age ? (
+                          <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]">
+                            Age : {player.age}
+                          </span>
+                        ) : null}
+                        {player?.gender !== undefined && player?.gender !== null && player?.gender !== "" ? (
+                          <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]">
+                            Gender: {player.gender === "male" || player.gender === "Male" ? "M" : "F"}
+                          </span>
+                        ) : null}
                       </div>
                     </div>
-                  </div>
 
-                  <div className="w-20 h-20 flex items-center justify-center ml-3">
-                    <Image
-                      src={playerImageUrl}
-                      alt={player.name}
-                      width={96}
-                      height={96}
-                      className="object-cover w-full h-full rounded"
-                      unoptimized
-                    />
+                    {/* ── MAIN BODY ── */}
+                    <div className="flex items-center justify-between px-4 py-3 sm:py-4 gap-3">
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <PlayerRankBadge rank={rank} />
+                        
+                        {/* Avatar */}
+                        {player.image ? (
+                          <Image
+                            src={playerImageUrl}
+                            alt={player.name}
+                            width={64}
+                            height={64}
+                            className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shrink-0"
+                            unoptimized
+                          />
+                        ) : (
+                          <div className={`flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br ${PLAYER_COLOR_CLASSES[(Number(rank) - 1) % PLAYER_COLOR_CLASSES.length]} text-sm sm:text-base font-bold text-white shrink-0`}>
+                            {getPlayerInitials(player?.name)}
+                          </div>
+                        )}
+
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-h5 font-semibold text-[var(--best-board-text)] mb-0.5">{player?.name || "N/A"}</p>
+                          <p className="truncate text-sm text-[var(--best-board-muted)]">{getPhoneText(player?.phone)}</p>
+                        </div>
+                      </div>
+
+                      {/* Challenge Button */}
+                      {loggedInUserId && !isCurrentUser && (
+                        <div className="flex items-center shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleChallengeClick(player);
+                            }}
+                            className="rounded-lg border border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] px-3 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-semibold text-[var(--best-board-text)] transition cursor-pointer hover:bg-[var(--best-board-border-strong)]/30"
+                          >
+                            Challenge
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -255,12 +313,16 @@ export default function Bestof5Players({ ladderId: propLadderId, ladderType: pro
       {isModalOpen && (
         <EditPlayer
           open={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedPlayerId(null);
+            setInitialTab("stats");
+          }}
           currentId={selectedPlayerId}
           ladder_id={ladderId}
           ladder_type={ladderType}
           userLevel={true}
-          initialTab="stats"
+          initialTab={initialTab}
         />
       )}
 
