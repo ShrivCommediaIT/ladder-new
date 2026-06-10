@@ -158,10 +158,12 @@ export default function PerformanceDatabase({ refreshTrigger }) {
   const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [keyword, setKeyword] = useState("");
+  const [unit, setUnit] = useState("");
   const [minResult, setMinResult] = useState("");
   const [maxResult, setMaxResult] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
 
   const [appliedFilters, setAppliedFilters] = useState({
     sport: "",
@@ -170,10 +172,12 @@ export default function PerformanceDatabase({ refreshTrigger }) {
     gender: "",
     country: "",
     keyword: "",
+    unit: "",
     minResult: "",
     maxResult: "",
     dateFrom: "",
     dateTo: "",
+    witnes_by: false,
   });
 
   const [sortBy, setSortBy] = useState("newest");
@@ -231,10 +235,12 @@ export default function PerformanceDatabase({ refreshTrigger }) {
           gender: currentFilters.gender || undefined,
           country: currentFilters.country || undefined,
           keyword: currentFilters.keyword || undefined,
+          unit: currentFilters.unit || undefined,
           min_result: currentFilters.minResult || undefined,
           max_result: currentFilters.maxResult || undefined,
           date_from: currentFilters.dateFrom || undefined,
           date_to: currentFilters.dateTo || undefined,
+          witnes_by: currentFilters.witnes_by || undefined,
         };
 
         if (adminId) {
@@ -315,14 +321,24 @@ export default function PerformanceDatabase({ refreshTrigger }) {
       gender,
       country,
       keyword,
+      unit,
       minResult,
       maxResult,
       dateFrom,
       dateTo,
+      witnes_by: verifiedOnly,
     };
     setAppliedFilters(newFilters);
     setCurrentPage(1);
     fetchResults(1, newFilters);
+  };
+
+  const handleUnitChange = (e) => {
+    setUnit(e.target.value);
+  };
+
+  const handleVerifiedOnlyToggle = () => {
+    setVerifiedOnly((current) => !current);
   };
 
   const handleReset = () => {
@@ -332,10 +348,12 @@ export default function PerformanceDatabase({ refreshTrigger }) {
     setGender("");
     setCountry("");
     setKeyword("");
+    setUnit("");
     setMinResult("");
     setMaxResult("");
     setDateFrom("");
     setDateTo("");
+    setVerifiedOnly(false);
 
     const clearedFilters = {
       sport: "",
@@ -344,10 +362,12 @@ export default function PerformanceDatabase({ refreshTrigger }) {
       gender: "",
       country: "",
       keyword: "",
+      unit: "",
       minResult: "",
       maxResult: "",
       dateFrom: "",
       dateTo: "",
+      witnes_by: false,
     };
 
     setAppliedFilters(clearedFilters);
@@ -620,7 +640,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                 SSP Talent Board
               </h1>
               <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
-                Entries on the SSP Talent Board are submitted by participating clubs and organisations to help showcase emerging talent and notable sporting achievements. Interested parties are encouraged to contact the submitting club or organisation directly for further information.  SSP reserves the right to remove or hide any entry that appears unsuitable, inaccurate, incomplete, or inappropriate 
+                Entries on the SSP Talent Board are submitted by participating articipating clubs, coaches and organisations to help showcase emerging talent and notable sporting achievements. Interested parties are encouraged to contact the submitting club or organisation directly for further information.  SSP reserves the right to remove or hide any entry that appears unsuitable, inaccurate, incomplete, or inappropriate 
               </p>
             </div>
 
@@ -654,8 +674,8 @@ export default function PerformanceDatabase({ refreshTrigger }) {
         </div>
 
         <form onSubmit={handleSearch} className={`${panelClass} space-y-6 p-6 sm:p-8`}>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
-            <div className="space-y-1.5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-[minmax(130px,0.85fr)_minmax(220px,1.3fr)_minmax(100px,0.65fr)_minmax(130px,0.85fr)_minmax(130px,0.85fr)_minmax(150px,0.95fr)_minmax(220px,1.3fr)]">
+            <div className="space-y-1.5 min-w-0">
               <label className={mutedLabelClass}>Sport</label>
               <select value={sport} onChange={(e) => setSport(e.target.value)} className={selectClass}>
                 <option value="">All Sports</option>
@@ -665,7 +685,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
               </select>
             </div>
 
-            <div className="space-y-1.5 sm:col-span-2 md:col-span-2 lg:col-span-2">
+            <div className="space-y-1.5 min-w-0 sm:col-span-2 lg:col-span-2 xl:col-span-1">
               <label className={mutedLabelClass}>Activity / Event</label>
               <select value={activity} onChange={(e) => setActivity(e.target.value)} className={selectClass}>
                 <option value="">All Activities</option>
@@ -675,7 +695,12 @@ export default function PerformanceDatabase({ refreshTrigger }) {
               </select>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 min-w-0">
+              <label className={mutedLabelClass}>Unit</label>
+              <input type="text" value={unit} onChange={handleUnitChange} className={fieldClass} />
+            </div>
+
+            <div className="space-y-1.5 min-w-0">
               <label className={mutedLabelClass}>Age Group</label>
               <select value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} className={selectClass}>
                 <option value="">All Ages</option>
@@ -688,7 +713,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
               </select>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 min-w-0">
               <label className={mutedLabelClass}>Gender</label>
               <select value={gender} onChange={(e) => setGender(e.target.value)} className={selectClass}>
                 <option value="">All Genders</option>
@@ -698,7 +723,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
               </select>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 min-w-0">
               <label className={mutedLabelClass}>Country</label>
               <select value={country} onChange={(e) => setCountry(e.target.value)} className={selectClass}>
                 <option value="">All Countries</option>
@@ -708,7 +733,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
               </select>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 min-w-0 sm:col-span-2 lg:col-span-2 xl:col-span-1">
               <label className={mutedLabelClass}>Keyword Search</label>
               <div className="relative">
                 <input
@@ -723,50 +748,60 @@ export default function PerformanceDatabase({ refreshTrigger }) {
             </div>
           </div>
 
-          <div className="flex flex-col items-start justify-between gap-3 border-t border-border/70 pt-2 lg:flex-row lg:items-end">
-            <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-3 lg:w-3/4">
-              <div className="space-y-1.5">
-                <label className={mutedLabelClass}>Result Range</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={minResult}
-                    max={maxResult !== "" ? maxResult : undefined}
-                    onChange={(e) => setMinResult(e.target.value)}
-                    className={fieldClass}
-                  />
-                  <span className="text-xs font-bold uppercase text-muted-foreground">to</span>
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={maxResult}
-                    min={minResult !== "" ? minResult : undefined}
-                    onChange={(e) => setMaxResult(e.target.value)}
-                    className={fieldClass}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className={mutedLabelClass}>Date From</label>
-                <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={fieldClass} />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className={mutedLabelClass}>Date To</label>
-                <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className={fieldClass} />
+          <div className="grid grid-cols-1 items-end gap-4 border-t border-border/70 pt-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-[minmax(260px,1.35fr)_minmax(150px,0.8fr)_minmax(150px,0.8fr)_minmax(150px,0.7fr)_auto]">
+            <div className="space-y-1.5 min-w-0">
+              <label className={mutedLabelClass}>Result Range</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={minResult}
+                  max={maxResult !== "" ? maxResult : undefined}
+                  onChange={(e) => setMinResult(e.target.value)}
+                  className={fieldClass}
+                />
+                <span className="text-xs font-bold uppercase text-muted-foreground">to</span>
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={maxResult}
+                  min={minResult !== "" ? minResult : undefined}
+                  onChange={(e) => setMaxResult(e.target.value)}
+                  className={fieldClass}
+                />
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row w-full gap-3 lg:w-auto shrink-0">
-              <button type="button" onClick={handleReset} className={`${subtleButtonClass} h-11 w-full sm:w-auto justify-center px-4`}>
+            <div className="space-y-1.5 min-w-0">
+              <label className={mutedLabelClass}>Date From</label>
+              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={fieldClass} />
+            </div>
+
+            <div className="space-y-1.5 min-w-0">
+              <label className={mutedLabelClass}>Date To</label>
+              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className={fieldClass} />
+            </div>
+            <div className="space-y-1.5 min-w-0">
+              <button
+                type="button"
+                aria-pressed={verifiedOnly}
+                onClick={handleVerifiedOnlyToggle}
+                className={`${fieldClass} whitespace-nowrap text-center ${
+                  verifiedOnly ? "border-primary bg-primary text-white shadow-md" : ""
+                }`}
+              >
+                Verified Only
+              </button>
+            </div>
+
+            <div className="flex w-full flex-col gap-3 sm:col-span-2 sm:flex-row lg:col-span-4 xl:col-span-1 xl:w-auto xl:shrink-0">
+              <button type="button" onClick={handleReset} className={`${subtleButtonClass} h-11 w-full justify-center whitespace-nowrap px-4 sm:w-auto`}>
                 <RotateCcw className="h-4 w-4" />
                 Reset Filters
               </button>
               <button
                 type="submit"
-                className="flex h-11 w-full sm:w-auto items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold uppercase tracking-wide text-white shadow-lg transition-all hover:-translate-y-0.5"
+                className="flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl px-6 text-sm font-semibold uppercase tracking-wide text-white shadow-lg transition-all hover:-translate-y-0.5 sm:w-auto"
                 style={{ backgroundImage: brandGradient, boxShadow: "var(--brand-button-shadow)" }}
               >
                 <Search className="h-4 w-4" />
