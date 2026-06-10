@@ -177,7 +177,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
     maxResult: "",
     dateFrom: "",
     dateTo: "",
-    witnes_by: false,
+    witness: false,
   });
 
   const [sortBy, setSortBy] = useState("newest");
@@ -240,7 +240,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
           max_result: currentFilters.maxResult || undefined,
           date_from: currentFilters.dateFrom || undefined,
           date_to: currentFilters.dateTo || undefined,
-          witnes_by: currentFilters.witnes_by || undefined,
+          witness: currentFilters.witness || undefined,
         };
 
         if (adminId) {
@@ -326,7 +326,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
       maxResult,
       dateFrom,
       dateTo,
-      witnes_by: verifiedOnly,
+      witness: verifiedOnly,
     };
     setAppliedFilters(newFilters);
     setCurrentPage(1);
@@ -367,7 +367,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
       maxResult: "",
       dateFrom: "",
       dateTo: "",
-      witnes_by: false,
+      witness: false,
     };
 
     setAppliedFilters(clearedFilters);
