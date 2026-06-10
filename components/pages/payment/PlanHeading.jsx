@@ -490,7 +490,122 @@ export default function PlanHeading() {
                     </svg>
                   </Link>
 
-              </div>
+                </div>
+                                <div className="relative mx-4 mb-4 mt-2 md:mt-0 md:mx-0 md:absolute md:bottom-4 md:left-4 md:right-4 w-[calc(100%-2rem)] md:w-auto bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] rounded-[24px] border border-cyan-500/40 p-4 md:py-4 md:px-7 shadow-[0_0_30px_rgba(6,182,212,0.22)] flex flex-wrap md:flex-nowrap items-center justify-around md:justify-between gap-4 md:gap-3 text-white">
+                  
+                  {/* 1. Download The App */}
+                  <div className="flex items-center gap-3.5">
+                    <div className="border-[2.5px] border-white/80 rounded-2xl p-1.5 w-10 h-[52px] flex items-center justify-center text-white shrink-0 shadow-inner">
+                      <svg className="h-7 w-5" viewBox="0 0 24 38" fill="none">
+                        <rect x="1" y="1" width="22" height="36" rx="4" stroke="currentColor" strokeWidth="2.5" />
+                        <circle cx="12" cy="31" r="1.5" fill="currentColor" />
+                      </svg>
+                    </div>
+                    <div className="flex flex-col text-left leading-tight">
+                      <span className="text-[10px] font-bold tracking-[0.1em] text-slate-300">DOWNLOAD</span>
+                      <span className="text-[15px] font-black tracking-wide text-cyan-400">THE APP</span>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="hidden md:block h-9 w-[1.5px] bg-cyan-500/20" />
+
+                  {/* 2. Use SSP ID */}
+                  <div className="flex items-center gap-3.5">
+                    <div className="text-cyan-400 shrink-0">
+                      <svg className="h-10 w-9" viewBox="0 0 32 36" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 2s10 2 10 9c0 9-10 14-10 14S6 20 6 11c0-7 10-9 10-9z" />
+                        <circle cx="16" cy="11" r="3" fill="currentColor" />
+                        <path d="M11 18c0-2.5 2.5-3 5-3s5 .5 5 3" />
+                      </svg>
+                    </div>
+                    <div className="flex flex-col text-left leading-none">
+                      <span className="text-[9px] font-bold tracking-[0.08em] text-slate-300 mb-1">USE SSP ID</span>
+                      <span className="text-sm font-black text-yellow-300 tracking-wide">"SSPCOMPS"</span>
+                      <span className="text-[9px] font-bold tracking-[0.08em] text-slate-300 mt-1">TO ENTER</span>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="hidden md:block h-9 w-[1.5px] bg-cyan-500/20" />
+
+                  {/* 3. Store Download Badges */}
+                  <div className="flex flex-col gap-1.5 shrink-0">
+                    {/* App Store Badge */}
+                    <a
+                      href="https://apps.apple.com/il/app/sports-solutions-pro/id6768947773"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-black hover:bg-slate-900 border border-white/15 rounded-xl px-3.5 py-1.5 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md w-[142px] h-[34px] cursor-pointer"
+                    >
+                      <svg className="h-4 w-4 fill-white shrink-0" viewBox="0 0 24 24">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.5-.63.73-1.18 1.87-1.03 2.97 1.12.09 2.27-.6 2.98-1.41z"/>
+                      </svg>
+                      <div className="text-left leading-tight flex flex-col justify-center">
+                        <span className="text-[6.5px] uppercase tracking-wider text-gray-300 leading-none">Download on the</span>
+                        <span className="text-[10.5px] font-bold font-sans text-white leading-none mt-0.5">App Store</span>
+                      </div>
+                    </a>
+
+                    {/* Google Play Badge */}
+                    <a
+                      href="https://play.google.com/store/apps/details?id=com.sportssolutions.ssp"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-black hover:bg-slate-900 border border-white/15 rounded-xl px-3.5 py-1.5 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md w-[142px] h-[34px] cursor-pointer"
+                    >
+                      <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
+                        <path d="M3.25 3.25c-.14.14-.25.36-.25.64v16.22c0 .28.11.5.25.64l.06.06L12.44 12v-.12L3.31 3.19l-.06.06z" fill="#3bccff" />
+                        <path d="M15.5 15.06l-3.06-3.06v-.12l3.06-3.06.07.04 3.63 2.06c1.04.59 1.04 1.55 0 2.14l-3.63 2.06-.07-.06z" fill="#ffcc00" />
+                        <path d="M12.44 11.94L3.25 21.13c.34.36.91.4 1.55.04l10.76-6.11-3.12-3.12z" fill="#ff3366" />
+                        <path d="M12.44 12.06l3.12-3.12L4.8 2.83c-.64-.36-1.21-.32-1.55.04L12.44 12z" fill="#48ff48" />
+                      </svg>
+                      <div className="text-left leading-tight flex flex-col justify-center">
+                        <span className="text-[6.5px] uppercase tracking-wider text-gray-300 leading-none">GET IT ON</span>
+                        <span className="text-[10.5px] font-bold font-sans text-white leading-none mt-0.5">Google Play</span>
+                      </div>
+                    </a>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="hidden md:block h-9 w-[1.5px] bg-cyan-500/20" />
+
+                  {/* 4. Follow Us */}
+                  <div className="flex items-center gap-3.5">
+                    <div className="flex flex-col items-center leading-none text-center">
+                      <span className="text-[9px] font-bold text-slate-300 tracking-wide">FOLLOW US</span>
+                      <span className="text-[9px] font-bold text-slate-300 tracking-wide mt-0.5">ON</span>
+                    </div>
+                    <a
+                      href="https://www.facebook.com/profile.php?id=61580051563946"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 rounded-full bg-white hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer"
+                    >
+                      <svg className="h-5 w-5 fill-[#1877F2]" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                    </a>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="hidden md:block h-9 w-[1.5px] bg-cyan-500/20" />
+
+                  {/* 5. Terms & Conditions */}
+                  <Link
+                    href="/terms-and-conditions"
+                    className="flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-black tracking-wide text-xs sm:text-sm group cursor-pointer transition-colors"
+                  >
+                    <div className="flex flex-col text-left leading-tight">
+                      <span>TERMS &</span>
+                      <span>CONDITIONS</span>
+                    </div>
+                    <svg className="h-4 w-4 transform group-hover:translate-x-1 transition-transform stroke-current" fill="none" viewBox="0 0 24 24" strokeWidth="3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+
+                </div>
             </div>
 
               {/* Popover overlay for /poster1.png */}
