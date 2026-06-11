@@ -304,7 +304,7 @@ const PlayerCard = ({
               className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center truncate "
               style={{ color: "var(--best-board-highlight)" }}
             >
-              {Math.abs(Number(player?.total_point || 0)).toFixed(2)}
+              {player?.total_point || 0}
             </span>
           </div>
 
