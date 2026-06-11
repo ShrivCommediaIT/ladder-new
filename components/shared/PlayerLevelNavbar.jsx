@@ -101,6 +101,22 @@ const PlayerLevelNavbar = ({
   const ladderId = searchParams.get("ladder_id");
   const fileInputRef = useRef(null);
 
+  // Players selectors for all board types
+  const skillPlayers = useSelector((state) => state.skillLeaderboard?.data || []);
+  const positivePlayers = useSelector((state) => state.positiveLeaderBoard?.data || []);
+  const negativePlayers = useSelector((state) => state.negativeLeaderBoard?.data || []);
+  const rosterPlayers = useSelector((state) => state.rosterLeaderboard?.data || []);
+  const minileagueDataSelector = useSelector((state) => state.minileague?.data || []);
+  const standardPlayers = useSelector((state) => ladderId ? state.player?.players?.[Number(ladderId)]?.data || [] : []);
+
+  // Ladder details selectors for all board types
+  const skillLadderDetails = useSelector((state) => state.skillLeaderboard?.ladderDetails);
+  const positiveLadderDetails = useSelector((state) => state.positiveLeaderBoard?.ladderDetails);
+  const negativeLadderDetails = useSelector((state) => state.negativeLeaderBoard?.ladderDetails);
+  const rosterLadderDetails = useSelector((state) => state.rosterLeaderboard?.ladderDetails);
+  const minileagueLadderDetails = useSelector((state) => state.minileague?.ladderDetails);
+  const standardLadderDetails = useSelector((state) => ladderId ? state.player?.players?.[Number(ladderId)]?.ladderDetails : null);
+
   const handleLogoClick = () => {
     if (!demoLadderName && !userLevel) {
       setShowLogoModal(true);
@@ -167,14 +183,63 @@ const PlayerLevelNavbar = ({
       setIsUploadingLogo(false);
     }
   };
+  const activeType = ladderType || playerEntry?.ladderDetails?.type || searchParams.get("type") || searchParams.get("ladder_type") || "";
+  const isSkill = activeType === "skill";
+  const isPositive = activeType === "positive";
+  const isNegative = activeType === "negative";
+  const isRoster = activeType === "roster";
+  const isMiniLeague = activeType === "minileague";
+
+  let computedLadderName = "";
+  if (isSkill && skillLadderDetails?.name) {
+    computedLadderName = skillLadderDetails.name;
+  } else if (isPositive && positiveLadderDetails?.name) {
+    computedLadderName = positiveLadderDetails.name;
+  } else if (isNegative && negativeLadderDetails?.name) {
+    computedLadderName = negativeLadderDetails.name;
+  } else if (isRoster && rosterLadderDetails?.name) {
+    computedLadderName = rosterLadderDetails.name;
+  } else if (isMiniLeague && minileagueLadderDetails?.name) {
+    computedLadderName = minileagueLadderDetails.name;
+  } else if (standardLadderDetails?.name) {
+    computedLadderName = standardLadderDetails.name;
+  }
+
+  let computedPlayerCount = 0;
+  if (isSkill) {
+    computedPlayerCount = skillPlayers.length;
+  } else if (isPositive) {
+    computedPlayerCount = positivePlayers.length;
+  } else if (isNegative) {
+    computedPlayerCount = negativePlayers.length;
+  } else if (isRoster) {
+    computedPlayerCount = rosterPlayers.length;
+  } else if (isMiniLeague) {
+    computedPlayerCount = minileagueDataSelector.reduce((sum, section) => sum + (section.users_record?.length || 0), 0);
+  } else {
+    computedPlayerCount = standardPlayers.length;
+  }
+
+  let computedLogo = null;
+  if (isSkill) computedLogo = skillLadderDetails?.logo;
+  else if (isPositive) computedLogo = positiveLadderDetails?.logo;
+  else if (isNegative) computedLogo = negativeLadderDetails?.logo;
+  else if (isRoster) computedLogo = rosterLadderDetails?.logo;
+  else if (isMiniLeague) computedLogo = minileagueLadderDetails?.logo;
+  else computedLogo = standardLadderDetails?.logo;
+
   const resolvedLadderName =
-    localName || ladderName || demoLadderName || playerEntry?.ladderDetails?.name || "Football Ladder";
+    localName || ladderName || demoLadderName || computedLadderName || playerEntry?.ladderDetails?.name || "Football Ladder";
+  
   const resolvedPlayerCount =
-    liveCount ?? playerEntry?.data?.length ?? 0;
-  const resolvedType = ladderType || playerEntry?.ladderDetails?.type || "";
+    liveCount !== undefined && liveCount !== null
+      ? liveCount
+      : computedPlayerCount || playerEntry?.data?.length || 0;
+
+  const resolvedType = activeType;
   const resolvedTypeLabel = formatLadderType(resolvedType);
 
-  const logo = localLogo || playerEntry?.ladderDetails?.logo || null;
+  const logo = localLogo || computedLogo || playerEntry?.ladderDetails?.logo || null;
   const imagePath =
     logo && logo !== "null"
       ? logo.startsWith("http") || logo.startsWith("blob:")
