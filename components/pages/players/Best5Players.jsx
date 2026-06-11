@@ -309,7 +309,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
       },
       {
         id: "add-remove",
-        label: isRoster ? "Add / Remove" : "Add / Move",
+        label: isRoster ? "Add / Remove" : "Add / Remove / Move",
         icon: Plus,
         onClick: () => setAddRemoveOpen(true),
       },

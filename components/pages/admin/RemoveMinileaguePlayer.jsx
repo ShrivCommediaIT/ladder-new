@@ -28,7 +28,7 @@ const fadeIn = {
 };
 
 const RemoveMinileaguePlayer = ({ onClose, onSuccessRefresh }) => {
-  const [rank, setRank] = useState(0);
+  const [rank, setRank] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -44,7 +44,7 @@ const RemoveMinileaguePlayer = ({ onClose, onSuccessRefresh }) => {
   }, [ladder_id, dispatch]);
 
   const handleRemove = async () => {
-    if (!ladder_id || rank <= 0 || !selectedSection) {
+    if (!ladder_id || Number(rank) <= 0 || !selectedSection) {
       setAlertInfo({ open: true, title: "Validation Error", description: "Select section and enter valid rank.", type: "error" });
       return;
     }
@@ -56,7 +56,7 @@ const RemoveMinileaguePlayer = ({ onClose, onSuccessRefresh }) => {
       setOpenConfirm(false);
 
       const payload = {
-        rank,
+        rank: Number(rank),
         section: selectedSection,
         removalReason: "Removed via admin panel",
       };
@@ -105,9 +105,21 @@ const RemoveMinileaguePlayer = ({ onClose, onSuccessRefresh }) => {
       </select>
 
       <Input
-        type="number"
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
         value={rank}
-        onChange={(e) => setRank(Number(e.target.value))}
+        onChange={(e) => {
+          const val = e.target.value.replace(/\D/g, "");
+          if (val === "") {
+            setRank("");
+          } else {
+            const num = parseInt(val, 10);
+            if (num > 0) {
+              setRank(String(num));
+            }
+          }
+        }}
         placeholder="Enter rank to remove"
         className="mb-4 w-full min-w-0 bg-[var(--best-board-surface-soft)] text-[var(--best-board-text)] border border-[var(--best-board-border)] rounded-lg focus-visible:ring-[var(--best-board-border-strong)] focus-visible:border-[var(--best-board-border-strong)] placeholder:text-[var(--best-board-muted)] transition-all duration-200"
       />

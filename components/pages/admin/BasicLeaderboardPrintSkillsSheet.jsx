@@ -1,14 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRef } from "react";
 
 export default function BasicLeaderboardPrintSkillsSheet({
   skills = [],
   ladderId = null,
-  className = "bg-blue-500 cursor-pointer hover:bg-blue-600 ",
-  children = "Print Skills",
+  className = null,
+  children = null,
 }) {
   const printRef = useRef(null);
 
@@ -226,14 +227,35 @@ ${printContent}
         </table>
       </div>
 
-      <button
-        onClick={handlePrint}
-        className={className}
-        id="print-trigger"
-        type="button"
-      >
-        {children}
-      </button>
+      {className === "hidden" ? (
+        <button
+          onClick={handlePrint}
+          className="hidden"
+          id="print-trigger"
+          type="button"
+        />
+      ) : className ? (
+        <button
+          onClick={handlePrint}
+          className={className}
+          id="print-trigger"
+          type="button"
+        >
+          {children || "Print Skills"}
+        </button>
+      ) : (
+        <Button
+          onClick={handlePrint}
+          variant="outline"
+          size="sm"
+          className="cursor-pointer border-sky-500/30 hover:border-sky-500/50 hover:bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-2 transition-all duration-200 shadow-sm"
+          id="print-trigger"
+          type="button"
+        >
+          <Printer size={16} className="text-sky-500" />
+          {children || "Print Skills"}
+        </Button>
+      )}
     </>
   );
 }

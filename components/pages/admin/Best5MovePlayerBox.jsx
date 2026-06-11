@@ -52,8 +52,10 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
 
   const handleDigit = (digit) => {
     if (activeInput === "from") {
+      if (digit === "0" && fromRank === "") return;
       setFromRank((prev) => prev + digit);
     } else {
+      if (digit === "0" && toRank === "") return;
       setToRank((prev) => prev + digit);
     }
   };
@@ -112,17 +114,17 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
   /* ------------ UI ------------ */
 
   return (
-    <Card className="max-w-md mx-auto rounded-2xl shadow-xl border bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+    <Card className="max-w-md mx-auto rounded-2xl shadow-xl border border-border bg-card text-foreground">
 
       {/* Header */}
 
       <CardHeader className="text-center space-y-1">
 
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-2xl font-bold text-foreground">
           Move Player
         </h2>
 
-        <p className="text-gray-400 text-sm">
+        <p className="text-muted-foreground text-sm">
           Enter ranks to swap players
         </p>
 
@@ -140,11 +142,11 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
             value={fromRank}
             placeholder="From Rank"
             onClick={() => setActiveInput("from")}
-            className={`text-center text-xl font-bold bg-black
+            className={`text-center text-xl font-bold cursor-pointer bg-input-theme-bg text-foreground placeholder:text-muted-foreground transition-all duration-200 border
             ${
               activeInput === "from"
-                ? "border-cyan-400"
-                : "border-gray-700"
+                ? "border-primary ring-2 ring-primary/20"
+                : "border-input-theme-border"
             }`}
           />
 
@@ -153,11 +155,11 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
             value={toRank}
             placeholder="To Rank"
             onClick={() => setActiveInput("to")}
-            className={`text-center text-xl font-bold bg-black
+            className={`text-center text-xl font-bold cursor-pointer bg-input-theme-bg text-foreground placeholder:text-muted-foreground transition-all duration-200 border
             ${
               activeInput === "to"
-                ? "border-cyan-400"
-                : "border-gray-700"
+                ? "border-primary ring-2 ring-primary/20"
+                : "border-input-theme-border"
             }`}
           />
 
@@ -172,7 +174,8 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
             <Button
               key={num}
               onClick={() => handleDigit(num.toString())}
-              className="h-12 text-lg bg-gray-700 hover:bg-cyan-500"
+              variant="secondary"
+              className="h-12 text-lg font-semibold cursor-pointer transition-all duration-200 hover:bg-primary hover:text-primary-foreground"
             >
               {num}
             </Button>
@@ -180,15 +183,16 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
 
           <Button
             onClick={handleBackspace}
-            variant="secondary"
-            className="h-12"
+            variant="outline"
+            className="h-12 cursor-pointer transition-all duration-200 hover:bg-muted"
           >
-            <ArrowLeft size={18}/>
+            <ArrowLeft size={18} className="text-foreground" />
           </Button>
 
           <Button
             onClick={() => handleDigit("0")}
-            className="h-12 text-lg bg-gray-700 hover:bg-cyan-500"
+            variant="secondary"
+            className="h-12 text-lg font-semibold cursor-pointer transition-all duration-200 hover:bg-primary hover:text-primary-foreground"
           >
             0
           </Button>
@@ -199,9 +203,9 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
               setToRank("");
             }}
             variant="destructive"
-            className="h-12"
+            className="h-12 cursor-pointer transition-all duration-200 hover:bg-destructive/90"
           >
-            <X size={18}/>
+            <X size={18} />
           </Button>
 
         </div>
@@ -214,17 +218,17 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
       <CardFooter className="flex gap-3">
 
         <Button
-  onClick={onClose}
-  variant="outline"
-  className="flex-1 text-black"
->
-  Cancel
-</Button>
+          onClick={onClose}
+          variant="outline"
+          className="flex-1 cursor-pointer"
+        >
+          Cancel
+        </Button>
 
         <Button
           onClick={movePlayerDirect}
           disabled={!isValid || loading}
-          className="flex-1 bg-cyan-500 hover:bg-cyan-600"
+          className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold cursor-pointer transition-all duration-200"
         >
           {loading ? "Moving..." : "Move Player"}
         </Button>
