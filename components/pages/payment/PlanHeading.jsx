@@ -756,7 +756,7 @@ export default function PlanHeading() {
               />
               <p className="max-w-sm leading-7">
                 The smart way to run automated ladders, mini-leagues, leaderboards and challenge
-                boards for your indoor sports club.
+                boards for your  sports club.
               </p>
             </div>
 

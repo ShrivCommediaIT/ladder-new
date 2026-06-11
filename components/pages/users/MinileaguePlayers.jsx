@@ -160,20 +160,37 @@ const PlayerCard = ({
         </div>
 
         {/* RIGHT SECTION: points badge + avatar */}
-        <div className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0 border-l border-[var(--best-board-border)]">
-
-          {/* Points badge */}
-          <div className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-2 sm:px-3 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[56px] bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)]">
-            <span className="text-base sm:text-xl md:text-2xl font-black leading-none text-[var(--best-board-highlight)]">
-              {player?.total_point || 0}
+        <div
+          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+          style={{ borderLeft: "1px solid var(--best-board-border)" }}
+        >
+          {/* Total Points badge */}
+               <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              Total Points
             </span>
-            <span className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5 text-[var(--best-board-muted)]">
-              pts
+          <div
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
+            style={{
+              background: "var(--best-board-accent-soft)",
+              border: "1px solid var(--best-board-border-strong)",
+            }}
+          >
+            <span
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center truncate "
+              style={{ color: "var(--best-board-highlight)" }}
+            >
+              {player?.total_point || 0}
             </span>
           </div>
 
           {/* Player avatar */}
-          <div className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px] border border-[var(--best-board-border-strong)]">
+          <div
+            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+            style={{ border: "1px solid var(--best-board-border-strong)" }}
+          >
             <Image
               src={playerImageUrl}
               alt={player?.name || "Player"}

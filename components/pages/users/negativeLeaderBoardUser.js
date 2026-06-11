@@ -155,27 +155,12 @@ const PlayerCard = ({
               imgSize={56}
               textClass="text-[10px] sm:text-xs md:text-sm"
             />
-            {showAgeRank && (
-              <div className="flex flex-col items-center">
-                <div
-                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
-                  style={{ background: "var(--best-board-success)" }}
-                >
-                  {ageRank}
-                </div>
-                <p
-                  className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
-                  style={{ color: "var(--best-board-success)" }}
-                >
-                  Age
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Info block */}
           <div className="flex-1 min-w-0">
-
+            <div className="flex gap-6 justify-between">
+            <div>
             {/* Player name */}
             <div
               className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight"
@@ -191,6 +176,24 @@ const PlayerCard = ({
             >
               {player?.phone || "N/A"}
             </div>
+            </div>
+              {showAgeRank && (
+              <div className="flex flex-col items-center">
+                <div
+                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
+                  style={{ background: "var(--best-board-success)" }}
+                >
+                  {ageRank}
+                </div>
+                <p
+                  className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
+                  style={{ color: "var(--best-board-success)" }}
+                >
+                  Age Rank
+                </p>
+              </div>
+            )}
+            </div>
 
 
             {/* Skills section */}
@@ -203,7 +206,7 @@ const PlayerCard = ({
                     return (
                       <div
                         key={i}
-                        onClick={() => isEditable && onSkillClick(player.id, skill.skill_number)}
+                        onClick={() => onSkillClick(player.id, skill.skill_number)}
                         className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors cursor-pointer relative"
                         style={{
                           background: "var(--best-board-accent-soft)",
@@ -247,10 +250,10 @@ const PlayerCard = ({
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {Number(scoreData.displayScore || 0).toFixed(2)}
+                        {scoreData.displayScore}
                       </div>
                     );
-                  })}
+                  })}               
                 </div>
               </>
             ) : (
@@ -274,24 +277,24 @@ const PlayerCard = ({
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
           {/* Total Points badge */}
+               <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              Total Points
+            </span>
           <div
-            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[56px]"
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
             style={{
               background: "var(--best-board-accent-soft)",
               border: "1px solid var(--best-board-border-strong)",
             }}
           >
             <span
-              className="text-sm sm:text-base md:text-[10px] font-black leading-none w-full text-center truncate"
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center truncate "
               style={{ color: "var(--best-board-highlight)" }}
             >
               {Math.abs(Number(player?.total_point || 0)).toFixed(2)}
-            </span>
-            <span
-              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              pts
             </span>
           </div>
 

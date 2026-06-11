@@ -165,27 +165,12 @@ const PlayerCard = ({
               imgSize={56}
               textClass="text-[10px] sm:text-xs md:text-sm"
             />
-            {showAgeRank && (
-              <div className="flex flex-col items-center">
-                <div
-                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
-                  style={{ background: "var(--best-board-success)" }}
-                >
-                  {ageRank}
-                </div>
-                <p
-                  className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
-                  style={{ color: "var(--best-board-success)" }}
-                >
-                  Age
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Info block */}
           <div className="flex-1 min-w-0">
-
+            <div className="flex gap-6 justify-between">
+            <div>
             {/* Player name */}
             <div
               className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight"
@@ -201,6 +186,25 @@ const PlayerCard = ({
             >
               {player?.phone || "N/A"}
             </div>
+            </div>
+              {showAgeRank && (
+              <div className="flex flex-col items-center">
+                <div
+                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
+                  style={{ background: "var(--best-board-success)" }}
+                >
+                  {ageRank}
+                </div>
+                <p
+                  className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
+                  style={{ color: "var(--best-board-success)" }}
+                >
+                  Age Rank
+                </p>
+              </div>
+            )}
+            </div>
+
 
             {/* Skills section */}
             {player.skills?.length > 0 ? (
@@ -212,22 +216,14 @@ const PlayerCard = ({
                     return (
                       <div
                         key={i}
-                        onClick={() => isEditable && onSkillClick(player.id, skill.skill_number)}
-                        className={`w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors relative
-                          ${isEditable
-                            ? "cursor-pointer"
-                            : "cursor-not-allowed opacity-50"
-                          }`}
+                        onClick={() => onSkillClick(player.id, skill.skill_number)}
+                        className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors cursor-pointer relative"
                         style={{
                           background: "var(--best-board-accent-soft)",
                           border: "1px solid var(--best-board-border-strong)",
                           color: "var(--best-board-highlight)",
                         }}
-                        title={
-                          isEditable
-                            ? `Edit Skill ${skill.skill_number}: ${skill.skill_description}`
-                            : "Only own skills can be edited"
-                        }
+                        title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
                       >
                         {isNeg && (
                           <span
@@ -244,7 +240,7 @@ const PlayerCard = ({
                 </div>
 
                 {/* ── SCORE ROW ── */}
-                <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
+                <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
                   {player.skills.map((skill, i) => {
                     const scoreData = getScoreBySkillNumber(
                       player.scores || [],
@@ -264,28 +260,10 @@ const PlayerCard = ({
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {Math.abs(scoreData.displayScore || 0)}
+                        {scoreData.displayScore}
                       </div>
                     );
-                  })}
-                </div>
-
-                {/* ── SKILL RANK ROW ── */}
-                <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {player.skills.map((skill, i) => (
-                    <div
-                      key={i}
-                      className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center rounded font-bold text-[9px] sm:text-[10px] border"
-                      style={{
-                        background: "rgba(99, 102, 241, 0.12)",
-                        borderColor: "rgba(99, 102, 241, 0.3)",
-                        color: "var(--best-board-highlight)",
-                      }}
-                      title={`Skill Rank for ${skill.skill_number}`}
-                    >
-                      {getRankBySkillNumber(player.ranks || [], skill.skill_number)}
-                    </div>
-                  ))}
+                  })}               
                 </div>
               </>
             ) : (
@@ -309,24 +287,24 @@ const PlayerCard = ({
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
           {/* Total Points badge */}
+               <span
+              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+              style={{ color: "var(--best-board-muted)" }}
+            >
+              Total Points
+            </span>
           <div
-            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[56px]"
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
             style={{
               background: "var(--best-board-accent-soft)",
               border: "1px solid var(--best-board-border-strong)",
             }}
           >
             <span
-              className="text-sm sm:text-base md:text-[10px] font-black leading-none w-full text-center truncate"
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center truncate "
               style={{ color: "var(--best-board-highlight)" }}
             >
-              {Math.abs(player?.total_point || 0)}
-            </span>
-            <span
-              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              pts
+              {Math.abs(Number(player?.total_point || 0)).toFixed(2)}
             </span>
           </div>
 
