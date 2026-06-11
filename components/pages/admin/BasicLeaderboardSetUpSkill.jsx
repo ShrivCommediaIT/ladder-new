@@ -273,8 +273,7 @@ export default function BasicLeaderboardSetUpSkill({
 
   return (
     <>
-      <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
-        <Card className="w-full max-w-[350px] sm:max-w-[600px] sm:w-xl bg-card border border-border rounded-xl overflow-hidden shadow-xl text-card-foreground">
+        <Card className="w-full max-w-[350px] sm:max-w-[600px] sm:w-xl bg-card border border-border rounded-xl overflow-hidden shadow-xl text-card-foreground p-0">
           <div className="bg-muted text-foreground py-3 border-b border-border relative">
             <h2 className="text-md font-semibold text-center">
               {type === "skill" ? "Skills/Performance Set Up" : type === "negative" ? "Set Up" : "LeaderBoard Set Up"}
@@ -458,9 +457,6 @@ export default function BasicLeaderboardSetUpSkill({
           </div>
 
         </Card>
-
-      </main>
-
       <Dialog open={openValidation} onOpenChange={setOpenValidation}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>

@@ -20,9 +20,9 @@ import { Input } from "@/components/ui/input";
 
 import { ArrowLeft, X, MoveUp } from "lucide-react";
 
-const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
+const Best5MovePlayerBox = ({ open, onClose = () => { }, onSuccessRefresh }) => {
 
-    if (!open) return null;
+  if (!open) return null;
 
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -96,7 +96,7 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
         setFromRank("");
         setToRank("");
 
-        onClose(); 
+        onClose();
       } else {
         toast.error(response.data.message);
       }
@@ -143,11 +143,10 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
             placeholder="From Rank"
             onClick={() => setActiveInput("from")}
             className={`text-center text-xl font-bold cursor-pointer bg-input-theme-bg text-foreground placeholder:text-muted-foreground transition-all duration-200 border
-            ${
-              activeInput === "from"
+            ${activeInput === "from"
                 ? "border-primary ring-2 ring-primary/20"
                 : "border-input-theme-border"
-            }`}
+              }`}
           />
 
           <Input
@@ -156,11 +155,10 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
             placeholder="To Rank"
             onClick={() => setActiveInput("to")}
             className={`text-center text-xl font-bold cursor-pointer bg-input-theme-bg text-foreground placeholder:text-muted-foreground transition-all duration-200 border
-            ${
-              activeInput === "to"
+            ${activeInput === "to"
                 ? "border-primary ring-2 ring-primary/20"
                 : "border-input-theme-border"
-            }`}
+              }`}
           />
 
         </div>
@@ -170,7 +168,7 @@ const Best5MovePlayerBox = ({ open, onClose = () => {}, onSuccessRefresh }) => {
 
         <div className="grid grid-cols-3 gap-3">
 
-          {[1,2,3,4,5,6,7,8,9].map((num) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <Button
               key={num}
               onClick={() => handleDigit(num.toString())}

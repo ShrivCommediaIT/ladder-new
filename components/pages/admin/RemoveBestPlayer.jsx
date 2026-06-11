@@ -33,7 +33,7 @@ const RemoveBestPlayer = ({ ladderId, onClose, onSuccessRefresh }) => {
 
   const handleRemove = async () => {
     const rankNum = Number(rank);
-    
+
     if (!ladderId || rankNum <= 0) {
       toast.warning("Please enter valid rank!", { autoClose: 2000 });
       return;
@@ -52,13 +52,13 @@ const RemoveBestPlayer = ({ ladderId, onClose, onSuccessRefresh }) => {
         // ✅ INSTANT CLOSE + REFRESH
         onClose?.(); // Close Remove dialog
         onSuccessRefresh?.(); // Refresh leaderboard
-        
+
         // Success feedback
         toast.success(`Player at rank ${rankNum} removed successfully! 🎉`, {
           position: "top-right",
           autoClose: 3000,
         });
-        
+
         // Reset form
         setRank("");
       } else {
@@ -108,7 +108,7 @@ const RemoveBestPlayer = ({ ladderId, onClose, onSuccessRefresh }) => {
 
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger asChild>
-          <button 
+          <button
             className="w-full h-12 bg-destructive hover:bg-destructive/90 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg cursor-pointer"
             disabled={isLoading || !rank || Number(rank) <= 0}
           >
@@ -123,7 +123,7 @@ const RemoveBestPlayer = ({ ladderId, onClose, onSuccessRefresh }) => {
               <AlertDialogTitle>Confirm Removal</AlertDialogTitle>
             </div>
             <AlertDialogDescription className="text-muted-foreground">
-              Player at <strong className="text-foreground">Rank {rank}</strong> will be 
+              Player at <strong className="text-foreground">Rank {rank}</strong> will be
               permanently removed from Ladder <strong className="text-foreground">#{ladderId}</strong>.
               <br /><br />
               <span className="text-destructive font-semibold">This action cannot be undone!</span>
@@ -131,7 +131,7 @@ const RemoveBestPlayer = ({ ladderId, onClose, onSuccessRefresh }) => {
           </AlertDialogHeader>
 
           <AlertDialogFooter className="gap-3">
-            <AlertDialogCancel 
+            <AlertDialogCancel
               onClick={() => setOpen(false)}
               disabled={isLoading}
               className="h-12 cursor-pointer text-foreground"

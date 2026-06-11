@@ -35,7 +35,7 @@ const LeaderBoard = () => {
   return (
     <div className="p-4 space-y-2">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-    
+
 
       {/* 🧭 Feedback */}
       {loading && <p className="text-sm text-blue-500">Loading players...</p>}
@@ -73,18 +73,18 @@ const LeaderBoard = () => {
                       <div className="flex justify-between items-start mb-1 px-1">
                         <PlayerStatusToggle player={player} user={false} />
                       </div>
-                       <div className="flex gap-4 items-center">
-                         <Image
+                      <div className="flex gap-4 items-center">
+                        <Image
                           src={Logo}
                           className="rounded-full w-10 h-10"
                           width={40}
                           height={40}
                           alt={`Player ${index + 1}`}
-                         />
-                         <p className="truncate">
-                           {player.name || player.username || "Unknown"}
-                         </p>
-                       </div>
+                        />
+                        <p className="truncate">
+                          {player.name || player.username || "Unknown"}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </DialogTrigger>
