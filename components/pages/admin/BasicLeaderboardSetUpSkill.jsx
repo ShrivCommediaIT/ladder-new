@@ -438,19 +438,14 @@ export default function BasicLeaderboardSetUpSkill({
           </div>
 
 
-          <div className={`bg-muted flex ${type === "positive" ||
-            type === "negative" ||
-            ladderType === "positive" ||
-            ladderType === "negative" ? "justify-end" : "justify-between"}   items-center w-full px-8 py-3 border-t border-border`}>
-            {(type !== "positive" && type !== "negative" && ladderType !== "positive" && ladderType !== "negative") ?
-              <div className="flex items-center justify-end mx-4">
+          <div className={`bg-muted flex justify-between   items-center w-full px-8 py-3 border-t border-border`}>
+              <div className="flex items-center  mx-4">
                 <BasicLeaderboardPrintSkillsSheet
                   skills={safeSkillsForPrint}
                   ladderId={ladderId}
-                  className="hidden"
                 />
-              </div> : null}
-            <div className="flex justify-center gap-4">
+              </div> 
+            <div className="flex  gap-4">
               <Button
                 size="sm"
                 disabled={saving}
