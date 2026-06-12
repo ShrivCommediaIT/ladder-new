@@ -27,6 +27,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Link from "next/link";
 import { Layers, Users, UploadCloud, ListChecks, Play, ShieldCheck, Sparkles, Target, FolderKanban, ArrowRight, Mail, Plus } from "lucide-react";
+import AdminQuickActions from "@/components/shared/AdminQuickActions";
 
 const cardToneClasses = [
   "from-primary/20 via-primary/5 to-transparent",
@@ -64,7 +65,6 @@ import { motion } from "framer-motion";
 import { importSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { importRoster } from "@/redux/slices/rosterSlice";
 import CreatePanel from "@/components/shared/CreatePanel";
-import BespokeFooter from "@/components/shared/BespokeFooter";
 
 export default function SubAdminDashboard() {
   const [ladderName, setLadderName] = useState("");
@@ -73,6 +73,7 @@ export default function SubAdminDashboard() {
   const [duplicateWarning, setDuplicateWarning] = useState(null);
   const [showDemo, setShowDemo] = useState(true);
   const [withoutCsv, setWithoutCsv] = useState(false);
+
 
 
 
@@ -566,10 +567,7 @@ export default function SubAdminDashboard() {
           </div>
         </div>
       </div>
-
-      <div className="relative z-10 mt-10">
-        <BespokeFooter />
-      </div>
+      <AdminQuickActions />
     </div>
   );
 }

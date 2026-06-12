@@ -373,7 +373,6 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
       <ToastContainer />
-      <PlayerLevelNavbar activeTab="" />
 
       <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         

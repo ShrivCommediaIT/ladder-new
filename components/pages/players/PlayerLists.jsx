@@ -386,14 +386,6 @@ export const PlayerLists = () => {
 
   return (
     <div className={isBestLayout ? "ladder-shell min-h-screen" : "bg-gray-800 min-h-screen"}>
-      <PlayerLevelNavbar
-        activeTab="players"
-        ladderName={currentLadderName}
-        liveCount={currentPlayerCount}
-        ladderType={type || ladderType}
-        searchValue={bestSearchValue}
-        onSearchChange={setBestSearchValue}
-      />
 
       {isBestLayout ? (
         <div className="w-full px-1 pb-6 sm:px-6 lg:px-10">
@@ -438,20 +430,6 @@ export const PlayerLists = () => {
           )}
         </>
       )}
-
-      <footer className="relative z-10 mt-10 px-4 pb-8 sm:px-6 lg:px-8">
-        <Card className="mx-auto w-full border border-border bg-card text-foreground shadow-lg">
-          <CardContent className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Sports Solutions Pro {formatLadderType(resolvedLadderType)} Ladder</p>
-              <p className="mt-1 text-sm text-muted-foreground">Rankings, activity, and player management in one shared ladder view.</p>
-            </div>
-            <p className="text-sm text-primary">
-              {currentPlayerCount > 0 ? `${currentPlayerCount} player${currentPlayerCount === 1 ? "" : "s"} on this ladder` : "Player list updates live as members join"}
-            </p>
-          </CardContent>
-        </Card>
-      </footer>
 
       {/* Sort by skill dialog */}
       <Dialog open={openSkillShortDialog} onOpenChange={setOpenSkillShortDialog}>

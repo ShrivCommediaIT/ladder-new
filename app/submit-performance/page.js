@@ -741,7 +741,6 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-[#f4faff] to-[#e8f3fc] dark:from-[#05101E] dark:via-[#091829] dark:to-[#05070f] text-foreground pb-6 transition-colors duration-300">
-      <PlayerLevelNavbar />
       <ToastContainer position="top-right" autoClose={3000} theme="dark" hideProgressBar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8">
