@@ -246,9 +246,6 @@ const QAndAPage = () => {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-[#07111f] text-white">
-      {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
-      <PlayerLevelNavbar activeTab="" />
-
       <div className="w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 pt-10 pb-8">
 
         <div className="max-w-4xl mx-auto rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-6 sm:p-8">

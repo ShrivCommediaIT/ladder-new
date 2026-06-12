@@ -16,12 +16,11 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CheckCircle2, ShieldCheck, CreditCard, Award, Zap, Coins } from "lucide-react";
+import { CheckCircle2, ShieldCheck, CreditCard, Zap, Coins, Award } from "lucide-react";
 
-export default function BespokeFooter() {
+export default function AdminQuickActions() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
@@ -100,13 +99,14 @@ export default function BespokeFooter() {
   }, [showPaymentPlans]);
 
   return (
-    <footer className="w-full border-t border-slate-200 bg-slate-50 px-4 py-6 text-slate-900 dark:border-white/5 dark:bg-[#030712] dark:text-white sm:px-6 sm:py-8 lg:px-10 lg:py-10">
-      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-4 md:gap-5 md:grid-cols-[1.2fr_1.2fr_0.6fr] xl:grid-cols-[1.25fr_1.25fr_0.5fr] xl:items-stretch justify-items-center">
+    <>
+      {/* CONDITIONAL ADMIN BUTTONS (AI CHATBOT, WHATSAPP, PAYMENT PLANS) */}
+      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-4 md:gap-5 md:grid-cols-[1.2fr_1.2fr_0.6fr] xl:grid-cols-[1.25fr_1.25fr_0.5fr] xl:items-stretch justify-items-center mt-10 mb-10">
         <button
           type="button"
           onClick={handleBotClick}
           aria-label="Open SSP AI Assistant"
-          className="group relative w-full overflow-hidden rounded-[20px] border border-fuchsia-200 bg-white shadow-xl transition-all duration-300 hover:border-fuchsia-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/70 dark:border-fuchsia-500/60 dark:bg-[#070913] dark:shadow-2xl p-2"
+          className="group relative w-full overflow-hidden rounded-[20px] border border-fuchsia-200 bg-white shadow-xl transition-all duration-300 hover:border-fuchsia-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/70 dark:border-fuchsia-500/60 dark:bg-[#070913] dark:shadow-2xl p-2 cursor-pointer"
         >
           <div className="relative w-full h-[90px] xs:h-[110px] sm:h-[130px] md:h-[140px] lg:h-[160px] xl:h-[180px]">
             <Image
@@ -124,7 +124,7 @@ export default function BespokeFooter() {
           type="button"
           onClick={handleWhatsAppClick}
           aria-label="Open WhatsApp chat"
-          className="group relative w-full overflow-hidden rounded-[20px] border border-emerald-200 bg-white shadow-xl transition-all duration-300 hover:border-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 dark:border-emerald-500/50 dark:bg-[#04090c] dark:shadow-2xl p-2"
+          className="group relative w-full overflow-hidden rounded-[20px] border border-emerald-200 bg-white shadow-xl transition-all duration-300 hover:border-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 dark:border-emerald-500/50 dark:bg-[#04090c] dark:shadow-2xl p-2 cursor-pointer"
         >
           <div className="relative w-full h-[90px] xs:h-[110px] sm:h-[130px] md:h-[140px] lg:h-[160px] xl:h-[180px]">
             <Image
@@ -142,7 +142,7 @@ export default function BespokeFooter() {
           type="button"
           onClick={() => setShowPaymentPlans(true)}
           aria-label="View Payment Plans"
-          className="group relative w-full overflow-hidden rounded-[20px] border border-cyan-200 bg-white shadow-xl transition-all duration-300 hover:border-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70 dark:border-cyan-500/50 dark:bg-[#020813] dark:shadow-2xl p-2"
+          className="group relative w-full overflow-hidden rounded-[20px] border border-cyan-200 bg-white shadow-xl transition-all duration-300 hover:border-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70 dark:border-cyan-500/50 dark:bg-[#020813] dark:shadow-2xl p-2 cursor-pointer"
         >
           <div className="relative w-full h-[90px] xs:h-[110px] sm:h-[130px] md:h-[140px] lg:h-[160px] xl:h-[180px] flex flex-col items-center justify-center bg-[#f8fafc] dark:bg-[#0c1020] rounded-[16px] border border-cyan-100 dark:border-cyan-950 transition-all duration-300">
             <div className="text-center transition-transform duration-300 group-hover:scale-105 flex flex-col items-center justify-center">
@@ -157,6 +157,7 @@ export default function BespokeFooter() {
         </button>
       </div>
 
+      {/* CONFIRMATION & PAYMENT PLANS DIALOGS */}
       <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
         <AlertDialogContent className="rounded-[24px] border border-border bg-card p-6 backdrop-blur-xl shadow-2xl w-[90vw] max-w-sm sm:max-w-md">
           <AlertDialogHeader>
@@ -168,12 +169,12 @@ export default function BespokeFooter() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <AlertDialogCancel className="w-full sm:w-auto rounded-xl border border-border bg-transparent text-foreground hover:bg-muted font-medium py-2.5 px-4 transition text-xs sm:text-sm">
+            <AlertDialogCancel className="w-full sm:w-auto rounded-xl border border-border bg-transparent text-foreground hover:bg-muted font-medium py-2.5 px-4 transition text-xs sm:text-sm cursor-pointer">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmNavigate}
-              className="w-full sm:w-auto rounded-xl bg-fuchsia-600 text-white hover:bg-fuchsia-700 font-semibold py-2.5 px-4 shadow-lg shadow-fuchsia-500/20 transition text-xs sm:text-sm"
+              className="w-full sm:w-auto rounded-xl bg-fuchsia-600 text-white hover:bg-fuchsia-700 font-semibold py-2.5 px-4 shadow-lg shadow-fuchsia-500/20 transition text-xs sm:text-sm cursor-pointer"
             >
               Continue
             </AlertDialogAction>
@@ -183,7 +184,6 @@ export default function BespokeFooter() {
 
       <Dialog open={showPaymentPlans} onOpenChange={setShowPaymentPlans}>
         <DialogContent className="w-[95vw] sm:max-w-3xl bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl max-h-[92vh] overflow-hidden flex flex-col">
-
           {/* Header Banner */}
           <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between">
             <div className="space-y-1">
@@ -200,8 +200,7 @@ export default function BespokeFooter() {
           </div>
 
           <div className="p-6 overflow-y-auto space-y-6 flex-1">
-
-            {/* SECTION 1: SUBSCRIPTION OPTIONS */}
+            {/* Platform Access Plans */}
             <div className="space-y-3">
               <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
                 <Coins className="h-3.5 w-3.5 text-primary" /> Platform Access Plans
@@ -282,10 +281,59 @@ export default function BespokeFooter() {
               </div>
             </div>
 
+            {/* SECTION 2: AD-HOC LICENSES */}
+            <div className="space-y-3 mt-6">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                <Award className="h-3.5 w-3.5 text-primary" /> One-Off Licenses & Competitions
+              </h3>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Competition Product */}
+                <div className="rounded-[20px] border border-border p-5 bg-card flex flex-col justify-between space-y-4 hover:border-primary/30 transition-all duration-300">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-block text-[10px] font-extrabold tracking-widest uppercase bg-primary/10 text-primary px-2.5 py-1 rounded-full">
+                        Competition Card
+                      </span>
+                      <span className="text-lg font-black text-foreground">£2</span>
+                    </div>
+                    <h4 className="font-extrabold text-foreground text-sm sm:text-base leading-snug">
+                      SSP International Competitions
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Instant competition listing license. Only single purchases allowed.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center min-h-[48px] w-full bg-background rounded-xl p-2.5 border border-border">
+                    <div id="paypal-container-XT89PWWRFSPNQ" className="w-full text-center"></div>
+                  </div>
+                </div>
+
+                {/* Talent Board Product */}
+                <div className="rounded-[20px] border border-border p-5 bg-card flex flex-col justify-between space-y-4 hover:border-secondary/30 transition-all duration-300">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-block text-[10px] font-extrabold tracking-widest uppercase bg-secondary/10 text-secondary px-2.5 py-1 rounded-full">
+                        Leaderboard Card
+                      </span>
+                      <span className="text-lg font-black text-foreground">£5</span>
+                    </div>
+                    <h4 className="font-extrabold text-foreground text-sm sm:text-base leading-snug">
+                      SSP Talent Board
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Talent leaderboard list upload. Multiple purchases available.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center min-h-[48px] w-full bg-background rounded-xl p-2.5 border border-border">
+                    <div id="paypal-container-HXX74PMDL43FE" className="w-full text-center"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Support Note */}
-            <div className="rounded-[16px] bg-primary/5 border border-primary/15 p-4 flex items-start gap-3">
+            <div className="rounded-[16px] bg-primary/5 border border-primary/15 p-4 flex items-start gap-3 mt-6">
               <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <h5 className="font-bold text-foreground text-xs uppercase tracking-wider">
@@ -299,6 +347,6 @@ export default function BespokeFooter() {
           </div>
         </DialogContent>
       </Dialog>
-    </footer>
+    </>
   );
 }
