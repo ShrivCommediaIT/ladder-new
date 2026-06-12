@@ -284,7 +284,7 @@ const MoveNumberInput = ({
       max-w-[95vw] overflow-auto sm:max-w-none md:max-w-none lg:max-w-none
       mx-auto
       p-3 sm:p-2 md:p-2
-      text-gray-100
+      text-slate-800 dark:text-gray-100
       rounded-xl
       max-h-[60vh]
       sm:max-h-[80vh]
@@ -295,13 +295,13 @@ const MoveNumberInput = ({
       scrollbar-track-transparent
     "
     >
-      <h3 className="mb-2 text-xl sm:text-2xl font-bold text-violet-200 text-center">
+      <h3 className="mb-2 text-xl sm:text-2xl font-bold text-slate-800 dark:text-violet-200 text-center">
         Record Match Result
       </h3>
 
       {/* Result Selection */}
-      <div className="mb-2 bg-gray-900/70 rounded-xl border border-gray-700 shadow-md">
-        <p className="text-sm font-medium mb-1 text-gray-300 text-center">
+      <div className="mb-2 p-2 bg-slate-50 dark:bg-gray-900/70 rounded-xl border border-slate-200 dark:border-gray-700 shadow-md">
+        <p className="text-sm font-medium mb-1 text-slate-500 dark:text-gray-300 text-center">
           Select the Match Outcome
         </p>
 
@@ -315,7 +315,7 @@ const MoveNumberInput = ({
                 onCheckedChange={(val) => setResultType(val ? "beat" : "")}
                 className="border-green-300 data-[state=checked]:bg-green-500"
               />
-              <label htmlFor="beat" className="text-base font-medium cursor-pointer">
+              <label htmlFor="beat" className="text-base font-medium cursor-pointer text-slate-700 dark:text-gray-200">
                 Beat
               </label>
             </div>
@@ -326,7 +326,7 @@ const MoveNumberInput = ({
                 onCheckedChange={(val) => setResultType(val ? "lost" : "")}
                 className="border-red-300 data-[state=checked]:bg-red-500"
               />
-              <label htmlFor="lost" className="text-base font-medium cursor-pointer">
+              <label htmlFor="lost" className="text-base font-medium cursor-pointer text-slate-700 dark:text-gray-200">
                 Lost to
               </label>
             </div>
@@ -338,8 +338,8 @@ const MoveNumberInput = ({
 
       {/* Score Selection */}
       {(ladderType === "best3" || ladderType === "best5") && (
-        <div className="mb-2 p-1 bg-gray-800 rounded-xl border border-gray-700 shadow-md">
-          <p className="text-sm font-medium mb-2 text-gray-300 text-center">
+        <div className="mb-2 p-1.5 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 shadow-md">
+          <p className="text-sm font-medium mb-2 text-slate-500 dark:text-gray-300 text-center">
             Select Final Score ({ladderType === "best3" ? "Best of 3" : "Best of 5"})
           </p>
 
@@ -352,7 +352,7 @@ const MoveNumberInput = ({
                   onCheckedChange={(val) => setScore(val ? s : "")}
                   className="border-violet-500 data-[state=checked]:bg-violet-600"
                 />
-                <label htmlFor={s} className="text-base font-medium cursor-pointer">
+                <label htmlFor={s} className="text-base font-medium cursor-pointer text-slate-700 dark:text-gray-200">
                   {s}
                 </label>
               </div>
@@ -362,10 +362,10 @@ const MoveNumberInput = ({
       )}
 
       {/* Rank Input + Numpad */}
-      <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
+      <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-center p-4 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 shadow-xl">
         {/* Input */}
         <div className="w-full md:w-1/2 flex flex-col items-center md:items-start">
-          <p className="text-base font-medium mb-2 text-gray-300">
+          <p className="text-base font-medium mb-2 text-slate-600 dark:text-gray-300">
             Enter Challenged Rank
           </p>
 
@@ -380,16 +380,19 @@ const MoveNumberInput = ({
             font-mono
             w-full
             max-w-[180px]
-            bg-gray-900
-            border-violet-500
-            text-violet-400
+            bg-slate-100
+            dark:bg-gray-900
+            border-violet-300
+            dark:border-violet-500
+            text-violet-600
+            dark:text-violet-400
             tracking-widest
             rounded-xl
           "
           />
 
           {challengedPlayer && (
-            <p className="text-base text-gray-100 mt-1">
+            <p className="text-base text-slate-700 dark:text-gray-100 mt-1">
               Player: <span className="font-semibold">{challengedPlayer.name}</span>
             </p>
           )}
@@ -408,16 +411,21 @@ const MoveNumberInput = ({
                     className="
               h-12
               w-full
-              bg-gray-700
-              text-gray-100
+              bg-slate-200
+              text-slate-800
+              dark:bg-gray-700
+              dark:text-gray-100
               hover:bg-violet-600
+              hover:text-white
+              dark:hover:bg-violet-600
               transition-all
               text-xl
               font-bold
               rounded-xl
               shadow-lg
               border
-              border-gray-600
+              border-slate-300
+              dark:border-gray-600
             "
                   >
                     {num}
@@ -436,16 +444,21 @@ const MoveNumberInput = ({
                 className="
           h-12
           w-full
-          bg-gray-700
-          text-gray-100
+          bg-slate-200
+          text-slate-800
+          dark:bg-gray-700
+          dark:text-gray-100
           hover:bg-violet-600
+          hover:text-white
+          dark:hover:bg-violet-600
           transition-all
           text-xl
           font-bold
           rounded-xl
           shadow-lg
           border
-          border-gray-600
+          border-slate-300
+          dark:border-gray-600
         "
               >
                 {num}
@@ -462,7 +475,7 @@ const MoveNumberInput = ({
         <Button
           variant="outline"
           onClick={handleBackspace}
-          className="w-full sm:w-auto bg-gray-700 text-gray-300"
+          className="w-full sm:w-auto bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 border-0"
         >
           <ArrowLeft className="w-4 h-4 mr-1" /> Backspace
         </Button>
@@ -491,13 +504,13 @@ const MoveNumberInput = ({
 
       {/* Confirm Dialog */}
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent className="bg-gray-900 border-violet-500 text-gray-100 w-[92vw] sm:max-w-md">
+        <AlertDialogContent className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-violet-500 text-slate-900 dark:text-gray-100 w-[92vw] sm:max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold text-violet-400 flex items-center gap-2">
+            <AlertDialogTitle className="text-xl font-bold text-violet-600 dark:text-violet-400 flex items-center gap-2">
               <CheckCircle className="text-green-500 h-5 w-5" /> Confirm Result
             </AlertDialogTitle>
 
-            <AlertDialogDescription className="text-start text-lg text-white">
+            <AlertDialogDescription className="text-start text-lg text-slate-700 dark:text-white">
               {resultType === "lost"
                 ? `${selectedPlayer?.name || "Player"} lost to ${challengedPlayer?.name || "Player"} ${score || ""}`
                 : `${selectedPlayer?.name || "Player"} beat ${challengedPlayer?.name || "Player"} ${score || ""}`}
@@ -505,13 +518,13 @@ const MoveNumberInput = ({
           </AlertDialogHeader>
 
           <AlertDialogFooter className="mt-5 flex flex-col sm:flex-row gap-3">
-            <AlertDialogCancel className="w-full text-gray-800 sm:w-auto">
+            <AlertDialogCancel className="w-full text-gray-800 dark:text-gray-200 sm:w-auto">
               Go Back
             </AlertDialogCancel>
 
             <AlertDialogAction
               onClick={confirmMove}
-              className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+              className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
             >
               Confirm & Post
             </AlertDialogAction>
@@ -523,13 +536,13 @@ const MoveNumberInput = ({
 
       {/* ❌ DIFFERENT SECTION ALERT */}
       <AlertDialog open={showSectionAlert} onOpenChange={setShowSectionAlert}>
-        <AlertDialogContent className="bg-gray-900 border-red-500 text-gray-100 w-[92vw] sm:max-w-md">
+        <AlertDialogContent className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-red-500 text-slate-900 dark:text-gray-100 w-[92vw] sm:max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold text-red-400">
+            <AlertDialogTitle className="text-xl font-bold text-red-500 dark:text-red-400">
               Invalid Match!
             </AlertDialogTitle>
 
-            <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
+            <AlertDialogDescription className="text-slate-600 dark:text-gray-300 mt-3 text-sm">
               You can only play with players from the <b>same section</b>.
               <br />
               Cross-section matches are <b>not allowed</b>.
@@ -539,7 +552,7 @@ const MoveNumberInput = ({
           <AlertDialogFooter className="mt-5">
             <AlertDialogAction
               onClick={() => setShowSectionAlert(false)}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
               OK, Got It
             </AlertDialogAction>
@@ -550,14 +563,14 @@ const MoveNumberInput = ({
 
       {/* ❌ INVALID RANK ALERT */}
       <AlertDialog open={showRankAlert} onOpenChange={setShowRankAlert}>
-        <AlertDialogContent className="bg-gray-900 border-red-500 text-gray-100 w-[92vw] sm:max-w-md">
+        <AlertDialogContent className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-red-500 text-slate-900 dark:text-gray-100 w-[92vw] sm:max-w-md">
 
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold text-red-400">
+            <AlertDialogTitle className="text-xl font-bold text-red-500 dark:text-red-400">
               Invalid Challenge!
             </AlertDialogTitle>
 
-            <AlertDialogDescription className="text-gray-300 mt-3 text-sm">
+            <AlertDialogDescription className="text-slate-600 dark:text-gray-300 mt-3 text-sm">
               {resultType === "lost"
                 ? "You can only report a loss to lower ranked players."
                 : "You can only challenge higher ranked players."}
@@ -567,7 +580,7 @@ const MoveNumberInput = ({
           <AlertDialogFooter className="mt-5">
             <AlertDialogAction
               onClick={() => setShowRankAlert(false)}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
               OK
             </AlertDialogAction>

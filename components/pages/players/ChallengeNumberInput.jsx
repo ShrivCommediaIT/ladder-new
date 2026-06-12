@@ -74,8 +74,8 @@ const Challenge = ({ userId }) => {
       setChallengeNumber((prev) => prev + num);
       gsap.fromTo(
         ".digit-display",
-        { scale: 1.2, color: "#38bdf8" },
-        { scale: 1, color: "#fff", duration: 0.3 }
+        { scale: 1.2 },
+        { scale: 1, duration: 0.3 }
       );
     }
   };
@@ -114,7 +114,7 @@ const Challenge = ({ userId }) => {
 
   if (localLoading) {
     return (
-      <div className="w-full h-auto flex items-center justify-center bg-gray-900 rounded-xl shadow-md">
+      <div className="w-full h-auto flex items-center justify-center bg-slate-100 dark:bg-gray-900 rounded-xl shadow-md">
         <Skeleton className="w-full h-full" />
       </div>
     );
@@ -124,10 +124,10 @@ const Challenge = ({ userId }) => {
     <>
       {/* 🔥 Confirm Dialog */}
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent className="z-50 bg-white shadow-xl scale-95 animate-in fade-in-50">
+        <AlertDialogContent className="z-50 bg-white dark:bg-gray-900 text-slate-900 dark:text-gray-100 border border-slate-200 dark:border-slate-800 shadow-xl scale-95 animate-in fade-in-50">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-slate-900 dark:text-white">Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
               This action cannot be undone. This will send a challenge to rank{" "}
               <span className="font-bold text-blue-600">
                 {challengeNumber}
@@ -141,7 +141,7 @@ const Challenge = ({ userId }) => {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmChallenge}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 text-white"
             >
               Confirm
             </AlertDialogAction>
@@ -156,11 +156,11 @@ const Challenge = ({ userId }) => {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full flex items-center justify-center max-h-[60vh] overflow-hidden p-4 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-800 rounded-xl shadow-xl"
+        className="w-full flex items-center justify-center max-h-[60vh] overflow-hidden p-4 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-gray-900 dark:via-blue-950 dark:to-gray-800 rounded-xl shadow-xl border border-slate-200 dark:border-gray-700"
       >
         <motion.form
           onSubmit={handleOpenConfirm}
-          className="space-y-4 mt-4 text-white w-full max-w-md"
+          className="space-y-4 mt-4 text-slate-800 dark:text-white w-full max-w-md"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -177,15 +177,15 @@ const Challenge = ({ userId }) => {
               value={challengeNumber}
               placeholder="Enter Rank"
               readOnly
-              className="w-40 border-2 border-zinc-100 digit-display text-center px-4 py-1 text-xl rounded-md text-gray-100 shadow-lg "
+              className="w-40 border-2 border-slate-300 dark:border-zinc-100 digit-display text-center px-4 py-1 text-xl rounded-md text-slate-800 dark:text-gray-100 bg-white dark:bg-gray-900 shadow-lg "
             />
           </motion.div>
 
           {/* 📱 Player Phone Section */}
           <div className="text-sm text-center flex flex-col gap-1 items-center">
-            <p className="text-gray-300">Their number will appear below:</p>
+            <p className="text-slate-500 dark:text-gray-300">Their number will appear below:</p>
             <motion.span
-              className="relative font-semibold border shadow-md px-8 py-2 rounded-md text-lg flex items-center justify-center gap-2 bg-gradient-to-r from-blue-700 to-blue-900"
+              className="relative font-semibold border shadow-md px-8 py-2 rounded-md text-lg flex items-center justify-center gap-2 bg-gradient-to-r from-blue-700 to-blue-900 text-white"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.5 }}
@@ -222,7 +222,7 @@ const Challenge = ({ userId }) => {
                 type="button"
                 whileTap={{ scale: 0.85 }}
                 onClick={() => handleKeyClick(num)}
-                className="py-2 rounded-md border border-gray-600 bg-gray-800 text-lg font-medium text-white cursor-pointer hover:bg-violet-600 transition-all shadow-md"
+                className="py-2 rounded-md border border-slate-300 dark:border-gray-600 bg-slate-200 dark:bg-gray-800 text-lg font-medium text-slate-800 dark:text-white cursor-pointer hover:bg-violet-600 hover:text-white dark:hover:bg-violet-600 transition-all shadow-md"
               >
                 {num}
               </motion.button>
@@ -232,7 +232,7 @@ const Challenge = ({ userId }) => {
               type="button"
               whileTap={{ scale: 0.9, backgroundColor: "#581c87" }}
               onClick={handleBackspace}
-              className="col-span-5 py-2 rounded-md border text-lg font-medium text-white bg-blue-950 hover:bg-violet-700 cursor-pointer shadow-lg"
+              className="col-span-5 py-2 rounded-md border border-slate-300 dark:border-slate-800 text-lg font-medium text-slate-800 dark:text-white bg-slate-200 dark:bg-blue-950 hover:bg-slate-300 dark:hover:bg-violet-700 cursor-pointer shadow-lg"
             >
               ⌫ Backspace
             </motion.button>

@@ -134,17 +134,22 @@ if (userData.user_type === "admin") {
     }
   }, [result, moveError, dispatch, ladder_id]);
 
-  // IMPORTANT: default state = "select"
-  const [selectedTab, setSelectedTab] = useState("select");
+  const [selectedTab, setSelectedTab] = useState("result");
 
   const tabs = [
-    { value: "select", label: "Select :" },
     { value: "result", label: "Result" },
     { value: "challenge", label: "Challenge" },
     { value: "stats", label: "Stats" },
     { value: "edit", label: "Edit" },
     { value: "load", label: "Upload Avatar" },
   ];
+
+  // Reset selectedTab on modal open
+  useEffect(() => {
+    if (open) {
+      setSelectedTab("result");
+    }
+  }, [open]);
 
   const sectionName =
     ladderType === "minileague"
@@ -154,101 +159,96 @@ if (userData.user_type === "admin") {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="min-w-full md:min-w-[700px] lg:min-w-[900px] bg-gray-900 text-white">
-        <DialogTitle className="text-xl font-bold border-b border-gray-700 ">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[95vw] sm:max-w-[700px] lg:max-w-[900px] mx-auto bg-white text-slate-900 border border-slate-200 dark:bg-slate-950 dark:text-white dark:border-slate-800 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogTitle className="text-xl font-bold border-b border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 p-4 text-center">
           {selectedPlayer?.name}
           {sectionName && (
-            <span className="ml-2 text-sm text-blue-400">{sectionName}</span>
+            <span className="ml-2 text-sm text-blue-500 dark:text-blue-400">({sectionName})</span>
           )}
         </DialogTitle>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4">
           <Tabs value={selectedTab} onValueChange={setSelectedTab}>
             {/* DESKTOP TABS */}
-            <div className="hidden text-white sm:block">
-              <TabsList className="w-full bg-gray-800">
-                {tabs
-                  .filter((t) => t.value !== "select")
-                  .map((tab) => (
-                    <TabsTrigger key={tab.value} value={tab.value} className="text-white data-[state=active]:bg-white data-[state=active]:text-black transition-all duration-200">
-                      {tab.label}
-                    </TabsTrigger>
-                  ))}
+            <div className="hidden sm:block mb-4">
+              <TabsList className="w-full flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 gap-1 border border-slate-200/50 dark:border-slate-800">
+                {tabs.map((tab) => (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className="flex-1 text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white text-xs py-1.5 rounded-lg transition-all data-[state=active]:bg-cyan-500 data-[state=active]:text-slate-950 data-[state=active]:font-black"
+                  >
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
               </TabsList>
             </div>
 
-            {/* MOBILE DROPDOWN – FIXED */}
+            {/* MOBILE DROPDOWN */}
             <div className="sm:hidden mb-4">
               <Select value={selectedTab} onValueChange={setSelectedTab}>
-                <SelectTrigger className="w-full bg-gray-800 text-white">
-                  <SelectValue>
-                    {tabs.find((t) => t.value === selectedTab)?.label ||
-                      "Select :"}
-                  </SelectValue>
+                <SelectTrigger className="w-full bg-slate-50 border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white h-10 rounded-xl focus:border-cyan-500">
+                  <SelectValue />
                 </SelectTrigger>
 
-                <SelectContent className="bg-gray-800 text-white">
-                  {tabs
-                    .filter((tab) => tab.value !== "select")
-                    .map((tab) => (
-                      <SelectItem key={tab.value} value={tab.value}>
-                        {tab.label}
-                      </SelectItem>
-                    ))}
+                <SelectContent className="bg-white border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white rounded-xl">
+                  {tabs.map((tab) => (
+                    <SelectItem key={tab.value} value={tab.value}>
+                      {tab.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             {/* TAB CONTENT */}
-            <TabsContent value="result">
-              <MoveNumberMinileague
-                onClose={onClose}
-                currentId={playerId}
-                currentRank={selectedPlayer?.rank}
-                setLoading={setLoading}
-                selectedPlayer={selectedPlayer}
-                userId={userId}
-                ladderId={ladder_id}
-                currentSectionIndex={playerSectionIndex}
-              />
-            </TabsContent>
+            <div className="mt-2 p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
+              <TabsContent value="result">
+                <MoveNumberMinileague
+                  onClose={onClose}
+                  currentId={playerId}
+                  currentRank={selectedPlayer?.rank}
+                  setLoading={setLoading}
+                  selectedPlayer={selectedPlayer}
+                  userId={userId}
+                  ladderId={ladder_id}
+                  currentSectionIndex={playerSectionIndex}
+                />
+              </TabsContent>
 
-            <TabsContent value="challenge">
-              <ChallengeNumberInput
-                selectedPlayer={selectedPlayer}
-                userId={userId}
-                ladderId={ladder_id}
-                ladderType={ladderType}
-              />
-            </TabsContent>
+              <TabsContent value="challenge">
+                <ChallengeNumberInput
+                  selectedPlayer={selectedPlayer}
+                  userId={userId}
+                  ladderId={ladder_id}
+                  ladderType={ladderType}
+                />
+              </TabsContent>
 
-            <TabsContent value="stats">
-              <PlayerStatsBox userId={playerId} ladderId={ladder_id} />
-            </TabsContent>
+              <TabsContent value="stats">
+                <PlayerStatsBox userId={playerId} ladderId={ladder_id} />
+              </TabsContent>
 
+              <TabsContent value="edit">
+                <EditPlayerDetails
+                  userId={playerId}
+                  ladderId={ladder_id}
+                  onClose={onClose}
+                  minileagueSelectedPlayer={selectedPlayer}
+                />
+              </TabsContent>
 
-            <TabsContent value="edit">
-              <EditPlayerDetails
-                userId={playerId}
-                ladderId={ladder_id} // YE ADD KARO (same as PlayerImage)
-                onClose={onClose}
-                minileagueSelectedPlayer={selectedPlayer}
-              />
-            </TabsContent>
-
-            <TabsContent value="load">
-              <PlayerImage
-                userId={playerId}
-                ladderId={ladder_id} // PASSED LADDER ID
-                onClose={onClose}
-              />
-            </TabsContent>
+              <TabsContent value="load">
+                <PlayerImage
+                  userId={playerId}
+                  ladderId={ladder_id}
+                  onClose={onClose}
+                />
+              </TabsContent>
+            </div>
           </Tabs>
         </motion.div>
       </DialogContent>
-
-
-      
     </Dialog>
   );
 };

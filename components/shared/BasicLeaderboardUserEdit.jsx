@@ -76,18 +76,11 @@ export const BasicLeaderboardUserEdit = ({
   }, [type, ladderType, playersSkills, playersPositive, playersNegative, playerId]);
 
   const [selectedTab, setSelectedTab] = useState("activity");
-  const [mobileTab, setMobileTab] = useState(""); // empty = shows placeholder
-
-  const handleMobileTabChange = (val) => {
-    setMobileTab(val);
-    setSelectedTab(val);
-  };
 
   // Reset to initial state every time the modal opens
   useEffect(() => {
     if (open) {
       setSelectedTab("activity");
-      setMobileTab("");
     }
   }, [open]);
 
@@ -128,7 +121,7 @@ export const BasicLeaderboardUserEdit = ({
 
             {/* MOBILE DROPDOWN */}
             <div className="sm:hidden mb-4">
-              <Select value={mobileTab} onValueChange={handleMobileTabChange}>
+              <Select value={selectedTab} onValueChange={setSelectedTab}>
                 <SelectTrigger className="w-full bg-muted border-border text-foreground h-10 rounded-xl focus:border-primary">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
@@ -142,8 +135,8 @@ export const BasicLeaderboardUserEdit = ({
               </Select>
             </div>
 
-            {/* TAB CONTENT — hidden on mobile until a type is selected */}
-            <div className={!mobileTab ? "hidden sm:block" : ""}>
+            {/* TAB CONTENT */}
+            <div className="mt-2 p-4 border border-border rounded-xl">
               {/* ACTIVITY TAB */}
               <TabsContent value="activity">
                 <div className="max-h-[70vh] overflow-auto">

@@ -60,18 +60,11 @@ export const BasicLeaderboardEdit = ({
   }, [result, moveError, dispatch]);
 
   const [selectedTab, setSelectedTab] = useState("activity");
-  const [mobileTab, setMobileTab] = useState(""); // empty = shows placeholder
-
-  const handleMobileTabChange = (val) => {
-    setMobileTab(val);
-    setSelectedTab(val);
-  };
 
   // Reset to initial state every time the modal opens
   useEffect(() => {
     if (open) {
       setSelectedTab("activity");
-      setMobileTab("");
     }
   }, [open]);
 
@@ -87,23 +80,23 @@ export const BasicLeaderboardEdit = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[700px] lg:max-w-[900px] mx-auto bg-gray-900 text-white max-h-[90vh] overflow-y-auto">
-        <DialogTitle className="text-xl font-bold border-b border-gray-700 p-1">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[95vw] sm:max-w-[700px] lg:max-w-[900px] mx-auto bg-background text-foreground border border-border shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogTitle className="text-xl font-bold border-b border-border p-4 text-center text-foreground">
           {selectedPlayer?.name  || "Player"}
         </DialogTitle>
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-3 sm:p-4">
+          <Tabs value={selectedTab} onValueChange={(v) => { setSelectedTab(v); setMobileTab(true); }}>
             {/* DESKTOP TABS */}
             <div className="hidden sm:block">
-              <TabsList className="w-full bg-gray-800 border border-gray-700">
+              <TabsList className="w-full bg-muted border border-border">
                 {tabs.map((tab) => (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
                     className="
-                    text-gray-300
-                    data-[state=active]:text-white
-                    data-[state=active]:bg-gray-700
+                    text-muted-foreground
+                    data-[state=active]:text-foreground
+                    data-[state=active]:bg-background
                     data-[state=active]:shadow-md
                     transition-all duration-200
                   "
@@ -112,16 +105,15 @@ export const BasicLeaderboardEdit = ({
                   </TabsTrigger>
                 ))}
               </TabsList>
-     
             </div>
 
             {/* MOBILE DROPDOWN */}
             <div className="sm:hidden mb-4">
-              <Select value={mobileTab} onValueChange={handleMobileTabChange}>
-                <SelectTrigger className="w-full bg-gray-800 text-white">
+              <Select value={selectedTab} onValueChange={setSelectedTab}>
+                <SelectTrigger className="w-full bg-muted border-border text-foreground">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 text-white">
+                <SelectContent className="bg-popover text-popover-foreground border border-border">
                   {tabs.map((tab) => (
                     <SelectItem key={tab.value} value={tab.value}>
                       {tab.label}
@@ -131,8 +123,8 @@ export const BasicLeaderboardEdit = ({
               </Select>
             </div>
 
-            {/* TAB CONTENT — hidden on mobile until a type is selected */}
-            <div className={!mobileTab ? "hidden sm:block" : ""}>
+            {/* TAB CONTENT */}
+            <div className="mt-2 p-2 sm:p-4 border border-border rounded-xl">
               {/* ACTIVITY TAB - PASS onClose */}
               <TabsContent value="activity">
                 <div className="max-h-[70vh] overflow-auto">

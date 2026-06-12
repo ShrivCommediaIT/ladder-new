@@ -16,14 +16,13 @@ import PlayerPerformationRanking from "./PlayerPerformationRanking";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import PlayerStatusToggle from "./PlayerStatusToggle";
-
-
+import { PLAYER_COLOR_CLASSES, getPlayerInitials, getPhoneText } from "./ladderUtils";
 
 /* ─────────────────────────────────────────────
    1. DEFAULT CARD  (bestof5 / best5 / best3 / winlose)
 ───────────────────────────────────────────── */
 const DefaultPlayerCard = ({ player, rank }) => {
-  const src = player.image ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}` : Logo;
+  const imageUrl = player.image ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}` : null;
   return (
     <div
       className="mb-3 rounded-xl transition-all duration-200 group overflow-hidden"
@@ -38,7 +37,7 @@ const DefaultPlayerCard = ({ player, rank }) => {
         className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2"
         style={{
           borderBottom: "1px solid var(--best-board-border)",
-          background: "var(--secondary)",
+          background: "var(--best-board-surface-soft)",
         }}
       >
         <PlayerStatusToggle player={player} user={true} viewOnly={true} />
@@ -46,94 +45,49 @@ const DefaultPlayerCard = ({ player, rank }) => {
         <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
           {player.age && (
             <span
-              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
-              style={{
-                background: "var(--best-board-accent-soft)",
-                color: "white",
-                border: "1px solid var(--best-board-border-strong)",
-              }}
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]"
             >
               Age : {player.age}
             </span>
           )}
           {player.gender && (
             <span
-              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
-              style={{
-                background: "var(--best-board-accent-soft)",
-                color: "white",
-                border: "1px solid var(--best-board-border-strong)",
-              }}
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]"
             >
-              Gender: {player.gender === "male" ? "M" : "F"}
+              Gender: {player.gender === "male" || player.gender === "Male" ? "M" : "F"}
             </span>
           )}
         </div>
       </div>
 
       {/* ── MAIN BODY ── */}
-      <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
-        {/* LEFT SECTION: rank badge + info */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
-          <PlayerRankBadge
-            rank={rank}
-            sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
-            imgSize={56}
-            textClass="text-[10px] sm:text-xs md:text-sm"
-          />
+      <div className="flex items-center justify-between px-4 py-3 sm:py-4 gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <PlayerRankBadge rank={rank} />
 
-          <div className="flex-1 min-w-0">
-            <div className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight text-[var(--best-board-text)]">
-              {player?.name || "N/A"}
-            </div>
-            <div
-              className="text-[10px] sm:text-xs truncate mb-1 leading-tight"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              {player?.phone || "N/A"}
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT SECTION: total tokens badge + avatar */}
-        <div
-          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
-          style={{ borderLeft: "1px solid var(--best-board-border)" }}
-        >
-          {/* Total Tokens badge */}
-          <div
-            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
-            style={{
-              background: "var(--best-board-accent-soft)",
-              border: "1px solid var(--best-board-border-strong)",
-            }}
-          >
-            <span
-              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
-              style={{ color: "var(--best-board-highlight)" }}
-            >
-              {player?.total_point ?? player?.total_token ?? 0}
-            </span>
-            <span
-              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              Points
-            </span>
-          </div>
-
-          <div
-            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
-            style={{ border: "1px solid var(--best-board-border-strong)" }}
-          >
+          {/* Avatar (Left side) */}
+          {imageUrl ? (
             <Image
-              src={src}
+              src={imageUrl}
               alt={player?.name || "Player"}
-              width={72}
-              height={72}
-              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-200"
+              width={64}
+              height={64}
+              className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shrink-0"
               unoptimized
             />
+          ) : (
+            <div className={`flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br ${PLAYER_COLOR_CLASSES[(Number(rank) - 1) % PLAYER_COLOR_CLASSES.length]} text-sm sm:text-base font-bold text-white shrink-0`}>
+              {getPlayerInitials(player?.name)}
+            </div>
+          )}
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-h5 font-semibold text-[var(--best-board-text)] mb-0.5">
+              {player?.name || "N/A"}
+            </p>
+            <p className="truncate text-sm text-[var(--best-board-muted)]">
+              {getPhoneText(player?.phone)}
+            </p>
           </div>
         </div>
       </div>
