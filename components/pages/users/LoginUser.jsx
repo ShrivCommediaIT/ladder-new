@@ -279,7 +279,7 @@ export default function LoginUser({ ladderId, ladderType }) {
 
           <div className="relative z-10 grid min-h-screen lg:h-screen lg:overflow-hidden lg:grid-cols-[1.15fr_0.85fr]">
             {/* Left Side - Image and Text */}
-            <div className="relative min-h-[380px] overflow-hidden px-6 py-10 sm:px-10 lg:min-h-screen lg:px-14 lg:py-14">
+            <div className="relative hidden lg:block min-h-[380px] overflow-hidden px-6 py-10 sm:px-10 lg:min-h-screen lg:px-14 lg:py-14">
               <div className="absolute inset-0">
                 <Image
                   src="/login/select-game.2.jpeg"

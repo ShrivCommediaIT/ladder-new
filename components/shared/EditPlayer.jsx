@@ -87,13 +87,7 @@ export const EditPlayer = ({
   const status = useSelector((s) => s?.playerStatus) || {};
   const image = useSelector((s) => s?.profileImage) || {};
 
-  const [activeTab, setActiveTab] = useState("");
-  const [mobileTab, setMobileTab] = useState(""); // empty = shows "Select Type" placeholder
-
-  const handleMobileTabChange = (val) => {
-    setMobileTab(val);
-    setActiveTab(val);
-  };
+  const [activeTab, setActiveTab] = useState("move");
   const [challengedPlayer, setChallengedPlayer] = useState("");
   const [showEditSkeleton, setShowEditSkeleton] = useState(false);
 
@@ -189,14 +183,12 @@ export const EditPlayer = ({
       const defaultVal = initialTab && tabs.some(t => t.value === initialTab)
         ? initialTab
         : tabs[0]?.value || "";
-      setMobileTab(defaultVal);
       setActiveTab(defaultVal);
     }
   }, [open, tabs, initialTab]);
 
   // Also reset mobile when ladderType changes (tabs list changes)
   useEffect(() => {
-    setMobileTab("");
     if (tabs.length > 0) {
       setActiveTab(tabs[0].value);
     }
@@ -235,7 +227,7 @@ export const EditPlayer = ({
 
             {/* MOBILE DROPDOWN */}
             <div className="sm:hidden mb-4">
-              <Select value={mobileTab} onValueChange={handleMobileTabChange}>
+              <Select value={activeTab} onValueChange={setActiveTab}>
                 <SelectTrigger className="w-full bg-slate-50 border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white h-10 rounded-xl focus:border-cyan-500">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
@@ -249,9 +241,9 @@ export const EditPlayer = ({
               </Select>
             </div>
 
-            {/* CONTENT — hidden on mobile until a type is selected */}
+            {/* CONTENT */}
             <motion.div
-              className={!mobileTab ? "hidden sm:block" : ""}
+              className="mt-2 p-4 border border-slate-200 dark:border-slate-800 rounded-xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >

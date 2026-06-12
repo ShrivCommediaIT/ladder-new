@@ -37,7 +37,7 @@ const STEPS = [
   },
 ];
 
-export default function OnboardingFlow({isVisible, setIsVisible, setIsONboardingFlowVisible}) {
+export default function OnboardingFlow({setIsONboardingFlowVisible}) {
   const [currentStep, setCurrentStep] = useState(0);
   const router = useRouter();
 
@@ -67,24 +67,22 @@ export default function OnboardingFlow({isVisible, setIsVisible, setIsONboarding
 
   const handleSkip = () => {
     router.push("/register-page");
-    setIsVisible(false);
     setIsONboardingFlowVisible(false);
     localStorage.setItem("hasSeenOnboarding", "true");
+    setCurrentStep(0);
   };
 
   const finishOnboarding = () => {
     router.push("/register-page");
-    setIsVisible(false);
     setIsONboardingFlowVisible(false);
     localStorage.setItem("hasSeenOnboarding", "true");
+    setCurrentStep(0);
   };
 
   const handleClose = () => {
-    setIsVisible(false);
     setIsONboardingFlowVisible(false);
+    setCurrentStep(0);
   };
-
-  if (!isVisible) return null;
 
   const step = STEPS[currentStep];
 

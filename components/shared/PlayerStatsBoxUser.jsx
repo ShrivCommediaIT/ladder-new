@@ -96,7 +96,7 @@ export default function PlayerStatsBoxUser({ userId, ladderId }) {
       transition={{ duration: 0.6 }}
       className="flex justify-center w-full"
     >
-      <div className="w-full sm:max-w-full bg-gradient-to-br from-gray-900 via-blue-950 to-gray-800 text-white rounded-2xl shadow-2xl p-5 overflow-hidden border border-gray-700 backdrop-blur-md">
+      <div className="w-full sm:max-w-full bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-gray-900 dark:via-blue-950 dark:to-gray-800 text-slate-800 dark:text-white rounded-2xl shadow-2xl p-3 sm:p-5 overflow-hidden border border-slate-200 dark:border-gray-700 backdrop-blur-md">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
           <motion.div
@@ -105,7 +105,7 @@ export default function PlayerStatsBoxUser({ userId, ladderId }) {
             transition={{ duration: 0.6 }}
             className="flex items-center gap-3"
           >
-            <h1 className="text-lg sm:text-xl font-bold tracking-wide text-white">
+            <h1 className="text-lg sm:text-xl font-bold tracking-wide text-slate-800 dark:text-white">
               🏆 Player Statistics
             </h1>
           </motion.div>
@@ -119,17 +119,17 @@ export default function PlayerStatsBoxUser({ userId, ladderId }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="rounded-xl overflow-x-auto border border-gray-700 shadow-inner bg-black/30 w-full"
+            className="rounded-xl overflow-x-auto border border-slate-200 dark:border-gray-700 shadow-inner bg-slate-100/50 dark:bg-black/30 w-full"
           >
-            <Table className="w-full text-xs sm:text-sm md:text-base">
-              <TableHeader className="bg-gradient-to-r from-gray-800 to-gray-900">
+            <Table className="w-full text-[11px] sm:text-sm md:text-base">
+              <TableHeader className="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-gray-800 dark:to-gray-900">
                 <TableRow>
-                  <TableHead className="text-blue-400">Games</TableHead>
-                  <TableHead className="text-green-400">Wins</TableHead>
-                  <TableHead className="text-red-400">Win%</TableHead>
-                  <TableHead className="text-sky-300">Points</TableHead>
-                  <TableHead className="text-violet-300">Avg</TableHead>
-                  <TableHead className="text-yellow-300">Rank</TableHead>
+                  <TableHead className="text-blue-600 dark:text-blue-400 px-1 py-2 sm:px-4 text-center">Games</TableHead>
+                  <TableHead className="text-green-600 dark:text-green-400 px-1 py-2 sm:px-4 text-center">Wins</TableHead>
+                  <TableHead className="text-red-600 dark:text-red-400 px-1 py-2 sm:px-4 text-center">Win%</TableHead>
+                  <TableHead className="text-sky-600 dark:text-sky-300 px-1 py-2 sm:px-4 text-center">Points</TableHead>
+                  <TableHead className="text-violet-600 dark:text-violet-300 px-1 py-2 sm:px-4 text-center">Avg</TableHead>
+                  <TableHead className="text-yellow-600 dark:text-yellow-300 px-1 py-2 sm:px-4 text-center">Rank</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -137,23 +137,23 @@ export default function PlayerStatsBoxUser({ userId, ladderId }) {
                   initial={{ opacity: 0, x: -30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
-                  className="border-b border-gray-700 hover:bg-gray-800/70 transition-all duration-200"
+                  className="border-b border-slate-200 dark:border-gray-700 hover:bg-slate-100 dark:hover:bg-gray-800/70 transition-all duration-200"
                 >
-                  <TableCell>{totalGame}</TableCell>
-                  <TableCell className="font-semibold text-gray-400">
+                  <TableCell className="px-1 py-2.5 sm:px-4 text-center text-slate-800 dark:text-gray-300">{totalGame}</TableCell>
+                  <TableCell className="font-semibold text-slate-700 dark:text-gray-400 px-1 py-2.5 sm:px-4 text-center">
                     {totalWin}
                   </TableCell>
                   {/* ✅ FRONTEND WIN% */}
-                  <TableCell className="font-semibold text-gray-400">
+                  <TableCell className="font-semibold text-slate-700 dark:text-gray-400 px-1 py-2.5 sm:px-4 text-center">
                     {winPercentage}
                   </TableCell>
-                  <TableCell className="font-semibold text-gray-400">
+                  <TableCell className="font-semibold text-slate-700 dark:text-gray-400 px-1 py-2.5 sm:px-4 text-center">
                     {totalPoint}
                   </TableCell>
-                  <TableCell className="font-semibold text-gray-400">
+                  <TableCell className="font-semibold text-slate-700 dark:text-gray-400 px-1 py-2.5 sm:px-4 text-center">
                     {avgPoints}
                   </TableCell>
-                  <TableCell className="font-semibold text-yellow-300">
+                  <TableCell className="font-semibold text-yellow-600 dark:text-yellow-300 px-1 py-2.5 sm:px-4 text-center">
                     {data.win_rank}
                   </TableCell>
                 </motion.tr>

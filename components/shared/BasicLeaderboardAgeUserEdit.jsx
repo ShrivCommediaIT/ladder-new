@@ -78,7 +78,6 @@ const BasicLeaderboardAgeUserEdit = ({
 
   const [showSkeleton, setShowSkeleton] = useState(false);
   const [toastPortalReady, setToastPortalReady] = useState(false);
-  console.log("Selected Player in Edit Form:", selectedPlayer);
 
   useEffect(() => {
     setToastPortalReady(true);

@@ -291,33 +291,33 @@ export default function BasicLeaderboardActivityEntryCard({
 
   return (
     <>
-      <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-card border border-border text-card-foreground rounded-2xl shadow-2xl p-3">
-        <div className="mb-2 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 bg-muted p-2 rounded-lg">
+      <Card className="w-full mx-auto max-w-sm sm:max-w-2xl bg-card border border-border text-card-foreground rounded-2xl shadow-2xl p-2 sm:p-3">
+        <div className="mb-2 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2 sm:gap-3 bg-muted p-1.5 sm:p-2 rounded-lg">
           <div className="flex flex-col gap-1">
-            <p className="text-[11px] uppercase tracking-wide text-sky-500">
+            <p className="text-[11px] uppercase tracking-wide text-sky-600 dark:text-sky-400">
               Skill Selected Number : {selectedActivity}
             </p>
             {loadingSkill ? (
               <p className="text-xs text-muted-foreground">Loading skill...</p>
             ) : (
               <>
-                <p className="text-sm text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words leading-relaxed">
+                <p className="text-sm text-sky-600 dark:text-sky-300 text-[11px] uppercase tracking-wide font-medium break-words leading-relaxed">
                   Skill Name : {skillDesc || "No skill description"}
                 </p>
-                <p className="text-sm text-emerald-300 text-[11px] uppercase tracking-wide font-medium leading-relaxed">
+                <p className="text-sm text-emerald-600 dark:text-emerald-300 text-[11px] uppercase tracking-wide font-medium leading-relaxed">
                   Target : {skillTarget ? Math.abs(Number(skillTarget)) : "No target"}
                 </p>
               </>
             )}
           </div>
 
-          <div className="flex gap-4 sm:gap-6 bg-background p-2 rounded-md border border-border w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
+          <div className="flex gap-2 sm:gap-4 bg-background p-1.5 sm:p-2 rounded-md border border-border w-full sm:w-auto mt-2 sm:mt-0 shadow-inner">
             <div className="flex-1 sm:flex-none flex flex-col items-center">
-              <label className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold whitespace-nowrap">
+              <label className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-normal sm:tracking-widest font-bold whitespace-nowrap">
                 Today's Result
               </label>
               <input
-                className="w-full sm:w-16 h-8 text-center rounded text-black font-bold mt-1 bg-white outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full sm:w-16 h-8 text-center rounded text-foreground font-bold mt-1 bg-background border border-input outline-none focus:ring-2 focus:ring-ring"
                 value={value}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -330,11 +330,11 @@ export default function BasicLeaderboardActivityEntryCard({
             </div>
 
             <div className="flex-1 sm:flex-none flex flex-col items-center">
-              <label className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold whitespace-nowrap">
+              <label className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-normal sm:tracking-widest font-bold whitespace-nowrap">
                 Best Result
               </label>
               <input
-                className="w-full sm:w-16 h-8 text-center rounded text-slate-700 font-bold mt-1 bg-slate-300 outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full sm:w-16 h-8 text-center rounded text-muted-foreground font-bold mt-1 bg-muted border border-input outline-none focus:ring-2 focus:ring-ring"
                 value={loadingTopScore ? "..." : topScore}
                 onChange={(e) => setTopScore(e.target.value)}
                 onFocus={() => setBestInputFocused(true)}
@@ -354,8 +354,8 @@ export default function BasicLeaderboardActivityEntryCard({
               }}
               className={`w-7 h-7 rounded-md border text-[11px] transition-all
                 ${selectedActivity === n
-                  ? "bg-sky-400 text-black border-border scale-110 shadow-md"
-                  : "bg-muted border-border text-foreground hover:bg-accent"}`}
+                  ? "bg-primary text-primary-foreground border-primary scale-110 shadow-md font-bold"
+                  : "bg-muted border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"}`}
             >
               {n}
             </button>
@@ -392,7 +392,7 @@ export default function BasicLeaderboardActivityEntryCard({
           <button
             onMouseDown={(e) => e.preventDefault()}
             onClick={handleClear}
-            className="h-9 bg-red-500 text-white rounded font-bold uppercase text-[10px]"
+            className="h-9 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded font-bold uppercase text-[10px] active:scale-95 transition-all"
           >
             Clear
           </button>
@@ -419,7 +419,7 @@ export default function BasicLeaderboardActivityEntryCard({
           <button
             onMouseDown={(e) => e.preventDefault()}
             onClick={handleBackspace}
-            className="h-9 bg-orange-400 text-white rounded font-bold"
+            className="h-9 bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-500 text-white rounded font-bold active:scale-95 transition-all"
           >
             ⌫
           </button>
@@ -428,7 +428,7 @@ export default function BasicLeaderboardActivityEntryCard({
         <Button
           disabled={saving}
           onClick={getBestScore}
-          className="w-full mt-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-11 shadow-lg"
+          className="w-full mt-3 bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-black font-bold h-11 shadow-lg transition-all"
         >
           {saving ? "Saving..." : "Submit Score"}
         </Button>
@@ -436,49 +436,49 @@ export default function BasicLeaderboardActivityEntryCard({
 
       {/* Dialogs */}
       <Dialog open={openSuccess} onOpenChange={handleSuccessClose}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-sm bg-background text-foreground border border-border p-6 rounded-2xl shadow-xl">
           <DialogHeader>
-            <DialogTitle className="text-emerald-500 text-xl font-bold">Score Saved</DialogTitle>
-            <DialogDescription className="text-lg">
-              Recorded score: <b>{value == "-" ? "Reset" : value}</b> <br />
-              Witness: <b>{witnessBy}</b>
+            <DialogTitle className="text-emerald-600 dark:text-emerald-500 text-xl font-bold">Score Saved</DialogTitle>
+            <DialogDescription className="text-lg text-muted-foreground">
+              Recorded score: <b className="text-foreground">{value == "-" ? "Reset" : value}</b> <br />
+              Witness: <b className="text-foreground">{witnessBy}</b>
             </DialogDescription>
           </DialogHeader>
-          <Button onClick={handleSuccessClose} className="bg-emerald-500 text-black font-bold mt-4">OK</Button>
+          <Button onClick={handleSuccessClose} className="bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-black font-bold mt-4 transition-all">OK</Button>
         </DialogContent>
       </Dialog>
 
 
 
       <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto bg-background text-foreground border border-border">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto bg-background text-foreground border border-border rounded-2xl shadow-xl">
 
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-muted/30">
             <h2 className="text-lg font-semibold text-emerald-600 dark:text-emerald-500">
               Enter Result
             </h2>
           </div>
 
           {/* Body */}
-          <div className="px-5 py-4 space-y-4">
+          <div className="px-5 py-4 space-y-4 bg-background">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between text-base sm:text-lg font-bold gap-3">
               <div className="flex items-center gap-2">
                 <span>Today’s Result</span>
-                <span className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-bold">
+                <span className="px-2 py-0.5 border border-input rounded bg-muted text-foreground font-bold">
                   {value}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <span>Your Best Result</span>
-                <span className="px-2 py-0.5 border border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white font-bold">
+                <span className="px-2 py-0.5 border border-input rounded bg-muted text-foreground font-bold">
                    {(topScore === 0 || topScore === "0") ? value : topScore}
                 </span>
               </div>
             </div>
 
-            <p className="text-sm text-gray-600 dark:text-gray-400 font-bold">Note: Results posted without a witness will not qualify for a token.</p>
+            <p className="text-sm text-muted-foreground font-bold">Note: Results posted without a witness will not qualify for a token.</p>
 
             {/* Witness */}
             <div>
@@ -493,7 +493,7 @@ export default function BasicLeaderboardActivityEntryCard({
                   handleSuccessCloseResult();
                 }
               }}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-semibold py-2 rounded-md transition-colors"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-black font-semibold py-2 rounded-md transition-all"
             >
               Confirm
             </Button>
@@ -503,35 +503,37 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
       <Dialog open={openZeroAlert} onOpenChange={setOpenZeroAlert}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto p-0 overflow-hidden rounded-md border border-border bg-background text-foreground shadow-xl [&>button]:hidden max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto p-0 overflow-hidden rounded-2xl border border-border bg-background text-foreground shadow-xl [&>button]:hidden max-h-[90vh] overflow-y-auto">
 
           {/* HEADER BAR (like system popup) */}
-          <div className="flex items-center justify-between bg-background px-3 py-2 border-b border-border">
-            <span className="font-semibold text-sm"> </span>
+          <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b border-border">
+            <span className="font-semibold text-sm">System Alert</span>
 
             {/* Single Close Button */}
             <button
               onClick={() => setOpenZeroAlert(false)}
-              className="text-muted-foreground hover:text-foreground text-lg font-bold"
+              className="text-muted-foreground hover:text-foreground text-lg font-bold transition-colors"
             >
               ✕
             </button>
           </div>
 
           {/* BODY */}
-          <div className="flex justify-between gap-4 p-4 text-foreground">
+          <div className="flex justify-between gap-4 p-4 text-foreground bg-background">
 
             {/* TEXT */}
             <div className="text-sm leading-relaxed">
               {(zeroAction !== "onlyReset") && <p className="font-bold">
                 DO YOU WISH TO ENTER A SCORE OF ZERO?{" "}
-                <span className="font-normal">If so - press OK</span>
+                <span className="font-normal text-muted-foreground">If so - press OK</span>
               </p>}
 
               <p className={`${zeroAction !== "onlyReset" ? "mt-3" : ''}`}>
                 <span className="font-bold">ERROR?</span>{" "}
-                If you wish to correct putting in a score incorrectly that should
-                have gone into another activity, press RESET
+                <span className="text-muted-foreground">
+                  If you wish to correct putting in a score incorrectly that should
+                  have gone into another activity, press RESET
+                </span>
               </p>
             </div>
 
@@ -542,7 +544,7 @@ export default function BasicLeaderboardActivityEntryCard({
               {zeroAction !== "onlyReset" && (
                 <button
                   onClick={() => handleZeroConfirm("ok")}
-                  className="bg-green-400 hover:bg-green-500 text-black font-bold py-1 rounded shadow"
+                  className="bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-black font-bold py-1 px-3 rounded shadow active:scale-95 transition-all"
                 >
                   OK
                 </button>
@@ -551,7 +553,7 @@ export default function BasicLeaderboardActivityEntryCard({
               {/* Reset button → always visible */}
               <button
                 onClick={() => handleZeroConfirm("reset")}
-                className="bg-red-500 hover:bg-red-600 text-black font-bold py-1 rounded shadow"
+                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold py-1 px-3 rounded shadow active:scale-95 transition-all"
               >
                 Reset
               </button>

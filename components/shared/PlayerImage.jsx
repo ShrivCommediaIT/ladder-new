@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Cropper from "react-easy-crop";
-import defaultAvatar from "@/public/logo.jpg";
+const defaultAvatar = "/logo.jpg";
 import { useSearchParams } from "next/navigation";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
@@ -31,6 +31,25 @@ const PlayerImage = ({ userId, ladderId, ladderType, onClose = () => { } }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  const playerState = useSelector((state) => state.player?.players?.[ladderId]) || {};
+  const rosterState = useSelector((state) => state.rosterLeaderboard) || {};
+
+  const isRoster = ladderType === "roster";
+  const imagePath = isRoster
+    ? (rosterState.image_path || "https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original")
+    : (playerState.image_path || "https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original");
+
+  const players = isRoster ? (rosterState.data || []) : (playerState.data || []);
+  const selectedPlayer = players.find((p) => Number(p.id) === Number(userId)) || null;
+
+  useEffect(() => {
+    if (selectedPlayer?.image) {
+      setPreview(`${imagePath}/${selectedPlayer.image}`);
+    } else {
+      setPreview(defaultAvatar);
+    }
+  }, [selectedPlayer, imagePath]);
 
   // Reset state on unmount
   useEffect(() => {
