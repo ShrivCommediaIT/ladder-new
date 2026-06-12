@@ -125,11 +125,16 @@ export default function LoginByClubForm() {
 
       const user =
         values.userType === "sub_admin"
-          ? { ...(res.subadmin || {}), isLoggedIn: true }
-          : { ...(res.data || {}), isLoggedIn: true };
+          ? { 
+              ...(res.subadmin || {}), 
+              isLoggedIn: true, 
+              user_type: "sub_admin",
+              image_path: res.image_path || res.data?.image_path || "https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original"
+            }
+          : { ...(res.data || {}), isLoggedIn: true, user_type: "admin" };
 
       sessionStorage.setItem(storageKey, JSON.stringify(user));
-      sessionStorage.setItem("adminDetails", JSON.stringify({ ...res.data, image_path: res.image_path }));
+      sessionStorage.setItem("adminDetails", JSON.stringify({ ...res.data, image_path: res.image_path, user_type: "admin" }));
 
       const route = values.userType === "sub_admin" ? subAdminPage : adminPage;
 

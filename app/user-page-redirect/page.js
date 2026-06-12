@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import PlayersList from "@/components/pages/users/PlayersList";
 import BasicLeaderboardUser from "@/components/pages/users/BasicLeaderboardUser";
 import RosterLeaderboardUser from "@/components/pages/users/RosterLeaderboardUser";
-import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
 import InfoSection from "@/components/shared/InfoSection";
 import { EditPlayer } from "@/components/shared/EditPlayer";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";

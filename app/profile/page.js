@@ -22,7 +22,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import useAuthGuard from "@/hooks/useAuthGuard";
-import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
+import Navbar from "@/components/shared/Navbar";
 import { postRequest, postFormData } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { checkPasswordStrength } from "@/lib/utils";
@@ -43,10 +43,14 @@ const getUserImage = (user) => {
   if (user.image.startsWith("http") || user.image.startsWith("blob:")) {
     return user.image;
   }
-  if (user.image_path) {
-    return `${user.image_path}/${user.image}`;
+  let img = user.image;
+  if (img.includes("/")) {
+    img = img.substring(img.lastIndexOf("/") + 1);
   }
-  return `https://ne-games.com/leaderBoard/public/uploads/${user.image}`;
+  if (user.image_path) {
+    return `${user.image_path}/${img}`;
+  }
+  return `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${img}`;
 };
 
 export default function ProfilePage() {
@@ -99,18 +103,24 @@ export default function ProfilePage() {
         const admin = storedAdmin ? JSON.parse(storedAdmin) : null;
 
         let mergedUser = null;
-        if (subAdmin?.user_type === "sub_admin") {
+        if (subAdmin?.user_type === "sub_admin" || subAdmin) {
           mergedUser = { ...subAdmin };
-        } else if (admin?.user_type === "admin") {
+          if (!mergedUser.user_type) mergedUser.user_type = "sub_admin";
+        } else if (admin?.user_type === "admin" || admin) {
           mergedUser = { ...admin, ...adminDetails };
-        } else if (adminDetails?.user_type === "admin") {
+          if (!mergedUser.user_type) mergedUser.user_type = "admin";
+        } else if (adminDetails?.user_type === "admin" || adminDetails) {
           mergedUser = { ...adminDetails };
+          if (!mergedUser.user_type) mergedUser.user_type = "admin";
         }
 
         if (mergedUser) {
+          if (!mergedUser.user_id) {
+            mergedUser.user_id = mergedUser.login_id || mergedUser.email || "";
+          }
           setUser(mergedUser);
-          setName(mergedUser.name || "");
-          setPhone(mergedUser.phone || "");
+          setName(mergedUser.name || mergedUser.admin_name || "");
+          setPhone(mergedUser.phone || mergedUser.admin_phone || "");
         }
       } catch (err) {
         console.error("Failed to parse user session in profile page", err);
@@ -187,8 +197,20 @@ export default function ProfilePage() {
               const existingUserData = JSON.parse(sessionStorage.getItem("userData") || "{}");
               const existingAdminDetails = JSON.parse(sessionStorage.getItem("adminDetails") || "{}");
 
-              const updatedUserData = { ...existingUserData, name: name.trim(), phone: cleanPhone };
-              const updatedAdminDetails = { ...existingAdminDetails, name: name.trim(), phone: cleanPhone };
+              const updatedUserData = { 
+                ...existingUserData, 
+                name: name.trim(), 
+                phone: cleanPhone,
+                admin_name: name.trim(),
+                admin_phone: cleanPhone
+              };
+              const updatedAdminDetails = { 
+                ...existingAdminDetails, 
+                name: name.trim(), 
+                phone: cleanPhone,
+                admin_name: name.trim(),
+                admin_phone: cleanPhone
+              };
 
               sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
               sessionStorage.setItem("adminDetails", JSON.stringify(updatedAdminDetails));
@@ -237,12 +259,14 @@ export default function ProfilePage() {
 
           const res = await postFormData(endpoint, formData);
 
-          if (res.status == 200 || res.status === "success") {
-            let imageUrl = res?.image || res?.data?.image || res?.path;
+          if (res.status == 200 || res.status === "success" || res.status === true || res.success) {
+            let imageUrl = res?.image || res?.data?.image || res?.path || res?.subadmin?.image || res?.data?.subadmin?.image || res?.image_name;
 
             if (imageUrl) {
               let filename = imageUrl;
               if (imageUrl.startsWith("http")) {
+                filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+              } else if (imageUrl.includes("/")) {
                 filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
               }
 
@@ -252,7 +276,7 @@ export default function ProfilePage() {
                 const updated = { 
                   ...existing, 
                   image: filename,
-                  image_path: res?.image_path || res?.data?.image_path || "https://ne-games.com/leaderBoard/public/uploads"
+                  image_path: res?.image_path || res?.data?.image_path || existing.image_path || "https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original"
                 };
                 sessionStorage.setItem("subAdmin", JSON.stringify(updated));
                 setUser(updated);
@@ -375,7 +399,16 @@ export default function ProfilePage() {
       <ToastContainer />
 
       <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        
+        {/* Back Button / Page Header */}
+        <div className="mb-6">
+          <button
+            onClick={handleBackToDashboard}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-400 hover:text-zinc-100 transition-colors"
+          >
+            <ArrowLeft className="h-4.5 w-4.5" />
+            Back to {user?.user_type === "sub_admin" ? "Sub-Admin Dashboard" : "Admin Dashboard"}
+          </button>
+        </div>
 
         {/* Dynamic Layout */}
         <div className={user?.user_type === "sub_admin" ? "max-w-2xl mx-auto w-full" : "grid grid-cols-1 lg:grid-cols-12 gap-8"}>
@@ -446,7 +479,7 @@ export default function ProfilePage() {
                   {name || "User Profile"}
                 </h3>
                 <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-widest mt-1 bg-blue-500/10 dark:bg-blue-500/20 px-3 py-1 rounded-full">
-                  {user?.user_type === "sub_admin" ? "Section Admin" : " Admin"}
+                  {user?.user_type === "sub_admin" ? "Section Admin" : "Admin"}
                 </span>
               </div>
 

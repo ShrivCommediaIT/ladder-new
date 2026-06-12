@@ -27,10 +27,14 @@ const getUserImage = (user) => {
   if (user.image.startsWith("http") || user.image.startsWith("blob:")) {
     return user.image;
   }
-  if (user.image_path) {
-    return `${user.image_path}/${user.image}`;
+  let img = user.image;
+  if (img.includes("/")) {
+    img = img.substring(img.lastIndexOf("/") + 1);
   }
-  return `https://ne-games.com/leaderBoard/public/uploads/${user.image}`;
+  if (user.image_path) {
+    return `${user.image_path}/${img}`;
+  }
+  return `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${img}`;
 };
 
 const UserDetails = ({ user: demoUser, ladderType }) => {

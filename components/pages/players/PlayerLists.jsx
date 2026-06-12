@@ -10,7 +10,6 @@ import ActivityLog from "./ActivityList";
 import LeaderBoard from "./LeaderBoard";
 import LadderRulesCard from "./LadderRulesCard";
 import MusicDownloadList from "./MusicDownloadList";
-import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
 import AdminEditPhone from "@/components/shared/AdminEditPhone";
 import Info from "@/components/shared/Info";
 import AgeFilter from "@/components/shared/AgeFilter";
