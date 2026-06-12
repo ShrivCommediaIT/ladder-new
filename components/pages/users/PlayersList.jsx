@@ -228,18 +228,11 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       return;
     }
 
+    setSelectedPlayerId(player.id);
     const isCurrentUser =
       String(loggedInUserId) === String(player.id) ||
       (player.user_id && String(loggedInUserId) === String(player.user_id));
-
-    if (!isCurrentUser) {
-      setDialogMessage("You cannot view or edit other players' control panels. You can only manage your own card.");
-      setIsDialogOpen(true);
-      return;
-    }
-
-    setSelectedPlayerId(player.id);
-    setInitialTab(null);
+    setInitialTab(isCurrentUser ? null : "stats");
     setIsModalOpen(true);
   };
 
@@ -376,7 +369,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                       </div>
 
                       {/* Challenge Button */}
-                      {loggedInUserId && isCurrentUser && (
+                      {loggedInUserId && !isCurrentUser && (
                         <div className="flex items-center shrink-0">
                           <button
                             type="button"

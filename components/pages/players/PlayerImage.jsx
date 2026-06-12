@@ -18,7 +18,7 @@ import Image from "next/image";
 import Cropper from "react-easy-crop";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, UploadCloud, Loader2 } from "lucide-react";
-import defaultAvatar from "@/public/logo.jpg";
+const defaultAvatar = "/logo.jpg";
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchUserActivity } from "@/redux/slices/activitySlice";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
@@ -37,6 +37,25 @@ const PlayerImage = ({ userId, ladderId, ladderType, onClose = () => { } }) => {
   const { loading, success, error } = useSelector(
     (state) => state.profileImage
   );
+
+  const playerState = useSelector((state) => state.player?.players?.[ladderId]) || {};
+  const rosterState = useSelector((state) => state.rosterLeaderboard) || {};
+
+  const isRoster = ladderType === "roster";
+  const imagePath = isRoster
+    ? (rosterState.image_path || "https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original")
+    : (playerState.image_path || "https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original");
+
+  const players = isRoster ? (rosterState.data || []) : (playerState.data || []);
+  const selectedPlayer = players.find((p) => Number(p.id) === Number(userId)) || null;
+
+  useEffect(() => {
+    if (selectedPlayer?.image) {
+      setPreview(`${imagePath}/${selectedPlayer.image}`);
+    } else {
+      setPreview(defaultAvatar);
+    }
+  }, [selectedPlayer, imagePath]);
 
   useEffect(() => {
     return () => {

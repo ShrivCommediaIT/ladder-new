@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/components/shared/Navbar";
 import topLogo from "@/public/topLogo.png";
@@ -19,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 export default function TermsAndConditions() {
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -253,12 +255,21 @@ export default function TermsAndConditions() {
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 mt-4">
         
         {/* Back navigation */}
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--landing-muted)] hover:text-[var(--landing-primary)] mb-8 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" /> Back to Home
-        </Link>
+        {isLoggedIn ? (
+          <button 
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--landing-muted)] hover:text-[var(--landing-primary)] mb-8 transition-colors cursor-pointer bg-transparent border-0 p-0"
+          >
+            <ArrowLeft className="h-4 w-4" /> Previous Page
+          </button>
+        ) : (
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--landing-muted)] hover:text-[var(--landing-primary)] mb-8 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to Home
+          </Link>
+        )}
 
         {/* Document Header */}
         <div className="text-center mb-16">

@@ -218,53 +218,55 @@ export const MinileagueEditPlayer = ({
               </Select>
             </div>
 
-          <TabsContent value="result">
-            <MovePlayerMinileague
-              onClose={onClose}
-              currentId={playerId}
-              currentRank={selectedPlayer?.rank}
-              setLoading={setLoading}
-              selectedPlayer={selectedPlayer}
-              ladderId={ladder_id}
-              userId={loggedInUserId}
-              currentSectionIndex={playerSectionIndex}
-            />
-          </TabsContent>
+            <div className="mt-2 p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
+              <TabsContent value="result">
+                <MovePlayerMinileague
+                  onClose={onClose}
+                  currentId={playerId}
+                  currentRank={selectedPlayer?.rank}
+                  setLoading={setLoading}
+                  selectedPlayer={selectedPlayer}
+                  ladderId={ladder_id}
+                  userId={loggedInUserId}
+                  currentSectionIndex={playerSectionIndex}
+                />
+              </TabsContent>
 
-          <TabsContent value="challenge">
-            <ChallengeNumberInput
-              selectedPlayer={selectedPlayer}
-              userId={loggedInUserId}
-              ladderId={ladder_id}
-              ladderType={ladderType}
-            />
-          </TabsContent>
+              <TabsContent value="challenge">
+                <ChallengeNumberInput
+                  selectedPlayer={selectedPlayer}
+                  userId={loggedInUserId}
+                  ladderId={ladder_id}
+                  ladderType={ladderType}
+                />
+              </TabsContent>
 
-          <TabsContent value="stats">
-            {playerId && ladder_id ? (
-              <PlayerStatsBoxUser userId={playerId} ladderId={ladder_id} />
-            ) : (
-              <Skeleton className="h-40 w-full bg-white/10" />
-            )}
-          </TabsContent>
+              <TabsContent value="stats">
+                {playerId && ladder_id ? (
+                  <PlayerStatsBoxUser userId={playerId} ladderId={ladder_id} />
+                ) : (
+                  <Skeleton className="h-40 w-full bg-white/10" />
+                )}
+              </TabsContent>
 
-          <TabsContent value="edit">
-            <EditPlayerDetails
-              userId={playerId}
-              ladderId={ladder_id}
-              selectedPlayer={selectedPlayer}
-              onClose={onClose}
-            />
-          </TabsContent>
+              <TabsContent value="edit">
+                <EditPlayerDetails
+                  userId={playerId}
+                  ladderId={ladder_id}
+                  selectedPlayer={selectedPlayer}
+                  onClose={onClose}
+                />
+              </TabsContent>
 
-          <TabsContent value="load">
-            <PlayerImage
-              userId={playerId}
-              ladderId={ladder_id}
-              onClose={onClose}
-            />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="load">
+                <PlayerImage
+                  userId={playerId}
+                  ladderId={ladder_id}
+                  onClose={onClose}
+                />
+              </TabsContent>
+            </div>
+          </Tabs>
         </div>
       </DialogContent>
     </Dialog>

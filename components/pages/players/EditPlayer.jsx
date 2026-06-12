@@ -93,20 +93,13 @@ export const EditPlayer = ({
   }, [result, moveError, dispatch, ladder_id]);
 
   const [selectedTab, setSelectedTab] = useState(initialTab || "result");
-  const [mobileTab, setMobileTab] = useState(initialTab || ""); // empty = shows placeholder
 
   // Reset tabs to initial state every time the modal opens
   useEffect(() => {
     if (open) {
       setSelectedTab(initialTab || "result");
-      setMobileTab(initialTab || "");
     }
   }, [open, initialTab]);
-
-  const handleMobileTabChange = (val) => {
-    setMobileTab(val);
-    setSelectedTab(val);
-  };
 
   const tabs = [
     { value: "result", label: "Result" },
@@ -119,8 +112,8 @@ export const EditPlayer = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[700px] lg:max-w-[900px] mx-auto bg-gray-900 text-white max-h-[90vh] overflow-y-auto">
-        <DialogTitle className="text-xl font-bold text-violet-400 border-b border-gray-800">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-[95vw] sm:max-w-[700px] lg:max-w-[900px] mx-auto bg-white text-slate-900 border border-slate-200 dark:bg-slate-950 dark:text-white dark:border-slate-800 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogTitle className="text-xl font-bold border-b border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 p-4 text-center">
           {selectedPlayer
             ? `Edit Player: ${selectedPlayer.name} (Rank: ${selectedPlayer.rank})`
             : "Edit Player"}
@@ -129,7 +122,7 @@ export const EditPlayer = ({
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-1"
+          className="p-4 overflow-y-auto max-h-[80vh]"
         >
           <Tabs
             value={selectedTab}
@@ -137,14 +130,13 @@ export const EditPlayer = ({
             className="w-full"
           >
             {/* DESKTOP TABS */}
-            <div className="hidden sm:block">
-              <TabsList className="w-full bg-gray-800 rounded-lg">
+            <div className="hidden sm:block mb-4">
+              <TabsList className="w-full flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 gap-1 border border-slate-200/50 dark:border-slate-800">
                 {tabs.map((tab) => (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="flex-1 px-4 py-2 text-sm text-gray-300 
-                    data-[state=active]:bg-violet-600 data-[state=active]:text-white"
+                    className="flex-1 text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white text-xs py-1.5 rounded-lg transition-all data-[state=active]:bg-cyan-500 data-[state=active]:text-slate-950 data-[state=active]:font-black"
                   >
                     {tab.label}
                   </TabsTrigger>
@@ -153,12 +145,12 @@ export const EditPlayer = ({
             </div>
 
             {/* MOBILE DROPDOWN */}
-            <div className="sm:hidden mb-2">
-              <Select value={mobileTab} onValueChange={handleMobileTabChange}>
-                <SelectTrigger className="w-full bg-gray-800 text-white">
+            <div className="sm:hidden mb-4">
+              <Select value={selectedTab} onValueChange={setSelectedTab}>
+                <SelectTrigger className="w-full bg-slate-50 border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white h-10 rounded-xl focus:border-cyan-500">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 text-white">
+                <SelectContent className="bg-white border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white rounded-xl">
                   {tabs.map((tab) => (
                     <SelectItem key={tab.value} value={tab.value}>
                       {tab.label}
@@ -169,7 +161,7 @@ export const EditPlayer = ({
             </div>
 
             {/* TAB CONTENT */}
-            <div className={`mt-2 p-4 border border-gray-700 rounded-xl ${!mobileTab ? "hidden sm:block" : ""}`}>
+            <div className="mt-2 p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
               <TabsContent value="result">
                 <MoveNumberInput
                   onClose={onClose}

@@ -48,7 +48,6 @@ import OnboardingFlow from "@/components/shared/OnboardingFlow";
 export default function PlanHeading() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-    const [isVisible, setIsVisible] = useState(true);
     const [isONboardingFlowVisible, setIsONboardingFlowVisible] = useState(false);
   
   const { theme, setTheme } = useTheme();
@@ -75,15 +74,11 @@ export default function PlanHeading() {
     setMounted(true);
   }, []);
 
-    // useEffect(() => {
-  //   const hasSeenOnboarding = localStorage.getItem("hasSeenOnboarding");
-  //   if (!hasSeenOnboarding) {
-  //     setIsVisible(true);
-  //   }
-  // }, []);
 
-
-  const handleNavigationToAuth = () => {
+  const handleNavigationToAuth = (e) => {
+    if (e && typeof e.preventDefault === "function") {
+      e.preventDefault();
+    }
     setIsONboardingFlowVisible(true);
   }
 
@@ -826,7 +821,7 @@ export default function PlanHeading() {
           </div>
         </div>
       </footer>
-      {isONboardingFlowVisible && <OnboardingFlow isVisible={isVisible} setIsVisible={setIsVisible} setIsONboardingFlowVisible={setIsONboardingFlowVisible} />}
+      {isONboardingFlowVisible && <OnboardingFlow setIsONboardingFlowVisible={setIsONboardingFlowVisible} />}
     </main>
   );
 }

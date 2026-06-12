@@ -213,13 +213,13 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="w-full max-w-full"
     >
-      <Card className="bg-gradient-to-br from-[#0f172a]/90 to-[#1e3a8a]/80 border border-white/20 shadow-2xl rounded-xl p-1 backdrop-blur-lg">
-        <CardContent className="p-6 text-white">
+      <Card className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0f172a]/90 dark:to-[#1e3a8a]/80 border border-slate-200 dark:border-white/20 shadow-2xl rounded-xl p-1 backdrop-blur-lg">
+        <CardContent className="p-6 text-slate-800 dark:text-white">
           <motion.h2
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-2xl font-bold text-center bg-gradient-to-r from-blue-100 to-cyan-300 text-transparent bg-clip-text mb-4"
+            className="text-2xl font-bold text-center bg-gradient-to-r from-blue-700 to-cyan-600 dark:from-blue-100 dark:to-cyan-300 text-transparent bg-clip-text mb-4"
           >
             Edit Player Details 
           </motion.h2>
@@ -239,7 +239,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
               className="space-y-5"
             >
               <motion.div whileHover={{ scale: 1.02 }}>
-                <Label htmlFor="name" className="text-blue-200 mb-2 font-semibold">
+                <Label htmlFor="name" className="text-slate-600 dark:text-blue-200 mb-2 font-semibold">
                   Name
                 </Label>
                 <Input
@@ -247,7 +247,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  className="bg-white/10 border-white/30 text-white focus:ring-2 focus:ring-cyan-400 py-6"
+                  className="bg-slate-100/50 border-slate-300 text-slate-800 dark:bg-white/10 dark:border-white/30 dark:text-white focus:ring-2 focus:ring-cyan-400 py-6"
                   required
                 />
               </motion.div>
@@ -255,7 +255,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
             <div>
               <Label
                 htmlFor="dob"
-                className="text-gray-300 font-semibold py-2 text-lg"
+                className="text-slate-600 dark:text-gray-300 font-semibold py-2 text-lg"
               >
                 Date of Birth
               </Label>
@@ -269,12 +269,12 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                     dob: date,
                   }))
                 }
-                className="text-white px-4 bg-gray-700/50 border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
+                className="text-slate-800 dark:text-white px-4 bg-slate-100 dark:bg-gray-700/50 border-slate-300 dark:border-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 h-12"
               />
             </div>
 
               <motion.div whileHover={{ scale: 1.02 }}>
-                <Label htmlFor="phone" className="text-blue-200 mb-2 font-semibold">
+                <Label htmlFor="phone" className="text-slate-600 dark:text-blue-200 mb-2 font-semibold">
                   Phone Number (Optional)
                 </Label>
                 <Input
@@ -284,14 +284,14 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                   maxLength={11}
                   value={form.phone}
                   onChange={handleChange}
-                  className="bg-white/10 py-6 border-white/30 text-white focus:ring-2 focus:ring-cyan-400"
+                  className="bg-slate-100/50 border-slate-300 text-slate-800 dark:bg-white/10 dark:border-white/30 dark:text-white focus:ring-2 focus:ring-cyan-400 py-6"
                   placeholder="Enter 11 digit phone number (Optional)"
                 />
               </motion.div>
 
               {/* GENDER */}
               { ladderType !== "minileague" && <motion.div whileHover={{ scale: 1.02 }} className="space-y-2 w-full" ref={genderRef}>
-                <Label className="text-blue-200 font-semibold">Gender</Label>
+                <Label className="text-slate-600 dark:text-blue-200 font-semibold">Gender</Label>
 
                 {/* Custom theme-aware gender dropdown */}
                 <div className="relative">
@@ -300,14 +300,14 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                     type="button"
                     onClick={() => !isReadOnly && setGenderOpen((o) => !o)}
                     disabled={isReadOnly}
-                    className={`h-12 w-full rounded-xl border border-white/30 bg-white/10 px-4 text-left text-sm flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all text-white ${isReadOnly ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                    className={`h-12 w-full rounded-xl border border-slate-300 dark:border-white/30 bg-slate-100/50 dark:bg-white/10 px-4 text-left text-sm flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all text-slate-800 dark:text-white ${isReadOnly ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                   >
-                    <span className={form.gender ? "text-white" : "text-white/50"}>
+                    <span className={form.gender ? "text-slate-800 dark:text-white" : "text-slate-400 dark:text-white/50"}>
                       {form.gender === "male" ? "Male" : form.gender === "female" ? "Female" : "Select Gender"}
                     </span>
                     {/* Chevron */}
                     <svg
-                      className={`w-4 h-4 text-white/60 shrink-0 transition-transform duration-200 ${genderOpen ? "rotate-180" : ""}`}
+                      className={`w-4 h-4 text-slate-600 dark:text-white/60 shrink-0 transition-transform duration-200 ${genderOpen ? "rotate-180" : ""}`}
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 20 20"
                       fill="currentColor"
@@ -318,7 +318,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
 
                   {/* Dropdown panel */}
                   {genderOpen && (
-                    <div className="absolute z-50 mt-1 w-full rounded-xl border border-white/20 bg-slate-800 shadow-lg overflow-hidden">
+                    <div className="absolute z-50 mt-1 w-full rounded-xl border border-slate-200 dark:border-white/20 bg-white dark:bg-slate-800 shadow-lg overflow-hidden">
                       {[
                         { value: "", label: "Select Gender", placeholder: true },
                         { value: "male", label: "Male" },
@@ -331,8 +331,8 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
                             setForm((prev) => ({ ...prev, gender: opt.value }));
                             setGenderOpen(false);
                           }}
-                          className={`w-full px-4 py-3 text-left text-sm flex items-center justify-between transition-colors hover:bg-white/10
-                            ${opt.placeholder ? "text-white/40" : "text-white"}
+                          className={`w-full px-4 py-3 text-left text-sm flex items-center justify-between transition-colors hover:bg-slate-100 dark:hover:bg-white/10
+                            ${opt.placeholder ? "text-slate-400 dark:text-white/40" : "text-slate-800 dark:text-white"}
                           `}
                         >
                           {opt.label}
@@ -350,11 +350,11 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
 
               {/* COUNTRY */}
               <motion.div whileHover={{ scale: 1.02 }} className="space-y-2 w-full">
-                <Label className="text-blue-200 font-semibold">Country</Label>
+                <Label className="text-slate-600 dark:text-blue-200 font-semibold">Country</Label>
                 <CountrySelect
                   value={form.country}
                   onValueChange={(val) => setForm((prev) => ({ ...prev, country: val }))}
-                  className="bg-white/10 border-white/30 text-white w-full focus:ring-2 focus:ring-cyan-400 py-6 h-12"
+                  className="bg-slate-100/50 border-slate-300 text-slate-800 dark:bg-white/10 dark:border-white/30 dark:text-white w-full focus:ring-2 focus:ring-cyan-400 py-6 h-12"
                 />
               </motion.div>
 
