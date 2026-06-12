@@ -29,7 +29,6 @@ import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
 import LadderList from "./LadderList";
 import DemoLadder from "./DemoLadder";
 import AdminImportantInfo from "./info/AdminImportantInfo";
-import BespokeFooter from "@/components/shared/BespokeFooter";
 
 import {
   Dialog,
@@ -37,6 +36,7 @@ import {
   DialogTrigger,
   DialogTitle,
 } from "@/components/ui/dialog";
+import AdminQuickActions from "@/components/shared/AdminQuickActions";
 
 const cardToneClasses = [
   "from-primary/20 via-primary/5 to-transparent",
@@ -71,6 +71,7 @@ export default function AdminPage() {
   const [duplicateWarning, setDuplicateWarning] = useState(null);
   const [admin, setAdmin] = useState(null);
   const [quickGuideOpen, setQuickGuideOpen] = useState(false);
+
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -289,8 +290,6 @@ export default function AdminPage() {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground mt-10 overflow-x-hidden">
-      {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
-      <PlayerLevelNavbar activeTab="dashboard" />
 
       <div className="absolute inset-0" style={{ background: "var(--page-glow-corners)" }} />
       <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "var(--page-grid-overlay)", backgroundSize: "78px 78px" }} />
@@ -511,11 +510,9 @@ export default function AdminPage() {
             )}
           </div>
         </div>
+        <AdminQuickActions />
       </div>
 
-      <div className="relative z-10 mt-10">
-        <BespokeFooter />
-      </div>
     </div>
   );
 }

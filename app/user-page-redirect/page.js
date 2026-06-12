@@ -14,7 +14,6 @@ import PlayersList from "@/components/pages/users/PlayersList";
 import BasicLeaderboardUser from "@/components/pages/users/BasicLeaderboardUser";
 import RosterLeaderboardUser from "@/components/pages/users/RosterLeaderboardUser";
 import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
-import BespokeFooter from "@/components/shared/BespokeFooter";
 import InfoSection from "@/components/shared/InfoSection";
 import { EditPlayer } from "@/components/shared/EditPlayer";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
@@ -225,12 +224,6 @@ function UserPageRedirectRouter() {
 
   return (
     <div className="ladder-shell flex flex-col min-h-screen">
-      <PlayerLevelNavbar
-        userLevel={true}
-        ladderType={ladderType}
-      />
-
-
       <main className="w-full px-1 pb-6 sm:px-6 lg:px-10 py-4">
         <div className="grid items-start gap-6 grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_360px] xl:grid-cols-[minmax(0,0.86fr)_400px]">
           <AnimatePresence>
