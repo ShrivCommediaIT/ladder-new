@@ -7,7 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import useAuthGuard from "@/hooks/useAuthGuard";
-import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
+import Navbar from "@/components/shared/Navbar";
 import { postFormData, getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import {

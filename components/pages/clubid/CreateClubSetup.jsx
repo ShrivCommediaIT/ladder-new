@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
+import Navbar from "@/components/shared/Navbar";
 
 export default function CreateClubSetup() {
   const [activeTab, setActiveTab] = useState("master");
@@ -35,7 +35,7 @@ export default function CreateClubSetup() {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-background text-foreground">
       {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
-      <PlayerLevelNavbar activeTab="dashboard" />
+      <Navbar activeTab="dashboard" />
 
       {/* Glow effects */}
       <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />

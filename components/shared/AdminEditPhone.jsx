@@ -96,12 +96,19 @@ const handleEdit = async () => {
 
     if (res.status == 200 || res.status === "success") {
       // update sessionStorage
-      const updated = { ...user, name, phone: cleanPhone };
+      const updated = { 
+        ...user, 
+        name, 
+        phone: cleanPhone,
+        admin_name: name,
+        admin_phone: cleanPhone
+      };
 
       if (sessionStorage.getItem("subAdmin")) {
         sessionStorage.setItem("subAdmin", JSON.stringify(updated));
       } else {
         sessionStorage.setItem("userData", JSON.stringify(updated));
+        sessionStorage.setItem("adminDetails", JSON.stringify(updated));
       }
 
       toast.success("Updated successfully");

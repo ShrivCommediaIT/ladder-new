@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from 'react';
-import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
+import Navbar from "@/components/shared/Navbar";
 
 // ─── Q&A DATA ────────────────────────────────────────────────────────────────
 const qaData = [

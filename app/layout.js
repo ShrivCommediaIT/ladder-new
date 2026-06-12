@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { usePathname } from 'next/navigation';
-import PlayerLevelNavbar from '@/components/shared/PlayerLevelNavbar';
+import Navbar from '@/components/shared/Navbar';
 import Footer from '@/components/shared/Footer';
 
 export default function RootLayout({ children }) {
@@ -46,7 +46,7 @@ export default function RootLayout({ children }) {
                  children
                ) : (
                  <div className="flex flex-col min-h-screen">
-                   <PlayerLevelNavbar />
+                   <Navbar />
                    <main className="flex-grow w-full">{children}</main>
                    <Footer />
                  </div>

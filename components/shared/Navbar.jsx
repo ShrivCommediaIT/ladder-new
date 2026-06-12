@@ -55,13 +55,17 @@ const getUserImage = (user) => {
   if (user.image.startsWith("http") || user.image.startsWith("blob:")) {
     return user.image;
   }
-  if (user.image_path) {
-    return `${user.image_path}/${user.image}`;
+  let img = user.image;
+  if (img.includes("/")) {
+    img = img.substring(img.lastIndexOf("/") + 1);
   }
-  return `https://ne-games.com/leaderBoard/public/uploads/${user.image}`;
+  if (user.image_path) {
+    return `${user.image_path}/${img}`;
+  }
+  return `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${img}`;
 };
 
-const PlayerLevelNavbar = ({
+const Navbar = ({
   activeTab = "players",
   ladderName,
   demoLadderName,
@@ -92,13 +96,15 @@ const PlayerLevelNavbar = ({
   const profileRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
-  const playerEntries = useSelector((state) => state.player?.players || {});
-  const playerEntry = Object.values(playerEntries)?.[0] || null;
-
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const isSubmitPerformance = pathname === "/submit-performance" || pathname?.includes("/submit-performance");
   const ladderId = searchParams.get("ladder_id");
+
+  const playerEntries = useSelector((state) => state.player?.players || {});
+  const playerEntry = ladderId 
+    ? (playerEntries[Number(ladderId)] || playerEntries[ladderId] || null) 
+    : (Object.values(playerEntries)?.[0] || null);
   const fileInputRef = useRef(null);
 
   // Players selectors for all board types
@@ -312,7 +318,7 @@ const PlayerLevelNavbar = ({
     }
   };
 
-  const isPlayersPage = activeTab === "players" || userLevel;
+  const isPlayersPage = (activeTab === "players" || userLevel) && !!ladderId;
   const userInitial = user?.name?.trim()?.[0]?.toUpperCase() || "?";
   const displayName = user?.name || "Guest";
   const roleLabel =
@@ -578,13 +584,15 @@ const PlayerLevelNavbar = ({
 
                     {!userLevel && (
                       <>
-                        <button
-                          onClick={handleDashboard}
-                          className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
-                        >
-                          <Shield className="h-4 w-4 text-blue-400" />
-                          {user?.user_type === "sub_admin" ? "Section-Admin Dashboard" : "Admin Dashboard"}
-                        </button>
+                        {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
+                          <button
+                            onClick={handleDashboard}
+                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                          >
+                            <Shield className="h-4 w-4 text-blue-400" />
+                            {user?.user_type === "sub_admin" ? "Section-Admin Dashboard" : "Admin Dashboard"}
+                          </button>
+                        )}
 
                         {user?.user_type === "admin" && (
                           <button
@@ -676,19 +684,20 @@ const PlayerLevelNavbar = ({
               <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{roleLabel}</p>
             </div>
 
-            {/* Dashboard / Admin options */}
             {!userLevel && (
               <>
-                <button
-                  onClick={() => {
-                    handleDashboard();
-                    setMobileOpen(false);
-                  }}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors text-left"
-                >
-                  <Shield className="h-4 w-4 text-blue-400" />
-                  {user?.user_type === "sub_admin" ? "Sub-Admin Dashboard" : "Admin Dashboard"}
-                </button>
+                {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
+                  <button
+                    onClick={() => {
+                      handleDashboard();
+                      setMobileOpen(false);
+                    }}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors text-left"
+                  >
+                    <Shield className="h-4 w-4 text-blue-400" />
+                    {user?.user_type === "sub_admin" ? "Sub-Admin Dashboard" : "Admin Dashboard"}
+                  </button>
+                )}
 
                 {user?.user_type === "admin" && (
                   <button
@@ -717,7 +726,7 @@ const PlayerLevelNavbar = ({
                 )}
               </>    
 
-              
+
             )}
 
             {/* Submit to Talent Board (Admin/Sub-Admin only) */}
@@ -907,4 +916,4 @@ const PlayerLevelNavbar = ({
   );
 };
 
-export default PlayerLevelNavbar;
+export default Navbar;

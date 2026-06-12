@@ -25,7 +25,6 @@ import { motion } from "framer-motion";
 import { importRoster } from "@/redux/slices/rosterSlice";
 import { createLadder } from "@/redux/slices/ladderSlice";
 import { fetchLadders } from "@/redux/slices/fetchLadderSlice";
-import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
 import LadderList from "./LadderList";
 import DemoLadder from "./DemoLadder";
 import AdminImportantInfo from "./info/AdminImportantInfo";
