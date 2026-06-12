@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
-import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
+import Navbar from "@/components/shared/Navbar";
 import topLogo from "@/public/topLogo.png";
 import {
   Sun,
@@ -176,7 +176,7 @@ export default function TermsAndConditions() {
     <div className="min-h-screen bg-[var(--landing-bg)] text-[var(--landing-text)] transition-colors duration-300">
       {/* Navbar rendering conditionally */}
       {isLoggedIn ? (
-        <PlayerLevelNavbar activeTab="" />
+        <Navbar activeTab="" />
       ) : (
         <nav className="sticky top-0 z-50 border-b border-[var(--landing-border)] bg-[var(--landing-surface)] backdrop-blur-md">
           <div className="mx-auto flex h-20 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">

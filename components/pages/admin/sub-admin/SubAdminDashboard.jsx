@@ -58,7 +58,7 @@ const brandGradient = "var(--background-image-gradient-brand)";
 
 import LadderList from "../LadderList";
 import LadderInfo from "../LadderInfo";
-import PlayerLevelNavbar from "@/components/shared/PlayerLevelNavbar";
+import Navbar from "@/components/shared/Navbar";
 
 import { motion } from "framer-motion";
 
@@ -385,7 +385,7 @@ export default function SubAdminDashboard() {
   return (
     <div className="relative min-h-screen bg-background text-foreground mt-10 overflow-x-hidden">
       {/* ── Unified Navbar (Admin & Sub-Admin) ── */}
-      <PlayerLevelNavbar activeTab="dashboard" />
+      <Navbar activeTab="dashboard" />
 
       <div className="absolute inset-0" style={{ background: "var(--page-glow-corners)" }} />
       <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "var(--page-grid-overlay)", backgroundSize: "78px 78px" }} />
