@@ -17,6 +17,7 @@ import {
   Eye,
   EyeOff,
   Trash2,
+  Copy,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import {
@@ -965,28 +966,32 @@ export default function PerformanceDatabase({ refreshTrigger }) {
           </div>
 
           {totalCount > 0 && !loading && (
-            <div className="flex flex-col items-center justify-between gap-4 border-t border-border/70 bg-[color:color-mix(in_srgb,var(--card),var(--primary)_4%)] p-6 sm:flex-row">
-              <button
-                onClick={() => handlePageClick(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className={`${subtleButtonClass} h-10 w-full px-4 text-xs font-bold uppercase tracking-wider disabled:cursor-not-allowed disabled:opacity-30 sm:w-auto`}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </button>
+            <div className={`flex flex-col items-center gap-4 border-t border-border/70 bg-[color:color-mix(in_srgb,var(--card),var(--primary)_4%)] p-6 sm:flex-row ${totalPages > 1 ? "justify-between" : "justify-center"}`}>
+              {totalPages > 1 && (
+                <button
+                  onClick={() => handlePageClick(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className={`${subtleButtonClass} h-10 w-full px-4 text-xs font-bold uppercase tracking-wider disabled:cursor-not-allowed disabled:opacity-30 sm:w-auto`}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </button>
+              )}
 
               <div className="flex flex-wrap items-center justify-center gap-2">
                 {renderPageNumbers()}
               </div>
 
-              <button
-                onClick={() => handlePageClick(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className={`${subtleButtonClass} h-10 w-full px-4 text-xs font-bold uppercase tracking-wider disabled:cursor-not-allowed disabled:opacity-30 sm:w-auto`}
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </button>
+              {totalPages > 1 && (
+                <button
+                  onClick={() => handlePageClick(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className={`${subtleButtonClass} h-10 w-full px-4 text-xs font-bold uppercase tracking-wider disabled:cursor-not-allowed disabled:opacity-30 sm:w-auto`}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -1043,9 +1048,38 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                 </DialogTitle>
               </div>
               {selectedItem && (selectedItem.submited_id || (historyData[0] && historyData[0].submited_id)) && (
-                <div className="h-9 px-3 rounded-lg bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-mono text-xs font-bold shrink-0">
-                  ID: {selectedItem.submited_id || historyData[0].submited_id}
-                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const token = selectedItem.submited_id || historyData[0].submited_id;
+                    if (token) {
+                      try {
+                        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+                          await navigator.clipboard.writeText(token);
+                        } else {
+                          const textarea = document.createElement("textarea");
+                          textarea.value = token;
+                          textarea.style.position = "fixed";
+                          textarea.style.left = "-9999px";
+                          document.body.appendChild(textarea);
+                          textarea.focus();
+                          textarea.select();
+                          document.execCommand("copy");
+                          document.body.removeChild(textarea);
+                        }
+                        toast.success("Access Token copied to clipboard!");
+                      } catch (err) {
+                        console.error("Copy token error:", err);
+                        toast.error("Failed to copy Access Token.");
+                      }
+                    }
+                  }}
+                  className="h-9 px-3 rounded-xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all flex items-center gap-1.5 font-mono text-xs font-bold shrink-0 cursor-pointer shadow-sm"
+                  title="Copy Access Token"
+                >
+                  <span>Access Token: {selectedItem.submited_id || historyData[0].submited_id}</span>
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
               )}
             </div>
 
@@ -1170,10 +1204,6 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                             <div className="truncate">
                               <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Email:</span>{" "}
                               <span className="text-foreground font-medium break-all">{record.email}</span>
-                            </div>
-                            <div>
-                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Submitted ID:</span>{" "}
-                              <span className="text-foreground font-mono font-medium">{record.submited_id || "—"}</span>
                             </div>
                           </div>
                           <div className="space-y-1">
