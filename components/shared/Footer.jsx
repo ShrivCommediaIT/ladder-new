@@ -1,11 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import topLogo from "@/public/topLogo.png";
 
 export default function Footer() {
+  const [isAdminOrSubAdmin, setIsAdminOrSubAdmin] = useState(false);
+  const [isNormalUser, setIsNormalUser] = useState(false);
+
+  useEffect(() => {
+    try {
+      const adminData = sessionStorage.getItem("userData");
+      const subAdminData = sessionStorage.getItem("subAdmin");
+      const userData = sessionStorage.getItem("user");
+
+      const parsedAdmin = adminData ? JSON.parse(adminData) : null;
+      const parsedSubAdmin = subAdminData ? JSON.parse(subAdminData) : null;
+      const parsedUser = userData ? JSON.parse(userData) : null;
+      
+      const role = parsedAdmin?.user_type || parsedSubAdmin?.user_type;
+      if (role === "admin" || role === "sub_admin") {
+        setIsAdminOrSubAdmin(true);
+      } else if (parsedUser?.user_type === "user" || parsedUser?.isLoggedIn) {
+        setIsNormalUser(true);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
   return (
     <footer
       id="contact"
@@ -17,7 +41,7 @@ export default function Footer() {
     >
       <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
         {/* CORPORATE FOOTER CONTENT */}
-        <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div className={`mb-8 grid grid-cols-1 gap-8 ${isNormalUser ? "md:grid-cols-3" : "md:grid-cols-4"}`}>
           <div className="md:col-span-2">
             <Image
               src={topLogo}
@@ -31,33 +55,55 @@ export default function Footer() {
             </p>
           </div>
 
-          <div>
-            <h3 className="mb-4 font-semibold" style={{ color: "var(--landing-footer-heading)" }}>
-              Product
-            </h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a href="#talent-board" className="transition-colors hover:text-foreground">
-                  SSP Talent Board
-                </a>
-              </li>
-              <li>
-                <a href="#features" className="transition-colors hover:text-foreground">
-                  Features
-                </a>
-              </li>
-              <li>
-                <a href="#pricing" className="transition-colors hover:text-foreground">
-                  Pricing
-                </a>
-              </li>
-              <li>
-                <a href="#clubs" className="transition-colors hover:text-foreground">
-                  Clubs
-                </a>
-              </li>
-            </ul>
-          </div>
+          {!isNormalUser && (
+            <div>
+              <h3 className="mb-4 font-semibold" style={{ color: "var(--landing-footer-heading)" }}>
+                Product
+              </h3>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a
+                    href={isAdminOrSubAdmin ? "/#talent-board" : "#talent-board"}
+                    target={isAdminOrSubAdmin ? "_blank" : undefined}
+                    rel={isAdminOrSubAdmin ? "noopener noreferrer" : undefined}
+                    className="transition-colors hover:text-foreground"
+                  >
+                    SSP Talent Board
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={isAdminOrSubAdmin ? "/#features" : "#features"}
+                    target={isAdminOrSubAdmin ? "_blank" : undefined}
+                    rel={isAdminOrSubAdmin ? "noopener noreferrer" : undefined}
+                    className="transition-colors hover:text-foreground"
+                  >
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={isAdminOrSubAdmin ? "/#pricing" : "#pricing"}
+                    target={isAdminOrSubAdmin ? "_blank" : undefined}
+                    rel={isAdminOrSubAdmin ? "noopener noreferrer" : undefined}
+                    className="transition-colors hover:text-foreground"
+                  >
+                    Pricing
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={isAdminOrSubAdmin ? "/#features" : "#features"}
+                    target={isAdminOrSubAdmin ? "_blank" : undefined}
+                    rel={isAdminOrSubAdmin ? "noopener noreferrer" : undefined}
+                    className="transition-colors hover:text-foreground"
+                  >
+                    Clubs
+                  </a>
+                </li>
+              </ul>
+            </div>
+          )}
 
           <div>
             <h3 className="mb-4 font-semibold" style={{ color: "var(--landing-footer-heading)" }}>

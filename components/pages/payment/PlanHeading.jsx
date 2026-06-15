@@ -56,6 +56,9 @@ export default function PlanHeading() {
   const [showPoster, setShowPoster] = useState(false);
   const [popupPosition, setPopupPosition] = useState("bottom");
 
+  const [dbLoaded, setDbLoaded] = useState(false);
+  const hasUserScrolledRef = useRef(false);
+
   const handleInfoClick = (e) => {
     e.preventDefault();
     if (buttonRef.current) {
@@ -73,6 +76,55 @@ export default function PlanHeading() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    const handleUserScroll = () => {
+      hasUserScrolledRef.current = true;
+    };
+    window.addEventListener("wheel", handleUserScroll, { passive: true });
+    window.addEventListener("touchmove", handleUserScroll, { passive: true });
+    window.addEventListener("keydown", handleUserScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleUserScroll);
+      window.removeEventListener("touchmove", handleUserScroll);
+      window.removeEventListener("keydown", handleUserScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleHashScroll = (force = false) => {
+      const hash = window.location.hash;
+      if (hash) {
+        const id = hash.replace("#", "");
+        const element = document.getElementById(id);
+        if (element) {
+          if (force || !hasUserScrolledRef.current) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+      }
+    };
+
+    const onHashChange = () => {
+      hasUserScrolledRef.current = false;
+      handleHashScroll(true);
+    };
+
+    if (mounted) {
+      handleHashScroll();
+
+      if (dbLoaded) {
+        handleHashScroll();
+      }
+
+      window.addEventListener("hashchange", onHashChange);
+
+      return () => {
+        window.removeEventListener("hashchange", onHashChange);
+      };
+    }
+  }, [mounted, dbLoaded]);
 
 
   const handleNavigationToAuth = (e) => {
@@ -212,7 +264,7 @@ export default function PlanHeading() {
       { label: "SSP Talent Board", href: "#talent-board" },
       { label: "Features", href: "#features" },
       { label: "Pricing", href: "#pricing" },
-      { label: "Clubs/Coaches", href: "#clubs" },
+      { label: "Clubs/Coaches", href: "#features" },
       { label: "Contact", href: "#contact" },
     ],
     [],
@@ -382,7 +434,7 @@ export default function PlanHeading() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.18 }}
               id={"ssp-international-competitions"}
-              className="mx-auto mb-16 max-w-[980px] flex flex-col select-none relative"
+              className="mx-auto mb-16 max-w-[980px] flex flex-col select-none relative scroll-mt-20"
             >
               {/* Unified Banner & Bottom Bar Container */}
               <div className="relative w-full overflow-hidden rounded-[16px] border border-cyan-500/35 bg-[#020713] p-1 shadow-[0_0_24px_rgba(0,145,255,0.28)]">
@@ -556,10 +608,10 @@ export default function PlanHeading() {
       </section>
 
       <div id="talent-board" className="relative z-10 border-y border-border bg-background scroll-mt-20">
-        <PerformanceDatabase />
+        <PerformanceDatabase onLoadComplete={() => setDbLoaded(true)} />
       </div>
 
-      <section id="features" className="py-10" style={{ background: "var(--landing-section-alt)" }}>
+      <section id="features" className="py-10 scroll-mt-20" style={{ background: "var(--landing-section-alt)" }}>
         <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
@@ -596,7 +648,7 @@ export default function PlanHeading() {
         </div>
       </section>
 
-      <section id="pricing" className="relative overflow-hidden py-5" style={{ background: "var(--landing-section-soft)" }}>
+      <section id="pricing" className="relative overflow-hidden py-5 scroll-mt-20" style={{ background: "var(--landing-section-soft)" }}>
         <div className="absolute inset-0 opacity-[0.03] [background-image:url('https://www.transparenttextures.com/patterns/cubes.png')]" />
         <div className="relative z-10 mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
@@ -712,7 +764,8 @@ export default function PlanHeading() {
       </section>
 
       <section
-        className="py-10"
+        id="clubs"
+        className="py-10 scroll-mt-20"
         style={{
           background: "var(--landing-section-alt)",
           borderBottom: "1px solid var(--landing-border)",
@@ -738,7 +791,7 @@ export default function PlanHeading() {
 
       <footer
         id="contact"
-        className="py-12"
+        className="py-12 scroll-mt-20"
         style={{ background: "var(--landing-footer-bg)", color: "var(--landing-footer-text)" }}
       >
         <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
@@ -776,7 +829,7 @@ export default function PlanHeading() {
                   </a>
                 </li>
                 <li>
-                  <a href="#clubs" className="transition-colors hover:text-foreground">
+                  <a href="#features" className="transition-colors hover:text-foreground">
                     Clubs
                   </a>
                 </li>

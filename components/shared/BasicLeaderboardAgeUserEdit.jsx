@@ -151,7 +151,7 @@ const BasicLeaderboardAgeUserEdit = ({
     const formData = {
       id: form.id,
       name: form.name,
-      dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
+      dob: form.dob ? format(form.dob, "dd/MM/yyyy") : null,
       age: calculateAge(form.dob),
       phone: cleanPhone,
       gender: form.gender,

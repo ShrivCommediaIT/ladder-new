@@ -52,7 +52,7 @@ export default function TermsAndConditions() {
     { label: "SSP Talent Board", href: "/#talent-board" },
     { label: "Features", href: "/#features" },
     { label: "Pricing", href: "/#pricing" },
-    { label: "Clubs", href: "/#clubs" },
+    { label: "Clubs", href: "/#features" },
     { label: "Contact", href: "/#contact" },
   ];
 
