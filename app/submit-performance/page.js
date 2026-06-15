@@ -103,6 +103,9 @@ export default function SubmitPerformancePage() {
 
   // Lookup and Update mode states
   const [lookupModalOpen, setLookupModalOpen] = useState(false);
+  const [listModalOpen, setListModalOpen] = useState(false);
+  const [matchedRecords, setMatchedRecords] = useState([]);
+  const [originalFormData, setOriginalFormData] = useState(null);
   const [searchId, setSearchId] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
@@ -407,6 +410,7 @@ useEffect(() => {
     setErrors({});
     setIsUpdateMode(false);
     setActiveRecordId(null);
+    setOriginalFormData(null);
 
     // Re-fill coach/submitter name & email from sessionStorage if available
     if (typeof window !== "undefined") {
@@ -427,58 +431,47 @@ useEffect(() => {
   const handleLookupSubmission = async (e) => {
     if (e) e.preventDefault();
     if (!searchId.trim()) {
-      toast.error("Please enter a valid Submitted ID");
+      toast.error("Please enter a valid Access Code");
       return;
     }
 
     setSearchLoading(true);
     try {
-      const response = await getRequest(API_ENDPOINTS.PERFORMANCE_RESULT_DETAILS, {
-        submited_id: searchId.trim()
+      let adminId = admin?.id;
+      if (!adminId && typeof window !== "undefined") {
+        const adminDetailsStr = sessionStorage.getItem("adminDetails");
+        if (adminDetailsStr) {
+          try {
+            const adminDetails = JSON.parse(adminDetailsStr);
+            adminId = adminDetails?.id;
+          } catch (e) {
+            console.error("Error parsing adminDetails in lookup:", e);
+          }
+        }
+      }
+
+      const response = await getRequest(API_ENDPOINTS.GET_PERFORMANCE_RESULT_LIST, {
+        admin_id: adminId || undefined,
+        limit: 1000
       });
 
-      if (response && (response.status === 200 || response.status === true) && response.data) {
-        const recordList = response.data;
-        const record = Array.isArray(recordList) ? recordList[0] : recordList;
+      if (response && (response.status === 200 || response.status === true)) {
+        const recordList = response.data?.data || (Array.isArray(response.data) ? response.data : []);
+        const isMatched = recordList.some(record => 
+          String(record.submited_id || "").trim() === searchId.trim()
+        );
 
-        if (record) {
-          const matchedSport = sportsList.includes(record.sport) ? record.sport : (record.sport ? "Other" : "");
-          const customSport = matchedSport === "Other" ? record.sport : "";
-
-          const matchedUnit = unitsList.includes(record.unit) ? record.unit : (record.unit ? "Other" : "");
-          const customUnit = matchedUnit === "Other" ? record.unit : "";
-
-          setFormData({
-            sport: matchedSport,
-            customSport: customSport || "",
-            activity: record.activity || "",
-            result: record.result !== null && record.result !== undefined ? String(record.result) : "",
-            unit: matchedUnit,
-            customUnit: customUnit || "",
-            full_name: record.full_name || "",
-            age: record.age !== null && record.age !== undefined ? String(record.age) : "",
-            date_of_performance: formatDateForInput(record.date_of_performance),
-            gender: record.gender || "",
-            country: record.country || "",
-            club_name: record.club_name || "",
-            coach_name: record.coach_name || "",
-            email: record.email || "",
-            venue: record.venue || "",
-            wind: record.wind || "",
-            video_link: record.video_link || "",
-            aditional_notes: record.aditional_notes || record.additional_notes || "",
-          });
-
-          setActiveRecordId(record.id);
-          setIsUpdateMode(true);
+        if (isMatched) {
+          setMatchedRecords(recordList);
           setLookupModalOpen(false);
+          setListModalOpen(true);
           setSearchId("");
-          toast.success("Submission details loaded. You can now make updates.");
+          toast.success("Access code verified! Displaying talent board submissions.");
         } else {
-          toast.error("No performance result found for the provided ID.");
+          toast.error("Invalid Access Token. Please enter a correct Submitted ID.");
         }
       } else {
-        toast.error(response?.message || "Could not find any submission with this ID.");
+        toast.error("Could not fetch the posted list of the talent board.");
       }
     } catch (error) {
       console.error("Lookup error:", error);
@@ -486,6 +479,79 @@ useEffect(() => {
     } finally {
       setSearchLoading(false);
     }
+  };
+
+  const handleSelectRecord = (record) => {
+    if (!record) return;
+    
+    const matchedSport = sportsList.includes(record.sport) ? record.sport : (record.sport ? "Other" : "");
+    const customSport = matchedSport === "Other" ? record.sport : "";
+
+    const matchedUnit = unitsList.includes(record.unit) ? record.unit : (record.unit ? "Other" : "");
+    const customUnit = matchedUnit === "Other" ? record.unit : "";
+
+    const initialFormData = {
+      sport: matchedSport,
+      customSport: customSport || "",
+      activity: record.activity || "",
+      result: record.result !== null && record.result !== undefined ? String(record.result) : "",
+      unit: matchedUnit,
+      customUnit: customUnit || "",
+      full_name: record.full_name || "",
+      age: record.age !== null && record.age !== undefined ? String(record.age) : "",
+      date_of_performance: formatDateForInput(record.date_of_performance),
+      gender: record.gender || "",
+      country: record.country || "",
+      club_name: record.club_name || "",
+      coach_name: record.coach_name || "",
+      email: record.email || "",
+      venue: record.venue || "",
+      wind: record.wind || "",
+      video_link: record.video_link || "",
+      aditional_notes: record.aditional_notes || record.additional_notes || "",
+    };
+
+    setFormData(initialFormData);
+    setOriginalFormData(initialFormData);
+    setActiveRecordId(record.id);
+    setIsUpdateMode(true);
+    setListModalOpen(false);
+    toast.success(`Selected ${record.full_name || "athlete"}'s submission. You can now edit the fields below.`);
+  };
+
+  const hasBeenEdited = () => {
+    if (!originalFormData) return false;
+    if (evidenceFile) return true;
+
+    const keysToCheck = [
+      "sport",
+      "customSport",
+      "activity",
+      "result",
+      "unit",
+      "customUnit",
+      "full_name",
+      "age",
+      "date_of_performance",
+      "gender",
+      "country",
+      "club_name",
+      "coach_name",
+      "email",
+      "venue",
+      "wind",
+      "video_link",
+      "aditional_notes"
+    ];
+
+    for (const key of keysToCheck) {
+      const val1 = String(formData[key] || "").trim();
+      const val2 = String(originalFormData[key] || "").trim();
+      if (val1 !== val2) {
+        return true;
+      }
+    }
+    return false;
   };
 
   const handleUpdateSubmission = async (e) => {
@@ -503,6 +569,13 @@ useEffect(() => {
           element.focus();
         }
       }, 100);
+      return;
+    }
+
+    if (!hasBeenEdited()) {
+      toast.error("No changes detected. Please edit at least one field before updating.", {
+        toastId: "no-changes-error",
+      });
       return;
     }
 
@@ -577,6 +650,7 @@ useEffect(() => {
         setErrors({});
         setIsUpdateMode(false);
         setActiveRecordId(null);
+        setOriginalFormData(null);
         setRefreshKey(prev => prev + 1);
       } else {
         toast.error(response?.message || response?.error_message || "Failed to update performance result.");
@@ -1400,18 +1474,18 @@ useEffect(() => {
             <form onSubmit={handleLookupSubmission} className="p-6 space-y-6">
               <div className="space-y-2">
                 <label className="text-xs sm:text-sm font-semibold text-foreground/80">
-                  Submitted ID <span className="text-red-500">*</span>
+                  Access Code <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={searchId}
                   onChange={(e) => setSearchId(e.target.value)}
-                  placeholder="Enter your submitted_id (e.g. 178054947229)"
+                  placeholder="Enter your Access Code (e.g. 1234)"
                   required
                   className="w-full h-12 px-4 rounded-xl bg-input-theme-bg border border-input-theme-border text-foreground placeholder-muted-foreground/60 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm font-medium"
                 />
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Enter the unique 12-digit submission ID you received when creating your performance result.
+                  Enter the unique 4-digit Access Code you received when creating your performance result.
                 </p>
               </div>
 
@@ -1439,6 +1513,78 @@ useEffect(() => {
                 </button>
               </div>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Selection List Dialog */}
+        <Dialog open={listModalOpen} onOpenChange={setListModalOpen}>
+          <DialogContent className="w-[95vw] sm:max-w-lg bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
+            {/* Header Banner */}
+            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1 bg-primary/15 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
+                  <FileSpreadsheet className="h-3.5 w-3.5" /> Select Submission
+                </div>
+                <DialogTitle className="text-xl font-black text-foreground">
+                  Choose Submission to Update
+                </DialogTitle>
+              </div>
+            </div>
+
+            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                We found the following submission(s) matching your access token. Select the one you wish to edit:
+              </p>
+
+              <div className="space-y-3">
+                {matchedRecords.map((record, idx) => (
+                  <div
+                    key={record.id || idx}
+                    onClick={() => handleSelectRecord(record)}
+                    className="group p-4 rounded-2xl border border-border bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-primary/50 transition-all cursor-pointer flex items-center justify-between gap-4"
+                  >
+                    <div className="space-y-1">
+                      <h4 className="font-extrabold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors">
+                        {record.full_name || "N/A"}
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground font-semibold">
+                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-md text-[10px]">
+                          {record.sport || "N/A"}
+                        </span>
+                        <span>•</span>
+                        <span>{record.activity || "N/A"}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <span className="text-base sm:text-lg font-black text-foreground">
+                          {record.result !== null && record.result !== undefined ? record.result : "N/A"}
+                        </span>
+                        <span className="text-xs font-semibold text-muted-foreground ml-1">
+                          {record.unit || ""}
+                        </span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="p-6 pt-0 border-t border-border mt-auto flex justify-end">
+              <button
+                type="button"
+                onClick={() => setListModalOpen(false)}
+                className="w-full sm:w-auto py-3 px-6 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-sm transition-all cursor-pointer text-center"
+              >
+                Cancel
+              </button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
