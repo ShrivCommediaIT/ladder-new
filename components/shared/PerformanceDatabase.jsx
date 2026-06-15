@@ -148,7 +148,7 @@ const formatDate = (dateStr) => {
   }
 };
 
-export default function PerformanceDatabase({ refreshTrigger }) {
+export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) {
   const [dbData, setDbData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
@@ -200,7 +200,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
   const [confirmModalConfig, setConfirmModalConfig] = useState({
     title: "",
     message: "",
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const fetchResults = useCallback(
@@ -290,6 +290,9 @@ export default function PerformanceDatabase({ refreshTrigger }) {
         setCountriesOptions([]);
       } finally {
         setLoading(false);
+        if (onLoadComplete) {
+          onLoadComplete();
+        }
       }
     },
     [appliedFilters],
@@ -554,19 +557,18 @@ export default function PerformanceDatabase({ refreshTrigger }) {
         key={idx}
         onClick={() => typeof p === "number" && handlePageClick(p)}
         disabled={p === "..."}
-        className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm font-semibold transition-all sm:h-10 sm:w-10 ${
-          p === currentPage
-            ? "scale-105 text-white"
-            : p === "..."
-              ? "cursor-default text-muted-foreground"
-              : "border border-border bg-[var(--input-bg)] text-foreground hover:bg-muted"
-        }`}
+        className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm font-semibold transition-all sm:h-10 sm:w-10 ${p === currentPage
+          ? "scale-105 text-white"
+          : p === "..."
+            ? "cursor-default text-muted-foreground"
+            : "border border-border bg-[var(--input-bg)] text-foreground hover:bg-muted"
+          }`}
         style={
           p === currentPage
             ? {
-                backgroundImage: brandGradient,
-                boxShadow: "var(--brand-button-shadow)",
-              }
+              backgroundImage: brandGradient,
+              boxShadow: "var(--brand-button-shadow)",
+            }
             : undefined
         }
       >
@@ -641,7 +643,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                 SSP Talent Board
               </h1>
               <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
-                Entries on the SSP Talent Board are submitted by participating articipating clubs, coaches and organisations to help showcase emerging talent and notable sporting achievements. Interested parties are encouraged to contact the submitting club or organisation directly for further information.  SSP reserves the right to remove or hide any entry that appears unsuitable, inaccurate, incomplete, or inappropriate 
+                Entries on the SSP Talent Board are submitted by participating articipating clubs, coaches and organisations to help showcase emerging talent and notable sporting achievements. Interested parties are encouraged to contact the submitting club or organisation directly for further information.  SSP reserves the right to remove or hide any entry that appears unsuitable, inaccurate, incomplete, or inappropriate
               </p>
             </div>
 
@@ -787,9 +789,8 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                 type="button"
                 aria-pressed={verifiedOnly}
                 onClick={handleVerifiedOnlyToggle}
-                className={`${fieldClass} whitespace-nowrap text-center ${
-                  verifiedOnly ? "border-primary bg-primary text-white shadow-md" : ""
-                }`}
+                className={`${fieldClass} whitespace-nowrap text-center ${verifiedOnly ? "border-primary bg-primary text-white shadow-md" : ""
+                  }`}
               >
                 Verified Only
               </button>
@@ -820,7 +821,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
 
             <div className="flex flex-wrap items-center w-full gap-3 sm:w-auto">
 
-              
+
               <div className="flex flex-1 min-w-[150px] items-center gap-2 sm:flex-none">
                 <span className="whitespace-nowrap text-xs font-bold uppercase tracking-wider text-muted-foreground">Sort By</span>
                 <select
@@ -836,8 +837,8 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                 </select>
               </div>
 
-              <button 
-                onClick={handleExportCSV} 
+              <button
+                onClick={handleExportCSV}
                 className={`${subtleButtonClass} h-10 px-4 text-xs font-bold uppercase tracking-wider flex-shrink-0`}
               >
                 <Download className="h-3.5 w-3.5" />
@@ -887,13 +888,12 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                     <tr
                       key={item.id || idx}
                       onClick={() => handleRowClick(item)}
-                      className={`cursor-pointer transition-colors ${
-                        item.status == 0
-                          ? "opacity-60 bg-amber-500/5 hover:bg-amber-500/10 border-l-2 border-amber-500"
-                          : idx % 2 === 0
-                            ? "bg-card hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_6%)]"
-                            : "bg-[color:color-mix(in_srgb,var(--card),var(--primary)_3%)] hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_8%)]"
-                      }`}
+                      className={`cursor-pointer transition-colors ${item.status == 0
+                        ? "opacity-60 bg-amber-500/5 hover:bg-amber-500/10 border-l-2 border-amber-500"
+                        : idx % 2 === 0
+                          ? "bg-card hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_6%)]"
+                          : "bg-[color:color-mix(in_srgb,var(--card),var(--primary)_3%)] hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_8%)]"
+                        }`}
                     >
                       <td className="px-6 py-4 font-medium whitespace-nowrap text-muted-foreground">
                         {formatDate(item.created_at || item.date_of_performance)}
@@ -1139,11 +1139,10 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                                     handleToggleStatus(record);
                                   }}
                                   title={record.status == 1 ? "Hide Performance" : "Show Performance"}
-                                  className={`flex h-8 w-8 items-center justify-center rounded-xl border transition-all active:scale-95 cursor-pointer ${
-                                    record.status == 1
-                                      ? "border-amber-500/25 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white"
-                                      : "border-slate-500/25 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"
-                                  }`}
+                                  className={`flex h-8 w-8 items-center justify-center rounded-xl border transition-all active:scale-95 cursor-pointer ${record.status == 1
+                                    ? "border-amber-500/25 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white"
+                                    : "border-slate-500/25 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"
+                                    }`}
                                 >
                                   {record.status == 1 ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                                 </button>
@@ -1271,7 +1270,7 @@ export default function PerformanceDatabase({ refreshTrigger }) {
                 {confirmModalConfig.title}
               </DialogTitle>
             </div>
-            
+
             <div className="p-6 space-y-6">
               <p className="text-sm text-muted-foreground leading-relaxed font-semibold">
                 {confirmModalConfig.message}
