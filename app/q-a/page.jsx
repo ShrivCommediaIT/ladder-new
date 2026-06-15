@@ -115,8 +115,8 @@ function FAQItem({ item, isOpen, onToggle }) {
   return (
     <div style={{
       borderRadius: "10px",
-      border: `1px solid ${isOpen ? "rgba(34,211,238,0.3)" : "rgba(255,255,255,0.05)"}`,
-      background: isOpen ? "rgba(34,211,238,0.05)" : "rgba(0,0,0,0.2)",
+      border: isOpen ? "1px solid var(--primary)" : "1px solid var(--border)",
+      background: isOpen ? "rgb(var(--brand-primary-rgb) / 0.08)" : "var(--muted)",
       overflow: "hidden",
       transition: "border-color 0.25s, background 0.25s",
       marginBottom: "8px",
@@ -124,7 +124,7 @@ function FAQItem({ item, isOpen, onToggle }) {
       <button onClick={onToggle} style={{
         width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
         gap: "12px", padding: "13px 16px", background: "none", border: "none", cursor: "pointer",
-        textAlign: "left", color: isOpen ? "#22d3ee" : "#d1d5db",
+        textAlign: "left", color: isOpen ? "var(--primary)" : "var(--foreground)",
         fontSize: "13.5px", fontWeight: isOpen ? "600" : "500",
         lineHeight: "1.4", transition: "color 0.2s",
       }}>
@@ -134,9 +134,9 @@ function FAQItem({ item, isOpen, onToggle }) {
       <div style={{ height: `${height}px`, overflow: "hidden", transition: "height 0.35s cubic-bezier(0.4,0,0.2,1)" }}>
         <div ref={bodyRef}>
           <div style={{
-            padding: "12px 16px 14px 16px", color: "#9ca3af",
+            padding: "12px 16px 14px 16px", color: "var(--muted-foreground)",
             fontSize: "13px", lineHeight: "1.7", whiteSpace: "pre-line",
-            borderTop: `1px solid ${isOpen ? "rgba(34,211,238,0.1)" : "rgba(255,255,255,0.05)"}`,
+            borderTop: "1px solid var(--border)",
           }}>
             {item.a}
           </div>
@@ -169,23 +169,23 @@ function QAPanel({ onClose }) {
       <style>{`
         @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
         @keyframes slideIn { from { opacity:0; transform: translateX(24px) scale(0.97) } to { opacity:1; transform: translateX(0) scale(1) } }
-        .qa-input::placeholder { color: rgba(255,255,255,0.4) !important; }
+        .qa-input::placeholder { color: var(--muted-foreground) !important; opacity: 0.7; }
         .qa-scroll::-webkit-scrollbar { width: 4px; }
         .qa-scroll::-webkit-scrollbar-track { background: transparent; }
-        .qa-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .qa-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
       `}</style>
 
-      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", pointerEvents: "auto", animation: "fadeIn 0.2s ease" }} />
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", pointerEvents: "auto", animation: "fadeIn 0.2s ease" }} />
 
       <div style={{
         position: "relative", pointerEvents: "auto", width: "min(420px, 95vw)",
-        maxHeight: "calc(100vh - 40px)", background: "#0f172a", borderRadius: "18px",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 4px 20px rgba(0,0,0,0.3)",
-        border: "1px solid rgba(255,255,255,0.1)",
+        maxHeight: "calc(100vh - 40px)", background: "var(--card)", borderRadius: "18px",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.15), 0 4px 20px rgba(0,0,0,0.08)",
+        border: "1px solid var(--border)",
         display: "flex", flexDirection: "column", overflow: "hidden",
         animation: "slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1)",
       }}>
-        <div style={{ background: "linear-gradient(135deg, #0891b2 0%, #1e40af 100%)", padding: "20px 20px 16px", flexShrink: 0 }}>
+        <div style={{ background: "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)", padding: "20px 20px 16px", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
@@ -193,7 +193,7 @@ function QAPanel({ onClose }) {
               </div>
               <div>
                 <div style={{ color: "#fff", fontWeight: "700", fontSize: "16px", letterSpacing: "-0.3px" }}>Help & FAQ</div>
-                <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "11.5px" }}>SSP Platform Guide</div>
+                <div style={{ color: "rgba(255,255,255,0.8)", fontSize: "11.5px" }}>SSP Platform Guide</div>
               </div>
             </div>
             <button onClick={onClose} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "8px", color: "#fff", cursor: "pointer", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -201,13 +201,13 @@ function QAPanel({ onClose }) {
             </button>
           </div>
           <div style={{ position: "relative" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", opacity: 0.5 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", opacity: 0.8 }}>
               <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2" />
               <path d="M21 21l-4.35-4.35" stroke="white" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <input type="text" placeholder="Search questions…" value={search} onChange={(e) => setSearch(e.target.value)} className="qa-input" style={{
               width: "100%", padding: "9px 12px 9px 32px", borderRadius: "10px",
-              border: "1px solid rgba(255,255,255,0.2)", background: "rgba(0,0,0,0.2)",
+              border: "1px solid rgba(255,255,255,0.3)", background: "rgba(0,0,0,0.15)",
               color: "#fff", fontSize: "13px", outline: "none", boxSizing: "border-box",
             }} />
           </div>
@@ -215,15 +215,15 @@ function QAPanel({ onClose }) {
 
         <div className="qa-scroll" style={{ overflowY: "auto", padding: "16px", flex: 1 }}>
           {filtered.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "32px 16px", color: "#64748b", fontSize: "13px" }}>
+            <div style={{ textAlign: "center", padding: "32px 16px", color: "var(--muted-foreground)", fontSize: "13px" }}>
               No results found for &quot;{search}&quot;
             </div>
           ) : (
             filtered.map((cat) => (
               <div key={cat.category} style={{ marginBottom: "20px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "10px", paddingBottom: "6px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "10px", paddingBottom: "6px", borderBottom: "1px solid var(--border)" }}>
                   <span style={{ fontSize: "15px" }}>{cat.icon}</span>
-                  <span style={{ fontSize: "11px", fontWeight: "700", color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.8px" }}>
+                  <span style={{ fontSize: "11px", fontWeight: "700", color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.8px" }}>
                     {cat.category}
                   </span>
                 </div>
@@ -245,22 +245,22 @@ const QAndAPage = () => {
   const [qaOpen, setQaOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-[#07111f] text-white">
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-background text-foreground">
       <div className="w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 pt-10 pb-8">
 
-        <div className="max-w-4xl mx-auto rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-6 sm:p-8">
+        <div className="max-w-4xl mx-auto rounded-2xl bg-card border border-border shadow-md p-6 sm:p-8">
 
           {/* Title row */}
-          <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-8">
-            <h2 className="text-2xl font-bold text-gray-100">Help &amp; FAQ</h2>
+          <div className="flex items-center justify-between pb-4 border-b border-border mb-8">
+            <h2 className="text-2xl font-bold text-foreground">Help &amp; FAQ</h2>
             <button
               onClick={() => setQaOpen(true)}
               style={{
                 display: "inline-flex", alignItems: "center", gap: "7px",
                 padding: "9px 18px", borderRadius: "10px", border: "none",
-                background: "linear-gradient(135deg, #5b21b6, #7c3aed)",
+                background: "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)",
                 color: "#fff", fontSize: "13px", fontWeight: "600",
-                cursor: "pointer", boxShadow: "0 4px 16px rgba(91,33,182,0.28)",
+                cursor: "pointer", boxShadow: "0 4px 12px rgb(var(--brand-primary-rgb) / 0.2)",
                 whiteSpace: "nowrap",
               }}
             >
@@ -269,45 +269,45 @@ const QAndAPage = () => {
             </button>
           </div>
 
-          <div className="space-y-8 text-gray-300">
+          <div className="space-y-8 text-muted-foreground">
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">WHAT&apos;S INVOLVED FOR ADMIN?</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">WHAT&apos;S INVOLVED FOR ADMIN?</h2>
               <p className="mb-4">After registering, Main Admin needs to do just three things which take no time at all:</p>
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-semibold text-gray-100 mb-2">(1) THE CLUB ID</h3>
+                  <h3 className="font-semibold text-foreground mb-2">(1) THE CLUB ID</h3>
                   <p>Admin must create the CLUB ID and PIN from his drop down menu.</p>
                   <p className="mt-2">This combination gives him and only him access to the club&apos;s main admin dashboard where all the competitions appear.</p>
                   <p className="mt-2">It also gives him and only him access to the app&apos;s main admin dashboard.</p>
                   <p className="mt-2">This gives him total overall control with no unexpected external input. He may, of course, impart this information to trusted coworkers.</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-100 mb-2">(2) CREATE SECTION DASHBOARDS</h3>
+                  <h3 className="font-semibold text-foreground mb-2">(2) CREATE SECTION DASHBOARDS</h3>
                   <p>Admin must create access for specific section administrators to their own specific section dashboards allocating them individual pins to use with the CLUB ID.</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-100 mb-2">(3) THE CLUB ROSTER</h3>
+                  <h3 className="font-semibold text-foreground mb-2">(3) THE CLUB ROSTER</h3>
                   <p>This is a list of all club members. This is where the members can see their tokens totals and redeemable tokens and the link in order to redeem them. It&apos;s actually a leaderboard where the members are ranked by the number of tokens they have earned. It is also where they can see their token membership status, the more tokens the higher their status.</p>
                 </div>
               </div>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">SETTING UP THE FREE APP</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">SETTING UP THE FREE APP</h2>
               <p>All competitions are visible to admin in the app. Admin simply link the app to the competitions so that the players may use the app to upload their results.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">HOW MUCH ADMIN INVOLVEMENT IS THERE?</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">HOW MUCH ADMIN INVOLVEMENT IS THERE?</h2>
               <p>That&apos;s it as detailed above!</p>
               <p className="mt-2">Obviously, members come and go and occasionally admin has to go into the dashboard and either remove or add players, but the software makes this particularly easy.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">COMPETITIONS - HOW ARE THEY CREATED?</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">COMPETITIONS - HOW ARE THEY CREATED?</h2>
               <p className="mb-4">Section administrators select the type of competition they want from a drop-down menu and upload a list of names and phone numbers if desired, and the competition is instantly created.</p>
-              <p className="font-semibold text-gray-100 mb-2">There&apos;s a choice of:</p>
+              <p className="font-semibold text-foreground mb-2">There&apos;s a choice of:</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong>Ladders</strong> - always fun and could be a first choice to get things started.</li>
                 <li><strong>Leaderboards</strong> - great for any specific activities</li>
@@ -317,13 +317,13 @@ const QAndAPage = () => {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">LISTS - Excel CSV files</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">LISTS - Excel CSV files</h2>
               <p>Lists need to be simple Excel CSV files with column A having names and column B having phone numbers.</p>
               <p className="mt-2 italic">Advice: for speed and convenience, if members need to be in specific orders or groups, it is wise to have them pre-ordered or pre-grouped in your CSV file. The software does enable some amending, but it is ready for fine-tuning.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">ADMIN SECURITY</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">ADMIN SECURITY</h2>
               <p>Within one club, there may be several sections for same sport but different gender and or age groups and there may be different sections for different Sports with these sections.</p>
               <p className="mt-2">SSP is set up to handle any number of sections.</p>
               <p className="mt-2">The main administrator has sole access to the main dashboard where he can see all the competitions created by the various sections.</p>
@@ -332,43 +332,43 @@ const QAndAPage = () => {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">HOW DO MEMBERS LOG IN TO THE APP AND COMPETITIONS</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">HOW DO MEMBERS LOG IN TO THE APP AND COMPETITIONS</h2>
               <p>Members log into the app by simply using the club ID. They then navigate to the various competitions they are in.</p>
               <p className="mt-2">Members login to any competition by first registering with their name and a pin number of their choice.</p>
               <p className="mt-2">Note that SSP does not acquire your members&apos; email addresses.</p>
-              <div className="mt-4 p-4 bg-red-900/20 border border-red-800 rounded-lg">
-                <h3 className="font-semibold text-red-400 mb-1">REGISTRATION FAILURE</h3>
-                <p className="text-red-300 text-sm">If a registration fails, then their name has not been added to the competition and the member needs to inform admin to add them after checking that the correct spelling of their name has been used.</p>
+              <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <h3 className="font-semibold text-red-600 dark:text-red-400 mb-1">REGISTRATION FAILURE</h3>
+                <p className="text-red-700 dark:text-red-300/90 text-sm">If a registration fails, then their name has not been added to the competition and the member needs to inform admin to add them after checking that the correct spelling of their name has been used.</p>
               </div>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">HOW DO MEMBERS POST THEIR RESULTS?</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">HOW DO MEMBERS POST THEIR RESULTS?</h2>
               <p>Members log into the app, click on their competition, log into their competition and post their results.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">TRANSPARENCY AND VALIDATION</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">TRANSPARENCY AND VALIDATION</h2>
               <p>All posts are reported in an activity log that all members can see and check. Any tomfoolery is very quickly spotted.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">ACTIVITY LOG</h2>
+              <h2 className="text-xl font-semibold text-primary mb-3">ACTIVITY LOG</h2>
               <p>The system lists all activity in an activity log viewable on the competition pages so that members can see daily activity within the club.</p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-cyan-400 mb-3">
-                INTRACLUB COMMUNICATIONS <span className="text-sm font-normal text-gray-500">- a major plus</span>
+              <h2 className="text-xl font-semibold text-primary mb-3">
+                INTRACLUB COMMUNICATIONS <span className="text-sm font-normal text-muted-foreground/60">- a major plus</span>
               </h2>
               <p className="mb-4">The app enables text messaging-like communications between selected groups which is a major bonus.</p>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-gray-100 mb-1">All Club</h3>
+                  <h3 className="font-semibold text-foreground mb-1">All Club</h3>
                   <p>Admin may communicate with the whole club by sending a message to the members on the roster.</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-100 mb-1">Sections Only</h3>
+                  <h3 className="font-semibold text-foreground mb-1">Sections Only</h3>
                   <p>Section administrators may want to send messages just to their section members and can do so by logging into the app under the section admin and then any message they send will only go to their section members.</p>
                   <p className="mt-2">This is essential as it prevents unwanted messages for instance about hockey going to footballers, or cricketers, or other unrelated sections.</p>
                 </div>

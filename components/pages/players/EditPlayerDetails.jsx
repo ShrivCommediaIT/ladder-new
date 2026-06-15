@@ -146,7 +146,7 @@ const EditPlayerDetails = ({ userId, ladderId, minileagueSelectedPlayer = null, 
       return;
     }
 
-    const formData = { id: form.id, name: form.name, phone: form.phone, gender: form.gender, dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
+    const formData = { id: form.id, name: form.name, phone: form.phone, gender: form.gender, dob: form.dob ? format(form.dob, "dd/MM/yyyy") : null,
           age: calculateAge(form.dob), country: form.country };
 
     setShowSkeleton(true);

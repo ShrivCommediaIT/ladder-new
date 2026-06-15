@@ -124,7 +124,7 @@ const EditPlayerDetails = ({
       name: form.name,
       phone: cleanPhone,
       gender: form.gender,
-      dob: form.dob ? format(form.dob, "yyyy-MM-dd") : null,
+      dob: form.dob ? format(form.dob, "dd/MM/yyyy") : null,
       age: calculateAge(form.dob),
       country: form.country,
     };
