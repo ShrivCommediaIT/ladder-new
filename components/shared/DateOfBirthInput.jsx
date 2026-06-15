@@ -1,6 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import { Calendar } from "lucide-react";
 import {
   cn,
   formatDateInputValue,
@@ -18,18 +19,28 @@ export default function DateOfBirthInput({
   min = DEFAULT_MIN_DATE,
   max,
   disabled = false,
+  style,
   ...props
 }) {
   const inputRef = useRef(null);
 
-  const handleClick = () => {
+  const handleClick = (e) => {
     if (inputRef.current) {
-      inputRef.current.showPicker?.() || inputRef.current.focus();
+      try {
+        if (typeof inputRef.current.showPicker === "function") {
+          inputRef.current.showPicker();
+        } else {
+          inputRef.current.focus();
+        }
+      } catch (err) {
+        inputRef.current.focus();
+      }
     }
   };
 
   return (
-    <div onClick={handleClick} className="cursor-pointer">
+    <div onClick={handleClick} className="relative cursor-pointer w-full">
+      <Calendar className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
       <Input
         ref={inputRef}
         id={id}
@@ -40,7 +51,7 @@ export default function DateOfBirthInput({
         onChange={(event) => onChange?.(parseDateInputValue(event.target.value))}
         disabled={disabled}
         className={cn(
-          "bg-[var(--input-bg)] border-[var(--input-border)] text-foreground accent-primary",
+          "bg-[var(--input-bg)] border-[var(--input-border)] text-foreground accent-primary pr-4",
           "focus:border-primary focus:ring-2 focus:ring-primary/20",
           "hover:border-primary/50",
           "[&::-webkit-calendar-picker-indicator]:cursor-pointer",
@@ -48,6 +59,10 @@ export default function DateOfBirthInput({
           "dark:[&::-webkit-calendar-picker-indicator]:brightness-0 dark:[&::-webkit-calendar-picker-indicator]:invert",
           className,
         )}
+        style={{
+          ...style,
+          paddingLeft: "44px",
+        }}
         {...props}
       />
     </div>
