@@ -4,16 +4,6 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-  AlertDialogTitle,
-  AlertDialogDescription,
-} from "@/components/ui/alert-dialog";
-import {
   Dialog,
   DialogContent,
   DialogTitle,
@@ -23,7 +13,6 @@ import { CheckCircle2, ShieldCheck, CreditCard, Zap, Coins, Award } from "lucide
 export default function AdminQuickActions() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
   const [showPaymentPlans, setShowPaymentPlans] = useState(false);
 
   useEffect(() => {
@@ -34,19 +23,6 @@ export default function AdminQuickActions() {
 
   const handleWhatsAppClick = () => {
     window.open("https://wa.me/441134180902", "_blank", "noopener,noreferrer");
-  };
-
-  const handleBotClick = () => {
-    setShowWarning(true);
-  };
-
-  const handleConfirmNavigate = () => {
-    window.open(
-      "https://chatgpt.com/g/g-6a0e2c4800e48191b115f12efef3522b-ai-guide-to-ssp-ask-any-question",
-      "_blank",
-      "noopener,noreferrer"
-    );
-    setShowWarning(false);
   };
 
   // Load and render PayPal SDK hosted buttons dynamically when Dialog is open
@@ -100,39 +76,20 @@ export default function AdminQuickActions() {
 
   return (
     <>
-      {/* CONDITIONAL ADMIN BUTTONS (AI CHATBOT, WHATSAPP, PAYMENT PLANS) */}
-      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-4 md:gap-5 md:grid-cols-[1.2fr_1.2fr_0.6fr] xl:grid-cols-[1.25fr_1.25fr_0.5fr] xl:items-stretch justify-items-center mt-10 mb-10">
-        <button
-          type="button"
-          onClick={handleBotClick}
-          aria-label="Open SSP AI Assistant"
-          className="group relative w-full overflow-hidden rounded-[20px] border border-fuchsia-200 bg-white shadow-xl transition-all duration-300 hover:border-fuchsia-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/70 dark:border-fuchsia-500/60 dark:bg-[#070913] dark:shadow-2xl p-2 cursor-pointer"
-        >
-          <div className="relative w-full h-[90px] xs:h-[110px] sm:h-[130px] md:h-[140px] lg:h-[160px] xl:h-[180px]">
-            <Image
-              src={isDark ? "/ai.png" : "/ai-1.png"}
-              alt="SSP AI Assistant"
-              fill
-              sizes="(max-width: 767px) 100vw, (max-width: 1279px) 45vw, 40vw"
-              className="object-contain"
-              priority
-            />
-          </div>
-        </button>
-
+      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-4 md:gap-5 md:grid-cols-2 xl:items-stretch justify-items-center mt-10 mb-10">
         <button
           type="button"
           onClick={handleWhatsAppClick}
           aria-label="Open WhatsApp chat"
-          className="group relative w-full overflow-hidden rounded-[20px] border border-emerald-200 bg-white shadow-xl transition-all duration-300 hover:border-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 dark:border-emerald-500/50 dark:bg-[#04090c] dark:shadow-2xl p-2 cursor-pointer"
+          className="group relative w-full overflow-hidden rounded-[20px] border border-emerald-200 bg-white shadow-xl transition-all duration-300 hover:border-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70 dark:border-emerald-500/50 dark:bg-[#04090c] dark:shadow-2xl cursor-pointer aspect-[3/1]"
         >
-          <div className="relative w-full h-[90px] xs:h-[110px] sm:h-[130px] md:h-[140px] lg:h-[160px] xl:h-[180px]">
+          <div className="relative w-full h-full">
             <Image
               src={isDark ? "/wtsapp.png" : "/wtsapp-1.png"}
               alt="WhatsApp contact card"
               fill
               sizes="(max-width: 767px) 100vw, (max-width: 1279px) 45vw, 40vw"
-              className="object-contain"
+              className="object-fill"
               priority
             />
           </div>
@@ -142,9 +99,9 @@ export default function AdminQuickActions() {
           type="button"
           onClick={() => setShowPaymentPlans(true)}
           aria-label="View Payment Plans"
-          className="group relative w-full overflow-hidden rounded-[20px] border border-cyan-200 bg-white shadow-xl transition-all duration-300 hover:border-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70 dark:border-cyan-500/50 dark:bg-[#020813] dark:shadow-2xl p-2 cursor-pointer"
+          className="group relative w-full overflow-hidden rounded-[20px] border border-cyan-200 bg-white shadow-xl transition-all duration-300 hover:border-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70 dark:border-cyan-500/50 dark:bg-[#020813] dark:shadow-2xl p-2 cursor-pointer aspect-[3/1]"
         >
-          <div className="relative w-full h-[90px] xs:h-[110px] sm:h-[130px] md:h-[140px] lg:h-[160px] xl:h-[180px] flex flex-col items-center justify-center bg-[#f8fafc] dark:bg-[#0c1020] rounded-[16px] border border-cyan-100 dark:border-cyan-950 transition-all duration-300">
+          <div className="relative w-full h-full flex flex-col items-center justify-center bg-[#f8fafc] dark:bg-[#0c1020] rounded-[16px] border border-cyan-100 dark:border-cyan-950 transition-all duration-300">
             <div className="text-center transition-transform duration-300 group-hover:scale-105 flex flex-col items-center justify-center">
               <span className="text-sm xs:text-base sm:text-lg md:text-xl xl:text-2xl font-black tracking-widest text-cyan-600 dark:text-cyan-400 leading-none">
                 PAYMENT
@@ -156,31 +113,6 @@ export default function AdminQuickActions() {
           </div>
         </button>
       </div>
-
-      {/* CONFIRMATION & PAYMENT PLANS DIALOGS */}
-      <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
-        <AlertDialogContent className="rounded-[24px] border border-border bg-card p-6 backdrop-blur-xl shadow-2xl w-[90vw] max-w-sm sm:max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-lg sm:text-xl font-bold text-foreground">
-              Opening SSP AI Assistant
-            </AlertDialogTitle>
-            <AlertDialogDescription className="mt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground">
-              This link will open the SSP AI Assistant in ChatGPT. Would you like to proceed?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <AlertDialogCancel className="w-full sm:w-auto rounded-xl border border-border bg-transparent text-foreground hover:bg-muted font-medium py-2.5 px-4 transition text-xs sm:text-sm cursor-pointer">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmNavigate}
-              className="w-full sm:w-auto rounded-xl bg-fuchsia-600 text-white hover:bg-fuchsia-700 font-semibold py-2.5 px-4 shadow-lg shadow-fuchsia-500/20 transition text-xs sm:text-sm cursor-pointer"
-            >
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <Dialog open={showPaymentPlans} onOpenChange={setShowPaymentPlans}>
         <DialogContent className="w-[95vw] sm:max-w-3xl bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl max-h-[92vh] overflow-hidden flex flex-col">

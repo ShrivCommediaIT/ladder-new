@@ -566,8 +566,8 @@ export default function SubAdminDashboard() {
             )}
           </div>
         </div>
+        <AdminQuickActions />
       </div>
-      <AdminQuickActions />
     </div>
   );
 }
