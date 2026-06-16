@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { getRequest, putRequest, deleteRequest } from "@/services/apiService";
+import { getRequest, putRequest, deleteRequest, postFormData } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import {
   Search,
@@ -17,7 +17,9 @@ import {
   Eye,
   EyeOff,
   Trash2,
-  Copy,
+  Pencil,
+  Save,
+  XCircle,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import {
@@ -202,6 +204,66 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
     message: "",
     onConfirm: () => { },
   });
+
+  // Inline edit states (admin only)
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [editSaving, setEditSaving] = useState(false);
+
+  const handleOpenEdit = (record) => {
+    setEditData({
+      id: record.id,
+      sport: record.sport || "",
+      activity: record.activity || "",
+      result: record.result !== null && record.result !== undefined ? String(record.result) : "",
+      unit: record.unit || "",
+      full_name: record.full_name || "",
+      age: record.age !== null && record.age !== undefined ? String(record.age) : "",
+      date_of_performance: record.date_of_performance || "",
+      gender: record.gender || "",
+      country: record.country || "",
+      club_name: record.club_name || "",
+      coach_name: record.coach_name || "",
+      email: record.email || "",
+      venue: record.venue || "",
+      wind: record.wind || "",
+      video_link: record.video_link || "",
+      aditional_notes: record.aditional_notes || "",
+    });
+    setEditMode(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editData) return;
+    setEditSaving(true);
+    try {
+      let adminId = undefined;
+      if (typeof window !== "undefined") {
+        const str = sessionStorage.getItem("adminDetails");
+        if (str) {
+          try { adminId = JSON.parse(str)?.id; } catch (_) {}
+        }
+      }
+      const payload = new FormData();
+      if (adminId) payload.append("admin_id", adminId);
+      Object.entries(editData).forEach(([k, v]) => payload.append(k, v ?? ""));
+      const response = await postFormData(API_ENDPOINTS.PERFORMANCE_RESULT_UPDATE, payload);
+      if (response && (response.status === 200 || response.status === true || response.success)) {
+        toast.success(response.message || "Performance updated successfully!");
+        setEditMode(false);
+        setEditData(null);
+        setHistoryModalOpen(false);
+        fetchResults(currentPage);
+      } else {
+        toast.error(response?.message || "Failed to update performance.");
+      }
+    } catch (err) {
+      console.error("Edit save error:", err);
+      toast.error(err.message || "An error occurred while saving.");
+    } finally {
+      setEditSaving(false);
+    }
+  };
 
   const fetchResults = useCallback(
     async (pageVal = 1, currentFilters = appliedFilters) => {
@@ -435,6 +497,15 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
   const handleRowClick = async (item) => {
     setSelectedItem(item);
     setHistoryModalOpen(true);
+
+    if (isAdmin) {
+      // Logged in: use the already-available list data — no API needed
+      setHistoryData([item]);
+      setHistoryLoading(false);
+      return;
+    }
+
+    // Not logged in: fetch the full performance history from API
     setHistoryLoading(true);
     setHistoryData([]);
     try {
@@ -1018,52 +1089,18 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
         )}
 
         {/* Performance History Dialog */}
-        <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+        <Dialog open={historyModalOpen} onOpenChange={(open) => { if (!open) { setEditMode(false); setEditData(null); } setHistoryModalOpen(open); }}>
           <DialogContent className="w-[95vw] sm:max-w-2xl bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header Banner */}
             <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between gap-4">
               <div className="space-y-1 min-w-0">
                 <div className="inline-flex items-center gap-1 bg-primary/15 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
-                  <Activity className="h-3.5 w-3.5" /> Performance History
+                  <Activity className="h-3.5 w-3.5" /> Performance Record
                 </div>
                 <DialogTitle className="text-xl font-black text-foreground truncate">
-                  {selectedItem ? `${selectedItem.full_name}'s Record Timeline` : "Performance History"}
+                  {selectedItem ? `${selectedItem.full_name}'s Record` : "Performance Record"}
                 </DialogTitle>
               </div>
-              {selectedItem && (selectedItem.submited_id || (historyData[0] && historyData[0].submited_id)) && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const token = selectedItem.submited_id || historyData[0].submited_id;
-                    if (token) {
-                      try {
-                        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-                          await navigator.clipboard.writeText(token);
-                        } else {
-                          const textarea = document.createElement("textarea");
-                          textarea.value = token;
-                          textarea.style.position = "fixed";
-                          textarea.style.left = "-9999px";
-                          document.body.appendChild(textarea);
-                          textarea.focus();
-                          textarea.select();
-                          document.execCommand("copy");
-                          document.body.removeChild(textarea);
-                        }
-                        toast.success("Access Token copied to clipboard!");
-                      } catch (err) {
-                        console.error("Copy token error:", err);
-                        toast.error("Failed to copy Access Token.");
-                      }
-                    }
-                  }}
-                  className="h-9 px-3 rounded-xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all flex items-center gap-1.5 font-mono text-xs font-bold shrink-0 cursor-pointer shadow-sm"
-                  title="Copy Access Token"
-                >
-                  <span>Access Token: {selectedItem.submited_id || historyData[0].submited_id}</span>
-                  <Copy className="h-3.5 w-3.5" />
-                </button>
-              )}
             </div>
 
             <div className="p-4 sm:p-6 overflow-y-auto space-y-6 custom-scroll">
@@ -1077,67 +1114,45 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                   No historical updates found for this performance record.
                 </div>
               ) : (
-                <div className="relative border-l border-border pl-4 sm:pl-6 ml-2 sm:ml-3 space-y-8">
-                  {historyData.map((record, index) => (
-                    <div key={record.id || index} className="relative">
-                      {/* Timeline Dot */}
-                      <span className="absolute -left-[24px] sm:-left-[32px] top-1.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-primary bg-background shadow-sm">
-                        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                      </span>
-
-                      {/* Card container */}
-                      <div className={`history-card rounded-2xl border p-4 sm:p-5 space-y-4 shadow-sm backdrop-blur-sm ${record.status == 0 ? "border-amber-500/20 opacity-75" : ""}`}>
+                <div className="space-y-6">
+                  {historyData.map((record, index) => {
+                    const isEditing = editMode && editData?.id === record.id;
+                    const inp = "w-full h-9 rounded-lg border border-input bg-[var(--input-bg)] px-3 text-xs font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all";
+                    return (
+                      <div key={record.id || index} className={`rounded-2xl border p-4 sm:p-5 space-y-4 shadow-sm ${record.status == 0 ? "border-amber-500/20 opacity-75" : "border-border"}`}>
                         {/* Header Row */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border/60 pb-3">
                           <div>
                             <span className="text-[11px] font-bold uppercase tracking-wider text-primary flex items-center gap-2">
                               {record.sport || "Other Sport"}
                               {record.status == 0 && (
-                                <span className="inline-flex items-center gap-1 rounded bg-amber-500/15 border border-amber-500/20 px-1.5 py-0.5 text-[9px] font-black uppercase text-amber-500 tracking-wider">
-                                  Hidden
-                                </span>
+                                <span className="inline-flex items-center gap-1 rounded bg-amber-500/15 border border-amber-500/20 px-1.5 py-0.5 text-[9px] font-black uppercase text-amber-500 tracking-wider">Hidden</span>
                               )}
                             </span>
-                            <h4 className="text-base font-bold text-foreground mt-0.5">
-                              {record.activity || "Performance Event"}
-                            </h4>
+                            <h4 className="text-base font-bold text-foreground mt-0.5">{record.activity || "Performance Event"}</h4>
                           </div>
-                          <div className="flex items-center gap-3 sm:text-right shrink-0">
-                            <div className="text-left sm:text-right">
-                              <span className="text-xs text-muted-foreground font-semibold block">
-                                Logged: {formatDate(record.created_at || record.date_of_performance)}
-                              </span>
-                              <span className="text-[11px] text-muted-foreground/80 mt-0.5 block">
-                                Perf Date: {formatDate(record.date_of_performance)}
-                              </span>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <div className="text-right">
+                              <span className="text-xs text-muted-foreground font-semibold block">Logged: {formatDate(record.created_at || record.date_of_performance)}</span>
+                              <span className="text-[11px] text-muted-foreground/80 mt-0.5 block">Perf Date: {formatDate(record.date_of_performance)}</span>
                             </div>
-
-                            {/* Admin Actions: Hide/Show & Delete */}
                             {isAdmin && (
-                              <div className="flex items-center gap-1.5 border-l border-border pl-3 ml-1">
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleToggleStatus(record);
-                                  }}
+                              <div className="flex items-center gap-1.5 border-l border-border pl-2 ml-1">
+                                {!isEditing && (
+                                  <button type="button" onClick={() => handleOpenEdit(record)}
+                                    title="Edit Performance"
+                                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary hover:bg-primary hover:text-white active:scale-95 transition-all cursor-pointer">
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                                <button type="button" onClick={(e) => { e.stopPropagation(); handleToggleStatus(record); }}
                                   title={record.status == 1 ? "Hide Performance" : "Show Performance"}
-                                  className={`flex h-8 w-8 items-center justify-center rounded-xl border transition-all active:scale-95 cursor-pointer ${record.status == 1
-                                    ? "border-amber-500/25 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white"
-                                    : "border-slate-500/25 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"
-                                    }`}
-                                >
+                                  className={`flex h-8 w-8 items-center justify-center rounded-xl border transition-all active:scale-95 cursor-pointer ${record.status == 1 ? "border-amber-500/25 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white" : "border-slate-500/25 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"}`}>
                                   {record.status == 1 ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                                 </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeletePerformance(record);
-                                  }}
+                                <button type="button" onClick={(e) => { e.stopPropagation(); handleDeletePerformance(record); }}
                                   title="Delete Performance"
-                                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-rose-500/25 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white active:scale-95 transition-all cursor-pointer"
-                                >
+                                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-rose-500/25 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white active:scale-95 transition-all cursor-pointer">
                                   <Trash2 className="h-4 w-4" />
                                 </button>
                               </div>
@@ -1145,90 +1160,117 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                           </div>
                         </div>
 
-                        {/* Details Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-semibold">
-                          <div>
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Result</span>
-                            <span className="text-primary font-black text-sm">{record.result} {record.unit}</span>
-                          </div>
-                          <div>
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Age & Gender</span>
-                            <span className="text-foreground capitalize">{record.age} yrs • {record.gender}</span>
-                          </div>
-                          <div>
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Country</span>
-                            <span className="text-foreground flex items-center gap-1.5 truncate" title={record.country}>
-                              {getCountryCode(record.country) && (
-                                <img
-                                  src={`https://flagcdn.com/20x15/${getCountryCode(record.country)}.png`}
-                                  alt=""
-                                  width={16}
-                                  height={12}
-                                  className="rounded-[2px] shrink-0"
-                                />
-                              )}
-                              <span className="truncate">{record.country}</span>
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Club / Team</span>
-                            <span className="text-foreground truncate block">{record.club_name || "—"}</span>
-                          </div>
-                        </div>
-
-                        {/* Submitter details, venue & notes */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-border/40 text-xs">
-                          <div className="space-y-1">
-                            <div>
-                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Coach/Submitter:</span>{" "}
-                              <span className="text-foreground font-semibold">{record.coach_name}</span>
+                        {isEditing ? (
+                          /* ── EDIT FORM ── */
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                              {[
+                                { label: "Athlete Name", key: "full_name" },
+                                { label: "Sport", key: "sport" },
+                                { label: "Activity / Event", key: "activity" },
+                                { label: "Result", key: "result" },
+                                { label: "Unit", key: "unit" },
+                                { label: "Age", key: "age", type: "number" },
+                                { label: "Gender", key: "gender" },
+                                { label: "Country", key: "country" },
+                                { label: "Club / Team", key: "club_name" },
+                                { label: "Coach / Submitter", key: "coach_name" },
+                                { label: "Email", key: "email" },
+                                { label: "Venue", key: "venue" },
+                                { label: "Wind / Conditions", key: "wind" },
+                                { label: "Video Link", key: "video_link" },
+                              ].map(({ label, key, type }) => (
+                                <div key={key} className="space-y-1">
+                                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold block">{label}</span>
+                                  <input
+                                    type={type || "text"}
+                                    value={editData[key] ?? ""}
+                                    onChange={(e) => setEditData(prev => ({ ...prev, [key]: e.target.value }))}
+                                    className={inp}
+                                  />
+                                </div>
+                              ))}
+                              <div className="col-span-2 sm:col-span-3 space-y-1">
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold block">Date of Performance</span>
+                                <input type="date" value={editData.date_of_performance ?? ""}
+                                  onChange={(e) => setEditData(prev => ({ ...prev, date_of_performance: e.target.value }))}
+                                  className={inp} />
+                              </div>
+                              <div className="col-span-2 sm:col-span-3 space-y-1">
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold block">Additional Notes</span>
+                                <textarea rows={3} value={editData.aditional_notes ?? ""}
+                                  onChange={(e) => setEditData(prev => ({ ...prev, aditional_notes: e.target.value }))}
+                                  className={`${inp} h-auto pt-2 resize-none`} />
+                              </div>
                             </div>
-                            <div className="truncate">
-                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Email:</span>{" "}
-                              <span className="text-foreground font-medium break-all">{record.email}</span>
+                            <div className="flex gap-2 pt-1">
+                              <button type="button" onClick={() => { setEditMode(false); setEditData(null); }}
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-xs transition-all cursor-pointer">
+                                <XCircle className="h-3.5 w-3.5" /> Cancel
+                              </button>
+                              <button type="button" onClick={handleEditSave} disabled={editSaving}
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-60"
+                                style={{ backgroundImage: brandGradient, boxShadow: "var(--brand-button-shadow)" }}>
+                                {editSaving ? <><div className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" /> Saving...</> : <><Save className="h-3.5 w-3.5" /> Save Changes</>}
+                              </button>
                             </div>
                           </div>
-                          <div className="space-y-1">
-                            <div>
-                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Venue:</span>{" "}
-                              <span className="text-foreground font-semibold">{record.venue || "—"}</span>
+                        ) : (
+                          /* ── READ-ONLY VIEW ── */
+                          <>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-semibold">
+                              <div>
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Result</span>
+                                <span className="text-primary font-black text-sm">{record.result} {record.unit}</span>
+                              </div>
+                              <div>
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Age & Gender</span>
+                                <span className="text-foreground capitalize">{record.age} yrs • {record.gender}</span>
+                              </div>
+                              <div>
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Country</span>
+                                <span className="text-foreground flex items-center gap-1.5 truncate" title={record.country}>
+                                  {getCountryCode(record.country) && (
+                                    <img src={`https://flagcdn.com/20x15/${getCountryCode(record.country)}.png`} alt="" width={16} height={12} className="rounded-[2px] shrink-0" />
+                                  )}
+                                  <span className="truncate">{record.country}</span>
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider block">Club / Team</span>
+                                <span className="text-foreground truncate block">{record.club_name || "—"}</span>
+                              </div>
                             </div>
-                            <div>
-                              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Wind/Conditions:</span>{" "}
-                              <span className="text-foreground font-semibold">{record.wind || "—"}</span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-border/40 text-xs">
+                              <div className="space-y-1">
+                                <div><span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Coach/Submitter:</span>{" "}<span className="text-foreground font-semibold">{record.coach_name}</span></div>
+                                <div className="truncate"><span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Email:</span>{" "}<span className="text-foreground font-medium break-all">{record.email}</span></div>
+                              </div>
+                              <div className="space-y-1">
+                                <div><span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Venue:</span>{" "}<span className="text-foreground font-semibold">{record.venue || "—"}</span></div>
+                                <div><span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Wind/Conditions:</span>{" "}<span className="text-foreground font-semibold">{record.wind || "—"}</span></div>
+                                {record.video_link && record.video_link.trim() && record.video_link !== "dfgg" && (
+                                  <div className="flex items-center gap-1.5 pt-1">
+                                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Video Evidence:</span>
+                                    <button type="button" onClick={(e) => { e.stopPropagation(); handlePlayVideo(record.video_link); }}
+                                      className="inline-flex h-5 items-center gap-1 px-2 rounded-full border border-primary/20 bg-primary/10 text-primary text-[10px] font-bold hover:bg-primary hover:text-white transition-all cursor-pointer">
+                                      <Play className="h-2 w-2 fill-current" /> Play Video
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                            {record.video_link && record.video_link.trim() && record.video_link !== "dfgg" && (
-                              <div className="flex items-center gap-1.5 pt-1">
-                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Video Evidence:</span>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handlePlayVideo(record.video_link);
-                                  }}
-                                  className="inline-flex h-5 items-center gap-1 px-2 rounded-full border border-primary/20 bg-primary/10 text-primary text-[10px] font-bold hover:bg-primary hover:text-white transition-all cursor-pointer"
-                                >
-                                  <Play className="h-2 w-2 fill-current" /> Play Video
-                                </button>
+                            {record.aditional_notes && (
+                              <div className="bg-muted/40 rounded-xl p-3 border border-border/40 text-xs">
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold block mb-1">Additional Notes</span>
+                                <p className="text-foreground/95 font-medium leading-relaxed italic">"{record.aditional_notes}"</p>
                               </div>
                             )}
-                          </div>
-                        </div>
-
-                        {/* Additional Notes */}
-                        {record.aditional_notes && (
-                          <div className="bg-muted/40 rounded-xl p-3 border border-border/40 text-xs">
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold block mb-1">
-                              Additional Notes
-                            </span>
-                            <p className="text-foreground/95 font-medium leading-relaxed italic">
-                              "{record.aditional_notes}"
-                            </p>
-                          </div>
+                          </>
                         )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, HelpCircle, Key, ArrowLeft, UploadCloud, FileSpreadsheet, X, CheckCircle, AlertTriangle, RefreshCw, Copy } from "lucide-react";
+import { ShieldCheck, UploadCloud, FileSpreadsheet, X, CheckCircle, AlertTriangle } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -94,22 +94,8 @@ export default function SubmitPerformancePage() {
   const [evidenceFile, setEvidenceFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const [accessCodeModalOpen, setAccessCodeModalOpen] = useState(false);
-  const [submittedAccessCode, setSubmittedAccessCode] = useState("");
-
-  // PayPal Payment Flow states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paypalLoading, setPaypalLoading] = useState(false);
-
-  // Lookup and Update mode states
-  const [lookupModalOpen, setLookupModalOpen] = useState(false);
-  const [listModalOpen, setListModalOpen] = useState(false);
-  const [matchedRecords, setMatchedRecords] = useState([]);
-  const [originalFormData, setOriginalFormData] = useState(null);
-  const [searchId, setSearchId] = useState("");
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [isUpdateMode, setIsUpdateMode] = useState(false);
-  const [activeRecordId, setActiveRecordId] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [admin, setAdmin] = useState(null);
   const [subAdmin, setSubAdmin] = useState(null);
@@ -385,182 +371,12 @@ useEffect(() => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleCancelUpdate = () => {
-    setFormData({
-      sport: "",
-      customSport: "",
-      activity: "",
-      result: "",
-      unit: "",
-      customUnit: "",
-      full_name: "",
-      age: "",
-      date_of_performance: "",
-      gender: "",
-      country: "",
-      club_name: "",
-      coach_name: "",
-      email: "",
-      venue: "",
-      wind: "",
-      video_link: "",
-      aditional_notes: "",
-    });
-    setEvidenceFile(null);
-    setErrors({});
-    setIsUpdateMode(false);
-    setActiveRecordId(null);
-    setOriginalFormData(null);
 
-    // Re-fill coach/submitter name & email from sessionStorage if available
-    if (typeof window !== "undefined") {
-      const storedAdmin = sessionStorage.getItem("userData");
-      const storedSubAdmin = sessionStorage.getItem("subAdmin");
-      const user = storedAdmin ? JSON.parse(storedAdmin) : (storedSubAdmin ? JSON.parse(storedSubAdmin) : null);
-      if (user) {
-        setFormData(prev => ({
-          ...prev,
-          coach_name: user.name || "",
-          email: user.email || ""
-        }));
-      }
-    }
-    toast.info("Update cancelled. Returned to New Submission mode.");
-  };
 
-  const handleLookupSubmission = async (e) => {
-    if (e) e.preventDefault();
-    if (!searchId.trim()) {
-      toast.error("Please enter a valid Access Code");
-      return;
-    }
-
-    setSearchLoading(true);
-    try {
-      let adminId = admin?.id;
-      if (!adminId && typeof window !== "undefined") {
-        const adminDetailsStr = sessionStorage.getItem("adminDetails");
-        if (adminDetailsStr) {
-          try {
-            const adminDetails = JSON.parse(adminDetailsStr);
-            adminId = adminDetails?.id;
-          } catch (e) {
-            console.error("Error parsing adminDetails in lookup:", e);
-          }
-        }
-      }
-
-      const response = await getRequest(API_ENDPOINTS.GET_PERFORMANCE_RESULT_LIST, {
-        admin_id: adminId || undefined,
-        limit: 1000
-      });
-
-      if (response && (response.status === 200 || response.status === true)) {
-        const recordList = response.data?.data || (Array.isArray(response.data) ? response.data : []);
-        const isMatched = recordList.some(record => 
-          String(record.submited_id || "").trim() === searchId.trim()
-        );
-
-        if (isMatched) {
-          setMatchedRecords(recordList);
-          setLookupModalOpen(false);
-          setListModalOpen(true);
-          setSearchId("");
-          toast.success("Access code verified! Displaying talent board submissions.");
-        } else {
-          toast.error("Invalid Access Token. Please enter a correct Submitted ID.");
-        }
-      } else {
-        toast.error("Could not fetch the posted list of the talent board.");
-      }
-    } catch (error) {
-      console.error("Lookup error:", error);
-      toast.error(error.response?.data?.message || error.message || "Failed to fetch submission details.");
-    } finally {
-      setSearchLoading(false);
-    }
-  };
-
-  const handleSelectRecord = (record) => {
-    if (!record) return;
-    
-    const matchedSport = sportsList.includes(record.sport) ? record.sport : (record.sport ? "Other" : "");
-    const customSport = matchedSport === "Other" ? record.sport : "";
-
-    const matchedUnit = unitsList.includes(record.unit) ? record.unit : (record.unit ? "Other" : "");
-    const customUnit = matchedUnit === "Other" ? record.unit : "";
-
-    const initialFormData = {
-      sport: matchedSport,
-      customSport: customSport || "",
-      activity: record.activity || "",
-      result: record.result !== null && record.result !== undefined ? String(record.result) : "",
-      unit: matchedUnit,
-      customUnit: customUnit || "",
-      full_name: record.full_name || "",
-      age: record.age !== null && record.age !== undefined ? String(record.age) : "",
-      date_of_performance: formatDateForInput(record.date_of_performance),
-      gender: record.gender || "",
-      country: record.country || "",
-      club_name: record.club_name || "",
-      coach_name: record.coach_name || "",
-      email: record.email || "",
-      venue: record.venue || "",
-      wind: record.wind || "",
-      video_link: record.video_link || "",
-      aditional_notes: record.aditional_notes || record.additional_notes || "",
-    };
-
-    setFormData(initialFormData);
-    setOriginalFormData(initialFormData);
-    setActiveRecordId(record.id);
-    setIsUpdateMode(true);
-    setListModalOpen(false);
-    toast.success(`Selected ${record.full_name || "athlete"}'s submission. You can now edit the fields below.`);
-  };
-
-  const hasBeenEdited = () => {
-    if (!originalFormData) return false;
-    if (evidenceFile) return true;
-
-    const keysToCheck = [
-      "sport",
-      "customSport",
-      "activity",
-      "result",
-      "unit",
-      "customUnit",
-      "full_name",
-      "age",
-      "date_of_performance",
-      "gender",
-      "country",
-      "club_name",
-      "coach_name",
-      "email",
-      "venue",
-      "wind",
-      "video_link",
-      "aditional_notes"
-    ];
-
-    for (const key of keysToCheck) {
-      const val1 = String(formData[key] || "").trim();
-      const val2 = String(originalFormData[key] || "").trim();
-      if (val1 !== val2) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const handleUpdateSubmission = async (e) => {
-    if (e) e.preventDefault();
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!validateForm()) {
       toast.error("Please fill in all required fields and fix validation errors");
-
-      // Scroll to the first element with an error
       setTimeout(() => {
         const firstErrorKey = Object.keys(errors)[0];
         const element = document.getElementsByName(firstErrorKey)[0];
@@ -571,152 +387,12 @@ useEffect(() => {
       }, 100);
       return;
     }
-
-    if (!hasBeenEdited()) {
-      toast.error("No changes detected. Please edit at least one field before updating.", {
-        toastId: "no-changes-error",
-      });
-      return;
+    if (dbData.length >= 50) {
+      setShowPaymentModal(true);
     }
-
-    setLoading(true);
-
-    try {
-      const payload = new FormData();
-
-      // Get admin_id from sessionStorage key "adminDetails"
-      if (typeof window !== "undefined") {
-        const adminDetailsStr = sessionStorage.getItem("adminDetails");
-        if (adminDetailsStr) {
-          try {
-            const adminDetails = JSON.parse(adminDetailsStr);
-            if (adminDetails && adminDetails.id) {
-              payload.append("admin_id", adminDetails.id);
-            }
-          } catch (e) {
-            console.error("Error parsing adminDetails:", e);
-          }
-        }
-      }
-
-      payload.append("id", activeRecordId);
-      payload.append("sport", formData.sport === "Other" ? formData.customSport : formData.sport);
-      payload.append("activity", formData.activity);
-      payload.append("result", formData.result);
-      payload.append("unit", formData.unit === "Other" ? formData.customUnit : formData.unit);
-      payload.append("full_name", formData.full_name);
-      payload.append("age", formData.age);
-      payload.append("date_of_performance", formData.date_of_performance);
-      payload.append("gender", formData.gender);
-      payload.append("country", formData.country);
-      payload.append("club_name", formData.club_name || "");
-      payload.append("coach_name", formData.coach_name);
-      payload.append("email", formData.email);
-      payload.append("venue", formData.venue || "");
-      payload.append("wind", formData.wind || "");
-      payload.append("video_link", formData.video_link || "");
-      payload.append("aditional_notes", formData.aditional_notes || "");
-
-      if (evidenceFile) {
-        payload.append("upload_avidence", evidenceFile);
-      }
-
-      const response = await postFormData(API_ENDPOINTS.PERFORMANCE_RESULT_UPDATE, payload);
-
-      if (response && (response.status === 200 || response.status === true || response.success)) {
-        toast.success("Performance result updated successfully!");
-
-        setFormData({
-          sport: "",
-          customSport: "",
-          activity: "",
-          result: "",
-          unit: "",
-          customUnit: "",
-          full_name: "",
-          age: "",
-          date_of_performance: "",
-          gender: "",
-          country: "",
-          club_name: "",
-          coach_name: "",
-          email: "",
-          venue: "",
-          wind: "",
-          video_link: "",
-          aditional_notes: "",
-        });
-        setEvidenceFile(null);
-        setErrors({});
-        setIsUpdateMode(false);
-        setActiveRecordId(null);
-        setOriginalFormData(null);
-        setRefreshKey(prev => prev + 1);
-      } else {
-        toast.error(response?.message || response?.error_message || "Failed to update performance result.");
-      }
-    } catch (error) {
-      console.error("Talent Board update error:", error);
-      toast.error(error.response?.data?.message || error.message || "An error occurred during update.");
-    } finally {
-      setLoading(false);
-    }
+    await submitFormData();
   };
 
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (isUpdateMode) {
-      await handleUpdateSubmission(e);
-    } else {
-      if (!validateForm()) {
-        toast.error("Please fill in all required fields and fix validation errors");
-
-        // Scroll to the first element with an error
-        setTimeout(() => {
-          const firstErrorKey = Object.keys(errors)[0];
-          const element = document.getElementsByName(firstErrorKey)[0];
-          if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "center" });
-            element.focus();
-          }
-        }, 100);
-        return;
-      }
-
-      if(dbData.length >= 50){
-          setShowPaymentModal(true);
-      }
-      await submitFormData()
-    }
-  };
-
-  const copyAccessCode = async () => {
-    if (!submittedAccessCode) return;
-
-    try {
-      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-        await navigator.clipboard.writeText(submittedAccessCode);
-      } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = submittedAccessCode;
-        textarea.style.position = "fixed";
-        textarea.style.left = "-9999px";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-      }
-
-      toast.success("Access code copied to clipboard!");
-    } catch (error) {
-      console.error("Access code copy error:", error);
-      toast.error("Unable to copy access code.");
-    }
-  };
 
   const submitFormData = async (transactionId) => {
 
@@ -760,22 +436,6 @@ useEffect(() => {
       const response = await postFormData(API_ENDPOINTS.SAVE_PERFORMANCE_RESULT, payload);
 
       if (response && (response.status === 200 || response.status === true || response.success)) {
-        const performanceResult =
-          response?.performance_result ||
-          response?.data?.performance_result ||
-          response?.data?.data?.performance_result ||
-          null;
-        const accessCode =
-          performanceResult?.submited_id ||
-          response?.submited_id ||
-          response?.data?.submited_id ||
-          "";
-
-        if (accessCode) {
-          setSubmittedAccessCode(String(accessCode));
-          setAccessCodeModalOpen(true);
-        }
-
         toast.success("Performance result submitted successfully!");
 
         // Reset all form inputs to empty strings
@@ -822,7 +482,7 @@ useEffect(() => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center mb-8">
           <div className="lg:col-span-2">
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-[#0284C7] to-accent bg-clip-text text-transparent mb-4">
-              {isUpdateMode ? "Update Performance Result" : "Submit a Performance Result"}
+              Submit a Performance Result
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base font-semibold leading-relaxed">
               The SSP Talent Board allows account holders to showcase notable sporting performances and emerging talent that may be of interest to coaches, scouts and sporting organisations.
@@ -1238,76 +898,24 @@ useEffect(() => {
             {/* ACTION BUTTONS */}
             <div className="space-y-4 pt-4 border-t border-border">
               <div className="flex flex-col sm:flex-row gap-4">
-                {isUpdateMode ? (
-                  <>
-                    {/* Cancel Update Button */}
-                    <button
-                      type="button"
-                      onClick={handleCancelUpdate}
-                      className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl border border-rose-200 dark:border-rose-900 bg-rose-50/50 hover:bg-rose-50 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 transition-all duration-200 text-left cursor-pointer"
-                    >
-                      <div className="p-3 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-300">
-                        <X className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="font-extrabold text-sm md:text-base text-rose-800 dark:text-rose-200">Cancel Update</p>
-                        <p className="text-[10px] md:text-xs text-rose-500 dark:text-rose-400 mt-0.5">Discard changes and return</p>
-                      </div>
-                    </button>
-
-                    {/* Update Submission (Submit Button) */}
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white transition-all duration-200 text-left shadow-lg shadow-emerald-500/15 cursor-pointer"
-                    >
-                      <div className="p-3 rounded-xl bg-white/10 text-white">
-                        <CheckCircle className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="font-extrabold text-sm md:text-base text-white">Update Submission</p>
-                        <p className="text-[10px] md:text-xs text-emerald-100/90 mt-0.5">
-                          {loading ? "Updating performance..." : "Save changes to performance result"}
-                        </p>
-                      </div>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    {/* Update Existing Submission */}
-                    <button
-                      type="button"
-                      onClick={() => setLookupModalOpen(true)}
-                      className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 hover:bg-slate-100 dark:bg-[#0c1628] dark:hover:bg-[#122038] transition-all duration-200 text-left cursor-pointer"
-                    >
-                      <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300">
-                        <RefreshCw className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="font-extrabold text-sm md:text-base text-slate-800 dark:text-slate-200">Click on result to update</p>
-                      </div>
-                    </button>
-
-                    {/* New Submission (Submit Button) */}
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all duration-200 text-left shadow-lg shadow-blue-500/15 cursor-pointer"
-                    >
-                      <div className="p-3 rounded-xl bg-white/10 text-white">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="font-extrabold text-sm md:text-base text-white">New Submission</p>
-                        <p className="text-[10px] md:text-xs text-blue-100/90 mt-0.5">
-                          {loading ? "Submitting performance..." : "Create a new performance submission"}
-                        </p>
-                      </div>
-                    </button>
-                  </>
-                )}
+                {/* New Submission (Submit Button) */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all duration-200 text-left shadow-lg shadow-blue-500/15 cursor-pointer"
+                >
+                  <div className="p-3 rounded-xl bg-white/10 text-white">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-sm md:text-base text-white">New Submission</p>
+                    <p className="text-[10px] md:text-xs text-blue-100/90 mt-0.5">
+                      {loading ? "Submitting performance..." : "Create a new performance submission"}
+                    </p>
+                  </div>
+                </button>
               </div>
 
               {/* Secure Footer */}
@@ -1391,202 +999,6 @@ useEffect(() => {
           </DialogContent>
         </Dialog>
 
-        {/* Submitted Access Code Dialog */}
-        <Dialog open={accessCodeModalOpen} onOpenChange={setAccessCodeModalOpen}>
-          <DialogContent className="w-[95vw] sm:max-w-md bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
-            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-emerald-500/10 via-primary/5 to-transparent flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
-                  <CheckCircle className="h-3.5 w-3.5" /> Submitted
-                </div>
-                <DialogTitle className="text-xl font-black text-foreground">
-                  Copy Access Code
-                </DialogTitle>
-              </div>
-              <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-300">
-                <Key className="h-5 w-5" />
-              </div>
-            </div>
-
-            <div className="p-6 space-y-5">
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Keep this code safe. You will need it to find and update this performance result later.
-                </p>
-                <div className="flex items-center gap-3 rounded-2xl border border-border bg-muted/60 p-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Access Code
-                    </p>
-                    <p className="mt-1 break-all font-mono text-lg font-black text-foreground">
-                      {submittedAccessCode || "-"}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={copyAccessCode}
-                    disabled={!submittedAccessCode}
-                    className="h-11 w-11 shrink-0 rounded-xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all cursor-pointer flex items-center justify-center shadow-md"
-                    title="Copy access code"
-                  >
-                    <Copy className="h-4.5 w-4.5" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setAccessCodeModalOpen(false)}
-                  className="flex-1 py-3 px-4 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-sm transition-all cursor-pointer text-center"
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  onClick={copyAccessCode}
-                  disabled={!submittedAccessCode}
-                  className="flex-1 py-3 px-4 rounded-xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <Copy className="h-4 w-4" />
-                  Copy Code
-                </button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Lookup Submitted ID Dialog */}
-        <Dialog open={lookupModalOpen} onOpenChange={setLookupModalOpen}>
-          <DialogContent className="w-[95vw] sm:max-w-md bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
-            {/* Header Banner */}
-            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-1 bg-primary/15 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
-                  <Key className="h-3.5 w-3.5" /> Lookup Submission
-                </div>
-                <DialogTitle className="text-xl font-black text-foreground">
-                  Update Submission
-                </DialogTitle>
-              </div>
-            </div>
-
-            <form onSubmit={handleLookupSubmission} className="p-6 space-y-6">
-              <div className="space-y-2">
-                <label className="text-xs sm:text-sm font-semibold text-foreground/80">
-                  Access Code <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={searchId}
-                  onChange={(e) => setSearchId(e.target.value)}
-                  placeholder="Enter your Access Code (e.g. 1234)"
-                  required
-                  className="w-full h-12 px-4 rounded-xl bg-input-theme-bg border border-input-theme-border text-foreground placeholder-muted-foreground/60 focus:border-primary dark:focus:border-accent focus:ring-2 focus:ring-primary/20 dark:focus:ring-accent/20 focus:outline-none transition-all text-sm font-medium"
-                />
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Enter the unique 4-digit Access Code you received when creating your performance result.
-                </p>
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setLookupModalOpen(false)}
-                  className="flex-1 py-3 px-4 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-sm transition-all cursor-pointer text-center"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={searchLoading}
-                  className="flex-1 py-3 px-4 rounded-xl bg-[#0091FF] hover:bg-[#0080E0] text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {searchLoading ? (
-                    <>
-                      <div className="w-4 h-4 rounded-full border-2 border-white/35 border-t-white animate-spin" />
-                      Searching...
-                    </>
-                  ) : (
-                    "Search & Fill"
-                  )}
-                </button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-
-        {/* Selection List Dialog */}
-        <Dialog open={listModalOpen} onOpenChange={setListModalOpen}>
-          <DialogContent className="w-[95vw] sm:max-w-lg bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
-            {/* Header Banner */}
-            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-1 bg-primary/15 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
-                  <FileSpreadsheet className="h-3.5 w-3.5" /> Select Submission
-                </div>
-                <DialogTitle className="text-xl font-black text-foreground">
-                  Choose Submission to Update
-                </DialogTitle>
-              </div>
-            </div>
-
-            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                We found the following submission(s) matching your access token. Select the one you wish to edit:
-              </p>
-
-              <div className="space-y-3">
-                {matchedRecords.map((record, idx) => (
-                  <div
-                    key={record.id || idx}
-                    onClick={() => handleSelectRecord(record)}
-                    className="group p-4 rounded-2xl border border-border bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-primary/50 transition-all cursor-pointer flex items-center justify-between gap-4"
-                  >
-                    <div className="space-y-1">
-                      <h4 className="font-extrabold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors">
-                        {record.full_name || "N/A"}
-                      </h4>
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground font-semibold">
-                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-md text-[10px]">
-                          {record.sport || "N/A"}
-                        </span>
-                        <span>•</span>
-                        <span>{record.activity || "N/A"}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right">
-                        <span className="text-base sm:text-lg font-black text-foreground">
-                          {record.result !== null && record.result !== undefined ? record.result : "N/A"}
-                        </span>
-                        <span className="text-xs font-semibold text-muted-foreground ml-1">
-                          {record.unit || ""}
-                        </span>
-                      </div>
-                      <div className="p-2 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="p-6 pt-0 border-t border-border mt-auto flex justify-end">
-              <button
-                type="button"
-                onClick={() => setListModalOpen(false)}
-                className="w-full sm:w-auto py-3 px-6 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground font-bold text-sm transition-all cursor-pointer text-center"
-              >
-                Cancel
-              </button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
       <PerformanceDatabase refreshTrigger={refreshKey} />
     </div>
