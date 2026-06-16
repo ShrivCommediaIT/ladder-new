@@ -309,10 +309,10 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedWitnessBy } = useSelector((state) => state.positiveLeaderBoard || {});
+  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy } = useSelector((state) => state.positiveLeaderBoard || {});
   const showAgeRank = Number(appliedAge) > 0;
   const isInverted = ladderDetails?.inverted == 0;
-  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
+  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "") || (appliedCountry && appliedCountry !== "");
   console.log('isInverted', isInverted)
   const currentUser = useSelector((state) => state.user?.user);
   const activityState = useSelector((state) => state.activity);
@@ -344,7 +344,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     setTimeout(() => setShowCelebration(false), 4000 + Math.random() * 1000);
   }, []);
 
-  const refreshLeaderboard = useCallback((skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, witness = localWitnessBy) => {
+  const refreshLeaderboard = useCallback((skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, witness = localWitnessBy, country = appliedCountry) => {
     if (ladderId) {
       const payload = {
         ladder_id: ladderId,
@@ -364,6 +364,9 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         if (gender) {
           payload.gender = gender;
         }
+        if (country) {
+          payload.country = country;
+        }
       }
 
       Promise.all([
@@ -373,10 +376,10 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     }
   }, [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy]);
 
-  const handleAgeSearch = (age, ageType, gender) => {
+  const handleAgeSearch = (age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : "";
-    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender, 0);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
+    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender, 0, country);
   };
 
   useEffect(() => { if (onPlayerAdded) refreshLeaderboard(); }, [onPlayerAdded, refreshLeaderboard]);
@@ -452,15 +455,15 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         }
       },
     },
-    { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters} /> },
+    { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters} defaultAge={appliedAge} defaultAgeType={appliedAgeType} defaultGender={appliedGender} defaultCountry={appliedCountry} /> },
     {
       id: "clear", label: "Clear All", icon: XCircle, tone: "danger",
       onClick: () => {
         setIsSorted(false);
         setLocalWitnessBy(0);
-        dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+        dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
         setAgeFilterResetSignal((p) => p + 1);
-        refreshLeaderboard(0, 0, "", "", 0);
+        refreshLeaderboard(0, 0, "", "", 0, "");
       },
       hidden: !isSorted && !hasFilters && localWitnessBy !== 1
     },

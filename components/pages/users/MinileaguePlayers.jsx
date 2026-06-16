@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { fetchMiniLeague, setAgeFilter } from "@/redux/slices/minileagueSlice";
+import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { setSelectedPlayer } from "@/redux/slices/leaderboardSlice";
 import { MinileagueEditPlayer } from "@/components/shared/MinileagueEditPlayer";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -210,7 +210,7 @@ const PlayerCard = ({
 
 const MinileaguePlayers = ({ ladderId }) => {
   const dispatch = useDispatch();
-  const { data: sectionedPlayers, appliedAge, appliedAgeType, appliedGender } =
+  const { data: sectionedPlayers } =
     useSelector((state) => state.minileague || {});
   const loggedInUser = useSelector((state) => state.user?.user);
 
@@ -235,20 +235,13 @@ const MinileaguePlayers = ({ ladderId }) => {
     isRefreshingRef.current = true;
     setLoadingPlayers(true);
     const payload = { ladder_id: ladderId, type: "minileague" };
-    if (appliedAge > 0) {
-      payload.dob = appliedAge;
-      payload.age_type = appliedAgeType;
-    }
-    if (appliedGender) {
-      payload.gender = appliedGender;
-    }
     try {
       await dispatch(fetchMiniLeague(payload));
     } finally {
       setLoadingPlayers(false);
       isRefreshingRef.current = false;
     }
-  }, [ladderId, dispatch, appliedAge, appliedAgeType, appliedGender]);
+  }, [ladderId, dispatch]);
 
   useEffect(() => {
     refreshLeaderboard();
@@ -310,19 +303,10 @@ const MinileaguePlayers = ({ ladderId }) => {
         <PlayerSearch
           searchTerm={searchQuery}
           setSearchTerm={setSearchQuery}
-          onAgeSearch={(age, ageType, gender) => {
-            const ageNum = age ? Number(age) : "";
-            dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-          }}
           onClearFilters={() => {
-            dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+            setSearchQuery("");
           }}
-          activeFilters={
-            Boolean(searchQuery) ||
-            appliedAge > 0 ||
-            Boolean(appliedGender)
-          }
-          defaultAge={appliedAge}
+          activeFilters={Boolean(searchQuery)}
         />
       </div>
 

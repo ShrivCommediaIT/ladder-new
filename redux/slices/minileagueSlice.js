@@ -47,19 +47,9 @@ const miniLeagueSlice = createSlice({
     data: [],
     gradebars: [],
     ladderDetails: null,
-    appliedAge: 0,
-    appliedAgeType: "under",
-    appliedGender: "",
     error: null,
   },
-  reducers: {
-    setAgeFilter: (state, action) => {
-      const { age, ageType, gender } = action.payload;
-      state.appliedAge = age;
-      state.appliedAgeType = ageType;
-      state.appliedGender = gender;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchMiniLeague.pending, (state) => { state.loading = true; })
@@ -92,5 +82,4 @@ const miniLeagueSlice = createSlice({
   },
 });
 
-export const { setAgeFilter } = miniLeagueSlice.actions;
 export default miniLeagueSlice.reducer;

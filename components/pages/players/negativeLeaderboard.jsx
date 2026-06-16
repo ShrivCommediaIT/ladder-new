@@ -341,13 +341,14 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     appliedAge,
     appliedAgeType,
     appliedGender,
+    appliedCountry,
     appliedWitnessBy,
   } = useSelector((state) => state.negativeLeaderBoard || {});
 
   const showAgeRank = Number(appliedAge) > 0;
   const isInverted = ladderDetails?.inverted == 0;
   const hasFilters =
-    (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
+    (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "") || (appliedCountry && appliedCountry !== "");
 
   const currentUser = useSelector((state) => state.user?.user);
   const activityState = useSelector((state) => state.activity);
@@ -389,7 +390,8 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       age = appliedAge,
       ageType = appliedAgeType,
       gender = appliedGender,
-      witness = localWitnessBy
+      witness = localWitnessBy,
+      country = appliedCountry
     ) => {
       if (ladderId) {
         const payload = { ladder_id: ladderId, type: "negative" };
@@ -402,6 +404,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
             if (ageType) payload.age_type = ageType;
           }
           if (gender) payload.gender = gender;
+          if (country) payload.country = country;
         }
         Promise.all([
           dispatch(fetchNegativeLeaderboard(payload)),
@@ -412,10 +415,10 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy]
   );
 
-  const handleAgeSearch = (age, ageType, gender) => {
+  const handleAgeSearch = (age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : "";
-    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender, 0);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
+    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender, 0, country);
   };
 
   useEffect(() => {
@@ -561,6 +564,10 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           user={false}
           resetSignal={ageFilterResetSignal}
           isActive={hasFilters}
+          defaultAge={appliedAge}
+          defaultAgeType={appliedAgeType}
+          defaultGender={appliedGender}
+          defaultCountry={appliedCountry}
         />
       ),
     },
@@ -572,9 +579,9 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       onClick: () => {
         setIsSorted(false);
         setLocalWitnessBy(0);
-        dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+        dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
         setAgeFilterResetSignal((p) => p + 1);
-        refreshLeaderboard(0, 0, "", "", 0);
+        refreshLeaderboard(0, 0, "", "", 0, "");
       },
       hidden: !isSorted && !hasFilters && localWitnessBy !== 1,
     },

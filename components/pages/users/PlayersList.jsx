@@ -81,7 +81,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
     useSelector((state) => state.player?.players?.[ladderId]?.ladderDetails) ||
     {};
 
-  const { appliedAge, appliedAgeType, appliedGender } = useSelector((state) => state.player || {});
+  const { appliedAge, appliedAgeType, appliedGender, appliedCountry } = useSelector((state) => state.player || {});
 
   const ladderType =
     ladderTypeFromParams ||
@@ -101,12 +101,12 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
   const [resetSignal, setResetSignal] = useState(0);
 
   useEffect(() => {
-    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
   }, [dispatch]);
 
   const handleClearFilters = useCallback(() => {
     setSearchTerm("");
-    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
     setResetSignal((p) => p + 1);
   }, [dispatch]);
 
@@ -114,7 +114,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
     if (onActionsChanged) {
       const actions = [];
       
-      if (appliedAge > 0 || Boolean(appliedGender)) {
+      if (appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)) {
         actions.push({
           id: "clear-all-filters",
           label: "Clear All Filters",
@@ -128,20 +128,24 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
         id: "age-filter",
         node: (
           <AgeFilter
-            onSearch={(age, ageType, gender) => {
+            onSearch={(age, ageType, gender, country) => {
               const ageNum = age ? Number(age) : "";
-              dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
+              dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
             }}
             user={false}
             resetSignal={resetSignal}
-            isActive={appliedAge > 0 || Boolean(appliedGender)}
+            isActive={appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)}
+            defaultAge={appliedAge}
+            defaultAgeType={appliedAgeType}
+            defaultGender={appliedGender}
+            defaultCountry={appliedCountry}
           />
         )
       });
 
       onActionsChanged(actions);
     }
-  }, [resetSignal, onActionsChanged, dispatch, appliedAge, appliedGender, handleClearFilters]);
+  }, [resetSignal, onActionsChanged, dispatch, appliedAge, appliedGender, appliedCountry, handleClearFilters]);
 
   const currentUser = players.find(
     (p) =>
@@ -165,11 +169,14 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       if (appliedGender) {
         payload.gender = appliedGender;
       }
+      if (appliedCountry) {
+        payload.country = appliedCountry;
+      }
       dispatch(fetchLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
       setCacheBuster(Date.now());
     }
-  }, [dispatch, ladderId, ladderType, appliedAge, appliedAgeType, appliedGender]);
+  }, [dispatch, ladderId, ladderType, appliedAge, appliedAgeType, appliedGender, appliedCountry]);
 
   const handleSelfRemove = useCallback(() => {
     setShowRemove(true);
@@ -268,13 +275,14 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           onClearFilters={() => {
-            dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+            dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
             setResetSignal((p) => p + 1);
           }}
           activeFilters={
             Boolean(searchTerm) ||
             appliedAge > 0 ||
-            Boolean(appliedGender)
+            Boolean(appliedGender) ||
+            Boolean(appliedCountry)
           }
         />
       </div>

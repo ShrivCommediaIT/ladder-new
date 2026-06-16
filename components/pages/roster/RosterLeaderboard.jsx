@@ -222,8 +222,9 @@ const RosterLeaderboard = () => {
   const [appliedAge, setAppliedAge] = useState(0);
   const [appliedAgeType, setAppliedAgeType] = useState("");
   const [appliedGender, setAppliedGender] = useState("");
+  const [appliedCountry, setAppliedCountry] = useState("");
   const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
-  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
+  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "") || (appliedCountry && appliedCountry !== "");
   const refreshRef = useRef(false);
   const inviteUrl =
     typeof window !== "undefined"
@@ -241,13 +242,14 @@ const RosterLeaderboard = () => {
           ladder_id: ladderId,
           ...(appliedAge > 0 ? { dob: appliedAge, age_type: appliedAgeType } : {}),
           ...(appliedGender ? { gender: appliedGender } : {}),
+          ...(appliedCountry ? { country: appliedCountry } : {}),
         }),
       ),
       dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })),
     ]).finally(() => {
       setTimeout(() => (refreshRef.current = false), 1000);
     });
-  }, [ladderId, dispatch, appliedAge, appliedAgeType, appliedGender]);
+  }, [ladderId, dispatch, appliedAge, appliedAgeType, appliedGender, appliedCountry]);
 
   useEffect(() => {
     loadRoster();
@@ -347,11 +349,12 @@ const RosterLeaderboard = () => {
   };
 
   const activityItems = activityState?.data?.data || [];
-  const handleAgeSearch = (age, ageType, gender) => {
+  const handleAgeSearch = (age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : 0;
     setAppliedAge(ageNum);
     setAppliedAgeType(ageType);
     setAppliedGender(gender);
+    setAppliedCountry(country || "");
   };
 
   const quickActions = [
@@ -363,6 +366,10 @@ const RosterLeaderboard = () => {
           user={false}
           resetSignal={ageFilterResetSignal}
           isActive={hasFilters}
+          defaultAge={appliedAge}
+          defaultAgeType={appliedAgeType}
+          defaultGender={appliedGender}
+          defaultCountry={appliedCountry}
         />
       ),
     },
@@ -375,6 +382,7 @@ const RosterLeaderboard = () => {
         setAppliedAge(0);
         setAppliedAgeType("");
         setAppliedGender("");
+        setAppliedCountry("");
         setAgeFilterResetSignal((p) => p + 1);
       },
       hidden: !hasFilters,

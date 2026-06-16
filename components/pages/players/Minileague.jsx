@@ -116,9 +116,6 @@ const Minileague = () => {
   const [isProDialogOpen, setIsProDialogOpen] = useState(false);
   const [localGradebars, setLocalGradebars] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [appliedAge, setAppliedAge] = useState(0);
-  const [appliedAgeType, setAppliedAgeType] = useState("under");
-  const [appliedGender, setAppliedGender] = useState("");
   const isRefreshingRef = useRef(false);
 
   const playerList = players?.[ladderId]?.data || [];
@@ -173,7 +170,7 @@ const Minileague = () => {
 
   const grades = generateGrades(uniquePlayers);
 
-  const refreshLeaderboard = useCallback(async (age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
+  const refreshLeaderboard = useCallback(async () => {
     if (!ladderId || isRefreshingRef.current) return;
     isRefreshingRef.current = true;
     setLoadingPlayers(true);
@@ -182,13 +179,6 @@ const Minileague = () => {
     try {
       const urlType = searchParams.get("type") || searchParams.get("ladder_type");
       const payload = { ladder_id: ladderId, type: urlType };
-      if (age > 0) {
-        payload.dob = age;
-        payload.age_type = ageType;
-      }
-      if (gender) {
-        payload.gender = gender;
-      }
       await Promise.all([
         dispatch(fetchGradebars(ladderId)),
         dispatch(fetchLeaderboard(payload)),
@@ -197,7 +187,7 @@ const Minileague = () => {
       setLoadingPlayers(false);
       setTimeout(() => (isRefreshingRef.current = false), 1500);
     }
-  }, [ladderId, dispatch, searchParams, appliedAge, appliedAgeType, appliedGender]);
+  }, [ladderId, dispatch, searchParams]);
 
   useEffect(() => {
     if (!ladderId) return;
@@ -227,13 +217,10 @@ const Minileague = () => {
           <PlayerSearch
             searchTerm={searchQuery}
             setSearchTerm={setSearchQuery}
-            onAgeSearch={(age, ageType, gender) => {
-              const ageNum = age ? Number(age) : "";
-              setAppliedAge(ageNum);
-              setAppliedAgeType(ageNum ? ageType || "under" : "");
-              setAppliedGender(gender || "");
-              refreshLeaderboard(ageNum, ageNum ? ageType || "under" : "", gender || "");
+            onClearFilters={() => {
+              setSearchQuery("");
             }}
+            activeFilters={Boolean(searchQuery)}
           />
         </div>
       </div>
