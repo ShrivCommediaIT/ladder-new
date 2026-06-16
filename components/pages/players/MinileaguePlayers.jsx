@@ -5,7 +5,7 @@ import { IMAGE_BASE_URL } from "@/constants/api";
 import Image from "next/image";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchMiniLeague, setAgeFilter } from "@/redux/slices/minileagueSlice";
+import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { setSelectedPlayer } from "@/redux/slices/leaderboardSlice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToastContainer, toast } from "react-toastify";
@@ -221,9 +221,6 @@ const MinileaguePlayers = () => {
   const activityState = useSelector((state) => state.activity);
   const {
     data: sectionedPlayers,
-    appliedAge,
-    appliedAgeType,
-    appliedGender,
   } = useSelector((state) => state.minileague || {});
 
   const [loadingPlayers, setLoadingPlayers] = useState(true);
@@ -235,9 +232,7 @@ const MinileaguePlayers = () => {
   const [contactOpen, setContactOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [addRemoveOpen, setAddRemoveOpen] = useState(false);
-  const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
-  const hasFilters =
-    (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
+  const hasFilters = false;
   const inviteUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`
@@ -259,11 +254,6 @@ const MinileaguePlayers = () => {
     isRefreshingRef.current = true;
     setLoadingPlayers(true);
     const payload = { ladder_id: ladderId, type: "minileague" };
-    if (appliedAge > 0) {
-      payload.dob = appliedAge;
-      payload.age_type = appliedAgeType;
-    }
-    if (appliedGender) payload.gender = appliedGender;
     try {
       await Promise.all([
         dispatch(fetchMiniLeague(payload)),
@@ -273,7 +263,7 @@ const MinileaguePlayers = () => {
       setLoadingPlayers(false);
       isRefreshingRef.current = false;
     }
-  }, [ladderId, dispatch, appliedAge, appliedAgeType, appliedGender]);
+  }, [ladderId, dispatch]);
 
   useEffect(() => {
     refreshLeaderboard();
@@ -372,11 +362,6 @@ const MinileaguePlayers = () => {
 
   const activityItems = activityState?.data?.data || [];
 
-  const handleAgeSearch = (age, ageType, gender) => {
-    const ageNum = age ? Number(age) : 0;
-    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-  };
-
   const quickActions = [
     {
       id: "reset",
@@ -389,28 +374,6 @@ const MinileaguePlayers = () => {
       label: "Add / Remove / Move",
       icon: Plus,
       onClick: () => setAddRemoveOpen(true),
-    },
-    // {
-    //   id: "age-filter",
-    //   node: (
-    //     <AgeFilter
-    //       onSearch={handleAgeSearch}
-    //       user={false}
-    //       resetSignal={ageFilterResetSignal}
-    //       isActive={hasFilters}
-    //     />
-    //   ),
-    // },
-    {
-      id: "clear",
-      label: "Clear All",
-      icon: XCircle,
-      tone: "danger",
-      onClick: () => {
-        dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
-        setAgeFilterResetSignal((p) => p + 1);
-      },
-      hidden: !hasFilters,
     },
   ];
 

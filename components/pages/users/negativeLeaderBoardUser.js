@@ -324,7 +324,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
 
-  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
+  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedCountry } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const showAgeRank = Number(appliedAge) > 0;
@@ -382,7 +382,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry) => {
       if (ladderId) {
         const payload = {
           ladder_id: ladderId,
@@ -399,18 +399,22 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
           payload.gender = gender;
         }
 
+        if (country) {
+          payload.country = country;
+        }
+
         setIsRefreshing(true);
         dispatch(fetchNegativeLeaderboard(payload)).finally(() => {
           setIsRefreshing(false);
         });
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, appliedCountry],
   );
 
-  const handleAgeSearch = useCallback((age, ageType, gender) => {
+  const handleAgeSearch = useCallback((age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : "";
-    const isClearing = age === null || age === "";
+    const isClearing = (age === null || age === "") && !country;
 
     if (isClearing) {
       setIsSorted(false);
@@ -420,8 +424,8 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
       setIsSorted(true);
     }
 
-    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(isClearing ? 0 : selectedPositiveFilter, ageNum, ageType, gender);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
+    refreshLeaderboard(isClearing ? 0 : selectedPositiveFilter, ageNum, ageType, gender, country);
   }, [dispatch, selectedPositiveFilter, refreshLeaderboard]);
 
   const handleClearFilters = useCallback(() => {
@@ -429,8 +433,8 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
     setIsSorted(false);
     setSelectedSkillFilter(0);
     setSelectedPositiveFilter(0);
-    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
-    refreshLeaderboard(0, 0, "", "");
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
+    refreshLeaderboard(0, 0, "", "", "");
     setResetSignal((p) => p + 1);
   }, [dispatch, refreshLeaderboard]);
 
@@ -462,14 +466,18 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
             onSearch={handleAgeSearch}
             user={false}
             resetSignal={resetSignal}
-            isActive={appliedAge > 0 || Boolean(appliedGender)}
+            isActive={appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)}
+            defaultAge={appliedAge}
+            defaultAgeType={appliedAgeType}
+            defaultGender={appliedGender}
+            defaultCountry={appliedCountry}
           />
         )
       });
 
       onActionsChanged(actions);
     }
-  }, [isSorted, appliedAge, appliedGender, resetSignal, onActionsChanged, handleAgeSearch]);
+  }, [isSorted, appliedAge, appliedGender, appliedCountry, resetSignal, onActionsChanged, handleAgeSearch]);
 
   // MANUAL REFRESH HANDLERS (only when explicitly called)
   const handleSelfRemove = useCallback(() => {
@@ -504,8 +512,8 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
     setIsSorted(false);
     setSelectedSkillFilter(0);
     setSelectedPositiveFilter(0);
-    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
-    refreshLeaderboard(0, 0, "under", "");
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
+    refreshLeaderboard(0, 0, "under", "", "");
   }, [refreshLeaderboard, dispatch]);
 
   const handleSkillClick = useCallback(
@@ -539,7 +547,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
   }, [refreshLeaderboard, selectedSkillFilter]);
 
   useEffect(() => {
-    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
   }, [dispatch]);
 
   // FIXED: ONLY LOAD ONCE WHEN ladderId CHANGES (NO INFINITE LOOP)
@@ -568,7 +576,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
               searchTerm={searchQuery}
               setSearchTerm={setSearchQuery}
               onClearFilters={handleClearFilters}
-              activeFilters={Boolean(searchQuery) || appliedAge > 0 || Boolean(appliedGender)}
+              activeFilters={Boolean(searchQuery) || appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)}
             />
           </div>
 

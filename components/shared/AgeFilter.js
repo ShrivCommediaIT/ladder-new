@@ -10,15 +10,47 @@ import { toast } from "react-toastify";
 import { calculateAge } from "@/lib/utils";
 import { Filter } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import CountrySelect from "@/components/shared/CountrySelect";
 
-const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
+const AgeFilter = ({
+  onSearch,
+  user,
+  resetSignal,
+  isActive,
+  defaultAge = "",
+  defaultAgeType = "",
+  defaultGender = "",
+  defaultCountry = ""
+}) => {
   const [open, setOpen] = useState(false);
   const [dobInput, setDobInput] = useState("");
   const [calculatedAge, setCalculatedAge] = useState("");
   const [gender, setGender] = useState("");
   const [ageType, setAgeType] = useState("");
+  const [country, setCountry] = useState("");
   const searchParams = useSearchParams();
   const ladderType = searchParams.get("type");
+
+  // Sync state with parent's applied filters when the dialog opens
+  useEffect(() => {
+    if (open) {
+      setCalculatedAge(defaultAge && defaultAge !== 0 ? String(defaultAge) : "");
+      setGender(defaultGender || "");
+      setAgeType(defaultAgeType || "");
+      setCountry(defaultCountry || "");
+
+      if (defaultAge && defaultAge !== 0) {
+        const age = parseInt(defaultAge, 10);
+        const today = new Date();
+        const prevYear = today.getFullYear() - age;
+        const dd = String(today.getDate()).padStart(2, "0");
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        setDobInput(`${dd}/${mm}/${prevYear}`);
+      } else {
+        setDobInput("");
+      }
+    }
+  }, [open, defaultAge, defaultAgeType, defaultGender, defaultCountry]);
 
   useEffect(() => {
     if (resetSignal !== undefined) {
@@ -26,6 +58,7 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
       setCalculatedAge("");
       setGender("");
       setAgeType("");
+      setCountry("");
     }
   }, [resetSignal]);
 
@@ -59,8 +92,9 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
     const ageValue = calculatedAge && calculatedAge !== "0" ? calculatedAge : "";
     const ageTypeValue = ageValue ? ageType : "";
     const genderValue = gender || "";
+    const countryValue = country || "";
 
-    if (!ageValue && !genderValue) {
+    if (!ageValue && !genderValue && !countryValue) {
       toast.error("Please select at least one filter before searching.");
       return;
     }
@@ -70,7 +104,7 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
       return;
     }
 
-    onSearch(ageValue || "", ageTypeValue, genderValue);
+    onSearch(ageValue || "", ageTypeValue, genderValue, countryValue);
     setOpen(false);
     toast.success("Searching by Filter!");
   };
@@ -80,12 +114,6 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
       open={open}
       onOpenChange={(isOpen) => {
         setOpen(isOpen);
-        if (!isOpen) {
-          setDobInput("");
-          setCalculatedAge("");
-          setGender("");
-          setAgeType("");
-        }
       }}
     >
       <DialogTrigger asChild>
@@ -99,26 +127,21 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
           } flex h-full w-full flex-col items-center justify-center gap-1 rounded-xl px-4 py-3 text-[10px] font-bold uppercase leading-tight shadow-none transition-all active:scale-95`}
         >
           <Filter className="h-5 w-5" />
-          {ladderType !== "minileague" ? (
-            <span>AGE/<br />GENDER</span>
-          ) : (
-            <span>AGE</span>
-          )}
+            <span>Filter</span>
         </Button>
       </DialogTrigger>
 
       <DialogContent className="bg-card text-foreground border border-border rounded-xl max-w-sm w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto flex flex-col items-center p-4 gap-0">
         <DialogTitle className="text-xl font-bold uppercase tracking-wide text-center w-full mt-0 text-foreground">
-          AGE/GENDER FILTER
+          FILTER
         </DialogTitle>
         <div className="w-full flex justify-center mt-1 mb-2">
           <span className="h-1 w-16 bg-primary rounded-full"></span>
         </div>
 
         {/* Gender Section — hidden for minileague */}
-        {ladderType !== "minileague" && (
           <>
-            <p className="text-base font-semibold text-primary mb-1">
+            <p className="text-base font-semibold text-primary mb-1 w-full text-left">
               Select Gender
             </p>
 
@@ -145,10 +168,8 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
               </button>
             </div>
           </>
-        )}
-
         {/* Age Type Section */}
-        <p className="text-base font-semibold text-primary mb-1">
+        <p className="text-base font-semibold text-primary mb-1 w-full text-left">
           Select Age Type
         </p>
 
@@ -213,15 +234,35 @@ const AgeFilter = ({ onSearch, user, resetSignal, isActive }) => {
           </div>
         </div>
 
+                {/* Country Section */}
+        <p className="text-base font-semibold text-primary mb-1 w-full text-left">
+          Select Country
+        </p>
+        <div className="w-full flex items-center gap-2 mb-3 mt-1">
+          <div className="flex-1">
+            <CountrySelect
+              value={country}
+              onValueChange={(val) => setCountry(val)}
+              className="w-full h-10 bg-muted border border-border rounded-xl px-3 text-sm text-foreground focus:ring-1 focus:ring-primary focus-visible:ring-1 focus-visible:ring-primary"
+              placeholder="Select Country"
+            />
+          </div>
+          {country && (
+            <Button
+              variant="outline"
+              onClick={() => setCountry("")}
+              className="h-10 px-3 rounded-xl border-border text-muted-foreground hover:text-foreground"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-2 w-full mt-4">
           <Button
             onClick={() => {
               setOpen(false);
-              setDobInput("");
-              setCalculatedAge("");
-              setGender("");
-              setAgeType("");
             }}
             className="h-10 rounded-xl border border-border bg-muted text-sm font-bold text-foreground hover:bg-accent transition-colors"
           >

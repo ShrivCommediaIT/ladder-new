@@ -54,6 +54,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
     appliedAge,
     appliedAgeType,
     appliedGender,
+    appliedCountry,
   } = useSelector((state) => state.player);
   const { gradebarDetails, gradebar } = useSelector((state) => state.gradebar);
 
@@ -76,7 +77,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
   const [modalTab, setModalTab] = useState("result");
   const [mobileSection, setMobileSection] = useState("players");
   const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
-  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
+  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "") || (appliedCountry && appliedCountry !== "");
   const [resetOpen, setResetOpen] = useState(false);
   const [addRemoveOpen, setAddRemoveOpen] = useState(false);
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
@@ -108,7 +109,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
   }, [dispatch, ladderId]);
 
   const refreshLeaderboard = useCallback(
-    async (age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
+    async (age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry) => {
       if (!ladderId || isRefreshingRef.current) return;
 
       isRefreshingRef.current = true;
@@ -123,6 +124,9 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
         }
         if (gender) {
           payload.gender = gender;
+        }
+        if (country) {
+          payload.country = country;
         }
 
         await Promise.all([
@@ -273,10 +277,10 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
     }
   };
 
-  const handleAgeSearch = useCallback((age, ageType, gender) => {
+  const handleAgeSearch = useCallback((age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : 0;
-    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(ageNum, ageType, gender);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
+    refreshLeaderboard(ageNum, ageType, gender, country);
   }, [dispatch, refreshLeaderboard]);
 
   const handleDeleteActivity = async (id) => {
@@ -321,6 +325,10 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
             user={false}
             resetSignal={ageFilterResetSignal}
             isActive={hasFilters}
+            defaultAge={appliedAge}
+            defaultAgeType={appliedAgeType}
+            defaultGender={appliedGender}
+            defaultCountry={appliedCountry}
           />
         ),
       },
@@ -330,9 +338,9 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
         icon: XCircle,
         tone: "danger",
         onClick: () => {
-          dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+          dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
           setAgeFilterResetSignal((p) => p + 1);
-          refreshLeaderboard(0, "", "");
+          refreshLeaderboard(0, "", "", "");
         },
         hidden: !hasFilters,
       },

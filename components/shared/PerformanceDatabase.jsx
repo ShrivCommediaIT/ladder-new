@@ -231,12 +231,10 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
           page: pageVal,
           limit: 10,
           sport: currentFilters.sport || undefined,
-          activity: currentFilters.activity || undefined,
+          activity: currentFilters.keyword || undefined,
           age: ageValue,
           gender: currentFilters.gender || undefined,
           country: currentFilters.country || undefined,
-          keyword: currentFilters.keyword || undefined,
-          unit: currentFilters.unit || undefined,
           min_result: currentFilters.minResult || undefined,
           max_result: currentFilters.maxResult || undefined,
           date_from: currentFilters.dateFrom || undefined,
@@ -677,7 +675,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
         </div>
 
         <form onSubmit={handleSearch} className={`${panelClass} space-y-6 p-6 sm:p-8`}>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-[minmax(130px,0.85fr)_minmax(220px,1.3fr)_minmax(100px,0.65fr)_minmax(130px,0.85fr)_minmax(130px,0.85fr)_minmax(150px,0.95fr)_minmax(220px,1.3fr)]">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             <div className="space-y-1.5 min-w-0">
               <label className={mutedLabelClass}>Sport</label>
               <select value={sport} onChange={(e) => setSport(e.target.value)} className={selectClass}>
@@ -686,21 +684,6 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                   <option key={idx} value={sp}>{sp}</option>
                 ))}
               </select>
-            </div>
-
-            <div className="space-y-1.5 min-w-0 sm:col-span-2 lg:col-span-2 xl:col-span-1">
-              <label className={mutedLabelClass}>Activity / Event</label>
-              <select value={activity} onChange={(e) => setActivity(e.target.value)} className={selectClass}>
-                <option value="">All Activities</option>
-                {activitiesOptions.map((act, idx) => (
-                  <option key={idx} value={act}>{act}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-1.5 min-w-0">
-              <label className={mutedLabelClass}>Unit</label>
-              <input type="text" value={unit} onChange={handleUnitChange} className={fieldClass} />
             </div>
 
             <div className="space-y-1.5 min-w-0">
@@ -736,8 +719,8 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
               </select>
             </div>
 
-            <div className="space-y-1.5 min-w-0 sm:col-span-2 lg:col-span-2 xl:col-span-1">
-              <label className={mutedLabelClass}>Keyword Search</label>
+            <div className="space-y-1.5 min-w-0">
+              <label className={mutedLabelClass}>Activity Search</label>
               <div className="relative">
                 <input
                   type="text"

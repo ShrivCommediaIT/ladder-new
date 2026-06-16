@@ -117,6 +117,7 @@ const initialState = {
   appliedAge: 0,
   appliedAgeType: "",
   appliedGender: "",
+  appliedCountry: "",
 };
 
 const playersSlice = createSlice({
@@ -169,10 +170,11 @@ const playersSlice = createSlice({
       ladder.data.splice(new_rank - 1, 0, player);
     },
     setAgeFilter: (state, action) => {
-      const { age, ageType, gender } = action.payload;
+      const { age, ageType, gender, country } = action.payload;
       state.appliedAge = age;
       state.appliedAgeType = ageType;
       state.appliedGender = gender;
+      state.appliedCountry = country || "";
     },
   },
   extraReducers: (builder) => {
@@ -192,11 +194,16 @@ const playersSlice = createSlice({
           ladderDetails: ladderDetails || {},
         };
 
-        const { dob, gender } = action.meta.arg || {};
-        if (!dob && !gender) {
+        const { dob, gender, country } = action.meta.arg || {};
+        if (!dob && !gender && !country) {
           state.appliedAge = 0;
           state.appliedAgeType = "";
           state.appliedGender = "";
+          state.appliedCountry = "";
+        } else {
+          if (country !== undefined) {
+            state.appliedCountry = country || "";
+          }
         }
       })
       .addCase(fetchLeaderboard.rejected, (state, action) => {

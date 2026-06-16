@@ -372,7 +372,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
   const [openSort, setOpenSort] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const { appliedAge, ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge, ladderDetails, appliedAgeType, appliedGender, appliedCountry } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showRemove, setShowRemove] = useState(false);
   const [playerSearchResetSignal, setPlayerSearchResetSignal] = useState(0);
@@ -389,7 +389,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
   const isInverted = ladderDetails?.inverted == 0;
 
   useEffect(() => {
-    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
   }, [dispatch]);
 
   useEffect(() => {
@@ -437,7 +437,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = 0, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
+    (skillNo = 0, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry) => {
       if (!ladderId || isRefreshing) return;
 
       setIsRefreshing(true);
@@ -448,17 +448,18 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
         age: age,
         age_type: ageType,
         gender: gender,
+        country: country,
       };
       dispatch(fetchSkillLeaderboard(payload)).finally(() => {
         setIsRefreshing(false);
       });
     },
-    [dispatch, ladderId, isRefreshing, appliedAge, appliedAgeType, appliedGender],
+    [dispatch, ladderId, isRefreshing, appliedAge, appliedAgeType, appliedGender, appliedCountry],
   );
 
-  const handleAgeSearch = useCallback((age, ageType, gender) => {
+  const handleAgeSearch = useCallback((age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : "";
-    const isClearing = age === null || age === "";
+    const isClearing = (age === null || age === "") && !country;
 
     if (isClearing) {
       setIsSorted(false);
@@ -467,8 +468,8 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
       setIsSorted(true);
     }
 
-    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(isClearing ? 0 : selectedSkillFilter, ageNum, ageType, gender);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
+    refreshLeaderboard(isClearing ? 0 : selectedSkillFilter, ageNum, ageType, gender, country);
   }, [dispatch, selectedSkillFilter, refreshLeaderboard]);
 
   const handleClearFilters = useCallback(() => {
@@ -478,7 +479,8 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
   const hasFiltersApplied =
     Boolean(searchQuery) ||
     appliedAge > 0 ||
-    Boolean(appliedGender);
+    Boolean(appliedGender) ||
+    Boolean(appliedCountry);
 
   // MANUAL REFRESH HANDLERS (only when explicitly called)
   const handleSelfRemove = useCallback(() => {
@@ -515,8 +517,8 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
     setSelectedSkillFilter(0);
     setSearchQuery("");
     setPlayerSearchResetSignal((prev) => prev + 1);
-    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
-    refreshLeaderboard(0, 0, "", "");
+    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
+    refreshLeaderboard(0, 0, "", "", "");
   }, [refreshLeaderboard]);
 
   useEffect(() => {
@@ -549,7 +551,11 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
             onSearch={handleAgeSearch}
             user={false}
             resetSignal={playerSearchResetSignal}
-            isActive={appliedAge > 0 || Boolean(appliedGender)}
+            isActive={appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)}
+            defaultAge={appliedAge}
+            defaultAgeType={appliedAgeType}
+            defaultGender={appliedGender}
+            defaultCountry={appliedCountry}
           />
         )
       });
