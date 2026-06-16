@@ -897,12 +897,12 @@ useEffect(() => {
 
             {/* ACTION BUTTONS */}
             <div className="space-y-4 pt-4 border-t border-border">
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex  justify-end flex-col sm:flex-row gap-4">
                 {/* New Submission (Submit Button) */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 flex items-center justify-start gap-4 p-4 rounded-2xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all duration-200 text-left shadow-lg shadow-blue-500/15 cursor-pointer"
+                  className=" flex items-center justify-start gap-4 p-4 rounded-2xl bg-[#0091FF] hover:bg-[#0080E0] disabled:opacity-50 text-white transition-all duration-200 text-left shadow-lg shadow-blue-500/15 cursor-pointer"
                 >
                   <div className="p-3 rounded-xl bg-white/10 text-white">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
