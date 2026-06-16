@@ -147,39 +147,39 @@ const PlayerCard = ({
           {/* Info block */}
           <div className="flex-1 min-w-0">
             <div className="flex gap-6 justify-between">
-            <div>
-            {/* Player name */}
-            <div
-              className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight"
-              style={{ color: "var(--best-board-text)" }}
-            >
-              {player?.name || "N/A"}
-            </div>
-
-            {/* Phone */}
-            <div
-              className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              {player?.phone || "N/A"}
-            </div>
-            </div>
-              {showAgeRank && (
-              <div className="flex flex-col items-center">
+              <div>
+                {/* Player name */}
                 <div
-                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
-                  style={{ background: "var(--best-board-success)" }}
+                  className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight"
+                  style={{ color: "var(--best-board-text)" }}
                 >
-                  {ageRank}
+                  {player?.name || "N/A"}
                 </div>
-                <p
-                  className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
-                  style={{ color: "var(--best-board-success)" }}
+
+                {/* Phone */}
+                <div
+                  className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight"
+                  style={{ color: "var(--best-board-muted)" }}
                 >
-                  Age Rank
-                </p>
+                  {player?.phone || "N/A"}
+                </div>
               </div>
-            )}
+              {showAgeRank && (
+                <div className="flex flex-col items-center">
+                  <div
+                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
+                    style={{ background: "var(--best-board-success)" }}
+                  >
+                    {ageRank}
+                  </div>
+                  <p
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
+                    style={{ color: "var(--best-board-success)" }}
+                  >
+                    Age Rank
+                  </p>
+                </div>
+              )}
             </div>
 
 
@@ -228,10 +228,9 @@ const PlayerCard = ({
                       <div
                         key={i}
                         className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
-                          ${
-                            scoreData.witnessBy
-                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
-                              : scoreData.isTargetAchieved
+                          ${scoreData.witnessBy
+                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
+                            : scoreData.isTargetAchieved
                               ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
                               : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
                           }`}
@@ -240,7 +239,7 @@ const PlayerCard = ({
                         {scoreData.displayScore}
                       </div>
                     );
-                  })}               
+                  })}
                 </div>
               </>
             ) : (
@@ -264,12 +263,12 @@ const PlayerCard = ({
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
           {/* Total Points badge */}
-               <span
-              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              Total Points
-            </span>
+          <span
+            className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+            style={{ color: "var(--best-board-muted)" }}
+          >
+            Total Points
+          </span>
           <div
             className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
             style={{
@@ -278,7 +277,7 @@ const PlayerCard = ({
             }}
           >
             <span
-              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center truncate "
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center"
               style={{ color: "var(--best-board-highlight)" }}
             >
               {Math.abs(Number(player?.total_point || 0)).toFixed(2)}
@@ -300,8 +299,8 @@ const PlayerCard = ({
             />
           </div>
         </div>
+      </div>
     </div>
-  </div>
   );
 };
 
@@ -314,7 +313,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const showAgeRank = Number(appliedAge) > 0;
   const isInverted = ladderDetails?.inverted == 0;
   const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
-console.log('isInverted', isInverted)
+  console.log('isInverted', isInverted)
   const currentUser = useSelector((state) => state.user?.user);
   const activityState = useSelector((state) => state.activity);
 

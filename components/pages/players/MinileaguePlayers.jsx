@@ -182,7 +182,7 @@ const PlayerCard = ({
             }}
           >
             <span
-              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center truncate "
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center"
               style={{ color: "var(--best-board-highlight)" }}
             >
               {player?.total_point || 0}
