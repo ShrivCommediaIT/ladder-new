@@ -64,9 +64,9 @@ export const PlayerLists = () => {
   const demoLadder = useSelector((state) => state.player?.players?.[ladderId]?.ladderDetails?.created_by);
   const isDemoLadder = demoLadder?.toLowerCase() === "demo";
 
-  const { appliedAge: skillAppliedAge, appliedAgeType: skillAppliedAgeType, appliedGender: skillAppliedGender } = useSelector((state) => state.skillLeaderboard || {});
-  const { appliedAge: positiveAppliedAge, appliedAgeType: positiveAppliedAgeType, appliedGender: positiveAppliedGender } = useSelector((state) => state.positiveLeaderBoard || {});
-  const { appliedAge: negativeAppliedAge, appliedAgeType: negativeAppliedAgeType, appliedGender: negativeAppliedGender } = useSelector((state) => state.negativeLeaderBoard || {});
+  const { appliedAge: skillAppliedAge, appliedAgeType: skillAppliedAgeType, appliedGender: skillAppliedGender, appliedCountry: skillAppliedCountry } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge: positiveAppliedAge, appliedAgeType: positiveAppliedAgeType, appliedGender: positiveAppliedGender, appliedCountry: positiveAppliedCountry } = useSelector((state) => state.positiveLeaderBoard || {});
+  const { appliedAge: negativeAppliedAge, appliedAgeType: negativeAppliedAgeType, appliedGender: negativeAppliedGender, appliedCountry: negativeAppliedCountry } = useSelector((state) => state.negativeLeaderBoard || {});
 
   // Page loading
   const [loadingPlayers, setLoadingPlayers] = useState(true);
@@ -91,18 +91,21 @@ export const PlayerLists = () => {
   const [localAge, setLocalAge] = useState(0);
   const [localAgeType, setLocalAgeType] = useState("under");
   const [localGender, setLocalGender] = useState("");
+  const [localCountry, setLocalCountry] = useState("");
   const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
   const [witnessBy, setWitnessBy] = useState(0);
 
   const appliedAge = isSkill ? skillAppliedAge : isPositive ? positiveAppliedAge : isNegative ? negativeAppliedAge : localAge;
   const appliedAgeType = isSkill ? skillAppliedAgeType : isPositive ? positiveAppliedAgeType : isNegative ? negativeAppliedAgeType : localAgeType;
   const appliedGender = isSkill ? skillAppliedGender : isPositive ? positiveAppliedGender : isNegative ? negativeAppliedGender : localGender;
+  const appliedCountry = isSkill ? skillAppliedCountry : isPositive ? positiveAppliedCountry : isNegative ? negativeAppliedCountry : localCountry;
 
   const hasFiltersApplied = () => {
     const age = isSkill ? skillAppliedAge : isPositive ? positiveAppliedAge : isNegative ? negativeAppliedAge : localAge;
     const ageType = isSkill ? skillAppliedAgeType : isPositive ? positiveAppliedAgeType : isNegative ? negativeAppliedAgeType : localAgeType;
     const gender = isSkill ? skillAppliedGender : isPositive ? positiveAppliedGender : isNegative ? negativeAppliedGender : localGender;
-    return (age && age !== "" && age !== 0) || (ageType && ageType !== "under") || (gender && gender !== "");
+    const country = isSkill ? skillAppliedCountry : isPositive ? positiveAppliedCountry : isNegative ? negativeAppliedCountry : localCountry;
+    return (age && age !== "" && age !== 0) || (ageType && ageType !== "under") || (gender && gender !== "") || (country && country !== "");
   };
 
   const refreshSkillLeaderboard = (skillNo = 0) => {
@@ -126,8 +129,9 @@ export const PlayerLists = () => {
       const payload = { ladder_id: ladderId, type: resolvedType };
       if (appliedAge > 0) { payload.dob = appliedAge; if (appliedAgeType) payload.age_type = appliedAgeType; }
       if (appliedGender) payload.gender = appliedGender;
+      if (appliedCountry) payload.country = appliedCountry;
       dispatch(fetchLeaderboard(payload));
-      if (isRoster) dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: appliedAge > 0 ? appliedAge : undefined, age_type: appliedAge > 0 && appliedAgeType ? appliedAgeType : undefined, gender: appliedGender || undefined }));
+      if (isRoster) dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: appliedAge > 0 ? appliedAge : undefined, age_type: appliedAge > 0 && appliedAgeType ? appliedAgeType : undefined, gender: appliedGender || undefined, country: appliedCountry || undefined }));
     }
   };
 
@@ -180,11 +184,11 @@ export const PlayerLists = () => {
 
   const handleClearAll = () => {
     setIsSorted(false); setCurrentSkillNo(0);
-    const clearedFilter = { age: 0, ageType: "", gender: "" };
+    const clearedFilter = { age: 0, ageType: "", gender: "", country: "" };
     if (isSkill) dispatch(setSkillAgeFilter(clearedFilter));
     else if (isPositive) dispatch(setPositiveAgeFilter(clearedFilter));
     else if (isNegative) dispatch(setNegativeAgeFilter(clearedFilter));
-    else { dispatch(setAgeFilter(clearedFilter)); setLocalAge(0); setLocalAgeType(""); setLocalGender(""); }
+    else { dispatch(setAgeFilter(clearedFilter)); setLocalAge(0); setLocalAgeType(""); setLocalGender(""); setLocalCountry(""); }
     setAgeFilterResetSignal((p) => p + 1);
     if (ladderId) {
       if (isSkill || isPositive || isNegative) refreshSkillLeaderboard(0);
@@ -192,18 +196,18 @@ export const PlayerLists = () => {
     }
   };
 
-  const handleAgeSearch = (age, ageType, gender) => {
+  const handleAgeSearch = (age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : "";
-    const filter = { age: ageNum, ageType, gender };
+    const filter = { age: ageNum, ageType, gender, country };
     if (isSkill) dispatch(setSkillAgeFilter(filter));
     else if (isPositive) dispatch(setPositiveAgeFilter(filter));
     else if (isNegative) dispatch(setNegativeAgeFilter(filter));
-    else { dispatch(setAgeFilter(filter)); setLocalAge(ageNum); setLocalAgeType(ageType); setLocalGender(gender); }
+    else { dispatch(setAgeFilter(filter)); setLocalAge(ageNum); setLocalAgeType(ageType); setLocalGender(gender); setLocalCountry(country || ""); }
     const laddartype = typeFromParams === "positive" ? "positive" : typeFromParams === "negative" ? "negative" : isSkill ? "skill" : resolvedType;
-    const payload = { ladder_id: ladderId, type: laddartype, dob: ageNum > 0 ? ageNum : undefined, gender: gender || undefined, ...(ageNum > 0 && ageType ? { age_type: ageType } : {}) };
+    const payload = { ladder_id: ladderId, type: laddartype, dob: ageNum > 0 ? ageNum : undefined, gender: gender || undefined, ...(ageNum > 0 && ageType ? { age_type: ageType } : {}), ...(country ? { country } : {}) };
     let fetchSlice = laddartype === "positive" ? fetchPositiveLeaderboard : laddartype === "negative" ? fetchNegativeLeaderboard : ["best5", "best3", "winlose", "bestof5", "bestof3", "roster"].includes(laddartype) ? fetchLeaderboard : fetchSkillLeaderboard;
     dispatch(fetchSlice(payload));
-    if (isRoster) dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: ageNum > 0 ? ageNum : undefined, age_type: ageNum > 0 && ageType ? ageType : undefined, gender: gender || undefined }));
+    if (isRoster) dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: ageNum > 0 ? ageNum : undefined, age_type: ageNum > 0 && ageType ? ageType : undefined, gender: gender || undefined, country: country || undefined }));
     setIsSorted(true);
   };
 
@@ -351,6 +355,10 @@ export const PlayerLists = () => {
           user={false}
           resetSignal={ageFilterResetSignal}
           isActive={hasFiltersApplied()}
+          defaultAge={appliedAge}
+          defaultAgeType={appliedAgeType}
+          defaultGender={appliedGender}
+          defaultCountry={appliedCountry}
         />
       ),
     });

@@ -311,7 +311,7 @@ const PlayerCard = ({
             }}
           >
             <span
-              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center truncate "
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center"
               style={{ color: "var(--best-board-highlight)" }}
             >
               {player?.total_point || 0}
@@ -358,7 +358,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const { appliedAge, ladderDetails, appliedAgeType, appliedGender } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge, ladderDetails, appliedAgeType, appliedGender, appliedCountry } = useSelector((state) => state.skillLeaderboard || {});
   const showAgeRank = Number(appliedAge) > 0;
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [mobileSection, setMobileSection] = useState("players");
@@ -372,7 +372,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const [localWitnessBy, setLocalWitnessBy] = useState(0);
   const [ageFilterResetSignal, setAgeFilterResetSignal] = useState(0);
   const [isSorted, setIsSorted] = useState(false);
-  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "");
+  const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "") || (appliedCountry && appliedCountry !== "");
   const isInverted = ladderDetails?.inverted == 0;
   const inviteUrl =
     typeof window !== "undefined"
@@ -389,7 +389,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, []);
 
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedSkillFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, witness = localWitnessBy) => {
+    (skillNo = selectedSkillFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, witness = localWitnessBy, country = appliedCountry) => {
       if (ladderId) {
         setIsRefreshing(true);
         const params = {
@@ -409,6 +409,9 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
           }
           if (gender) {
             params.gender = gender;
+          }
+          if (country) {
+            params.country = country;
           }
         }
 
@@ -516,18 +519,18 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
   const activityItems = activityState?.data?.data || [];
 
-  const handleAgeSearch = (age, ageType, gender) => {
+  const handleAgeSearch = (age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : "";
-    dispatch(setSkillAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(selectedSkillFilter, ageNum, ageType, gender, 0);
+    dispatch(setSkillAgeFilter({ age: ageNum, ageType, gender, country }));
+    refreshLeaderboard(selectedSkillFilter, ageNum, ageType, gender, 0, country);
   };
 
   const handleClearAll = () => {
     setIsSorted(false);
     setLocalWitnessBy(0);
-    dispatch(setSkillAgeFilter({ age: 0, ageType: "", gender: "" }));
+    dispatch(setSkillAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
     setAgeFilterResetSignal((p) => p + 1);
-    refreshLeaderboard(0, 0, "", "", 0);
+    refreshLeaderboard(0, 0, "", "", 0, "");
   };
 
   const quickActions = [
@@ -553,7 +556,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         }
       },
     },
-    { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters} /> },
+    { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters} defaultAge={appliedAge} defaultAgeType={appliedAgeType} defaultGender={appliedGender} defaultCountry={appliedCountry} /> },
     { id: "clear", label: "Clear All", icon: XCircle, tone: "danger", onClick: handleClearAll, hidden: !isSorted && !hasFilters && localWitnessBy !== 1 },
   ];
 

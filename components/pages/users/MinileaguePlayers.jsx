@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { fetchMiniLeague, setAgeFilter } from "@/redux/slices/minileagueSlice";
+import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import { setSelectedPlayer } from "@/redux/slices/leaderboardSlice";
 import { MinileagueEditPlayer } from "@/components/shared/MinileagueEditPlayer";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -147,8 +147,8 @@ const PlayerCard = ({
                   <div
                     key={r}
                     className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-xs font-bold transition-all ${found
-                        ? "bg-[var(--best-board-surface-strong)] border border-[var(--best-board-border-strong)] text-[var(--best-board-text)] shadow-[0_1px_4px_rgba(0,0,0,0.18)]"
-                        : "bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] text-[var(--best-board-muted)]"
+                      ? "bg-[var(--best-board-surface-strong)] border border-[var(--best-board-border-strong)] text-[var(--best-board-text)] shadow-[0_1px_4px_rgba(0,0,0,0.18)]"
+                      : "bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] text-[var(--best-board-muted)]"
                       }`}
                   >
                     {found?.point ?? ""}
@@ -165,12 +165,12 @@ const PlayerCard = ({
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
           {/* Total Points badge */}
-               <span
-              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              Total Points
-            </span>
+          <span
+            className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+            style={{ color: "var(--best-board-muted)" }}
+          >
+            Total Points
+          </span>
           <div
             className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
             style={{
@@ -179,7 +179,7 @@ const PlayerCard = ({
             }}
           >
             <span
-              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center truncate "
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center"
               style={{ color: "var(--best-board-highlight)" }}
             >
               {player?.total_point || 0}
@@ -210,7 +210,7 @@ const PlayerCard = ({
 
 const MinileaguePlayers = ({ ladderId }) => {
   const dispatch = useDispatch();
-  const { data: sectionedPlayers, appliedAge, appliedAgeType, appliedGender } =
+  const { data: sectionedPlayers } =
     useSelector((state) => state.minileague || {});
   const loggedInUser = useSelector((state) => state.user?.user);
 
@@ -235,20 +235,13 @@ const MinileaguePlayers = ({ ladderId }) => {
     isRefreshingRef.current = true;
     setLoadingPlayers(true);
     const payload = { ladder_id: ladderId, type: "minileague" };
-    if (appliedAge > 0) {
-      payload.dob = appliedAge;
-      payload.age_type = appliedAgeType;
-    }
-    if (appliedGender) {
-      payload.gender = appliedGender;
-    }
     try {
       await dispatch(fetchMiniLeague(payload));
     } finally {
       setLoadingPlayers(false);
       isRefreshingRef.current = false;
     }
-  }, [ladderId, dispatch, appliedAge, appliedAgeType, appliedGender]);
+  }, [ladderId, dispatch]);
 
   useEffect(() => {
     refreshLeaderboard();
@@ -310,19 +303,10 @@ const MinileaguePlayers = ({ ladderId }) => {
         <PlayerSearch
           searchTerm={searchQuery}
           setSearchTerm={setSearchQuery}
-          onAgeSearch={(age, ageType, gender) => {
-            const ageNum = age ? Number(age) : "";
-            dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-          }}
           onClearFilters={() => {
-            dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
+            setSearchQuery("");
           }}
-          activeFilters={
-            Boolean(searchQuery) ||
-            appliedAge > 0 ||
-            Boolean(appliedGender)
-          }
-          defaultAge={appliedAge}
+          activeFilters={Boolean(searchQuery)}
         />
       </div>
 

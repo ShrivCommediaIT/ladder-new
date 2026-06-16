@@ -176,39 +176,39 @@ const PlayerCard = ({
           {/* Info block */}
           <div className="flex-1 min-w-0">
             <div className="flex gap-6 justify-between">
-            <div>
-            {/* Player name */}
-            <div
-              className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight"
-              style={{ color: "var(--best-board-text)" }}
-            >
-              {player?.name || "N/A"}
-            </div>
-
-            {/* Phone */}
-            <div
-              className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              {player?.phone || "N/A"}
-            </div>
-            </div>
-              {showAgeRank && (
-              <div className="flex flex-col items-center">
+              <div>
+                {/* Player name */}
                 <div
-                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
-                  style={{ background: "var(--best-board-success)" }}
+                  className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight"
+                  style={{ color: "var(--best-board-text)" }}
                 >
-                  {ageRank}
+                  {player?.name || "N/A"}
                 </div>
-                <p
-                  className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
-                  style={{ color: "var(--best-board-success)" }}
+
+                {/* Phone */}
+                <div
+                  className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight"
+                  style={{ color: "var(--best-board-muted)" }}
                 >
-                  Age Rank
-                </p>
+                  {player?.phone || "N/A"}
+                </div>
               </div>
-            )}
+              {showAgeRank && (
+                <div className="flex flex-col items-center">
+                  <div
+                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
+                    style={{ background: "var(--best-board-success)" }}
+                  >
+                    {ageRank}
+                  </div>
+                  <p
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
+                    style={{ color: "var(--best-board-success)" }}
+                  >
+                    Age Rank
+                  </p>
+                </div>
+              )}
             </div>
 
 
@@ -257,10 +257,9 @@ const PlayerCard = ({
                       <div
                         key={i}
                         className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
-                          ${
-                            scoreData.witnessBy
-                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
-                              : scoreData.isTargetAchieved
+                          ${scoreData.witnessBy
+                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
+                            : scoreData.isTargetAchieved
                               ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
                               : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
                           }`}
@@ -269,7 +268,7 @@ const PlayerCard = ({
                         {scoreData.displayScore}
                       </div>
                     );
-                  })}               
+                  })}
                 </div>
               </>
             ) : (
@@ -293,12 +292,12 @@ const PlayerCard = ({
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
           {/* Total Points badge */}
-               <span
-              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              Total Points
-            </span>
+          <span
+            className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+            style={{ color: "var(--best-board-muted)" }}
+          >
+            Total Points
+          </span>
           <div
             className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
             style={{
@@ -307,7 +306,7 @@ const PlayerCard = ({
             }}
           >
             <span
-              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center truncate "
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center"
               style={{ color: "var(--best-board-highlight)" }}
             >
               {Math.abs(Number(player?.total_point || 0)).toFixed(2)}
@@ -329,8 +328,8 @@ const PlayerCard = ({
             />
           </div>
         </div>
+      </div>
     </div>
-  </div>
   );
 };
 
@@ -339,7 +338,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
-  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender } = useSelector(
+  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedCountry } = useSelector(
     (state) => state.positiveLeaderBoard || {},
   );
   const showAgeRank = Number(appliedAge) > 0;
@@ -376,7 +375,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
   }, []);
 
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry) => {
       if (ladderId) {
         const payload = {
           ladder_id: ladderId,
@@ -392,18 +391,22 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
         if (gender) {
           payload.gender = gender;
         }
+
+        if (country) {
+          payload.country = country;
+        }
         dispatch(fetchPositiveLeaderboard(payload)).finally(() => {
           setIsRefreshing(false);
         });
         // dispatch(fetchPositiveLeaderboard(payload));
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, appliedCountry],
   );
 
-  const handleAgeSearch = useCallback((age, ageType, gender) => {
+  const handleAgeSearch = useCallback((age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : "";
-    const isClearing = age === null || age === "";
+    const isClearing = (age === null || age === "") && !country;
 
     if (isClearing) {
       setIsSorted(false);
@@ -414,8 +417,8 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
       setIsSorted(true);
     }
 
-    dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
-    refreshLeaderboard(isClearing ? 0 : selectedPositiveFilter, ageNum, ageType, gender);
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
+    refreshLeaderboard(isClearing ? 0 : selectedPositiveFilter, ageNum, ageType, gender, country);
   }, [dispatch, selectedPositiveFilter, refreshLeaderboard]);
 
   const handleClearFilters = useCallback(() => {
@@ -423,8 +426,8 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
     setIsSorted(false);
     setSelectedSkillFilter(0);
     setSelectedPositiveFilter(0);
-    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
-    refreshLeaderboard(0, 0, "", "");
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
+    refreshLeaderboard(0, 0, "", "", "");
     setResetSignal((p) => p + 1);
   }, [dispatch, refreshLeaderboard]);
 
@@ -456,14 +459,18 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
             onSearch={handleAgeSearch}
             user={false}
             resetSignal={resetSignal}
-            isActive={appliedAge > 0 || Boolean(appliedGender)}
+            isActive={appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)}
+            defaultAge={appliedAge}
+            defaultAgeType={appliedAgeType}
+            defaultGender={appliedGender}
+            defaultCountry={appliedCountry}
           />
         )
       });
 
       onActionsChanged(actions);
     }
-  }, [isSorted, appliedAge, appliedGender, resetSignal, onActionsChanged, handleAgeSearch]);
+  }, [isSorted, appliedAge, appliedGender, appliedCountry, resetSignal, onActionsChanged, handleAgeSearch]);
 
   const handleSortBySkill = useCallback(() => {
     setOpenSort(true);
@@ -499,17 +506,18 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
     setIsSorted(false);
     setSelectedSkillFilter(0);
     setSelectedPositiveFilter(0);
-    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "" }));
-    refreshLeaderboard(0, 0, "under", "");
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
+    refreshLeaderboard(0, 0, "under", "", "");
   }, [refreshLeaderboard, dispatch]);
 
   const hasFiltersApplied =
     Boolean(searchQuery) ||
     appliedAge > 0 ||
-    Boolean(appliedGender);
+    Boolean(appliedGender) ||
+    Boolean(appliedCountry);
 
   useEffect(() => {
-    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
+    dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
   }, [dispatch]);
 
   useEffect(() => {

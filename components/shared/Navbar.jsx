@@ -99,6 +99,7 @@ const Navbar = ({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const isSubmitPerformance = pathname === "/submit-performance" || pathname?.includes("/submit-performance");
+  const isClubIdPage = pathname === "/clubid-page" || pathname?.includes("/clubid-page");
   const ladderId = searchParams.get("ladder_id");
 
   const playerEntries = useSelector((state) => state.player?.players || {});
@@ -536,130 +537,133 @@ const Navbar = ({
             )}
 
 
-
             <div className="flex items-center gap-2">
               
 
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
-                aria-label="Toggle theme"
-              >
-                {mounted && (theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />)}
-              </button>
-
-              <div className="relative hidden lg:block" ref={profileRef}>
+              {!isClubIdPage && (
                 <button
-                  onClick={() => setProfileOpen((previous) => !previous)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white transition-all overflow-hidden border border-white/10"
-                  style={{
-                    background: "linear-gradient(135deg,#29abe2,#1a3a8f)",
-                    boxShadow: profileOpen ? "0 0 0 2px rgba(41,171,226,0.45)" : "none",
-                  }}
-                  aria-label="User menu"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+                  aria-label="Toggle theme"
                 >
-                  {getUserImage(user) ? (
-                    <img
-                      src={getUserImage(user)}
-                      alt={user.name || "User"}
-                      className="h-full w-full object-cover rounded-full"
-                    />
-                  ) : (
-                    userInitial
-                  )}
+                  {mounted && (theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />)}
                 </button>
+              )}
 
-                {profileOpen && (
-                  <div
-                    className="absolute right-0 top-10 z-50 w-52 rounded-xl py-2 shadow-2xl"
+              {!isClubIdPage && (
+                <div className="relative hidden lg:block" ref={profileRef}>
+                  <button
+                    onClick={() => setProfileOpen((previous) => !previous)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white transition-all overflow-hidden border border-white/10"
                     style={{
-                      background: "var(--navbar-bg)",
-                      border: "1px solid var(--navbar-border)",
+                      background: "linear-gradient(135deg,#29abe2,#1a3a8f)",
+                      boxShadow: profileOpen ? "0 0 0 2px rgba(41,171,226,0.45)" : "none",
                     }}
+                    aria-label="User menu"
                   >
-                    <div className="border-b border-white/10 px-4 py-2">
-                      <p className="truncate text-sm font-semibold text-white">{displayName}</p>
-                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{roleLabel}</p>
-                    </div>
-
-                    {!userLevel && (
-                      <>
-                        {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
-                          <button
-                            onClick={handleDashboard}
-                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
-                          >
-                            <Shield className="h-4 w-4 text-blue-400" />
-                            {user?.user_type === "sub_admin" ? "Section-Admin Dashboard" : "Admin Dashboard"}
-                          </button>
-                        )}
-
-                        {user?.user_type === "admin" && (
-                          <button
-                            onClick={() => {
-                              router.push(createClubId);
-                              setProfileOpen(false);
-                            }}
-                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
-                          >
-                            <UserCircle2 className="h-4 w-4 text-blue-400" />
-                           Create Club or Coach ID 
-                          </button>
-                        )}
-
-                        {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
-                          <button
-                            onClick={() => {
-                              router.push("/profile");
-                              setProfileOpen(false);
-                            }}
-                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
-                          >
-                            <UserCircle2 className="h-4 w-4 text-emerald-400" />
-                            Update Profile
-                          </button>
-                        )}
-                      </>
+                    {getUserImage(user) ? (
+                      <img
+                        src={getUserImage(user)}
+                        alt={user.name || "User"}
+                        className="h-full w-full object-cover rounded-full"
+                      />
+                    ) : (
+                      userInitial
                     )}
+                  </button>
 
-                    {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
+                  {profileOpen && (
+                    <div
+                      className="absolute right-0 top-10 z-50 w-52 rounded-xl py-2 shadow-2xl"
+                      style={{
+                        background: "var(--navbar-bg)",
+                        border: "1px solid var(--navbar-border)",
+                      }}
+                    >
+                      <div className="border-b border-white/10 px-4 py-2">
+                        <p className="truncate text-sm font-semibold text-white">{displayName}</p>
+                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{roleLabel}</p>
+                      </div>
+
+                      {!userLevel && (
+                        <>
+                          {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
+                            <button
+                              onClick={handleDashboard}
+                              className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                            >
+                              <Shield className="h-4 w-4 text-blue-400" />
+                              {user?.user_type === "sub_admin" ? "Section-Admin Dashboard" : "Admin Dashboard"}
+                            </button>
+                          )}
+
+                          {user?.user_type === "admin" && (
+                            <button
+                              onClick={() => {
+                                router.push(createClubId);
+                                setProfileOpen(false);
+                              }}
+                              className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                            >
+                              <UserCircle2 className="h-4 w-4 text-blue-400" />
+                             Create Club or Coach ID 
+                            </button>
+                          )}
+
+                          {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
+                            <button
+                              onClick={() => {
+                                router.push("/profile");
+                                setProfileOpen(false);
+                              }}
+                              className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                            >
+                              <UserCircle2 className="h-4 w-4 text-emerald-400" />
+                              Update Profile
+                            </button>
+                          )}
+                        </>
+                      )}
+
+                      {(user?.user_type === "admin" || user?.user_type === "sub_admin") && (
+                        <button
+                          onClick={() => {
+                            router.push(submitPerformancePage);
+                            setProfileOpen(false);
+                          }}
+                          className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                        >
+                          <Trophy className="h-4 w-4 text-amber-400" />
+                          Submit to Talent Board
+                        </button>
+                      )}
+
                       <button
                         onClick={() => {
-                          router.push(submitPerformancePage);
+                          window.open("/q-a", "_blank");
                           setProfileOpen(false);
                         }}
                         className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
                       >
-                        <Trophy className="h-4 w-4 text-amber-400" />
-                        Submit to Talent Board
+                        <HelpCircle className="h-4 w-4 text-slate-400" />
+                        Q &amp; A
                       </button>
-                    )}
 
-                    <button
-                      onClick={() => {
-                        window.open("/q-a", "_blank");
-                        setProfileOpen(false);
-                      }}
-                      className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
-                    >
-                      <HelpCircle className="h-4 w-4 text-slate-400" />
-                      Q &amp; A
-                    </button>
+                      <div className="my-1 border-t border-white/10" />
 
-                    <div className="my-1 border-t border-white/10" />
+                      <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-left text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
-                    <button
-                      onClick={handleLogout}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-left text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {!userLevel && (
+              {!userLevel && !isClubIdPage && (
                 <button
                   onClick={() => setMobileOpen((previous) => !previous)}
                   className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white lg:hidden"
@@ -672,7 +676,7 @@ const Navbar = ({
           </div>
         </div>
 
-        {mobileOpen && (
+        {mobileOpen && !isClubIdPage && (
           <div
             ref={mobileMenuRef}
             className="border-t border-nav-border px-4 pb-4 pt-2 lg:hidden flex flex-col gap-1"

@@ -51,6 +51,7 @@ const negativeLeaderboardSlice = createSlice({
     appliedAge: "",
     appliedAgeType: "",
     appliedGender: "",
+    appliedCountry: "",
     appliedWitnessBy: 0,
     error: null,
   },
@@ -59,10 +60,11 @@ const negativeLeaderboardSlice = createSlice({
       state.appliedAge = action.payload;
     },
     setAgeFilter: (state, action) => {
-      const { age, ageType, gender } = action.payload;
+      const { age, ageType, gender, country } = action.payload;
       state.appliedAge = age;
       state.appliedAgeType = ageType;
       state.appliedGender = gender;
+      state.appliedCountry = country || "";
     },
   },
   extraReducers: (builder) => {
@@ -75,11 +77,16 @@ const negativeLeaderboardSlice = createSlice({
         state.ladderDetails = action.payload.ladderDetails;
         state.appliedWitnessBy = action.meta.arg?.witness_by || 0;
 
-        const { dob, gender } = action.meta.arg || {};
-        if (!dob && !gender) {
+        const { dob, gender, country } = action.meta.arg || {};
+        if (!dob && !gender && !country) {
           state.appliedAge = 0;
           state.appliedAgeType = "";
           state.appliedGender = "";
+          state.appliedCountry = "";
+        } else {
+          if (country !== undefined) {
+            state.appliedCountry = country || "";
+          }
         }
       })
       .addCase(fetchNegativeLeaderboard.rejected, (state, action) => {
