@@ -34,7 +34,9 @@ const PlayerCard = ({
   player,
   overallRank,
   showAgeRank,
-  ageRank,
+  rank,
+  showGenderRank,
+  showCountryRank,
   isInverted,
   onSkillClick,
   onTargetAchieved,
@@ -188,22 +190,35 @@ const PlayerCard = ({
                   {player?.phone || "N/A"}
                 </div>
               </div>
-              {showAgeRank && (
-                <div className="flex flex-col items-center">
-                  <div
-                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
-                    style={{ background: "var(--best-board-success)" }}
-                  >
-                    {ageRank}
+              {(showAgeRank || showGenderRank || showCountryRank) && (() => {
+                const activeRankLabels = [
+                  showAgeRank && " Age ",
+                  showGenderRank && " Gender ",
+                  showCountryRank && " Country ",
+                ].filter(Boolean);
+
+                return (
+                  <div className="flex flex-col items-center">
+                    <div
+                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
+                      style={{ background: "var(--best-board-success)" }}
+                    >
+                      {rank}
+                    </div>
+                    <p
+                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
+                      style={{ color: "var(--best-board-success)" }}
+                    >
+                      Rank By :-
+                    </p>
+                    <p
+                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+                    >
+                      {`(${activeRankLabels.join(",")})`}
+                    </p>
                   </div>
-                  <p
-                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
-                    style={{ color: "var(--best-board-success)" }}
-                  >
-                    Age Rank
-                  </p>
-                </div>
-              )}
+                );
+              })()}
             </div>
 
 
@@ -252,9 +267,8 @@ const PlayerCard = ({
                       <div
                         key={i}
                         className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
-                          ${scoreData.witnessBy
-                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
-                            : scoreData.isTargetAchieved
+                          ${scoreData.witnessBy && "underline decoration-dark decoration-[2px]"}
+                            ${ scoreData.isTargetAchieved
                               ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
                               : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
                           }`}
@@ -346,6 +360,8 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   } = useSelector((state) => state.negativeLeaderBoard || {});
 
   const showAgeRank = Number(appliedAge) > 0;
+  const showGenderRank = appliedGender != ""; 
+  const showCountryRank = appliedCountry != "";
   const isInverted = ladderDetails?.inverted == 0;
   const hasFilters =
     (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "") || (appliedCountry && appliedCountry !== "");
@@ -657,7 +673,9 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
                   player={player}
                   overallRank={player.rank || index + 1}
                   showAgeRank={showAgeRank}
-                  ageRank={index + 1}
+                  showGenderRank={showGenderRank}
+                  showCountryRank={showCountryRank}
+                  rank={index + 1}
                   isInverted={isInverted}
                   onSkillClick={handleSkillClick}
                   onTargetAchieved={handleTargetAchieved}

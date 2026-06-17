@@ -16,7 +16,7 @@ const PlayerEditInfoModel = ({isDialogOpen, dialogMessage, setIsDialogOpen}) => 
                 <DialogHeader>
                     <DialogTitle>Notice</DialogTitle>
                 </DialogHeader>
-                <p className="py-2 text-gray-800">{dialogMessage}</p>
+                <p className="py-2 text-foreground">{dialogMessage}</p>
                 <DialogFooter>
                     <Button onClick={() => setIsDialogOpen(false)}>OK</Button>
                 </DialogFooter>
