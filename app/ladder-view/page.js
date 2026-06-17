@@ -32,9 +32,6 @@ export default function LadderView() {
   return (
     <div className="flex flex-col w-full min-h-screen py-4 bg-background text-foreground relative">
       {/* Floating Theme Toggle */}
-      <div className="fixed top-4 right-4 z-[60]">
-        <ThemeToggle />
-      </div>
 
       {/* Back Button and Header Actions */}
       <div className="w-full flex items-center justify-between px-4 sm:px-8 lg:px-12 max-w-8xl mx-auto mb-6">
