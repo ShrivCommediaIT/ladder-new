@@ -164,8 +164,6 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("user_name", playerName);
 
 
-      console.log("cuurentScore", currentScore)
-
       if (bestScore !== undefined && bestScore !== null) {
         let bestToSubmit;
         if (value > bestScore) {

@@ -249,17 +249,25 @@ const MovePlayerMinileague = ({
         opposit_user_id:challengedPlayer.name,
         score: score || "",
         bet: betDescription || "",
+        witness_by: selectedPlayer.name,
+        admin_id: adminDetails.id,
         move_from_section: fromSectionName,
         move_to_section: toSectionName,
       };
 
       const moveMiniLeagueRes = await dispatch(moveMiniLeague(payload)).unwrap();
             
-            if (moveMiniLeagueRes.success_message == "Success") {
+            if (moveMiniLeagueRes?.result?.status== 200) {
               toast.success(`Result posted in ${sectionName}`, { autoClose: 2000 });
-              if(moveMiniLeagueRes?.eligible_for_token == 1){
+              if(moveMiniLeagueRes?.result?.eligible_for_token == 1){
                 updateLadderToken({
                   user_id: selectedPlayer.name,
+                  ladder_id : effectiveLadderId,
+                  ladder_type: "minileague",
+                })
+
+                updateLadderToken({
+                  user_id: challengedPlayer.name,
                   ladder_id : effectiveLadderId,
                   ladder_type: "minileague",
                 })
