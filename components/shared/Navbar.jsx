@@ -373,7 +373,7 @@ const Navbar = ({
       window.removeEventListener("storage", loadUser);
       window.removeEventListener("profileUpdate", loadUser);
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     const handler = (event) => {
