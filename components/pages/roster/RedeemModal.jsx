@@ -4,9 +4,10 @@ import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 
 const REDEEM_OPTIONS = [
-    { discountPercent: 10, tokenCost: 10 },
     { discountPercent: 20, tokenCost: 20 }
 ];
+
+const MIN_TOKENS_TO_REDEEM = Math.min(...REDEEM_OPTIONS.map((option) => option.tokenCost));
 
 const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) => {
     // Steps: "history" | "select" | "confirm" | "success"
@@ -34,8 +35,8 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
     if (!open) return null;
 
     const handleRedeemClick = () => {
-        if (availableTokens < 10) {
-            toast.error("You need at least 10 tokens to redeem.", {
+        if (availableTokens < MIN_TOKENS_TO_REDEEM) {
+            toast.error(`You need at least ${MIN_TOKENS_TO_REDEEM} tokens to redeem.`, {
                 toastId: "insufficient_tokens"
             });
             return;
@@ -295,10 +296,6 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
                                     <div className="flex justify-between">
                                         <span>20 Tokens</span>
                                         <span>20%</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>10 Tokens</span>
-                                        <span>10%</span>
                                     </div>
                                 </div>
                             </div>
