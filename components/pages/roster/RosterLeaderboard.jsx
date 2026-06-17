@@ -65,23 +65,17 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
 
         <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
           {player?.token_status && (
-            <span
-              className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full best-board-tag-soft"
-            >
+            <span className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full best-board-tag-soft">
               Status: {player.token_status}
             </span>
           )}
           {player.age !== null && player.age !== undefined && player.age !== "" && (
-            <span
-              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap best-board-tag-accent"
-            >
+            <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap best-board-tag-accent">
               Age : {player.age}
             </span>
           )}
           {!!player.gender && (
-            <span
-              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap best-board-tag-accent"
-            >
+            <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap best-board-tag-accent">
               Gender: {player.gender === "male" ? "M" : "F"}
             </span>
           )}
@@ -92,39 +86,73 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
       <div className="flex items-stretch px-2 sm:px-3 py-2 sm:py-2.5 gap-2 sm:gap-3">
 
         {/* LEFT SECTION: rank badge + name/phone/tokens */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
-          <div className="flex flex-col items-center gap-1 flex-shrink-0">
-            <PlayerRankBadge
-              rank={rank}
-              sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
-              imgSize={56}
-              textClass="text-[10px] sm:text-xs md:text-sm"
-            />
+        <div className="flex items-stretch sm:items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
+          <div className="flex flex-col items-center justify-center gap-1 flex-shrink-0">
+            {/* MOBILE: flat color rank box, no icon/image */}
+            <div
+              className="sm:hidden flex items-center justify-center h-12 w-12 rounded-lg"
+              style={{ background: "var(--best-board-highlight)" }}
+            >
+              <span
+                className="text-xl font-black leading-none"
+                style={{ color: "var(--best-board-surface)" }}
+              >
+                {rank}
+              </span>
+            </div>
+
+            {/* DESKTOP/TABLET: original badge component, unchanged */}
+            <div className="hidden sm:block">
+              <PlayerRankBadge
+                rank={rank}
+                sizeClass="h-12 w-12 md:h-14 md:w-14"
+                imgSize={56}
+                textClass="text-xs md:text-sm"
+              />
+            </div>
           </div>
 
           {/* Info block */}
           <div className="flex-1 min-w-0">
             {/* Player name */}
-            <div
-              className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight best-board-text"
-            >
+            <div className="text-xs sm:text-sm font-bold truncate mb-0.5 leading-tight best-board-text">
               {player?.name || "N/A"}
             </div>
 
             {/* Phone */}
-            <div
-              className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight best-board-muted"
-            >
+            <div className="text-[10px] sm:text-xs truncate mb-1.5 sm:mb-2 leading-tight best-board-muted">
               {player?.phone || "N/A"}
             </div>
 
-            {/* Tokens Section */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            {/* Tokens — MOBILE: stacked Today/redeem + Today/total rows */}
+            <div className="flex flex-col gap-1 sm:hidden">
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRedeemClick(player);
+                }}
+              >
+                <span className="text-[10px] best-board-muted">Today:</span>
+                <span className="text-xs font-bold px-2 py-0.5 rounded best-board-tag-soft">
+                  {player?.today_token ?? "0"}
+                </span>
+                <span className="text-[10px] font-bold text-cyan-400">to redeem</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] best-board-muted">Today:</span>
+                <span className="text-xs font-bold px-2 py-0.5 rounded best-board-tag-soft">
+                  {player?.total_token ?? 0}
+                </span>
+                <span className="text-[10px] best-board-muted">In Total</span>
+              </div>
+            </div>
+
+            {/* Tokens — DESKTOP/TABLET: original single row + Redeem link */}
+            <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1.5">
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] sm:text-xs best-board-muted">Today:</span>
-                <span
-                  className="text-xs sm:text-sm font-bold px-2 py-0.5 rounded best-board-tag-soft"
-                >
+                <span className="text-xs best-board-muted">Today:</span>
+                <span className="text-sm font-bold px-2 py-0.5 rounded best-board-tag-soft">
                   {player?.today_token ?? "0"}
                 </span>
               </div>
@@ -133,7 +161,7 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
                   e.stopPropagation();
                   onRedeemClick(player);
                 }}
-                className="text-cyan-400 hover:text-cyan-300 font-bold text-xs sm:text-sm cursor-pointer underline decoration-cyan-400 decoration-[1.5px]"
+                className="text-cyan-400 hover:text-cyan-300 font-bold text-sm cursor-pointer underline decoration-cyan-400 decoration-[1.5px]"
               >
                 Redeem
               </button>
@@ -143,12 +171,12 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
 
         {/* ── RIGHT SECTION: total tokens badge + avatar ── */}
         <div
-          className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
+          className="flex flex-col items-stretch sm:items-center justify-center sm:justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
-          {/* Total Tokens badge */}
+          {/* Total Tokens badge — desktop/tablet only, folded into the left rows on mobile */}
           <div
-            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+            className="hidden sm:flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
             style={{
               background: "var(--best-board-accent-soft)",
               border: "1px solid var(--best-board-border-strong)",
@@ -168,9 +196,9 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
             </span>
           </div>
 
-          {/* Player avatar */}
+          {/* Player avatar — real photo on every breakpoint, just resized for mobile */}
           <div
-            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-[52px] h-[52px] sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
+            className="rounded-md sm:rounded-lg overflow-hidden flex-shrink-0 w-20 h-full sm:w-16 sm:h-16 md:w-[72px] md:h-[72px]"
             style={{ border: "1px solid var(--best-board-border-strong)" }}
           >
             <Image
