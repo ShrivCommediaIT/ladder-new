@@ -655,8 +655,14 @@ export default function PlanHeading() {
             <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
               Simple Pricing, No Surprises
             </h2>
-            <p className="mb-2 text-xl text-[var(--landing-nav-text)]">
-              Just GBP 1/month per player, easily covered by a small court fee tweak.
+<h3 className="mb-4 text-3xl font-bold bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] bg-clip-text text-transparent md:text-4xl">
+  All for less than $2 a player per month
+</h3>
+            <span className="text-xl text-[var(--landing-nav-text)]">
+              {`( less than a cup of coffee per player a month)`}
+            </span>
+            <p className="mt-5 text-xl text-[var(--landing-nav-text)]">
+              All charges ONE MONTH IN ARREARS after free set up and free trial
             </p>
           </div>
 

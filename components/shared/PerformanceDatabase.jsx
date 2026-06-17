@@ -791,11 +791,11 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
             </div>
 
             <div className="space-y-1.5 min-w-0">
-              <label className={mutedLabelClass}>Activity Search</label>
+              <label className={mutedLabelClass}> Search</label>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search athlete, club, etc..."
+                  placeholder="Search "
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   className={`${fieldClass} pl-9`}
