@@ -166,13 +166,37 @@ const PlayerCard = ({
         <div className="flex items-center gap-1.5 sm:gap-2.5 flex-1 min-w-0">
 
           {/* Rank badge + optional age rank below */}
-          <div className="flex flex-col items-center gap-1 flex-shrink-0">
+          <div className="flex flex-col items-center justify-center gap-1 flex-shrink-0">
+
             <PlayerRankBadge
-              rank={overallRank}
+              rank={(showAgeRank || showGenderRank || showCountryRank) ? rank : overallRank}
               sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
               imgSize={56}
               textClass="text-[10px] sm:text-xs md:text-sm"
             />
+            {(showAgeRank || showGenderRank || showCountryRank) && (() => {
+                const activeRankLabels = [
+                  showAgeRank && " Age ",
+                  showGenderRank && " Gender ",
+                  showCountryRank && " Country ",
+                ].filter(Boolean);
+
+                return (
+                  <div className="flex flex-col  mt-2">
+                    <p
+                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+                      
+                    >
+                      Rank By:-
+                    </p>
+                    <p
+                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+                    >
+                      {`(${activeRankLabels.join(",")})`}
+                    </p>
+                  </div>
+                );
+              })()}
           </div>
 
           {/* Info block */}
@@ -195,35 +219,6 @@ const PlayerCard = ({
                   {player?.phone || "N/A"}
                 </div>
               </div>
-              {(showAgeRank || showGenderRank || showCountryRank) && (() => {
-                const activeRankLabels = [
-                  showAgeRank && " Age ",
-                  showGenderRank && " Gender ",
-                  showCountryRank && " Country ",
-                ].filter(Boolean);
-
-                return (
-                  <div className="flex flex-col items-center">
-                    <div
-                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
-                      style={{ background: "var(--best-board-success)" }}
-                    >
-                      {rank}
-                    </div>
-                    <p
-                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
-                      style={{ color: "var(--best-board-success)" }}
-                    >
-                      Rank By :-
-                    </p>
-                    <p
-                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
-                    >
-                      {`(${activeRankLabels.join(",")})`}
-                    </p>
-                  </div>
-                );
-              })()}
             </div>
 
 
