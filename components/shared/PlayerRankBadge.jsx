@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const PlayerRankBadge = ({ rank, sizeClass = "h-10 w-10 sm:h-14 sm:w-14", imgSize = 64, textClass = "text-xs sm:text-sm" }) => {
   const rankNum = Number(rank);
-  let src = "/ranksImg/rank.png";
+  let src = "/ranksImg/rr-10.png";
   let scaleClass = "scale-[1.5] group-hover:scale-[1.65]";
 
   const rankStr = String(rank || "").trim();
@@ -12,13 +12,13 @@ const PlayerRankBadge = ({ rank, sizeClass = "h-10 w-10 sm:h-14 sm:w-14", imgSiz
   let offsetClass = "-translate-y-[12%]";
 
   if (rankNum === 1) {
-    src = "/ranksImg/rank-1.png";
+    src = "/ranksImg/rr-11.png";
     offsetClass = "-translate-y-[12%]";
   } else if (rankNum === 2) {
-    src = "/ranksImg/rank-2.png";
+    src = "/ranksImg/rr-12.png";
     offsetClass = "-translate-y-[12%]";
   } else if (rankNum === 3) {
-    src = "/ranksImg/rank-3.png";
+    src = "/ranksImg/rr-13.png";
     offsetClass = "-translate-y-[12%]";
   }
 
@@ -39,7 +39,7 @@ const PlayerRankBadge = ({ rank, sizeClass = "h-10 w-10 sm:h-14 sm:w-14", imgSiz
         className={`object-contain transition-transform duration-200 ${scaleClass} ${sizeClass}`}
         unoptimized
       />
-      <span className={`absolute inset-0 flex items-center justify-center font-black text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)] leading-none ${offsetClass} ${textScale} ${textClass}`}>
+      <span className={`absolute inset-0 flex items-center justify-center font-black text-foreground drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)] leading-none ${offsetClass} ${textScale} ${textClass}`}>
         {rank}
       </span>
     </div>
