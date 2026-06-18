@@ -1,145 +1,462 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import topLogo from "@/public/topLogo.png";
+
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaTiktok,
+  FaYoutube,
+  FaLinkedinIn,
+  FaMapMarkerAlt,
+  FaEnvelope,
+  FaPhoneAlt,
+  FaChevronRight,
+} from "react-icons/fa";
+
+import { FaWhatsapp, FaXTwitter } from "react-icons/fa6";
+import { BsThreads } from "react-icons/bs";
+
+/* Simple inline ISO 9001:2015 laurel badge — no external asset required */
+function IsoBadge({ className = "h-20 w-20" }) {
+  return (
+    <svg
+      viewBox="0 0 120 120"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Left laurel branch */}
+      <g fill="#facc15">
+        <path d="M30 95 C18 88 12 72 16 58 C18 64 24 70 30 72 C26 78 26 86 30 95Z" />
+        <path d="M24 80 C12 75 6 60 10 46 C13 52 19 57 25 59 C21 65 20 73 24 80Z" />
+        <path d="M22 64 C11 60 6 46 10 33 C13 39 19 43 24 45 C20 50 19 58 22 64Z" />
+        <path d="M24 48 C14 45 10 32 14 20 C17 26 22 30 27 31 C23 36 22 43 24 48Z" />
+      </g>
+      {/* Right laurel branch */}
+      <g fill="#facc15">
+        <path d="M90 95 C102 88 108 72 104 58 C102 64 96 70 90 72 C94 78 94 86 90 95Z" />
+        <path d="M96 80 C108 75 114 60 110 46 C107 52 101 57 95 59 C99 65 100 73 96 80Z" />
+        <path d="M98 64 C109 60 114 46 110 33 C107 39 101 43 96 45 C100 50 101 58 98 64Z" />
+        <path d="M96 48 C106 45 110 32 106 20 C103 26 98 30 93 31 C97 36 98 43 96 48Z" />
+      </g>
+      {/* Center circle */}
+      <circle cx="60" cy="48" r="34" fill="#0c1f3f" stroke="#facc15" strokeWidth="3" />
+      <text
+        x="60"
+        y="38"
+        textAnchor="middle"
+        fill="#ffffff"
+        fontSize="13"
+        fontWeight="700"
+        fontFamily="Arial, sans-serif"
+      >
+        ISO
+      </text>
+      <text
+        x="60"
+        y="52"
+        textAnchor="middle"
+        fill="#38bdf8"
+        fontSize="10"
+        fontWeight="700"
+        fontFamily="Arial, sans-serif"
+      >
+        9001:2015
+      </text>
+      <text
+        x="60"
+        y="64"
+        textAnchor="middle"
+        fill="#facc15"
+        fontSize="7"
+        fontWeight="600"
+        letterSpacing="1"
+        fontFamily="Arial, sans-serif"
+      >
+        CERTIFIED
+      </text>
+    </svg>
+  );
+}
 
 export default function Footer() {
-  const [isAdminOrSubAdmin, setIsAdminOrSubAdmin] = useState(false);
-  const [isNormalUser, setIsNormalUser] = useState(false);
-
-  useEffect(() => {
-    try {
-      const adminData = sessionStorage.getItem("userData");
-      const subAdminData = sessionStorage.getItem("subAdmin");
-      const userData = sessionStorage.getItem("user");
-
-      const parsedAdmin = adminData ? JSON.parse(adminData) : null;
-      const parsedSubAdmin = subAdminData ? JSON.parse(subAdminData) : null;
-      const parsedUser = userData ? JSON.parse(userData) : null;
-      
-      const role = parsedAdmin?.user_type || parsedSubAdmin?.user_type;
-      if (role === "admin" || role === "sub_admin") {
-        setIsAdminOrSubAdmin(true);
-      } else if (parsedUser?.user_type === "user" || parsedUser?.isLoggedIn) {
-        setIsNormalUser(true);
-      }
-    } catch (e) {
-      // ignore
-    }
-  }, []);
-
   return (
-    <footer
-      id="contact"
-      className="py-12"
-      style={{
-        background: "var(--landing-footer-bg)",
-        color: "var(--landing-footer-text)",
-      }}
-    >
-      <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
-        {/* CORPORATE FOOTER CONTENT */}
-        <div className={`mb-8 grid grid-cols-1 gap-8 ${isNormalUser ? "md:grid-cols-3" : "md:grid-cols-4"}`}>
-          <div className="md:col-span-2">
+<footer
+  id="contact"
+  className="relative overflow-hidden bg-contain bg-top bg-no-repeat text-white"
+  style={{
+    backgroundImage: "url('/footer.png')",
+    backgroundSize: "100% 100%",
+  }}
+>
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/50"></div>
+
+      <div className="relative z-10 mx-auto max-w-8xl px-6 py-12">
+        {/* Top Section */}
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-4">
+          {/* Logo Section */}
+          <div>
+            <div className="flex  gap-5">
             <Image
-              src={topLogo}
+              src="/topLogo.png"
               alt="Sports Solutions Pro"
-              className="mb-6 h-8 w-auto brightness-0 invert opacity-80"
-              priority
+              width={60}
+              height={60}
+              className="mb-6"
             />
-            <p className="max-w-sm leading-7">
-              The smart way to run automated ladders, mini-leagues, leaderboards and challenge
-              boards for your sports club.
-            </p>
+            <div>
+              <p className=" text-2xl font-bold text-primary">SPORTS </p>
+                <p className=" text-l font-bold text-white"> 
+              SOLUTIONS PRO
+              </p>
+            </div>
           </div>
 
-          {!isNormalUser && (
-            <div>
-              <h3 className="mb-4 font-semibold" style={{ color: "var(--landing-footer-heading)" }}>
-                Product
-              </h3>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a
-                    href={isAdminOrSubAdmin ? "/#talent-board" : "#talent-board"}
-                    target={isAdminOrSubAdmin ? "_blank" : undefined}
-                    rel={isAdminOrSubAdmin ? "noopener noreferrer" : undefined}
-                    className="transition-colors hover:text-foreground"
-                  >
-                    SSP Talent Board
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={isAdminOrSubAdmin ? "/#features" : "#features"}
-                    target={isAdminOrSubAdmin ? "_blank" : undefined}
-                    rel={isAdminOrSubAdmin ? "noopener noreferrer" : undefined}
-                    className="transition-colors hover:text-foreground"
-                  >
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={isAdminOrSubAdmin ? "/#pricing" : "#pricing"}
-                    target={isAdminOrSubAdmin ? "_blank" : undefined}
-                    rel={isAdminOrSubAdmin ? "noopener noreferrer" : undefined}
-                    className="transition-colors hover:text-foreground"
-                  >
-                    Pricing
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href={isAdminOrSubAdmin ? "/#features" : "#features"}
-                    target={isAdminOrSubAdmin ? "_blank" : undefined}
-                    rel={isAdminOrSubAdmin ? "noopener noreferrer" : undefined}
-                    className="transition-colors hover:text-foreground"
-                  >
-                    Clubs
-                  </a>
-                </li>
-              </ul>
-            </div>
-          )}
+            <p className="text-sm leading-7 text-gray-300">
+              The smart way to run automated ladders, mini-leagues,
+              leaderboards, challenge boards, international competitions
+              and talent identification systems for sports clubs,
+              coaches, schools and organisations worldwide.
+            </p>
 
+            <div className="mt-6 text-sm font-semibold tracking-wide text-sky-400">
+              COMPETE • IMPROVE • ACHIEVE
+            </div>
+          </div>
+
+          {/* Contact */}
           <div>
-            <h3 className="mb-4 font-semibold" style={{ color: "var(--landing-footer-heading)" }}>
-              Company
+            <h3 className="mb-5 border-b-2 border-sky-500 pb-2 text-lg font-bold inline-block">
+              CONTACT
             </h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a href="#" className="transition-colors hover:text-foreground">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <Link href="/terms-and-conditions" className="transition-colors hover:text-foreground">
-                  Terms of Service
+
+            <div className="space-y-4 text-sm text-gray-300">
+              <div className="flex gap-3">
+                <FaMapMarkerAlt className="mt-1 h-4 w-4 flex-shrink-0 text-sky-400" />
+                <p>
+                  Sports Solutions Pro
+                  <br />
+                  A subsidiary of NE Games Ltd
+                  <br />
+                  Richmond House,
+                  <br />
+                  Lawnswood Business Park,
+                  <br />
+                  Redvers Close,
+                  <br />
+                  Leeds LS16 6QY
+                  <br />
+                  United Kingdom
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <FaEnvelope className="mt-1 h-4 w-4 flex-shrink-0 text-sky-400" />
+                <p>
+                  Email:
+                  <br />
+                  <a
+                    href="mailto:support@sportssolutionspro.com"
+                    className="text-sky-400 hover:text-sky-300"
+                  >
+                    support@sportssolutionspro.com
+                  </a>
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <FaPhoneAlt className="mt-1 h-4 w-4 flex-shrink-0 text-sky-400" />
+                <p>
+                  Tel:
+                  <br />
+                  <a
+                    href="https://wa.me/441134180902"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-400 hover:text-sky-300"
+                  >
+                    0113 418 0902
+                  </a>
+                  <br />
+                  <span className="text-xs text-gray-400">
+                    (WhatsApp Business 24/7)
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="mb-5 border-b-2 border-sky-500 pb-2 text-lg font-bold inline-block">
+              QUICK LINKS
+            </h3>
+
+            <ul className="space-y-3 text-sm text-gray-300">
+              <li className="flex items-center gap-2">
+                <FaChevronRight className="h-3 w-3 text-sky-400" />
+                <Link href="/#features" className="hover:text-sky-400">
+                  Features
                 </Link>
               </li>
-              <li>
-                <a href="mailto:support@sportssolutionspro.com" className="transition-colors hover:text-foreground">
-                  Support
-                </a>
+
+              <li className="flex items-center gap-2">
+                <FaChevronRight className="h-3 w-3 text-sky-400" />
+                <Link href="/#pricing" className="hover:text-sky-400">
+                  Pricing
+                </Link>
               </li>
-              <li>
-                <a href="mailto:support@sportssolutionspro.com" className="transition-colors hover:text-foreground">
-                  Contact
-                </a>
+
+              <li className="flex items-center gap-2">
+                <FaChevronRight className="h-3 w-3 text-sky-400" />
+                <Link href="/#competitions" className="hover:text-sky-400">
+                  International Competitions
+                </Link>
+              </li>
+
+              <li className="flex items-center gap-2">
+                <FaChevronRight className="h-3 w-3 text-sky-400" />
+                <Link href="/#talent-board" className="hover:text-sky-400">
+                  SSP Talent Board
+                </Link>
+              </li>
+
+              <li className="flex items-center gap-2">
+                <FaChevronRight className="h-3 w-3 text-sky-400" />
+                <Link href="/#clubs" className="hover:text-sky-400">
+                  Clubs & Coaches
+                </Link>
+              </li>
+
+              <li className="flex items-center gap-2">
+                <FaChevronRight className="h-3 w-3 text-sky-400" />
+                <Link href="/contact" className="hover:text-sky-400">
+                  Contact Us
+                </Link>
               </li>
             </ul>
           </div>
-        </div>
+          {/* Social Links */}
+          <div>
+            <h3 className="mb-5 inline-block border-b-2 border-sky-500 pb-2 text-lg font-bold">
+              FOLLOW SSP
+            </h3>
 
-        <div
-          className="flex flex-col items-center justify-between gap-4 pt-8 text-center md:flex-row"
-          style={{ borderTop: "1px solid var(--landing-footer-border)" }}
-        >
-          <p>© 2026 Sports Solutions Pro. All rights reserved.</p>
-          <p className="text-sm">Made for sports clubs worldwide.</p>
+            <div className="grid grid-cols-4 gap-x-4 gap-y-5">
+              {/* Facebook */}
+              <a
+                href="https://www.facebook.com/profile.php?id=61580051563946"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1877F2] text-white">
+                  <FaFacebookF size={20} />
+                </div>
+                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                  Facebook
+                </span>
+              </a>
+
+              {/* Instagram */}
+              <a
+                href="https://www.instagram.com/sports_solutions_pro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5] text-white">
+                  <FaInstagram size={20} />
+                </div>
+                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                  Instagram
+                </span>
+              </a>
+
+              {/* TikTok */}
+              <a
+                href="https://www.tiktok.com/@ssp48721"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">
+                  <FaTiktok size={20} />
+                </div>
+                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                  TikTok
+                </span>
+              </a>
+
+              {/* X */}
+              <a
+                href="https://x.com/Sports_Sol_Pro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">
+                  <FaXTwitter size={20} />
+                </div>
+                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                  X
+                </span>
+              </a>
+
+              {/* Threads */}
+              <a
+                href="https://www.threads.com/@sports_solutions_pro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">
+                  <BsThreads size={20} />
+                </div>
+                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                  Threads
+                </span>
+              </a>
+
+              {/* YouTube */}
+              <a
+                href="https://www.youtube.com/@sportssolutionspro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FF0000] text-white">
+                  <FaYoutube size={20} />
+                </div>
+                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                  YouTube
+                </span>
+              </a>
+
+              {/* LinkedIn */}
+              <a
+                href="https://www.linkedin.com/company/sports-solutions-pro/?viewAsMember=true"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
+                  <FaLinkedinIn size={20} />
+                </div>
+                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                  LinkedIn
+                </span>
+              </a>
+
+              {/* WhatsApp */}
+              <a
+                href="https://wa.me/441134180902"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white">
+                  <FaWhatsapp size={20} />
+                </div>
+                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                  WhatsApp
+                </span>
+              </a>
+            </div>
+          </div>
+          </div>
+      {/* Bottom Section */}
+        <div className="mt-8 border-t border-white/10 pt-5">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            
+            {/* Left Side */}
+            <div className="flex items-start">
+              {/* ISO Logo */}
+              <div className="flex-shrink-0 border-r border-white/20 pr-6">
+                <Image
+                  src="/iso-certified.png"
+                  alt="ISO 9001:2015 Certified"
+                  width={150}
+                  height={150}
+                  className="h-auto w-auto"
+                />
+              </div>
+
+              {/* Company Details */}
+              <div className="ml-6">
+                <p className="text-sm font-semibold text-sky-400">
+                  Sports Solutions Pro – a subsidiary of NE Games Ltd
+                </p>
+
+                <p className="mt-2 text-sm text-gray-300">
+                  NE Games Ltd Registered in England & Wales.
+                </p>
+
+                <p className="mt-3 text-sm text-gray-300">
+                  ISO 9001:2015 Certified.
+                </p>
+              </div>
+            </div>
+
+            {/* Right Side */}
+            <div className="">
+              <div className="flex justify-between">
+                <div>
+              <p className="text-sm text-gray-300">
+                © 2026 Sports Solutions Pro.
+              </p>
+
+              <p className="mt-1 text-sm text-gray-300">
+                All rights reserved.
+              </p>
+              </div>
+
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-4 lg:justify-end">
+                <Link
+                  href="/privacy-policy"
+                  className="text-sm text-sky-400 hover:text-sky-300"
+                >
+                  Privacy Policy
+                </Link>
+
+                <span className="text-white/30">|</span>
+
+                <Link
+                  href="/terms-and-conditions"
+                  className="text-sm text-sky-400 hover:text-sky-300"
+                >
+                  Terms & Conditions
+                </Link>
+
+                <span className="text-white/30">|</span>
+
+                <Link
+                  href="/refund-policy"
+                  className="text-sm text-sky-400 hover:text-sky-300"
+                >
+                  Cancellation & Refund Policy
+                </Link>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+        <div className="flex justify-end">
+            <div className="">
+              <p className="text-xl font-bold text-white">
+                Designed & Developed by :  
+              </p>
+
+              <Link href="https://commediait.com/" target="_blank" className="mt-1 text-sm text-primary">
+                Shriv ComMedia Solutions Pvt. Ltd.
+              </Link>
+            </div>
         </div>
       </div>
     </footer>
