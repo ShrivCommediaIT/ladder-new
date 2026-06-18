@@ -652,119 +652,18 @@ export default function PlanHeading() {
         <div className="absolute inset-0 opacity-[0.03] [background-image:url('https://www.transparenttextures.com/patterns/cubes.png')]" />
         <div className="relative z-10 mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
-            <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
+            <h2 className="mb-4 text-3xl font-bold text-foreground md:text-5xl">
               Simple Pricing, No Surprises
             </h2>
-<h3 className="mb-4 text-3xl font-bold bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] bg-clip-text text-transparent md:text-4xl">
-  All for less than $2 a player per month
-</h3>
-            <span className="text-xl text-[var(--landing-nav-text)]">
+            <h3 className="mb-4 text-2xl font-bold italic bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] bg-clip-text text-transparent md:text-3xl">
+              All for less than £2 a player per month
+            </h3>
+            <span className="text-l text-[var(--landing-nav-text)]">
               {`( less than a cup of coffee per player a month)`}
             </span>
             <p className="mt-5 text-xl text-[var(--landing-nav-text)]">
               All charges ONE MONTH IN ARREARS after free set up and free trial
             </p>
-          </div>
-
-          <div className="mx-auto grid max-w-3xl gap-6 md:grid-cols-2 md:items-center">
-            {pricing.map((plan) => (
-              <Card
-                key={plan.name}
-                className={[
-                  "py-0",
-                  plan.featured ? "relative z-10 shadow-xl md:scale-102" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                style={{
-                  borderColor: plan.featured 
-                    ? "var(--landing-secondary)" 
-                    : theme === "light" 
-                      ? "rgba(0, 0, 0, 0.15)" 
-                      : "var(--landing-card-border)",
-                  background: theme === "light" ? "#ffffff" : "var(--landing-surface-strong)",
-                  boxShadow: theme === "light"
-                    ? plan.featured
-                      ? "0 10px 30px -5px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.06)"
-                      : "0 4px 15px -3px rgba(0, 0, 0, 0.08)"
-                    : "var(--landing-card-shadow)",
-                }}
-              >
-                {plan.featured && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <span className="rounded-full bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-
-                <CardHeader className="p-5 pb-5">
-                  <CardTitle
-                    className={[
-                      "text-base uppercase tracking-[0.08em]",
-                      plan.featured ? "text-[var(--landing-primary)]" : "text-[var(--landing-nav-text)]",
-                    ].join(" ")}
-                  >
-                    {plan.name}
-                  </CardTitle>
-                  <div className="mt-2 flex items-baseline text-foreground">
-                    <span className={["font-extrabold", plan.featured ? "text-3xl" : "text-2xl"].join(" ")}>
-                      {plan.price}
-                    </span>
-                    {plan.suffix ? (
-                      <span className="ml-1 text-sm font-medium text-[var(--landing-nav-text)]">
-                        {plan.suffix}
-                      </span>
-                    ) : null}
-                  </div>
-                  <CardDescription className="mt-2 text-xs">
-                    {plan.description}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="px-5">
-                  <ul className="space-y-2.5">
-                    {plan.items.map((item) => (
-                      <li key={item} className="flex items-center gap-2">
-                        <Check
-                          className={[
-                            "h-4 w-4 shrink-0",
-                            plan.featured ? "text-[var(--landing-primary)]" : "text-[var(--landing-secondary)]",
-                          ].join(" ")}
-                        />
-                        <span className={["text-xs sm:text-sm", plan.featured ? "font-medium text-foreground" : "text-[var(--landing-nav-text)]"].join(" ")}>
-                          {item}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-
-                <CardFooter className="p-5 pt-6">
-                  <Button
-                    asChild
-                    variant={plan.featured ? "default" : "outline"}
-                    className={[
-                      "h-10 w-full rounded-lg text-sm",
-                      plan.featured ? buttonClass : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                    style={
-                      plan.featured
-                        ? undefined
-                        : {
-                            borderColor: "var(--landing-outline-button)",
-                            color: "var(--landing-outline-button-text)",
-                            background: "transparent",
-                          }
-                    }
-                  >
-                    <Link href={plan.buttonHref}>{plan.buttonLabel}</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
