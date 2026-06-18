@@ -83,37 +83,35 @@ function IsoBadge({ className = "h-20 w-20" }) {
 
 export default function Footer() {
   return (
-<footer
-  id="contact"
-  className="relative overflow-hidden bg-contain bg-top bg-no-repeat text-white"
-  style={{
-    backgroundImage: "url('/footer.png')",
-    backgroundSize: "100% 100%",
-  }}
->
+    <footer
+      id="contact"
+      className="relative overflow-hidden bg-top bg-no-repeat text-white"
+      style={{
+        backgroundImage: "url('/footer.png')",
+        backgroundSize: "cover",
+      }}
+    >
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/50"></div>
 
-      <div className="relative z-10 mx-auto max-w-8xl px-6 py-12">
+      <div className="relative z-10 mx-auto max-w-8xl px-4 py-10 sm:px-6 sm:py-12">
         {/* Top Section */}
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Logo Section */}
           <div>
-            <div className="flex  gap-5">
-            <Image
-              src="/topLogo.png"
-              alt="Sports Solutions Pro"
-              width={60}
-              height={60}
-              className="mb-6"
-            />
-            <div>
-              <p className=" text-2xl font-bold text-primary">SPORTS </p>
-                <p className=" text-l font-bold text-white"> 
-              SOLUTIONS PRO
-              </p>
+            <div className="flex gap-5">
+              <Image
+                src="/topLogo.png"
+                alt="Sports Solutions Pro"
+                width={60}
+                height={60}
+                className="mb-6 h-auto w-12 sm:w-[60px]"
+              />
+              <div>
+                <p className="text-2xl font-bold text-primary">SPORTS</p>
+                <p className="text-l font-bold text-white">SOLUTIONS PRO</p>
+              </div>
             </div>
-          </div>
 
             <p className="text-sm leading-7 text-gray-300">
               The smart way to run automated ladders, mini-leagues,
@@ -129,7 +127,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="mb-5 border-b-2 border-sky-500 pb-2 text-lg font-bold inline-block">
+            <h3 className="mb-5 inline-block border-b-2 border-sky-500 pb-2 text-lg font-bold">
               CONTACT
             </h3>
 
@@ -155,7 +153,7 @@ export default function Footer() {
 
               <div className="flex gap-3">
                 <FaEnvelope className="mt-1 h-4 w-4 flex-shrink-0 text-sky-400" />
-                <p>
+                <p className="break-all sm:break-normal">
                   Email:
                   <br />
                   <a
@@ -191,7 +189,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="mb-5 border-b-2 border-sky-500 pb-2 text-lg font-bold inline-block">
+            <h3 className="mb-5 inline-block border-b-2 border-sky-500 pb-2 text-lg font-bold">
               QUICK LINKS
             </h3>
 
@@ -239,13 +237,14 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+
           {/* Social Links */}
           <div>
             <h3 className="mb-5 inline-block border-b-2 border-sky-500 pb-2 text-lg font-bold">
               FOLLOW SSP
             </h3>
 
-            <div className="grid grid-cols-4 gap-x-4 gap-y-5">
+            <div className="grid grid-cols-4 gap-x-3 gap-y-5 sm:gap-x-4">
               {/* Facebook */}
               <a
                 href="https://www.facebook.com/profile.php?id=61580051563946"
@@ -253,10 +252,10 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex flex-col items-center"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1877F2] text-white">
-                  <FaFacebookF size={20} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1877F2] text-white sm:h-12 sm:w-12">
+                  <FaFacebookF size={18} />
                 </div>
-                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
                   Facebook
                 </span>
               </a>
@@ -268,10 +267,10 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex flex-col items-center"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5] text-white">
-                  <FaInstagram size={20} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5] text-white sm:h-12 sm:w-12">
+                  <FaInstagram size={18} />
                 </div>
-                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
                   Instagram
                 </span>
               </a>
@@ -283,10 +282,10 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex flex-col items-center"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">
-                  <FaTiktok size={20} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white sm:h-12 sm:w-12">
+                  <FaTiktok size={18} />
                 </div>
-                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
                   TikTok
                 </span>
               </a>
@@ -298,10 +297,10 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex flex-col items-center"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">
-                  <FaXTwitter size={20} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white sm:h-12 sm:w-12">
+                  <FaXTwitter size={18} />
                 </div>
-                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
                   X
                 </span>
               </a>
@@ -313,10 +312,10 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex flex-col items-center"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">
-                  <BsThreads size={20} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white sm:h-12 sm:w-12">
+                  <BsThreads size={18} />
                 </div>
-                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
                   Threads
                 </span>
               </a>
@@ -328,10 +327,10 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex flex-col items-center"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FF0000] text-white">
-                  <FaYoutube size={20} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FF0000] text-white sm:h-12 sm:w-12">
+                  <FaYoutube size={18} />
                 </div>
-                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
                   YouTube
                 </span>
               </a>
@@ -343,10 +342,10 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex flex-col items-center"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
-                  <FaLinkedinIn size={20} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0A66C2] text-white sm:h-12 sm:w-12">
+                  <FaLinkedinIn size={18} />
                 </div>
-                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
                   LinkedIn
                 </span>
               </a>
@@ -358,35 +357,35 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex flex-col items-center"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white">
-                  <FaWhatsapp size={20} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#25D366] text-white sm:h-12 sm:w-12">
+                  <FaWhatsapp size={18} />
                 </div>
-                <span className="mt-1 text-[11px] leading-none text-gray-300">
+                <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
                   WhatsApp
                 </span>
               </a>
             </div>
           </div>
-          </div>
-      {/* Bottom Section */}
+        </div>
+
+        {/* Bottom Section */}
         <div className="mt-8 border-t border-white/10 pt-5">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            
             {/* Left Side */}
-            <div className="flex items-start">
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:gap-0">
               {/* ISO Logo */}
-              <div className="flex-shrink-0 border-r border-white/20 pr-6">
+              <div className="flex-shrink-0 border-b border-white/20 pb-4 sm:border-b-0 sm:border-r sm:pb-0 sm:pr-6">
                 <Image
                   src="/iso-certified.png"
                   alt="ISO 9001:2015 Certified"
                   width={150}
                   height={150}
-                  className="h-auto w-auto"
+                  className="h-auto w-24 sm:w-28 lg:w-32"
                 />
               </div>
 
               {/* Company Details */}
-              <div className="ml-6">
+              <div className="sm:ml-6">
                 <p className="text-sm font-semibold text-sky-400">
                   Sports Solutions Pro – a subsidiary of NE Games Ltd
                 </p>
@@ -402,21 +401,12 @@ export default function Footer() {
             </div>
 
             {/* Right Side */}
-            <div className="">
-              <div className="flex justify-between">
-                <div>
+            <div className="w-full text-left lg:w-auto lg:text-right">
               <p className="text-sm text-gray-300">
-                © 2026 Sports Solutions Pro.
+                © 2026 Sports Solutions Pro. All rights reserved.
               </p>
 
-              <p className="mt-1 text-sm text-gray-300">
-                All rights reserved.
-              </p>
-              </div>
-
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-4 lg:justify-end">
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 lg:justify-end">
                 <Link
                   href="/privacy-policy"
                   className="text-sm text-sky-400 hover:text-sky-300"
@@ -424,7 +414,7 @@ export default function Footer() {
                   Privacy Policy
                 </Link>
 
-                <span className="text-white/30">|</span>
+                <span className="hidden h-3 w-px bg-white/20 sm:inline-block" />
 
                 <Link
                   href="/terms-and-conditions"
@@ -433,7 +423,7 @@ export default function Footer() {
                   Terms & Conditions
                 </Link>
 
-                <span className="text-white/30">|</span>
+                <span className="hidden h-3 w-px bg-white/20 sm:inline-block" />
 
                 <Link
                   href="/refund-policy"
@@ -442,21 +432,23 @@ export default function Footer() {
                   Cancellation & Refund Policy
                 </Link>
               </div>
-
             </div>
-
           </div>
         </div>
-        <div className="flex justify-end">
-            <div className="">
-              <p className="text-xl font-bold text-white">
-                Designed & Developed by :  
-              </p>
 
-              <Link href="https://commediait.com/" target="_blank" className="mt-1 text-sm text-primary">
-                Shriv ComMedia Solutions Pvt. Ltd.
-              </Link>
-            </div>
+        {/* Credit */}
+        <div className="mt-6 flex flex-col items-center gap-1 border-t border-white/10 pt-4 text-center sm:flex-row sm:justify-center sm:gap-2 lg:justify-end">
+          <p className="text-xs text-gray-400 sm:text-sm">
+            Designed &amp; Developed by
+          </p>
+
+          <Link
+            href="https://commediait.com/"
+            target="_blank"
+            className="text-xs font-semibold text-sky-400 hover:text-sky-300 sm:text-sm"
+          >
+            Shriv ComMedia Solutions Pvt. Ltd.
+          </Link>
         </div>
       </div>
     </footer>
