@@ -37,6 +37,7 @@ const PlayerCard = ({
   onTargetAchieved,
   isEditable,
   currentUser,
+  selectedPositiveFilter,
 }) => {
   const playerImageUrl =
     player?.image && player.image !== "null" && player.image !== "undefined" && player.image !== ""
@@ -92,7 +93,7 @@ const PlayerCard = ({
 
   const getRankBySkillNumber = (ranks, skillNumber) => {
     const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
-    return rankObj ? rankObj.rank : "-";
+    return rankObj ? rankObj.rank : rank;
   };
 
   return (
@@ -153,7 +154,7 @@ const PlayerCard = ({
           <div className="flex flex-col items-center justify-center gap-1 flex-shrink-0">
 
             <PlayerRankBadge
-              rank={(showAgeRank || showGenderRank || showCountryRank) ? rank : overallRank}
+              rank={selectedPositiveFilter > 0 ? getRankBySkillNumber(player.ranks, selectedPositiveFilter) : ((showAgeRank || showGenderRank || showCountryRank) ? rank : overallRank)}
               sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
               imgSize={56}
               textClass="text-[10px] sm:text-xs md:text-sm"
@@ -612,6 +613,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
                     onTargetAchieved={handleTargetAchieved} // No-op since celebration is handled inside PlayerCard
                     isEditable={isEditablePlayer}
                     loggedInUser={loggedInUser}
+                    selectedPositiveFilter={selectedPositiveFilter}
                   />
                 );
               })
