@@ -34,7 +34,7 @@ function UserPageRedirectRouter() {
   const ladderId = searchParams.get("ladder_id");
   const ladderType = searchParams.get("ladder_type") || searchParams.get("type")
 
-  const [isLadderView, setIsLadderView] = useState(true);
+  const [mobileSection, setMobileSection] = useState("players");
   const [isDesktop, setIsDesktop] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -224,9 +224,30 @@ function UserPageRedirectRouter() {
   return (
     <div className="ladder-shell flex flex-col min-h-screen">
       <main className="w-full px-1 pb-6 sm:px-6 lg:px-10 py-4">
+        {/* Mobile/Tablet tab switcher */}
+        <div className="mb-4 flex gap-2 lg:hidden mt-5">
+          {[
+            { id: "players", label: "Players" },
+            { id: "info", label: "Info" },
+          ].map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              onClick={() => setMobileSection(section.id)}
+              className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                mobileSection === section.id
+                  ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] text-white font-semibold"
+                  : "border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] hover:bg-[var(--best-board-surface-soft)]"
+              }`}
+            >
+              {section.label}
+            </button>
+          ))}
+        </div>
+
         <div className="grid items-start gap-6 grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_360px] xl:grid-cols-[minmax(0,0.86fr)_400px]">
           <AnimatePresence>
-            {isLadderView && (
+            {(mobileSection === "players" || isDesktop) && (
               <motion.div
                 key="ladder"
                 initial={{ opacity: 0, y: 20 }}
@@ -236,7 +257,7 @@ function UserPageRedirectRouter() {
                 className="min-w-0"
               >
                 <MobileQuickActionsAndInvite
-                  inviteUrl={inviteUrl}
+                  // inviteUrl={inviteUrl}
                   quickActions={mergedQuickActions}
                 />
                 {renderPlayers()}
@@ -245,7 +266,7 @@ function UserPageRedirectRouter() {
           </AnimatePresence>
 
           <AnimatePresence>
-            {(!isLadderView || isDesktop) && (
+            {(mobileSection === "info" || isDesktop) && (
               <motion.div
                 key="sidebar"
                 initial={{ opacity: 0, y: 20 }}
@@ -260,6 +281,7 @@ function UserPageRedirectRouter() {
                   user={user}
                   inviteUrl={inviteUrl}
                   quickActions={mergedQuickActions}
+                  mobileSection={mobileSection}
                 />
               </motion.div>
             )}

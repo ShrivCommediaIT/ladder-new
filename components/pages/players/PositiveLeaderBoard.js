@@ -45,6 +45,7 @@ const PlayerCard = ({
   onSkillClick,
   onTargetAchieved,
   currentUser,
+  selectedPositiveFilter,
 }) => {
   const playerImageUrl =
     player?.image && player.image !== "null" && player.image !== "undefined" && player.image !== ""
@@ -81,6 +82,11 @@ const PlayerCard = ({
   React.useEffect(() => {
     if (achievedTargets > 0) onTargetAchieved(player.name, achievedTargets);
   }, [player.scores, achievedTargets, player.name, onTargetAchieved]);
+
+  const getRankBySkillNumber = (ranks, skillNumber) => {
+    const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
+    return rankObj ? rankObj.rank : rank;
+  };
 
   return (
     <div
@@ -140,7 +146,7 @@ const PlayerCard = ({
           <div className="flex flex-col items-center justify-center gap-1 flex-shrink-0">
 
             <PlayerRankBadge
-              rank={(showAgeRank || showGenderRank || showCountryRank) ? rank : overallRank}
+              rank={selectedPositiveFilter > 0 ? getRankBySkillNumber(player.ranks, selectedPositiveFilter) : ((showAgeRank || showGenderRank || showCountryRank) ? rank : overallRank)}
               sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
               imgSize={56}
               textClass="text-[10px] sm:text-xs md:text-sm"
@@ -427,8 +433,14 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       ...data.filter((p) => clean(p.name).startsWith(q)).sort((a, b) => a.name.localeCompare(b.name)),
       ...data.filter((p) => !clean(p.name).startsWith(q) && clean(p.name).includes(q)).sort((a, b) => a.name.localeCompare(b.name)),
     ];
-    return [...baseList].sort((a, b) => sortMode === "name" ? (a?.name || "").localeCompare(b?.name || "") : Number(a?.rank || 0) - Number(b?.rank || 0));
-  }, [data, searchQuery, sortMode]);
+    if (sortMode === "name") {
+      return [...baseList].sort((a, b) => (a?.name || "").localeCompare(b?.name || ""));
+    }
+    if (isSorted || selectedPositiveFilter > 0) {
+      return baseList;
+    }
+    return [...baseList].sort((a, b) => Number(a?.rank || 0) - Number(b?.rank || 0));
+  }, [data, searchQuery, sortMode, isSorted, selectedPositiveFilter]);
 
   const handleDeleteActivity = useCallback(async (id) => {
     try { await getRequest(API_ENDPOINTS.ACTIVITY_DELETE, { id }); dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })); }
@@ -440,6 +452,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       await getRequest(API_ENDPOINTS.RESET_SKILLBOARD, { ladder_id: ladderId });
       setResetOpen(false);
       setOpenSkillSetupDialog(true);
+      setSelectedPositiveFilter(0);
       refreshLeaderboard();
     }
     catch (error) { console.error("Failed to reset skill leaderboard", error); }
@@ -471,6 +484,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       id: "clear", label: "Clear All", icon: XCircle, tone: "danger",
       onClick: () => {
         setIsSorted(false);
+        setSelectedPositiveFilter(0);
         setLocalWitnessBy(0);
         dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
         setAgeFilterResetSignal((p) => p + 1);
@@ -521,7 +535,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
               <div className="best-board-card rounded-xl px-6 py-10 text-center font-bold text-[var(--best-board-muted)]">No players found</div>
             ) : (
               filteredPlayers.map((player, index) => (
-                <PlayerCard key={player.id} player={player} overallRank={player.rank || index + 1} showAgeRank={showAgeRank} showGenderRank={showGenderRank} showCountryRank={showCountryRank} rank={index + 1} isInverted={isInverted} onSkillClick={handleSkillClick} onTargetAchieved={handleTargetAchieved} currentUser={currentUser} appliedWitnessBy={appliedWitnessBy} />
+                <PlayerCard key={player.id} player={player} overallRank={player.rank || index + 1} showAgeRank={showAgeRank} showGenderRank={showGenderRank} showCountryRank={showCountryRank} rank={index + 1} isInverted={isInverted} onSkillClick={handleSkillClick} onTargetAchieved={handleTargetAchieved} currentUser={currentUser} appliedWitnessBy={appliedWitnessBy} selectedPositiveFilter={selectedPositiveFilter} />
               ))
             )}
           </div>
@@ -545,6 +559,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
             onSkillsUpdated={(skillNo) => {
               dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
               setAgeFilterResetSignal((p) => p + 1); setLocalWitnessBy(0);
+              setSelectedPositiveFilter(skillNo);
               refreshLeaderboard(skillNo, 0, "", "", 0); setIsSorted(true); setOpenSkillSortDialog(false);
             }}
           />
