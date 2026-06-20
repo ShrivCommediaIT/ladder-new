@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -82,6 +82,20 @@ function IsoBadge({ className = "h-20 w-20" }) {
 }
 
 export default function Footer() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const loggedIn = !!(
+        sessionStorage.getItem("user") ||
+        sessionStorage.getItem("userData") ||
+        sessionStorage.getItem("subAdmin") ||
+        sessionStorage.getItem("adminDetails")
+      );
+      setIsLoggedIn(loggedIn);
+    }
+  }, []);
+
   return (
     <footer
       id="contact"
@@ -196,42 +210,72 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-gray-300">
               <li className="flex items-center gap-2">
                 <FaChevronRight className="h-3 w-3 text-sky-400" />
-                <Link href="/#features" className="hover:text-sky-400">
+                <Link
+                  href="/#features"
+                  className="hover:text-sky-400"
+                  target={isLoggedIn ? "_blank" : undefined}
+                  rel={isLoggedIn ? "noopener noreferrer" : undefined}
+                >
                   Features
                 </Link>
               </li>
 
               <li className="flex items-center gap-2">
                 <FaChevronRight className="h-3 w-3 text-sky-400" />
-                <Link href="/#pricing" className="hover:text-sky-400">
+                <Link
+                  href="/#pricing"
+                  className="hover:text-sky-400"
+                  target={isLoggedIn ? "_blank" : undefined}
+                  rel={isLoggedIn ? "noopener noreferrer" : undefined}
+                >
                   Pricing
                 </Link>
               </li>
 
               <li className="flex items-center gap-2">
                 <FaChevronRight className="h-3 w-3 text-sky-400" />
-                <Link href="/#competitions" className="hover:text-sky-400">
+                <Link
+                  href="/#competitions"
+                  className="hover:text-sky-400"
+                  target={isLoggedIn ? "_blank" : undefined}
+                  rel={isLoggedIn ? "noopener noreferrer" : undefined}
+                >
                   International Competitions
                 </Link>
               </li>
 
               <li className="flex items-center gap-2">
                 <FaChevronRight className="h-3 w-3 text-sky-400" />
-                <Link href="/#talent-board" className="hover:text-sky-400">
+                <Link
+                  href="/#talent-board"
+                  className="hover:text-sky-400"
+                  target={isLoggedIn ? "_blank" : undefined}
+                  rel={isLoggedIn ? "noopener noreferrer" : undefined}
+                >
                   SSP Talent Board
                 </Link>
               </li>
 
               <li className="flex items-center gap-2">
                 <FaChevronRight className="h-3 w-3 text-sky-400" />
-                <Link href="/#clubs" className="hover:text-sky-400">
+                <Link
+                  href="/#clubs"
+                  className="hover:text-sky-400"
+                  target={isLoggedIn ? "_blank" : undefined}
+                  rel={isLoggedIn ? "noopener noreferrer" : undefined}
+                >
                   Clubs & Coaches
                 </Link>
               </li>
 
               <li className="flex items-center gap-2">
                 <FaChevronRight className="h-3 w-3 text-sky-400" />
-                <Link href="/contact" className="hover:text-sky-400">
+                <Link
+                  href="/contact"
+                  className="hover:text-sky-400"
+                  target={isLoggedIn ? "_blank" : undefined}
+                  rel={isLoggedIn ? "noopener noreferrer" : undefined}
+                >
                   Contact Us
                 </Link>
               </li>
