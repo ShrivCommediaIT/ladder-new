@@ -125,33 +125,25 @@ const PlayerCard = ({
               {player?.phone || "N/A"}
             </div>
 
-            {/* GW RANK NUMBER ROW */}
-            <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
-              {currentSectionRanks.map((r) => (
-                <div
-                  key={r}
-                  className="w-6 h-5 sm:w-7 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]"
-                >
-                  {r}
-                </div>
-              ))}
-            </div>
-
-            {/* GW POINTS RESULT ROW */}
+            {/* GW RANKS & POINTS COLUMNS */}
             <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
               {currentSectionRanks.map((r) => {
                 const found = player.result_details?.find(
                   (i) => Number(i.rank) === Number(r)
                 );
                 return (
-                  <div
-                    key={r}
-                    className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-xs font-bold transition-all ${found
-                      ? "bg-[var(--best-board-surface-strong)] border border-[var(--best-board-border-strong)] text-[var(--best-board-text)] shadow-[0_1px_4px_rgba(0,0,0,0.18)]"
-                      : "bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] text-[var(--best-board-muted)]"
-                      }`}
-                  >
-                    {found?.point ?? ""}
+                  <div key={r} className="flex flex-col items-center gap-1 flex-shrink-0">
+                    <div className="w-6 h-5 sm:w-7 sm:h-6 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/25 text-zinc-700 dark:text-white/90">
+                      {r}
+                    </div>
+                    <div
+                      className={`w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-xs font-bold transition-all ${found
+                        ? "bg-blue-600 dark:bg-blue-500 border border-blue-500 dark:border-blue-400 text-white shadow-sm"
+                        : "bg-black/5 dark:bg-white/5 border border-dashed border-black/10 dark:border-white/15 text-zinc-400 dark:text-white/40"
+                        }`}
+                    >
+                      {found?.point ?? ""}
+                    </div>
                   </div>
                 );
               })}
