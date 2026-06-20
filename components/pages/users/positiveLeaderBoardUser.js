@@ -276,7 +276,7 @@ const PlayerCard = ({
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {scoreData.displayScore}
+                        {scoreData.displayScore.toFixed(2)}
                       </div>
                     );
                   })}
