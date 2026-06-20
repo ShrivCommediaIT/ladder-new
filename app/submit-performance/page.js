@@ -387,10 +387,11 @@ useEffect(() => {
       }, 100);
       return;
     }
-    if (dbData.length >= 50) {
+    // if (dbData.length >= 50) {
       setShowPaymentModal(true);
-    }
-    await submitFormData();
+    // } else {
+    //   await submitFormData();
+    // }
   };
 
 
@@ -970,23 +971,6 @@ useEffect(() => {
                   id={`paypal-container-${process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`}
                   className="min-h-[150px] w-full transition-all duration-300"
                 />
-
-                <div className="flex flex-col items-center space-y-2 pt-2 border-t border-dashed border-border">
-                  <p className="text-[10px] text-muted-foreground italic">
-                    If PayPal fails to load (due to invalid client-id or network), use this fallback to test form submission:
-                  </p>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      toast.success("Bypass payment successful! Submitting performance result...");
-                      setShowPaymentModal(false);
-                      await submitFormData("DUMMY_TRX_ID_" + Date.now());
-                    }}
-                    className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
-                  >
-                    Payment Success (Bypass)
-                  </button>
-                </div>
               </div>
 
               <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-muted-foreground/60 font-medium">
