@@ -55,8 +55,8 @@ const PlayerCard = ({
     const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
     const skillObj = skills?.find((s) => s.skill_number === skillNumber);
     const witnessBy = scoreObj?.witness_by || skillObj?.witness_by || "";
-    const score = scoreObj ? Number(scoreObj.best_score) : 0;
-    const bestScore = scoreObj ? Number(scoreObj.best_score) : 0;
+    const score = scoreObj ? Number(scoreObj.best_score) : 0.00;
+    const bestScore = scoreObj ? Number(scoreObj.best_score) : 0.00;
     const inputScore = scoreObj?.input_score !== null && scoreObj?.input_score !== undefined ? Number(scoreObj.input_score) : null;
     const displayScore = bestScore;
     const target = skillObj?.target !== null && skillObj?.target !== undefined ? Number(skillObj.target) : null;
@@ -251,7 +251,7 @@ const PlayerCard = ({
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
-                        {scoreData.displayScore}
+                        {scoreData.displayScore.toFixed(2)}
                       </div>
                     );
                   })}

@@ -48,7 +48,58 @@ import OnboardingFlow from "@/components/shared/OnboardingFlow";
 export default function PlanHeading() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-    const [isONboardingFlowVisible, setIsONboardingFlowVisible] = useState(false);
+  const [isONboardingFlowVisible, setIsONboardingFlowVisible] = useState(false);
+  const [views, setViews] = useState(20000);
+
+  useEffect(() => {
+    let active = true;
+
+    async function incrementCounter() {
+      try {
+        const response = await fetch("https://api.counterapi.dev/v1/ssp-leaderboard/visits/up");
+        if (!response.ok) throw new Error("API response error");
+        const data = await response.json();
+        if (data && typeof data.count === "number") {
+          const syncedCount = 20000 + data.count;
+          if (active) {
+            setViews(syncedCount);
+          }
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch synced views, falling back to local storage", err);
+      }
+
+      // Safe fallback using local storage if the API is down or blocked
+      try {
+        const storedViews = localStorage.getItem("ssp_page_views");
+        let currentViews = 20000;
+        if (storedViews) {
+          currentViews = parseInt(storedViews, 10);
+          if (currentViews < 20000) {
+            currentViews = 20000;
+          }
+        } else {
+          currentViews = 20000 + Math.floor(Math.random() * 500);
+        }
+        currentViews += 1;
+        localStorage.setItem("ssp_page_views", currentViews.toString());
+        if (active) {
+          setViews(currentViews);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    if (mounted) {
+      incrementCounter();
+    }
+
+    return () => {
+      active = false;
+    };
+  }, [mounted]);
   
   const { theme, setTheme } = useTheme();
 
@@ -296,6 +347,15 @@ export default function PlanHeading() {
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
+            {mounted && (
+              <div className="flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/20 px-3 py-1.5 text-xs font-bold text-cyan-400 shadow-sm backdrop-blur">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>{views.toLocaleString()} views</span>
+              </div>
+            )}
             <button
               type="button"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -310,6 +370,15 @@ export default function PlanHeading() {
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
+            {mounted && (
+              <div className="flex items-center gap-1 rounded-full border border-cyan-500/30 bg-cyan-950/20 px-2 py-1 text-[10px] font-bold text-cyan-400 shadow-sm shrink-0">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                </span>
+                <span>{views.toLocaleString()}</span>
+              </div>
+            )}
             <button
               type="button"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -362,20 +431,37 @@ export default function PlanHeading() {
         />
 
         <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45 }}
-              className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-semibold text-[var(--landing-primary)] shadow-sm"
-              style={{
-                borderColor: "var(--landing-badge-border)",
-                background: "var(--landing-badge-bg)",
-              }}
-            >
-              <span className="mr-2 flex h-2 w-2 rounded-full bg-[var(--landing-secondary)]" />
-              The #1 platform for sports clubs
-            </motion.div>
+          <div className="mx-auto max-w-4xl text-center flex flex-col items-center">
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45 }}
+                className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-semibold text-[var(--landing-primary)] shadow-sm"
+                style={{
+                  borderColor: "var(--landing-badge-border)",
+                  background: "var(--landing-badge-bg)",
+                }}
+              >
+                <span className="mr-2 flex h-2 w-2 rounded-full bg-[var(--landing-secondary)]" />
+                The #1 platform for sports clubs
+              </motion.div>
+
+              {mounted && (
+                <motion.div
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, delay: 0.05 }}
+                  className="inline-flex items-center gap-2 rounded-full border border-cyan-500/45 bg-cyan-950/30 px-4 py-1.5 text-sm font-black text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] backdrop-blur"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span>Live Page Views: <span className="text-yellow-300 font-mono tracking-wider">{views.toLocaleString()}</span></span>
+                </motion.div>
+              )}
+            </div>
 
             <motion.h1
               initial={{ opacity: 0, y: 24 }}

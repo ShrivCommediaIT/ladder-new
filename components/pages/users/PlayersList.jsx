@@ -377,7 +377,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                       </div>
 
                       {/* Challenge Button */}
-                      {loggedInUserId && !isCurrentUser && (
+                      {loggedInUserId && isCurrentUser && (
                         <div className="flex items-center shrink-0">
                           <button
                             type="button"
