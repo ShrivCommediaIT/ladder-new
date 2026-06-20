@@ -175,29 +175,23 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
           </div>
 
           <div className="mt-1">
-            <div className="flex gap-1 mb-1 overflow-x-auto">
-              {sectionRanks.map(r => (
-                <div
-                  key={r}
-                  className="w-6 h-5 sm:w-8 sm:h-6 flex items-center justify-center text-[10px] font-bold text-[var(--best-board-text)] rounded bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)]"
-                >
-                  {r}
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-1 overflow-x-auto">
+            <div className="flex gap-1 overflow-x-auto pb-1">
               {sectionRanks.map(r => {
                 const found = player.result_details?.find(i => Number(i.rank) === Number(r));
                 return (
-                  <div
-                    key={r}
-                    className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${
-                      found
-                        ? "bg-[var(--best-board-surface-strong)] text-[var(--best-board-text)] border-[var(--best-board-border-strong)]"
-                        : "bg-[var(--best-board-surface-soft)] opacity-60 border-[var(--best-board-border)] text-[10px] text-[var(--best-board-muted)]"
-                    }`}
-                  >
-                    {found ? found.point : ""}
+                  <div key={r} className="flex flex-col items-center gap-1 flex-shrink-0">
+                    <div className="w-6 h-5 sm:w-8 sm:h-6 flex items-center justify-center text-[10px] font-bold rounded bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/25 text-zinc-700 dark:text-white/90">
+                      {r}
+                    </div>
+                    <div
+                      className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${
+                        found
+                          ? "bg-blue-600 dark:bg-blue-500 border border-blue-500 dark:border-blue-400 text-white shadow-sm"
+                          : "bg-black/5 dark:bg-white/5 border border-dashed border-black/10 dark:border-white/15 text-zinc-400 dark:text-white/40"
+                      }`}
+                    >
+                      {found ? found.point : ""}
+                    </div>
                   </div>
                 );
               })}
