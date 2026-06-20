@@ -32,6 +32,7 @@ import {
   Volleyball,
   Waves,
   X,
+  Play,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,12 +46,37 @@ import {
 import PerformanceDatabase from "@/components/shared/PerformanceDatabase";
 import OnboardingFlow from "@/components/shared/OnboardingFlow";
 import Footer from "@/components/shared/Footer";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function PlanHeading() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isONboardingFlowVisible, setIsONboardingFlowVisible] = useState(false);
   const [views, setViews] = useState(20000);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+  const [activeVideoId, setActiveVideoId] = useState("NpUEYIXdaNI");
+
+  const demoVideos = [
+    {
+      id: "NpUEYIXdaNI",
+      title: "The Benefits of the SSP Participation Eco System",
+      description: "Learn how the SSP Participation Ecosystem rewards and engages players of all ages.",
+    },
+    {
+      id: "IdkhONLRAe8",
+      title: "Main Admin Dashboard Explained",
+      description: "A comprehensive guide to managing your sports organization from the main admin panel.",
+    },
+    {
+      id: "p2BPSnIN1uA",
+      title: "Section Admin Dashboard & Creating Solutions",
+      description: "How to set up mini-leagues, challenge boards, and custom leaderboards as a Section Admin.",
+    },
+  ];
 
   useEffect(() => {
     let active = true;
@@ -502,7 +528,7 @@ export default function PlanHeading() {
               </Button>
 
               <Button
-                asChild
+                onClick={() => setIsDemoModalOpen(true)}
                 variant="outline"
                 size="lg"
                 className="h-14 w-full rounded-full px-8 text-lg transition-all sm:w-auto"
@@ -512,7 +538,7 @@ export default function PlanHeading() {
                   background: "var(--landing-surface)",
                 }}
               >
-                <Link href="/demo-page">Watch Demo</Link>
+                Watch Demo
               </Button>
             </motion.div>
             {/* App Promotion & Info Card */}
@@ -783,6 +809,71 @@ export default function PlanHeading() {
 
       <Footer />
       {isONboardingFlowVisible && <OnboardingFlow setIsONboardingFlowVisible={setIsONboardingFlowVisible} />}
+
+      {isDemoModalOpen && (
+        <Dialog open={isDemoModalOpen} onOpenChange={setIsDemoModalOpen}>
+          <DialogContent className={`w-[95vw] sm:w-[90vw] md:max-w-4xl lg:max-w-5xl p-4 sm:p-6 rounded-2xl border shadow-2xl backdrop-blur-md max-h-[90vh] overflow-y-auto ${
+            mounted && theme !== "dark" ? "bg-white text-gray-900 border-gray-200" : "bg-zinc-950/95 text-white border-zinc-800"
+          }`}>
+            <DialogTitle className="text-xl sm:text-2xl font-bold mb-4 pr-6">SSP Demo & Explainer Videos</DialogTitle>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Main Video Player */}
+              <div className="md:col-span-2 flex flex-col gap-3">
+                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-white/10 shadow-lg">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${activeVideoId}?autoplay=1`}
+                    title="SSP Demo Video"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="absolute inset-0 w-full h-full"
+                  ></iframe>
+                </div>
+                <h3 className="text-lg font-bold mt-2">
+                  {demoVideos.find((v) => v.id === activeVideoId)?.title}
+                </h3>
+                <p className="text-sm opacity-70">
+                  {demoVideos.find((v) => v.id === activeVideoId)?.description}
+                </p>
+              </div>
+              
+              {/* Video List */}
+              <div className="flex flex-col gap-3 max-h-[350px] overflow-y-auto pr-1">
+                <span className="text-xs font-semibold uppercase tracking-wider text-primary mb-1">Select Video</span>
+                <div className="flex flex-col gap-2">
+                  {demoVideos.map((video) => {
+                    const isActive = video.id === activeVideoId;
+                    return (
+                      <button
+                        key={video.id}
+                        onClick={() => setActiveVideoId(video.id)}
+                        className={`w-full text-left p-3 rounded-xl border transition-all flex flex-col gap-1 ${
+                          isActive 
+                            ? "bg-blue-600/10 border-blue-500 text-blue-500 shadow-md"
+                            : mounted && theme !== "dark"
+                              ? "bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-800"
+                              : "bg-zinc-900/50 hover:bg-zinc-900 border-zinc-800 text-zinc-300"
+                        }`}
+                      >
+                        <div className="flex items-start gap-2 w-full">
+                          <div className={`mt-1 rounded-full p-1 shrink-0 ${isActive ? "bg-blue-500 text-white" : "bg-zinc-800 text-zinc-400"}`}>
+                            <Play className="w-3.5 h-3.5 fill-current" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-sm font-bold leading-tight">{video.title}</h4>
+                            <p className="text-[11px] opacity-70 mt-1 line-clamp-2">{video.description}</p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </main>
   );
 }
