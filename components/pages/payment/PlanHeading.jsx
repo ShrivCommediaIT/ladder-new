@@ -375,7 +375,7 @@ export default function PlanHeading() {
 
           <div className="hidden items-center gap-3 lg:flex">
             {mounted && (
-              <div className="flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/20 px-3 py-1.5 text-xs font-bold text-cyan-400 shadow-sm backdrop-blur">
+              <div className="views-badge flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold shadow-sm backdrop-blur">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -398,7 +398,7 @@ export default function PlanHeading() {
 
           <div className="flex items-center gap-2 lg:hidden">
             {mounted && (
-              <div className="flex items-center gap-1 rounded-full border border-cyan-500/30 bg-cyan-950/20 px-2 py-1 text-[10px] font-bold text-cyan-400 shadow-sm shrink-0">
+              <div className="views-badge flex items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-bold shadow-sm shrink-0">
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
@@ -479,13 +479,13 @@ export default function PlanHeading() {
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.45, delay: 0.05 }}
-                  className="inline-flex items-center gap-2 rounded-full border border-cyan-500/45 bg-cyan-950/30 px-4 py-1.5 text-sm font-black text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] backdrop-blur"
+                  className="views-badge inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-black backdrop-blur"
                 >
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  <span>Live Page Views: <span className="text-yellow-300 font-mono tracking-wider">{views.toLocaleString()}</span></span>
+                  <span>Live Page Views: <span className="views-badge-highlight font-mono tracking-wider">{views.toLocaleString()}</span></span>
                 </motion.div>
               )}
             </div>
