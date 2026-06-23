@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/shared/Navbar';
 import Footer from '@/components/shared/Footer';
+import Script from 'next/script';
 
 export default function RootLayout({ children }) {
   const [userType, setUserType] = useState("")
@@ -53,6 +54,16 @@ export default function RootLayout({ children }) {
                )}
              </PersistGate>
            </Provider>
+           <Script id="chatling-config" strategy="afterInteractive">
+             {`window.chtlConfig = { chatbotId: "7385437887" };`}
+           </Script>
+           <Script
+             async
+             data-id="7385437887"
+             id="chtl-script"
+             src="https://chatling.ai/js/embed.js"
+             strategy="afterInteractive"
+           />
            <ToastContainer position="top-right" autoClose={3000} hideProgressBar theme="colored" />
          </ThemeProvider>
        </body>
