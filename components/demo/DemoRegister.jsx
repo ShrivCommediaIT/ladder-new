@@ -53,51 +53,31 @@ export default function DemoRegister({ ladderId, ladderType }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   if (formSubmitted && successMessage) {
-  //     toast.success("Account created! Redirecting to login...");
-
-  //     setTimeout(() => {
-  //       const encodedId = formData.ladder_id ? btoa(formData.ladder_id) : null;
-  //       const loginRedirectUrl = encodedId
-  //         ? `/demo-login?id=${encodedId}&autoLogin=true`
-  //         : "/demo-login?autoLogin=true";
-
-  //       router.push(loginRedirectUrl);
-  //     }, 1500);
-  //   }
-
-  //   if (formSubmitted && error) {
-  //     toast.error(error);
-  //     dispatch(resetUserState());
-  //     setFormSubmitted(false);
-  //   }
-  // }, [successMessage, error, dispatch, router, formData, formSubmitted]);
 
 
 
-// ✅ Update this useEffect in DemoRegister.jsx
 useEffect(() => {
   if (formSubmitted && successMessage) {
     toast.success("Account created! Redirecting to login...");
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       const encodedId = formData.ladder_id ? btoa(formData.ladder_id) : null;
-      const encodedType = formData.type ? btoa(formData.type) : null; // ✅ Added
+      const encodedType = formData.type ? btoa(formData.type) : null;
       const loginRedirectUrl = encodedId && encodedType
         ? `/demo-login?id=${encodedId}&type=${encodedType}&autoLogin=true`
         : `/demo-login?autoLogin=true`;
 
       router.push(loginRedirectUrl);
     }, 1500);
+
+    return () => clearTimeout(timer);
   }
 
-      if (formSubmitted && error) {
-      toast.error(error);
-      dispatch(resetUserState());
-      setFormSubmitted(false);
-    }
-
+  if (formSubmitted && error) {
+    toast.error(error);
+    dispatch(resetUserState());
+    setFormSubmitted(false);
+  }
 }, [successMessage, error, dispatch, router, formData, formSubmitted]);
 
 

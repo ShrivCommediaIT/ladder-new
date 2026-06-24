@@ -68,11 +68,21 @@ function UserPageRedirectRouter() {
   // ---------------- USER ID (only localStorage) ----------------
   const loggedInUserId = user?.id || (!isNaN(Number(user?.user_id)) ? Number(user?.user_id) : null);
 
-  // Resolve current user rank from Redux
-  const players =
-    useSelector((state) => state.player?.players?.[Number(ladderId)]?.data) || [];
+  // Resolve current user rank from Redux based on active ladder type
+  const winlosePlayers = useSelector((state) => state.player?.players?.[Number(ladderId)]?.data) || [];
+  const positivePlayers = useSelector((state) => state.positiveLeaderBoard?.data) || [];
+  const negativePlayers = useSelector((state) => state.negativeLeaderBoard?.data) || [];
+  const skillPlayers = useSelector((state) => state.skillLeaderboard?.data) || [];
+  const rosterPlayers = useSelector((state) => state.rosterLeaderboard?.data) || [];
   const minileagueData = useSelector((state) => state.minileague?.data || []);
-  const rosterData = useSelector((state) => state.rosterLeaderboard?.data || []);
+
+  const players = (() => {
+    if (ladderType === "positive") return positivePlayers;
+    if (ladderType === "negative") return negativePlayers;
+    if (ladderType === "skill") return skillPlayers;
+    if (ladderType === "roster") return rosterPlayers;
+    return winlosePlayers;
+  })();
 
   const currentUser = (() => {
     if (!loggedInUserId) return null;
@@ -82,15 +92,36 @@ function UserPageRedirectRouter() {
         const found = users.find((p) => Number(p.id || p.user_id) === Number(loggedInUserId));
         if (found) return found;
       }
-    } else if (ladderType === "roster") {
-      return rosterData.find((p) => Number(p.id) === Number(loggedInUserId));
     } else {
-      return players.find((p) => Number(p.id) === Number(loggedInUserId));
+      return players.find(
+        (p) =>
+          Number(p.id) === Number(loggedInUserId) ||
+          (p.user_id && Number(p.user_id) === Number(loggedInUserId))
+      );
     }
     return null;
   })();
 
-  const myRank = currentUser?.rank || "-";
+  const myRank = (() => {
+    if (!currentUser) return "-";
+    if (currentUser.rank) return currentUser.rank;
+    
+    if (ladderType === "minileague") {
+      for (let i = 0; i < minileagueData.length; i++) {
+        const users = minileagueData[i]?.users_record || minileagueData[i]?.users || [];
+        const idx = users.findIndex((p) => Number(p.id || p.user_id) === Number(loggedInUserId));
+        if (idx !== -1) return idx + 1;
+      }
+    } else {
+      const idx = players.findIndex(
+        (p) =>
+          Number(p.id) === Number(loggedInUserId) ||
+          (p.user_id && Number(p.user_id) === Number(loggedInUserId))
+      );
+      if (idx !== -1) return idx + 1;
+    }
+    return "-";
+  })();
 
   // Invite URL and User Quick Actions
   const inviteUrl = typeof window !== "undefined"
@@ -234,11 +265,10 @@ function UserPageRedirectRouter() {
               key={section.id}
               type="button"
               onClick={() => setMobileSection(section.id)}
-              className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${
-                mobileSection === section.id
+              className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${mobileSection === section.id
                   ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] text-white font-semibold"
                   : "border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] hover:bg-[var(--best-board-surface-soft)]"
-              }`}
+                }`}
             >
               {section.label}
             </button>
@@ -312,6 +342,7 @@ function UserPageRedirectRouter() {
         <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
           <BasicLeaderboardUserRemove
             ladderId={ladderId}
+            ladderType={ladderType}
             myRank={myRank}
             onClose={() => setIsLeaveDialogOpen(false)}
             onSuccessRefresh={() => {

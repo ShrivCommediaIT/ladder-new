@@ -228,10 +228,10 @@ export default function AdminPage() {
       return;
     }
 
-  if (ladderExists(cleanName)) {
-    toast.error(`${cleanName} name already exists — choose another`);
-    return;
-  }
+    if (ladderExists(cleanName)) {
+      toast.error(`${cleanName} name already exists — choose another`);
+      return;
+    }
 
     try {
       const ladderResult = await dispatch(

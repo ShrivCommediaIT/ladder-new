@@ -25,7 +25,7 @@ export default function useAuthGuard(options = {}) {
     }
 
     if (!isAllowed) {
-      router.replace("/404");
+      router.replace("/login-page");
     } else {
       setAllowed(true);
     }

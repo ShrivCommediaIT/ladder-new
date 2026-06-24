@@ -176,28 +176,28 @@ const PlayerCard = ({
               textClass="text-[10px] sm:text-xs md:text-sm"
             />
             {(showAgeRank || showGenderRank || showCountryRank) && (() => {
-                const activeRankLabels = [
-                  showAgeRank && " Age ",
-                  showGenderRank && " Gender ",
-                  showCountryRank && " Country ",
-                ].filter(Boolean);
+              const activeRankLabels = [
+                showAgeRank && " Age ",
+                showGenderRank && " Gender ",
+                showCountryRank && " Country ",
+              ].filter(Boolean);
 
-                return (
-                  <div className="flex flex-col  mt-2">
-                    <p
-                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
-                      
-                    >
-                      Rank By:-
-                    </p>
-                    <p
-                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
-                    >
-                      {`(${activeRankLabels.join(",")})`}
-                    </p>
-                  </div>
-                );
-              })()}
+              return (
+                <div className="flex flex-col  mt-2">
+                  <p
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+
+                  >
+                    Rank By:-
+                  </p>
+                  <p
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+                  >
+                    {`(${activeRankLabels.join(",")})`}
+                  </p>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Info block */}
@@ -269,10 +269,10 @@ const PlayerCard = ({
                         key={i}
                         className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
                           ${scoreData.witnessBy
-                            && "underline decoration-dark decoration-[2px]"}
-                            ${ scoreData.isTargetAchieved
-                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
-                              : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
+                          && "underline decoration-dark decoration-[2px]"}
+                            ${scoreData.isTargetAchieved
+                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
+                            : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
@@ -353,7 +353,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
     (state) => state.positiveLeaderBoard || {},
   );
   const showAgeRank = Number(appliedAge) > 0;
-    const showGenderRank = appliedGender != ""; 
+  const showGenderRank = appliedGender != "";
   const showCountryRank = appliedCountry != "";
   const isInverted = ladderDetails?.inverted == 0;;
   const currentUser = useSelector((state) => state.user?.user);
@@ -542,11 +542,12 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
     }
   }, [onPlayerAdded, refreshLeaderboard]);
 
+  // FIXED: ONLY LOAD ONCE WHEN ladderId CHANGES (NO INFINITE LOOP)
   useEffect(() => {
     if (ladderId) {
       refreshLeaderboard();
     }
-  }, [ladderId, refreshLeaderboard]);
+  }, [ladderId]); // REMOVED refreshLeaderboard from deps
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -638,13 +639,13 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
             filteredPlayers.map((player, index) => {
               const isEditablePlayer = player.id === currentUserId;
               return (
-                 <PlayerCard
+                <PlayerCard
                   key={player.id}
                   player={player}
                   overallRank={player.rank || index + 1}
                   showAgeRank={showAgeRank}
-                  showGenderRank={showGenderRank} 
-                  showCountryRank={showCountryRank} 
+                  showGenderRank={showGenderRank}
+                  showCountryRank={showCountryRank}
                   rank={index + 1}
                   isInverted={isInverted}
                   onSkillClick={handleSkillClick}
@@ -663,7 +664,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
         dialogMessage={dialogMessage}
         setIsDialogOpen={setIsDialogOpen}
       />
-      
+
       {openEdit && selectedPlayerId && selectedSkillNumber && (
         <BasicLeaderboardUserEdit
           open={openEdit}

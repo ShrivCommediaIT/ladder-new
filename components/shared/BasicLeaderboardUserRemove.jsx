@@ -1,7 +1,7 @@
 
 "use client";
 import React, { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button"; // ✅ SHADCN BUTTON
@@ -27,11 +27,14 @@ const fadeIn = {
   visible: { opacity: 1, y: 0 },
 };
 
-const BasicLeaderboardUserRemove = ({ ladderId, myRank, onClose, onSuccessRefresh }) => {
+const BasicLeaderboardUserRemove = ({ ladderId, ladderType, myRank, onClose, onSuccessRefresh }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  console.log(myRank && myRank, 'parsedUser==>2')
 
   const [rankInput, setRankInput] = useState("");
-const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
 
 
@@ -52,6 +55,10 @@ const [showConfirm, setShowConfirm] = useState(false);
       });
 
       if (response?.status === 200) {
+        // Clear user session storage
+        sessionStorage.removeItem("user");
+        sessionStorage.removeItem("userData");
+
         onClose(); // Close dialog
         onSuccessRefresh(); // Refresh leaderboard
         
@@ -59,6 +66,9 @@ const [showConfirm, setShowConfirm] = useState(false);
           position: "top-right",
           autoClose: 3000,
         });
+
+        const activeLadderType = ladderType || searchParams.get("ladder_type") || searchParams.get("type") || "winlose";
+        router.push(`/login-user?ladder_id=${ladderId}&ladder_type=${activeLadderType}`);
       } else {
         throw new Error(response?.message || "Failed to remove");
       }
@@ -75,6 +85,7 @@ const [showConfirm, setShowConfirm] = useState(false);
     toast.warning("Please enter your rank");
     return;
   }
+  console.log(myRank, 'parsedUser==>1')
 
   if (Number(rankInput) !== Number(myRank)) {
     toast.error(" Rank does not match your current rank");

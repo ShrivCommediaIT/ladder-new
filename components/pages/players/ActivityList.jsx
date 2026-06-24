@@ -33,7 +33,11 @@ const ActivityLog = ({ ladderId: propLadderId, userLevel = false }) => {
     };
 
     fetchActivity(); // Initial fetch
-    const interval = setInterval(fetchActivity, 1000); // Hits the API every second
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchActivity();
+      }
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [ladderId, dispatch]);

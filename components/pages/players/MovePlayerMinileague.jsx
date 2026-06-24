@@ -567,28 +567,28 @@ const MoveNumberMinileague = ({
                 )}
                 Confirm {isWin ? 'WIN' : 'LOSS'}
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-200 mt-4 space-y-4 text-sm">
-                {/* Match Details Card */}
-                <div>
-
-                  <div className={`py-3 px-4 rounded text-md font-bold mx-auto w-fit ${isWin
-                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                    : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                    }`}>
-                    {isWin ? 'WIN' : ' LOSS'} ({score}) vs #{selectedNumber} ({challengedPlayer?.name})
+              <AlertDialogDescription asChild>
+                <div className="text-gray-200 mt-4 space-y-4 text-sm">
+                  {/* Match Details Card */}
+                  <div>
+                    <div className={`py-3 px-4 rounded text-md font-bold mx-auto w-fit ${isWin
+                      ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                      : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                      }`}>
+                      {isWin ? 'WIN' : ' LOSS'} ({score}) vs #{selectedNumber} ({challengedPlayer?.name})
+                    </div>
                   </div>
-                </div>
 
-                {/* Warning Banner */}
-                <div className="py-2 px-2 rounded-lg bg-gradient-to-r from-red-900/20 to-red-900/10 border border-red-500/30 backdrop-blur-sm">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-red-200 font-semibold text-sm">
-                        Please verify all details carefully.
-                        This action cannot be undone.
-                      </p>
-
+                  {/* Warning Banner */}
+                  <div className="py-2 px-2 rounded-lg bg-gradient-to-r from-red-900/20 to-red-900/10 border border-red-500/30 backdrop-blur-sm">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-red-200 font-semibold text-sm">
+                          Please verify all details carefully.
+                          This action cannot be undone.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -101,7 +101,7 @@ const PlayerCard = ({
 
   const getRankBySkillNumber = (ranks, skillNumber) => {
     const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
-    return rankObj ? rankObj.rank : ageRank;
+    return  rankObj?.rank || "-";
   };
 
   return (
@@ -253,9 +253,9 @@ const PlayerCard = ({
                         key={i}
                         className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
                           ${scoreData.witnessBy && "underline decoration-dark decoration-[2px]"}
-                            ${ scoreData.isTargetAchieved
-                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
-                              : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
+                            ${scoreData.isTargetAchieved
+                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
+                            : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
@@ -263,6 +263,23 @@ const PlayerCard = ({
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Ranks */}
+                <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-1 mt-1 scrollbar-none">
+                  {player.skills.map((skill, i) => (
+                    <div
+                      key={i}
+                      className="w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded font-bold text-[9px] sm:text-[10px] border shadow-sm"
+                      style={{
+                        background: "var(--best-board-accent-soft)",
+                        borderColor: "var(--best-board-border-strong)",
+                        color: "var(--best-board-highlight)",
+                      }}
+                    >
+                      {getRankBySkillNumber(player.ranks || [], skill.skill_number)}
+                    </div>
+                  ))}
                 </div>
               </>
             ) : (
@@ -445,7 +462,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
         ladder_id: ladderId,
         type: "skill",
         sortbyskillnumber: skillNo,
-        age: age,
+        dob: age,
         age_type: ageType,
         gender: gender,
         country: country,
@@ -721,12 +738,12 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
 
       <Dialog open={showRemove} onOpenChange={setShowRemove}>
         <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
-          <BasicLeaderboardUserRemove
+          {/* <BasicLeaderboardUserRemove
             ladderId={ladderId}
             myRank={myRank}
             onClose={handleRemoveClose}
             onSuccessRefresh={handleRemoveSuccess}
-          />
+          /> */}
         </DialogContent>
       </Dialog>
 

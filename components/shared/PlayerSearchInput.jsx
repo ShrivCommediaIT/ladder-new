@@ -195,6 +195,7 @@ const PlayerInfo = () => {
                               width={48}
                               height={48}
                               alt={`Player ${player.name}`}
+                              unoptimized
                             />
                             <div className="flex flex-col flex-1 min-w-0">
                               <p

@@ -22,6 +22,7 @@ export default function PlayerCard({ name, phone, rank, image }) {
           width={100}
           height={100}
           className="rounded-full object-cover w-12 h-12 "
+          unoptimized
         />
         <div
           style={{

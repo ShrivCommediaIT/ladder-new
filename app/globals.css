@@ -124,34 +124,24 @@ body {
   --input-bg: #f8fcff;
   --input-border: #c9dfef;
 
-  --page-glow-top-left: radial-gradient(
-    circle at top left,
-    rgb(var(--brand-primary-rgb) / 0.16),
-    transparent 34%
-  );
-  --page-glow-corners: radial-gradient(
-      circle at top left,
+  --page-glow-top-left: radial-gradient(circle at top left,
+      rgb(var(--brand-primary-rgb) / 0.16),
+      transparent 34%);
+  --page-glow-corners: radial-gradient(circle at top left,
       rgb(var(--brand-primary-rgb) / 0.12),
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at bottom right,
+      transparent 40%),
+    radial-gradient(circle at bottom right,
       rgb(var(--brand-deep-rgb) / 0.14),
-      transparent 45%
-    );
+      transparent 45%);
   --page-grid-overlay: linear-gradient(rgb(var(--brand-navy-rgb) / 0.06) 1px, transparent 1px),
     linear-gradient(90deg, rgb(var(--brand-navy-rgb) / 0.06) 1px, transparent 1px);
-  --hero-image-overlay: linear-gradient(
-    90deg,
-    rgb(var(--brand-navy-rgb) / 0.92) 0%,
-    rgb(var(--brand-navy-2-rgb) / 0.76) 42%,
-    rgb(var(--brand-navy-rgb) / 0.4) 100%
-  );
-  --hero-image-glow: radial-gradient(
-    circle at bottom,
-    rgb(var(--brand-primary-rgb) / 0.16),
-    transparent 36%
-  );
+  --hero-image-overlay: linear-gradient(90deg,
+      rgb(var(--brand-navy-rgb) / 0.92) 0%,
+      rgb(var(--brand-navy-2-rgb) / 0.76) 42%,
+      rgb(var(--brand-navy-rgb) / 0.4) 100%);
+  --hero-image-glow: radial-gradient(circle at bottom,
+      rgb(var(--brand-primary-rgb) / 0.16),
+      transparent 36%);
   --brand-badge-bg: rgb(var(--brand-navy-2-rgb) / 0.78);
   --brand-badge-border: rgb(var(--brand-primary-rgb) / 0.28);
   --brand-badge-shadow: 0 0 24px rgb(var(--brand-primary-rgb) / 0.12);
@@ -161,11 +151,9 @@ body {
   --brand-button-shadow: 0 16px 34px rgb(var(--brand-primary-rgb) / 0.26);
   --brand-tab-shadow: 0 10px 30px rgb(var(--brand-primary-rgb) / 0.24);
 
-  --ladder-shell-bg: linear-gradient(
-      180deg,
+  --ladder-shell-bg: linear-gradient(180deg,
       rgb(var(--brand-white-rgb) / 0.96) 0%,
-      rgb(233 245 255 / 0.94) 100%
-    );
+      rgb(233 245 255 / 0.94) 100%);
   --ladder-surface: rgb(255 255 255 / 0.82);
   --ladder-surface-strong: rgb(255 255 255 / 0.92);
   --ladder-surface-muted: rgb(var(--brand-primary-rgb) / 0.06);
@@ -174,11 +162,9 @@ body {
   --ladder-shadow: 0 24px 44px rgb(var(--brand-navy-rgb) / 0.1);
   --ladder-card-shadow: 0 18px 32px rgb(var(--brand-primary-rgb) / 0.12);
   --ladder-text-muted: #52708a;
-  --ladder-rank-bg: linear-gradient(
-    135deg,
-    rgb(var(--brand-primary-rgb)) 0%,
-    rgb(var(--brand-deep-rgb)) 100%
-  );
+  --ladder-rank-bg: linear-gradient(135deg,
+      rgb(var(--brand-primary-rgb)) 0%,
+      rgb(var(--brand-deep-rgb)) 100%);
   --ladder-chip-bg: rgb(var(--brand-primary-rgb) / 0.08);
   --ladder-chip-text: #0f3e63;
   --ladder-chip-border: rgb(var(--brand-primary-rgb) / 0.18);
@@ -266,17 +252,13 @@ body {
 
   --page-grid-overlay: linear-gradient(rgb(var(--brand-white-rgb) / 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgb(var(--brand-white-rgb) / 0.04) 1px, transparent 1px);
-  --hero-image-overlay: linear-gradient(
-    90deg,
-    rgb(var(--brand-navy-rgb) / 0.92) 0%,
-    rgb(var(--brand-navy-2-rgb) / 0.78) 42%,
-    rgb(var(--brand-navy-rgb) / 0.38) 100%
-  );
-  --hero-image-glow: radial-gradient(
-    circle at bottom,
-    rgb(var(--brand-primary-rgb) / 0.2),
-    transparent 36%
-  );
+  --hero-image-overlay: linear-gradient(90deg,
+      rgb(var(--brand-navy-rgb) / 0.92) 0%,
+      rgb(var(--brand-navy-2-rgb) / 0.78) 42%,
+      rgb(var(--brand-navy-rgb) / 0.38) 100%);
+  --hero-image-glow: radial-gradient(circle at bottom,
+      rgb(var(--brand-primary-rgb) / 0.2),
+      transparent 36%);
   --brand-badge-bg: rgb(var(--brand-navy-2-rgb) / 0.82);
   --brand-badge-border: rgb(var(--brand-primary-rgb) / 0.34);
   --brand-badge-shadow: 0 0 24px rgb(var(--brand-primary-rgb) / 0.14);
@@ -286,11 +268,9 @@ body {
   --brand-button-shadow: 0 16px 34px rgb(var(--brand-primary-rgb) / 0.3);
   --brand-tab-shadow: 0 10px 30px rgb(var(--brand-primary-rgb) / 0.26);
 
-  --ladder-shell-bg: linear-gradient(
-      180deg,
+  --ladder-shell-bg: linear-gradient(180deg,
       rgb(var(--brand-navy-rgb) / 0.98) 0%,
-      rgb(var(--brand-navy-2-rgb) / 0.98) 100%
-    );
+      rgb(var(--brand-navy-2-rgb) / 0.98) 100%);
   --ladder-surface: rgb(var(--brand-card-rgb) / 0.78);
   --ladder-surface-strong: rgb(var(--brand-card-rgb) / 0.94);
   --ladder-surface-muted: rgb(var(--brand-primary-rgb) / 0.12);
@@ -299,11 +279,9 @@ body {
   --ladder-shadow: 0 28px 54px rgb(0 0 0 / 0.24);
   --ladder-card-shadow: 0 18px 34px rgb(0 0 0 / 0.28);
   --ladder-text-muted: rgb(var(--brand-white-rgb) / 0.62);
-  --ladder-rank-bg: linear-gradient(
-    135deg,
-    rgb(var(--brand-primary-rgb)) 0%,
-    rgb(var(--brand-deep-rgb)) 100%
-  );
+  --ladder-rank-bg: linear-gradient(135deg,
+      rgb(var(--brand-primary-rgb)) 0%,
+      rgb(var(--brand-deep-rgb)) 100%);
   --ladder-chip-bg: rgb(var(--brand-primary-rgb) / 0.14);
   --ladder-chip-text: rgb(var(--brand-white-rgb) / 0.9);
   --ladder-chip-border: rgb(var(--brand-primary-rgb) / 0.28);
@@ -344,11 +322,9 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    to bottom,
-    rgb(var(--brand-primary-rgb)),
-    rgb(var(--brand-deep-rgb))
-  );
+  background: linear-gradient(to bottom,
+      rgb(var(--brand-primary-rgb)),
+      rgb(var(--brand-deep-rgb)));
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -388,11 +364,9 @@ body {
   --color-light: var(--light-theme);
   --color-white: #FFFFFF;
 
-  --background-image-gradient-brand: linear-gradient(
-    135deg,
-    var(--primary),
-    var(--secondary)
-  );
+  --background-image-gradient-brand: linear-gradient(135deg,
+      var(--primary),
+      var(--secondary));
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -471,6 +445,7 @@ body {
 }
 
 @keyframes flash {
+
   0%,
   100% {
     opacity: 1;
@@ -716,6 +691,7 @@ body {
 }
 
 @keyframes pulse-slow {
+
   0%,
   100% {
     opacity: 0.3;
@@ -727,6 +703,7 @@ body {
 }
 
 @keyframes bounce-subtle {
+
   0%,
   100% {
     transform: scale(1.15);
@@ -783,7 +760,7 @@ body {
    GLOBAL DIALOG / MODAL THEME OVERRIDES
    - Dynamically styles modals based on active theme
    ───────────────────────────────────────────── */
-[role="dialog"], 
+[role="dialog"],
 .DialogContent,
 div[class*="DialogContent"] {
   background-color: var(--background) !important;

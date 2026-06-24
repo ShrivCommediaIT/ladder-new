@@ -38,20 +38,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const getUserImage = (user) => {
-  if (!user || !user.image) return null;
-  if (user.image.startsWith("http") || user.image.startsWith("blob:")) {
-    return user.image;
-  }
-  let img = user.image;
-  if (img.includes("/")) {
-    img = img.substring(img.lastIndexOf("/") + 1);
-  }
-  if (user.image_path) {
-    return `${user.image_path}/${img}`;
-  }
-  return `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${img}`;
-};
+import { getUserImage } from "@/lib/utils";
 
 export default function ProfilePage() {
   const allowed = useAuthGuard();
@@ -405,7 +392,7 @@ export default function ProfilePage() {
             onClick={handleBackToDashboard}
             className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-400 hover:text-zinc-100 transition-colors"
           >
-            <ArrowLeft className="h-4.5 w-4.5" />
+            <ArrowLeft className="h-[1.125rem] w-[1.125rem]" />
             Back to {user?.user_type === "sub_admin" ? "Sub-Admin Dashboard" : "Admin Dashboard"}
           </button>
         </div>
@@ -463,7 +450,7 @@ export default function ProfilePage() {
                     className="absolute bottom-1 right-1 bg-blue-600 hover:bg-blue-500 text-white p-2 rounded-full shadow-lg border border-white dark:border-zinc-900 transition-all hover:scale-110 duration-200 cursor-pointer"
                     aria-label="Change profile image"
                   >
-                    <Camera className="h-4.5 w-4.5" />
+                    <Camera className="h-[1.125rem] w-[1.125rem]" />
                   </button>
                 </div>
 
@@ -491,7 +478,7 @@ export default function ProfilePage() {
                     Email / ID
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-[1.125rem] w-[1.125rem] text-muted-foreground" />
                     <Input
                       value={user?.user_id || ""}
                       disabled
@@ -506,7 +493,7 @@ export default function ProfilePage() {
                     Full Name
                   </Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-[1.125rem] w-[1.125rem] text-muted-foreground" />
                     <Input
                       id="profile-name"
                       value={name}
@@ -523,7 +510,7 @@ export default function ProfilePage() {
                     Phone Number (Optional)
                   </Label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-[1.125rem] w-[1.125rem] text-muted-foreground" />
                     <Input
                       id="profile-phone"
                       value={phone}
@@ -576,7 +563,7 @@ export default function ProfilePage() {
                       Current Password
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-[1.125rem] w-[1.125rem] text-muted-foreground" />
                       <Input
                         id="old-password"
                         type={showOldPassword ? "text" : "password"}
@@ -590,7 +577,7 @@ export default function ProfilePage() {
                         onClick={() => setShowOldPassword((prev) => !prev)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        {showOldPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+                        {showOldPassword ? <EyeOff className="h-[1.125rem] w-[1.125rem]" /> : <Eye className="h-[1.125rem] w-[1.125rem]" />}
                       </button>
                     </div>
                   </div>
@@ -601,7 +588,7 @@ export default function ProfilePage() {
                       New Password
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-[1.125rem] w-[1.125rem] text-muted-foreground" />
                       <Input
                         id="new-password"
                         type={showNewPassword ? "text" : "password"}
@@ -616,7 +603,7 @@ export default function ProfilePage() {
                         onClick={() => setShowNewPassword((prev) => !prev)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        {showNewPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+                        {showNewPassword ? <EyeOff className="h-[1.125rem] w-[1.125rem]" /> : <Eye className="h-[1.125rem] w-[1.125rem]" />}
                       </button>
                     </div>
                     
@@ -648,7 +635,7 @@ export default function ProfilePage() {
                       Confirm New Password
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-[1.125rem] w-[1.125rem] text-muted-foreground" />
                       <Input
                         id="confirm-password"
                         type={showConfirmPassword ? "text" : "password"}
@@ -662,7 +649,7 @@ export default function ProfilePage() {
                         onClick={() => setShowConfirmPassword((prev) => !prev)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        {showConfirmPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+                        {showConfirmPassword ? <EyeOff className="h-[1.125rem] w-[1.125rem]" /> : <Eye className="h-[1.125rem] w-[1.125rem]" />}
                       </button>
                     </div>
                   </div>

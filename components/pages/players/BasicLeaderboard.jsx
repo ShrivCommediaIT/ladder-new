@@ -108,7 +108,7 @@ const PlayerCard = ({
 
   const getRankBySkillNumber = (ranks, skillNumber) => {
     const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
-    return rankObj ? rankObj.rank : ageRank;
+    return  rankObj?.rank || "-";
   };
 
   const skillsToRender = appliedWitnessBy === 1
@@ -274,6 +274,23 @@ const PlayerCard = ({
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Ranks */}
+                <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-1 mt-1 scrollbar-none">
+                  {player.skills.map((skill, i) => (
+                    <div
+                      key={i}
+                      className="w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded font-bold text-[9px] sm:text-[10px] border shadow-sm"
+                      style={{
+                        background: "var(--best-board-accent-soft)",
+                        borderColor: "var(--best-board-border-strong)",
+                        color: "var(--best-board-highlight)",
+                      }}
+                    >
+                      {getRankBySkillNumber(player.ranks || [], skill.skill_number)}
+                    </div>
+                  ))}
                 </div>
               </>
             ) : (

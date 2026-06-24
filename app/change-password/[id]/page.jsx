@@ -1,23 +1,3 @@
-// import ChangePassword from "@/components/pages/admin/ChangePassword";
-
-// const changePasswordPage = ()=>{
-
-//     return (
-//         <div>
-//             <ChangePassword/>
-//         </div>
-//     )
-// }
-
-
-// export default changePasswordPage;
-
-
-
-
-
-// ======================
-
 "use client";
 
 import ChangePassword from "@/components/pages/admin/ChangePassword";
@@ -29,7 +9,7 @@ const ChangePasswordForm = () => {
 
   // Redirect if id is missing
   if (!id) {
-    router.push("/login-page"); // or any fallback page
+    router.push("/login-page");
     return null;
   }
 
