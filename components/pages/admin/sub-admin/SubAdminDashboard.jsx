@@ -105,7 +105,7 @@ export default function SubAdminDashboard() {
   const router = useRouter();
 
   const activeLadders = useMemo(
-    () => allLadders.filter((ladder) => ladder.created_by !== "demo" && ladder.type !== "roster" ),
+    () => allLadders.filter((ladder) => ladder.created_by !== "demo" && ladder.type !== "roster"),
     [allLadders],
   );
 
@@ -374,7 +374,7 @@ export default function SubAdminDashboard() {
     }
   };
 
-    const ladderExists = (name) => {
+  const ladderExists = (name) => {
     if (!allLadders || !Array.isArray(allLadders)) return false;
     const laddarNames = allLadders.map((l) => l.name?.trim().toLowerCase());
     const cleanName = name.trim().toLowerCase();
@@ -423,8 +423,8 @@ export default function SubAdminDashboard() {
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                  <span className="font-medium text-muted-foreground">Section:</span>
-                  <span className="font-bold capitalize text-primary">{subAdmin?.sport_name || "N/A"}</span>
+                <span className="font-medium text-muted-foreground">Section:</span>
+                <span className="font-bold capitalize text-primary">{subAdmin?.sport_name || "N/A"}</span>
               </div>
             </div>
           </div>
@@ -508,7 +508,7 @@ export default function SubAdminDashboard() {
                 <div className="mb-5 flex items-start justify-between gap-4">
                   <div>
                     <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary">
-                      Create Solution  
+                      Create Solution
                     </p>
                   </div>
                 </div>

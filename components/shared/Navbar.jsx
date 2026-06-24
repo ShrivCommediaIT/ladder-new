@@ -1,5 +1,6 @@
 "use client";
 
+import { getUserImage } from "@/lib/utils";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import topLogo from "@/public/topLogo.png";
@@ -50,20 +51,8 @@ const formatLadderType = (type) => {
   return map[type] || "";
 };
 
-const getUserImage = (user) => {
-  if (!user || !user.image) return null;
-  if (user.image.startsWith("http") || user.image.startsWith("blob:")) {
-    return user.image;
-  }
-  let img = user.image;
-  if (img.includes("/")) {
-    img = img.substring(img.lastIndexOf("/") + 1);
-  }
-  if (user.image_path) {
-    return `${user.image_path}/${img}`;
-  }
-  return `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${img}`;
-};
+const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
 
 const Navbar = ({
   activeTab = "players",
@@ -93,6 +82,12 @@ const Navbar = ({
   const [selectedLogoPreview, setSelectedLogoPreview] = useState(null);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
+  useEffect(() => {
+    return () => {
+      if (selectedLogoPreview) URL.revokeObjectURL(selectedLogoPreview);
+    };
+  }, [selectedLogoPreview]);
+
   const profileRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
@@ -102,19 +97,19 @@ const Navbar = ({
   const isClubIdPage = pathname === "/clubid-page" || pathname?.includes("/clubid-page");
   const ladderId = searchParams.get("ladder_id");
 
-  const playerEntries = useSelector((state) => state.player?.players || {});
+  const playerEntries = useSelector((state) => state.player?.players || EMPTY_OBJECT);
   const playerEntry = ladderId 
     ? (playerEntries[Number(ladderId)] || playerEntries[ladderId] || null) 
     : (Object.values(playerEntries)?.[0] || null);
   const fileInputRef = useRef(null);
 
   // Players selectors for all board types
-  const skillPlayers = useSelector((state) => state.skillLeaderboard?.data || []);
-  const positivePlayers = useSelector((state) => state.positiveLeaderBoard?.data || []);
-  const negativePlayers = useSelector((state) => state.negativeLeaderBoard?.data || []);
-  const rosterPlayers = useSelector((state) => state.rosterLeaderboard?.data || []);
-  const minileagueDataSelector = useSelector((state) => state.minileague?.data || []);
-  const standardPlayers = useSelector((state) => ladderId ? state.player?.players?.[Number(ladderId)]?.data || [] : []);
+  const skillPlayers = useSelector((state) => state.skillLeaderboard?.data || EMPTY_ARRAY);
+  const positivePlayers = useSelector((state) => state.positiveLeaderBoard?.data || EMPTY_ARRAY);
+  const negativePlayers = useSelector((state) => state.negativeLeaderBoard?.data || EMPTY_ARRAY);
+  const rosterPlayers = useSelector((state) => state.rosterLeaderboard?.data || EMPTY_ARRAY);
+  const minileagueDataSelector = useSelector((state) => state.minileague?.data || EMPTY_ARRAY);
+  const standardPlayers = useSelector((state) => ladderId ? state.player?.players?.[Number(ladderId)]?.data || EMPTY_ARRAY : EMPTY_ARRAY);
 
   // Ladder details selectors for all board types
   const skillLadderDetails = useSelector((state) => state.skillLeaderboard?.ladderDetails);

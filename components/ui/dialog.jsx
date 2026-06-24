@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
 import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -45,12 +46,40 @@ function DialogOverlay({
   );
 }
 
+function hasDialogTitle(children) {
+  let found = false;
+  React.Children.forEach(children, (child) => {
+    if (found || !child || typeof child !== "object") return;
+    if (
+      child.type === DialogTitle ||
+      child.type === DialogPrimitive.Title ||
+      child.props?.["data-slot"] === "dialog-title" ||
+      child.type?.name === "DialogTitle" ||
+      child.type?.displayName === "DialogTitle" ||
+      child.props?.["data-slot"] === "alert-dialog-title" ||
+      child.type?.name === "AlertDialogTitle" ||
+      child.type?.displayName === "AlertDialogTitle"
+    ) {
+      found = true;
+      return;
+    }
+    if (child.props?.children) {
+      if (hasDialogTitle(child.props.children)) {
+        found = true;
+      }
+    }
+  });
+  return found;
+}
+
 function DialogContent({
   className,
   children,
   showCloseButton = true,
   ...props
 }) {
+  const hasTitle = hasDialogTitle(children);
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
@@ -61,6 +90,11 @@ function DialogContent({
           className
         )}
         {...props}>
+        {!hasTitle && (
+          <VisuallyHidden.Root asChild>
+            <DialogPrimitive.Title>Dialog</DialogPrimitive.Title>
+          </VisuallyHidden.Root>
+        )}
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close

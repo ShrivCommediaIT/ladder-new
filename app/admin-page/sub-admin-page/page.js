@@ -6,9 +6,8 @@ import React from 'react'
 
 const SubAdminDashboardRouter = () => {
 
-      // ... Protected Route ...
-      const allowed = useAuthGuard();
-      if (!allowed) return null;
+  const allowed = useAuthGuard();
+  if (!allowed) return null;
 
   return (
     <div>

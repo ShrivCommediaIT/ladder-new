@@ -343,6 +343,7 @@ const AddPlayer = ({ ladderId, onClose, onSuccessRefresh }) => {
               alt="Profile"
               fill
               className="object-cover group-hover:scale-105 transition-transform"
+              unoptimized
             />
             <input
               type="file"

@@ -26,7 +26,7 @@ export default function DynamicPage() {
       (subAdmin && subAdmin.isLoggedIn === true);
 
     if (!isLoggedIn) {
-      router.replace("/404");
+      router.replace("/login-page");
       return;
     }
 

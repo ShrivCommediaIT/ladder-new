@@ -101,6 +101,7 @@ const UserHeading = () => {
             width={100}
             height={100}
             className="rounded-full border shadow-md object-cover w-20 h-16"
+            unoptimized
           />
         </div>
 

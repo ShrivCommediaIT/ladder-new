@@ -101,6 +101,35 @@ export default function SubmitPerformancePage() {
   const [subAdmin, setSubAdmin] = useState(null);
   const [dbData, setDbData] = useState([]);
   
+  // States for Manual Transaction ID Entry
+  const [manualTxId, setManualTxId] = useState("");
+  const [showManualTx, setShowManualTx] = useState(false);
+
+  // Load saved performance data from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedData = localStorage.getItem("pending_performance_data");
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          setFormData(prev => ({
+            ...prev,
+            ...parsed
+          }));
+        } catch (e) {
+          console.error("Error parsing saved performance data:", e);
+        }
+      }
+    }
+  }, []);
+
+  // Save performance data to localStorage on changes
+  useEffect(() => {
+    if (typeof window !== "undefined" && (formData.full_name || formData.sport || formData.activity)) {
+      localStorage.setItem("pending_performance_data", JSON.stringify(formData));
+    }
+  }, [formData]);
+  
 
 
 useEffect(() => {
@@ -150,8 +179,8 @@ useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
     const hostedButtonId = process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID;
 
-    const scriptId = "paypal-subscription-sdk";
-    const scriptSrc = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=GBP`;
+    const scriptId = "paypal-hosted-buttons-sdk";
+    const scriptSrc = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo,paylater&currency=GBP`;
 
     let retries = 0;
     const initializeButtons = () => {
@@ -201,41 +230,37 @@ useEffect(() => {
       }
     };
 
-    // Clean up any existing PayPal scripts and globals to avoid conflicts (e.g. from footer)
-    const existingScripts = document.querySelectorAll("script[src*='paypal.com/sdk/js']");
-    let scriptLoaded = false;
+    if (window.paypal && window.paypal.HostedButtons) {
+      setTimeout(initializeButtons, 100);
+      return;
+    }
 
-    existingScripts.forEach((s) => {
-      if (s.getAttribute("src") === scriptSrc && window.paypal && window.paypal.HostedButtons) {
-        scriptLoaded = true;
-      } else {
-        s.parentNode.removeChild(s);
-      }
-    });
-
-    if (!scriptLoaded) {
-      if (window.paypal) {
-        try {
-          delete window.paypal;
-        } catch (_) {
-          window.paypal = undefined;
-        }
-      }
-      const script = document.createElement("script");
+    let script = document.getElementById(scriptId);
+    if (!script) {
+      script = document.createElement("script");
       script.id = scriptId;
       script.src = scriptSrc;
       script.async = true;
-      script.onload = () => {
-        setTimeout(initializeButtons, 200);
-      };
-      script.onerror = () => {
-        toast.error("Failed to load PayPal SDK");
-        setPaypalLoading(false);
-      };
       document.body.appendChild(script);
-    } else {
-      setTimeout(initializeButtons, 200);
     }
+
+    const handleLoad = () => {
+      setTimeout(initializeButtons, 200);
+    };
+    const handleError = () => {
+      toast.error("Failed to load PayPal SDK");
+      setPaypalLoading(false);
+    };
+
+    script.addEventListener("load", handleLoad);
+    script.addEventListener("error", handleError);
+
+    return () => {
+      if (script) {
+        script.removeEventListener("load", handleLoad);
+        script.removeEventListener("error", handleError);
+      }
+    };
   }, [showPaymentModal]);
 
   // Pre-fill coach/submitter details from logged-in admin if available
@@ -254,6 +279,28 @@ useEffect(() => {
       }
     }
   }, [allowed]);
+
+  // Detect return from PayPal redirect with success query parameters
+  useEffect(() => {
+    if (typeof window !== "undefined" && admin) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isSuccess = urlParams.get("payment") === "success" || urlParams.get("status") === "success";
+      const txId = urlParams.get("tx") || urlParams.get("paymentId") || "PAYPAL_REDIRECT_" + Date.now();
+
+      if (isSuccess) {
+        const savedDataStr = localStorage.getItem("pending_performance_data");
+        if (savedDataStr) {
+          try {
+            const savedData = JSON.parse(savedDataStr);
+            toast.info("Payment confirmed! Completing your performance submission...");
+            submitFormData(txId, savedData);
+          } catch (e) {
+            console.error("Error parsing saved performance data for auto-submit:", e);
+          }
+        }
+      }
+    }
+  }, [admin]);
 
   if (!allowed) return null;
 
@@ -395,36 +442,36 @@ useEffect(() => {
   };
 
 
-  const submitFormData = async (transactionId) => {
-
+  async function submitFormData(transactionId, customFormData = null) {
+    const dataToSubmit = customFormData || formData;
     setLoading(true);
     try {
       const payload = new FormData();
       if (subAdmin == null) {
-        payload.append("admin_id", admin.id);
-        payload.append("user_id", admin.id);
-        payload.append("user_type", admin.user_type);
+        payload.append("admin_id", admin?.id || "");
+        payload.append("user_id", admin?.id || "");
+        payload.append("user_type", admin?.user_type || "");
       } else {
-        payload.append("admin_id", admin.id);
-        payload.append("user_id", subAdmin.id);
-        payload.append("user_type", subAdmin.user_type);
+        payload.append("admin_id", admin?.id || "");
+        payload.append("user_id", subAdmin?.id || "");
+        payload.append("user_type", subAdmin?.user_type || "");
       }
-      payload.append("sport", formData.sport === "Other" ? formData.customSport : formData.sport);
-      payload.append("activity", formData.activity);
-      payload.append("result", formData.result);
-      payload.append("unit", formData.unit === "Other" ? formData.customUnit : formData.unit);
-      payload.append("full_name", formData.full_name);
-      payload.append("age", formData.age);
-      payload.append("date_of_performance", formData.date_of_performance);
-      payload.append("gender", formData.gender);
-      payload.append("country", formData.country);
-      payload.append("club_name", formData.club_name || "");
-      payload.append("coach_name", formData.coach_name);
-      payload.append("email", formData.email);
-      payload.append("venue", formData.venue || "");
-      payload.append("wind", formData.wind || "");
-      payload.append("video_link", formData.video_link || "");
-      payload.append("aditional_notes", formData.aditional_notes || "");
+      payload.append("sport", dataToSubmit.sport === "Other" ? dataToSubmit.customSport : dataToSubmit.sport);
+      payload.append("activity", dataToSubmit.activity);
+      payload.append("result", dataToSubmit.result);
+      payload.append("unit", dataToSubmit.unit === "Other" ? dataToSubmit.customUnit : dataToSubmit.unit);
+      payload.append("full_name", dataToSubmit.full_name);
+      payload.append("age", dataToSubmit.age);
+      payload.append("date_of_performance", dataToSubmit.date_of_performance);
+      payload.append("gender", dataToSubmit.gender);
+      payload.append("country", dataToSubmit.country);
+      payload.append("club_name", dataToSubmit.club_name || "");
+      payload.append("coach_name", dataToSubmit.coach_name);
+      payload.append("email", dataToSubmit.email);
+      payload.append("venue", dataToSubmit.venue || "");
+      payload.append("wind", dataToSubmit.wind || "");
+      payload.append("video_link", dataToSubmit.video_link || "");
+      payload.append("aditional_notes", dataToSubmit.aditional_notes || "");
 
       if (transactionId) {
         payload.append("paypal_subscription_id", transactionId);
@@ -438,6 +485,12 @@ useEffect(() => {
 
       if (response && (response.status === 200 || response.status === true || response.success)) {
         toast.success("Performance result submitted successfully!");
+        localStorage.removeItem("pending_performance_data");
+
+        // Clear query parameters from URL
+        if (typeof window !== "undefined") {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
 
         // Reset all form inputs to empty strings
         setFormData({
@@ -463,6 +516,9 @@ useEffect(() => {
         setEvidenceFile(null);
         setErrors({});
         setRefreshKey(prev => prev + 1);
+        setShowManualTx(false);
+        setManualTxId("");
+        setShowPaymentModal(false);
       } else {
         toast.error(response?.message || response?.error_message || "Failed to submit performance result.");
       }
@@ -472,7 +528,9 @@ useEffect(() => {
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-[#f4faff] to-[#e8f3fc] dark:from-[#05101E] dark:via-[#091829] dark:to-[#05070f] text-foreground pb-6 transition-colors duration-300">
@@ -961,16 +1019,66 @@ useEffect(() => {
               </div>
 
               <div className="border-t border-border pt-4 space-y-4">
-                {paypalLoading && (
+                {paypalLoading && !showManualTx && (
                   <div className="flex flex-col items-center justify-center py-6 space-y-3">
                     <div className="w-8 h-8 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
                     <p className="text-xs text-muted-foreground font-semibold">Initializing PayPal Payment...</p>
                   </div>
                 )}
-                <div
-                  id={`paypal-container-${process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`}
-                  className="min-h-[150px] w-full transition-all duration-300"
-                />
+                
+                {!showManualTx && (
+                  <div
+                    id={`paypal-container-${process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`}
+                    className="min-h-[150px] w-full transition-all duration-300"
+                  />
+                )}
+
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setShowManualTx(!showManualTx)}
+                      className="text-xs font-semibold text-primary hover:underline transition-all cursor-pointer"
+                    >
+                      {showManualTx ? "← Back to PayPal Payment" : "Already paid? Submit Transaction ID manually"}
+                    </button>
+                  </div>
+
+                  {showManualTx && (
+                    <div className="space-y-3 rounded-2xl border border-border/80 bg-muted/30 p-4 transition-all duration-200">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                          PayPal Transaction ID / Receipt Number
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 8MC47407H2048743K"
+                          value={manualTxId}
+                          onChange={(e) => setManualTxId(e.target.value.trim())}
+                          className="w-full h-11 px-3 rounded-xl border border-input bg-background text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        disabled={loading || !manualTxId}
+                        onClick={async () => {
+                          if (!manualTxId) return;
+                          await submitFormData(manualTxId);
+                        }}
+                        className="w-full h-11 rounded-xl bg-primary text-white font-bold text-sm shadow-md hover:bg-primary/95 active:scale-98 transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {loading ? (
+                          <>
+                            <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          "Verify & Submit Result"
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-muted-foreground/60 font-medium">

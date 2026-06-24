@@ -19,23 +19,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { getUserImage } from "@/lib/utils";
 import { createClubId } from "@/helper/RouteName";
 import { resetUserState } from "@/redux/slices/userSlice";
-
-const getUserImage = (user) => {
-  if (!user || !user.image) return null;
-  if (user.image.startsWith("http") || user.image.startsWith("blob:")) {
-    return user.image;
-  }
-  let img = user.image;
-  if (img.includes("/")) {
-    img = img.substring(img.lastIndexOf("/") + 1);
-  }
-  if (user.image_path) {
-    return `${user.image_path}/${img}`;
-  }
-  return `https://ne-games.com/leaderBoard/public/admin/clip-one/assets/user/original/${img}`;
-};
 
 const UserDetails = ({ user: demoUser, ladderType }) => {
   const router = useRouter();
@@ -163,7 +149,7 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
         <DropdownMenuContent className="w-52 mt-2" align="end">
           <DropdownMenuLabel className="flex flex-col gap-0.5 text-zinc-700 dark:text-zinc-200">
             <div className="flex items-center gap-2">
-              <UserCircle2 className="w-4.5 h-4.5 text-zinc-500" />
+              <UserCircle2 className="w-[1.125rem] h-[1.125rem] text-zinc-500" />
               <span>{finalUser?.name || "Guest"}</span>
             </div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 ml-6.5">

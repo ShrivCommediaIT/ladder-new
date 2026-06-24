@@ -7,7 +7,6 @@ import useAuthGuard from "@/hooks/useAuthGuard";
 
 export default function PlayerListsRouter() {
 
-  // ... Protected Route ...
   const allowed = useAuthGuard();
   if (!allowed) return null;
 
