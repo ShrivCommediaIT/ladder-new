@@ -522,7 +522,9 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
 
       refreshLeaderboard(skillNo);
     },
-    [refreshLeaderboard],
+    [refreshLeaderboard], 
+
+    
   );
 
   const handleSortBySkill = useCallback(() => {
