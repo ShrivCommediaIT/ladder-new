@@ -69,6 +69,11 @@ body {
   --landing-badge-bg: #f0f9ff;
   --landing-badge-border: #dbeafe;
   --landing-stat-text: rgb(var(--brand-white-rgb) / 0.82);
+  --landing-views-badge-bg: rgb(14 165 233 / 0.08);
+  --landing-views-badge-border: rgb(14 165 233 / 0.22);
+  --landing-views-badge-text: var(--landing-primary);
+  --landing-views-badge-highlight: var(--landing-secondary);
+  --landing-views-badge-glow: 0 4px 12px rgb(14 165 233 / 0.06);
 
   --background: #f4faff;
   --foreground: var(--navy);
@@ -220,6 +225,11 @@ body {
   --landing-badge-bg: rgb(var(--brand-primary-rgb) / 0.08);
   --landing-badge-border: rgb(var(--brand-primary-rgb) / 0.14);
   --landing-stat-text: rgb(var(--brand-white-rgb) / 0.78);
+  --landing-views-badge-bg: rgb(14 165 233 / 0.12);
+  --landing-views-badge-border: rgb(14 165 233 / 0.28);
+  --landing-views-badge-text: var(--accent-theme);
+  --landing-views-badge-highlight: var(--accent-theme);
+  --landing-views-badge-glow: 0 0 15px rgb(14 165 233 / 0.15);
 
   --background: var(--dark-theme);
   --foreground: var(--white);
@@ -801,4 +811,16 @@ div[class*="DialogContent"] {
 .dark .history-card {
   background-color: rgba(13, 31, 53, 0.6) !important;
   border-color: var(--border) !important;
+}
+
+/* Page views counter badge styling */
+.views-badge {
+  background-color: var(--landing-views-badge-bg);
+  border-color: var(--landing-views-badge-border);
+  color: var(--landing-views-badge-text);
+  box-shadow: var(--landing-views-badge-glow);
+}
+
+.views-badge-highlight {
+  color: var(--landing-views-badge-highlight);
 }
