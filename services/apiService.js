@@ -7,7 +7,7 @@ export const getRequest = async (url, params = {}) => {
 
 export const postRequest = async (url, data = {}) => {
   const res = await axiosInstance.post(url, data, {
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
   });
   return res.data;
 };

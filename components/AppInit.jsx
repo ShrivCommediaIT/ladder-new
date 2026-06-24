@@ -1,13 +1,11 @@
-
-
-
-
-import React from 'react'
+import { useEffect } from 'react';
 
 const AppInit = () => {
-  return (
-    <div></div>
-  )
-}
+  useEffect(() => {
+    // App initialization logic can go here (e.g., analytics, service workers)
+  }, []);
 
-export default AppInit
+  return null;
+};
+
+export default AppInit;

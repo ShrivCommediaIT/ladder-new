@@ -1066,21 +1066,36 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
               </div>
 
               <div className="aspect-video w-full bg-black">
-                {activeVideo.startsWith("http") ? (
+                {(() => {
+                  if (!activeVideo.startsWith("http")) return false;
+                  try {
+                    const parsed = new URL(activeVideo);
+                    const trustedHosts = [
+                      "youtube.com",
+                      "www.youtube.com",
+                      "youtu.be",
+                      "vimeo.com",
+                      "player.vimeo.com",
+                    ];
+                    return trustedHosts.some(
+                      (host) => parsed.hostname === host || parsed.hostname.endsWith(`.${host}`)
+                    );
+                  } catch {
+                    return false;
+                  }
+                })() ? (
                   <iframe
                     src={activeVideo}
                     title="Performance Video Player"
                     className="h-full w-full border-none"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    sandbox="allow-scripts allow-same-origin allow-presentation"
                   ></iframe>
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center bg-[color:color-mix(in_srgb,var(--card),var(--primary)_4%)] p-6 text-center text-muted-foreground">
                     <Play className="mb-3 h-12 w-12 animate-pulse text-primary/50" />
-                    <p className="text-sm font-medium text-foreground">Invalid Video Link</p>
-                    <p className="mt-1 max-w-xs text-xs text-muted-foreground">
-                      This video URL could not be dynamically parsed. Use the direct link to review evidence.
-                    </p>
+                    <p className="text-sm font-medium text-foreground">Invalid or Untrusted Video Link</p>
                   </div>
                 )}
               </div>

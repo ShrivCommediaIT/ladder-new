@@ -101,7 +101,7 @@ export default function OnboardingFlow({setIsONboardingFlowVisible}) {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.3 }}
-        className="relative w-full max-w-6xl h-full md:h-[680px] bg-background border-y md:border border-border dark:border-white/10 sm:rounded-2xl overflow-hidden flex flex-col z-[160] shadow-2xl transition-all duration-300"
+        className="relative w-full max-w-6xl h-[80vh] sm:h-[82vh] md:h-[680px] max-h-[540px] sm:max-h-[620px] md:max-h-[680px] bg-background border-y md:border border-border dark:border-white/10 rounded-2xl overflow-hidden flex flex-col z-[160] shadow-2xl transition-all duration-300"
       >
         {/* Close Button - Responsive and beautiful */}
         <button 
@@ -114,7 +114,7 @@ export default function OnboardingFlow({setIsONboardingFlowVisible}) {
 
         {/* Top Header - Hidden for initial summary step */}
         {step.type !== "summary" && (
-          <div className="flex-shrink-0 w-full bg-white/70 dark:bg-black/30 backdrop-blur-md py-4 px-12 border-b border-border dark:border-white/10 text-center relative z-20 transition-colors duration-300">
+          <div className="flex-shrink-0 w-full bg-white/70 dark:bg-black/30 backdrop-blur-md py-2.5 sm:py-4 px-6 sm:px-12 border-b border-border dark:border-white/10 text-center relative z-20 transition-colors duration-300">
             <h1 className="text-foreground dark:text-white text-2xl sm:text-3xl font-black italic tracking-wider uppercase">
               Participation <span className="text-primary">Eco-System</span>
             </h1>
@@ -131,12 +131,12 @@ export default function OnboardingFlow({setIsONboardingFlowVisible}) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -15 }}
                 transition={{ duration: 0.35 }}
-                className="w-full h-full flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 lg:gap-16 px-4 py-8"
+                className="w-full h-full flex flex-col md:flex-row items-center justify-center gap-4 sm:gap-8 md:gap-12 lg:gap-16 px-4 py-4 sm:py-8"
               >
                 {step.type === "summary" ? (
                   // Summary Layout (Large image, floating in a premium themed card)
                   <div className="w-full h-full flex flex-col items-center justify-center p-2 sm:p-4">
-                    <div className="text-center mb-6 max-w-2xl px-4">
+                    <div className="text-center mb-3 sm:mb-6 max-w-2xl px-4">
                       <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2 text-foreground dark:text-white leading-tight">
                         Participation <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Eco-System</span>
                       </h1>
@@ -144,7 +144,7 @@ export default function OnboardingFlow({setIsONboardingFlowVisible}) {
                         {"PLAY > EARN > SPEND > REPEAT. The Perpetual Sales Loop Keeps You in the Game."}
                       </p>
                     </div>
-                    <div className="relative w-full h-[70%] sm:h-[75%] max-w-[850px] flex items-center justify-center bg-white dark:bg-[#0D1F35] rounded-2xl overflow-hidden shadow-xl p-3 sm:p-6 border border-border dark:border-white/10 transition-all duration-300">
+                    <div className="relative w-full h-[65%] sm:h-[72%] md:h-[75%] max-w-[850px] flex items-center justify-center bg-white dark:bg-[#0D1F35] rounded-2xl overflow-hidden shadow-xl p-2 sm:p-4 md:p-6 border border-border dark:border-white/10 transition-all duration-300">
                       <Image
                         src={step.image}
                         alt="Summary Flow"
@@ -176,10 +176,10 @@ export default function OnboardingFlow({setIsONboardingFlowVisible}) {
                       </div>
 
                       {/* Main Body (Grid Body) */}
-                      <div className="flex flex-col md:flex-row min-h-[300px] sm:min-h-[400px]">
+                      <div className="flex flex-col md:flex-row min-h-[260px] sm:min-h-[340px] md:min-h-[400px]">
                         {/* Bottom-Left: Image Area */}
-                        <div className="w-full md:w-[35%] sm:md:w-[30%] bg-slate-50/50 dark:bg-[#0A1829]/60 flex items-center justify-center p-8 border-b md:border-b-0 md:border-r border-border dark:border-white/10">
-                          <div className="relative w-40 h-40 sm:w-56 sm:h-56 rounded-full border-[3px] border-primary/20 dark:border-primary/30 overflow-hidden shadow-lg transition-transform duration-500 hover:scale-105">
+                        <div className="w-full md:w-[35%] sm:md:w-[30%] bg-slate-50/50 dark:bg-[#0A1829]/60 flex items-center justify-center p-4 sm:p-8 border-b md:border-b-0 md:border-r border-border dark:border-white/10">
+                          <div className="relative w-28 h-28 sm:w-40 sm:h-40 md:w-56 md:h-56 rounded-full border-[3px] border-primary/20 dark:border-primary/30 overflow-hidden shadow-lg transition-transform duration-500 hover:scale-105">
                             <Image
                               src={step.image}
                               alt={step.title}
@@ -191,7 +191,7 @@ export default function OnboardingFlow({setIsONboardingFlowVisible}) {
                         </div>
 
                         {/* Bottom-Right: Content Area */}
-                        <div className="flex-1 bg-white dark:bg-[#0D1F35] p-6 sm:p-12 flex flex-col justify-center transition-all duration-300">
+                        <div className="flex-1 bg-white dark:bg-[#0D1F35] p-4 sm:p-8 md:p-12 flex flex-col justify-center transition-all duration-300">
                           {step.subtitle && (
                              <h3 className="text-primary dark:text-accent text-lg sm:text-2xl font-extrabold mb-4 italic leading-tight uppercase">
                                {step.subtitle}
@@ -211,7 +211,7 @@ export default function OnboardingFlow({setIsONboardingFlowVisible}) {
         </div>
 
         {/* Bottom Navigation Control Bar */}
-        <div className="flex-shrink-0 w-full bg-white/90 dark:bg-[#0A1829] backdrop-blur-md py-4 px-4 sm:px-8 border-t border-border dark:border-white/10 flex items-center justify-between relative z-20 transition-all duration-300">
+        <div className="flex-shrink-0 w-full bg-white/90 dark:bg-[#0A1829] backdrop-blur-md py-3 sm:py-4 px-4 sm:px-8 border-t border-border dark:border-white/10 flex items-center justify-between relative z-20 transition-all duration-300">
           {/* Back Button Container */}
           <div className="w-20 sm:w-40 flex justify-start">
             {currentStep > 0 && (

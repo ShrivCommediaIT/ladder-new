@@ -160,9 +160,7 @@ const CreatePanel = ({
         >
           {loading
             ? "Creating..."
-            : isAdmin
-              ? "Create Roster"
-              : "Create Solution"}
+            : "Create Solution"}
         </Button>
       </div>
     </div>

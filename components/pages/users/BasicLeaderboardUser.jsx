@@ -253,9 +253,9 @@ const PlayerCard = ({
                         key={i}
                         className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
                           ${scoreData.witnessBy && "underline decoration-dark decoration-[2px]"}
-                            ${ scoreData.isTargetAchieved
-                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
-                              : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
+                            ${scoreData.isTargetAchieved
+                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
+                            : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
@@ -721,12 +721,12 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
 
       <Dialog open={showRemove} onOpenChange={setShowRemove}>
         <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
-          <BasicLeaderboardUserRemove
+          {/* <BasicLeaderboardUserRemove
             ladderId={ladderId}
             myRank={myRank}
             onClose={handleRemoveClose}
             onSuccessRefresh={handleRemoveSuccess}
-          />
+          /> */}
         </DialogContent>
       </Dialog>
 

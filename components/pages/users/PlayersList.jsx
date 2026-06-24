@@ -104,16 +104,47 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
     dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
   }, [dispatch]);
 
+  /* ------------------ FETCH DATA ------------------ */
+
+  const refreshData = useCallback((age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry) => {
+    if (ladderId && ladderType) {
+      const payload = {
+        ladder_id: ladderId,
+        type: ladderType
+      };
+      if (age > 0) {
+        payload.dob = age;
+        payload.age_type = ageType;
+      }
+      if (gender) {
+        payload.gender = gender;
+      }
+      if (country) {
+        payload.country = country;
+      }
+      dispatch(fetchLeaderboard(payload));
+      dispatch(fetchGradebars(ladderId));
+      setCacheBuster(Date.now());
+    }
+  }, [dispatch, ladderId, ladderType, appliedAge, appliedAgeType, appliedGender, appliedCountry]);
+
+  const handleAgeSearch = useCallback((age, ageType, gender, country) => {
+    const ageNum = age ? Number(age) : "";
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
+    refreshData(ageNum, ageType, gender, country);
+  }, [dispatch, refreshData]);
+
   const handleClearFilters = useCallback(() => {
     setSearchTerm("");
     dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
+    refreshData(0, "under", "", "");
     setResetSignal((p) => p + 1);
-  }, [dispatch]);
+  }, [dispatch, refreshData]);
 
   useEffect(() => {
     if (onActionsChanged) {
       const actions = [];
-      
+
       if (appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)) {
         actions.push({
           id: "clear-all-filters",
@@ -128,10 +159,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
         id: "age-filter",
         node: (
           <AgeFilter
-            onSearch={(age, ageType, gender, country) => {
-              const ageNum = age ? Number(age) : "";
-              dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
-            }}
+            onSearch={handleAgeSearch}
             user={false}
             resetSignal={resetSignal}
             isActive={appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)}
@@ -145,7 +173,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
 
       onActionsChanged(actions);
     }
-  }, [resetSignal, onActionsChanged, dispatch, appliedAge, appliedGender, appliedCountry, handleClearFilters]);
+  }, [resetSignal, onActionsChanged, dispatch, appliedAge, appliedGender, appliedCountry, handleClearFilters, handleAgeSearch]);
 
   const currentUser = players.find(
     (p) =>
@@ -153,30 +181,6 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       (p.user_id && Number(p.user_id) === Number(loggedInUserId))
   );
   const myRank = currentUser?.rank || "-";
-
-  /* ------------------ FETCH DATA ------------------ */
-
-  const refreshData = useCallback(() => {
-    if (ladderId && ladderType) {
-      const payload = {
-        ladder_id: ladderId,
-        type: ladderType
-      };
-      if (appliedAge > 0) {
-        payload.dob = appliedAge;
-        payload.age_type = appliedAgeType;
-      }
-      if (appliedGender) {
-        payload.gender = appliedGender;
-      }
-      if (appliedCountry) {
-        payload.country = appliedCountry;
-      }
-      dispatch(fetchLeaderboard(payload));
-      dispatch(fetchGradebars(ladderId));
-      setCacheBuster(Date.now());
-    }
-  }, [dispatch, ladderId, ladderType, appliedAge, appliedAgeType, appliedGender, appliedCountry]);
 
   const handleSelfRemove = useCallback(() => {
     setShowRemove(true);
@@ -192,8 +196,10 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
   }, [refreshData]);
 
   useEffect(() => {
-    refreshData();
-  }, [refreshData]);
+    if (ladderId) {
+      refreshData();
+    }
+  }, [ladderId, ladderType]);
 
   /* ------------------ FILTER ------------------ */
 
@@ -353,7 +359,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
                     <div className="flex items-center justify-between px-4 py-3 sm:py-4 gap-3">
                       <div className="flex min-w-0 flex-1 items-center gap-3">
                         <PlayerRankBadge rank={rank} />
-                        
+
                         {/* Avatar */}
                         {player.image ? (
                           <Image
@@ -429,12 +435,12 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
 
       <Dialog open={showRemove} onOpenChange={setShowRemove}>
         <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
-          <BasicLeaderboardUserRemove
+          {/* <BasicLeaderboardUserRemove
             ladderId={ladderId}
             myRank={myRank}
             onClose={handleRemoveClose}
             onSuccessRefresh={handleRemoveSuccess}
-          />
+          /> */}
         </DialogContent>
       </Dialog>
     </div>

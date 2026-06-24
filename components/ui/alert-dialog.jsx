@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -39,10 +40,39 @@ function AlertDialogOverlay({
   );
 }
 
+function hasAlertDialogTitle(children) {
+  let found = false;
+  React.Children.forEach(children, (child) => {
+    if (found || !child || typeof child !== "object") return;
+    if (
+      child.type === AlertDialogTitle ||
+      child.type === AlertDialogPrimitive.Title ||
+      child.props?.["data-slot"] === "alert-dialog-title" ||
+      child.type?.name === "AlertDialogTitle" ||
+      child.type?.displayName === "AlertDialogTitle" ||
+      child.props?.["data-slot"] === "dialog-title" ||
+      child.type?.name === "DialogTitle" ||
+      child.type?.displayName === "DialogTitle"
+    ) {
+      found = true;
+      return;
+    }
+    if (child.props?.children) {
+      if (hasAlertDialogTitle(child.props.children)) {
+        found = true;
+      }
+    }
+  });
+  return found;
+}
+
 function AlertDialogContent({
   className,
+  children,
   ...props
 }) {
+  const hasTitle = hasAlertDialogTitle(children);
+
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
@@ -52,7 +82,14 @@ function AlertDialogContent({
           "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
           className
         )}
-        {...props} />
+        {...props}>
+        {!hasTitle && (
+          <VisuallyHidden.Root asChild>
+            <AlertDialogPrimitive.Title>Alert Dialog</AlertDialogPrimitive.Title>
+          </VisuallyHidden.Root>
+        )}
+        {children}
+      </AlertDialogPrimitive.Content>
     </AlertDialogPortal>
   );
 }

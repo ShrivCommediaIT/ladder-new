@@ -4,9 +4,11 @@
 export const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL || "https://ne-games.com/leaderBoard/api";
 
-export const APPKEY =
-  process.env.NEXT_PUBLIC_APPKEY ||
-  "Py9YJXgBecbbqxjRVaHarcSnJyuzhxGqJTkY6xKZRfrdXFy72HPXvFRvfEjy";
+const appKey = process.env.NEXT_PUBLIC_APPKEY;
+if (!appKey && typeof window === "undefined") {
+  console.error("CRITICAL WARNING: NEXT_PUBLIC_APPKEY environment variable is missing!");
+}
+export const APPKEY = appKey || "";
 
 export const IMAGE_BASE_URL =
   process.env.NEXT_PUBLIC_IMAGE_BASE_URL ||

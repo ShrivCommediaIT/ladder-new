@@ -147,7 +147,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
             )}
 
             {!loading && allLadders?.length === 0 && (
-              <p className="text-xs sm:text-sm text-white/50 px-2">
+              <p className="text-xs sm:text-sm text-muted-foreground px-2">
                 No ladders created yet.
               </p>
             )}
@@ -161,7 +161,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
               }`}
             >
               {visibleLadders?.length === 0 && !loading && (
-                <p className="text-xs sm:text-sm text-white/50 px-2 text-center">
+                <p className="text-xs sm:text-sm text-muted-foreground px-2 text-center">
                   No competitions to display.
                 </p>
               )}
@@ -224,11 +224,11 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                           <Button
                             size="sm"
                             variant="ghost"
-                            className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm cursor-pointer
+                            className={`flex-1 sm:flex-none px-4 sm:px-6 h-8 sm:h-9 text-xs sm:text-sm cursor-pointer transition-colors duration-200
                               ${
                                 isDemo
-                                  ? "text-red-400 border border-red-500 hover:bg-red-300"
-                                  : "text-red-400 border border-red-400/30 hover:bg-red-400/50"
+                                  ? "text-red-600 border border-red-600 hover:bg-red-50 dark:text-red-400 dark:border-red-500 dark:hover:bg-red-950/30"
+                                  : "text-red-500 border border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-400/30 dark:hover:bg-red-950/30"
                               }`}
                             onClick={() => {
                               setDeleteLadderId(ladder.id);
@@ -242,7 +242,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                           <AlertDialogHeader>
                             <AlertDialogTitle>
                               Delete{" "}
-                              <span className="text-red-400 font-bold">
+                              <span className="text-red-600 dark:text-red-400 font-bold">
                                 {deleteLadderName}
                               </span>
                               ?
@@ -253,7 +253,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel
-                              className="text-black"
+                              className="cursor-pointer text-foreground hover:bg-muted border border-border"
                               onClick={() => setDeleteLadderId(null)}
                             >
                               Cancel
@@ -262,7 +262,7 @@ const visibleLadders = seeAll ? filteredLadders : initialLadders;
                               onClick={() =>
                                 handleDelete(deleteLadderId)
                               }
-                              className="bg-red-600 hover:bg-red-700"
+                              className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
                             >
                               Delete
                             </AlertDialogAction>

@@ -6,6 +6,7 @@ import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { useSearchParams } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { sanitizeHtml } from "@/lib/utils";
 
 const LadderRuleCardUser = ({ ladderIdProp }) => {
   const searchParams = useSearchParams();
@@ -94,7 +95,7 @@ const LadderRuleCardUser = ({ ladderIdProp }) => {
                     <div
                       className="mt-2 max-h-[380px] overflow-y-auto rounded-2xl border border-border bg-background/70 p-5 text-sm sm:text-base text-foreground space-y-3 leading-relaxed shadow-inner"
                       dangerouslySetInnerHTML={{
-                        __html: rule.rules || "No rules available.",
+                        __html: sanitizeHtml(rule.rules) || "No rules available.",
                       }}
                     />
                   </div>

@@ -30,10 +30,10 @@ export default function AdminQuickActions() {
     if (!showPaymentPlans) return;
 
     const scriptId = "paypal-hosted-buttons-sdk";
-    let script = document.getElementById(scriptId);
+    const scriptSrc = "https://www.paypal.com/sdk/js?client-id=BAAc2_cQyRDE1kjkpMPKFbAJgSS7H4EX2qcxO7brl9fOl0hvYya7c92nDBIus93UObSqywxRScV34mrX5g&components=hosted-buttons&disable-funding=venmo,paylater&currency=GBP";
 
     const initializeButtons = () => {
-      if (window.paypal) {
+      if (window.paypal && window.paypal.HostedButtons) {
         const container1 = document.getElementById("paypal-container-XT89PWWRFSPNQ");
         if (container1) {
           container1.innerHTML = "";
@@ -60,18 +60,30 @@ export default function AdminQuickActions() {
       }
     };
 
+    if (window.paypal && window.paypal.HostedButtons) {
+      setTimeout(initializeButtons, 100);
+      return;
+    }
+
+    let script = document.getElementById(scriptId);
     if (!script) {
       script = document.createElement("script");
       script.id = scriptId;
-      script.src = "https://www.paypal.com/sdk/js?client-id=BAAc2_cQyRDE1kjkpMPKFbAJgSS7H4EX2qcxO7brl9fOl0hvYya7c92nDBIus93UObSqywxRScV34mrX5g&components=hosted-buttons&disable-funding=venmo&currency=GBP";
+      script.src = scriptSrc;
       script.async = true;
-      script.onload = () => {
-        setTimeout(initializeButtons, 150);
-      };
       document.body.appendChild(script);
-    } else {
-      setTimeout(initializeButtons, 250);
     }
+
+    const handleLoad = () => {
+      setTimeout(initializeButtons, 150);
+    };
+    script.addEventListener("load", handleLoad);
+
+    return () => {
+      if (script) {
+        script.removeEventListener("load", handleLoad);
+      }
+    };
   }, [showPaymentPlans]);
 
   return (
