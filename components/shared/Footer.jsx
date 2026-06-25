@@ -14,6 +14,7 @@ import {
   FaEnvelope,
   FaPhoneAlt,
   FaChevronRight,
+  FaHandshake,
 } from "react-icons/fa";
 
 import { FaWhatsapp, FaXTwitter } from "react-icons/fa6";
@@ -196,6 +197,20 @@ export default function Footer() {
                   <span className="text-xs text-gray-400">
                     (WhatsApp Business 24/7)
                   </span>
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <FaHandshake className="mt-1 h-4 w-4 flex-shrink-0 text-sky-400" />
+                <p>
+                  <a
+                    href="https://www.moneymakers.com/startup-pitch/sp-676cccd301bf4247a0ef1939"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-400 hover:text-sky-300"
+                  >
+                    Investors and Partners
+                  </a>
                 </p>
               </div>
             </div>
