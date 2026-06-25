@@ -66,7 +66,8 @@ export default function ClientLayoutWrapper({ children }) {
                                pathname?.startsWith("/register") ||
                                pathname?.startsWith("/reset-password") ||
                                pathname?.startsWith("/change-password") ||
-                               pathname?.startsWith("/demo-login");
+                               pathname?.startsWith("/demo-login") ||
+                               pathname?.startsWith("/super-admin");
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
@@ -83,16 +84,20 @@ export default function ClientLayoutWrapper({ children }) {
           )}
         </PersistGate>
       </Provider>
-      <Script id="chatling-config" strategy="afterInteractive">
-        {`window.chtlConfig = { chatbotId: "7385437887" };`}
-      </Script>
-      <Script
-        async
-        data-id="7385437887"
-        id="chtl-script"
-        src="https://chatling.ai/js/embed.js"
-        strategy="afterInteractive"
-      />
+      {!pathname?.startsWith("/super-admin") && (
+        <>
+          <Script id="chatling-config" strategy="afterInteractive">
+            {`window.chtlConfig = { chatbotId: "7385437887" };`}
+          </Script>
+          <Script
+            async
+            data-id="7385437887"
+            id="chtl-script"
+            src="https://chatling.ai/js/embed.js"
+            strategy="afterInteractive"
+          />
+        </>
+      )}
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar theme="colored" />
     </ThemeProvider>
   );
