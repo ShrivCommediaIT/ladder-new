@@ -58,9 +58,19 @@ export default function PlanHeading() {
   const [isONboardingFlowVisible, setIsONboardingFlowVisible] = useState(false);
   const [views, setViews] = useState(20000);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
-  const [activeVideoId, setActiveVideoId] = useState("NpUEYIXdaNI");
+  const [activeVideoId, setActiveVideoId] = useState("u8uIqPDPWmo");
 
   const demoVideos = [
+    {
+      id: "u8uIqPDPWmo",
+      title: "Start up (How to)",
+      description: "Learn how to set up your club and get started with SSP.",
+    },
+    {
+      id: "9TlbfBtM9JI",
+      title: "Leaderboards, Colours and Filters",
+      description: "Learn how to use the leaderboards, colours and filters.",
+    },
     {
       id: "NpUEYIXdaNI",
       title: "The Benefits of the SSP Participation Eco System",
