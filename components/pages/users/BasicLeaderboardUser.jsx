@@ -15,7 +15,7 @@ import BasicLeaderboardShort from "../admin/BasicLeaderboardShort";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Funnel, X } from "lucide-react";
+import { Funnel, X, XCircle } from "lucide-react";
 import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import BasicLeaderboardPrintSkillsSheet from "../admin/BasicLeaderboardPrintSkillsSheet";
@@ -389,7 +389,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
   const [openSort, setOpenSort] = useState(false);
   const [isSorted, setIsSorted] = useState(false);
   const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
-  const { appliedAge, ladderDetails, appliedAgeType, appliedGender, appliedCountry } = useSelector((state) => state.skillLeaderboard || {});
+  const { appliedAge, ladderDetails, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy } = useSelector((state) => state.skillLeaderboard || {});
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showRemove, setShowRemove] = useState(false);
   const [playerSearchResetSignal, setPlayerSearchResetSignal] = useState(0);
@@ -454,7 +454,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = 0, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry) => {
+    (skillNo = 0, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry, witness = appliedWitnessBy) => {
       if (!ladderId || isRefreshing) return;
 
       setIsRefreshing(true);
@@ -467,16 +467,20 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
         gender: gender,
         country: country,
       };
+      if (witness === 1) {
+        payload.witness_by = 1;
+      }
       dispatch(fetchSkillLeaderboard(payload)).finally(() => {
         setIsRefreshing(false);
       });
     },
-    [dispatch, ladderId, isRefreshing, appliedAge, appliedAgeType, appliedGender, appliedCountry],
+    [dispatch, ladderId, isRefreshing, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy],
   );
 
-  const handleAgeSearch = useCallback((age, ageType, gender, country) => {
+  const handleAgeSearch = useCallback((age, ageType, gender, country, witness) => {
     const ageNum = age ? Number(age) : "";
-    const isClearing = (age === null || age === "") && !country;
+    const witnessVal = witness !== undefined ? witness : 0;
+    const isClearing = (age === null || age === "") && !country && !witnessVal;
 
     if (isClearing) {
       setIsSorted(false);
@@ -486,7 +490,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
     }
 
     dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
-    refreshLeaderboard(isClearing ? 0 : selectedSkillFilter, ageNum, ageType, gender, country);
+    refreshLeaderboard(isClearing ? 0 : selectedSkillFilter, ageNum, ageType, gender, country, witnessVal);
   }, [dispatch, selectedSkillFilter, refreshLeaderboard]);
 
   const handleClearFilters = useCallback(() => {
@@ -537,30 +541,20 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
     setSearchQuery("");
     setPlayerSearchResetSignal((prev) => prev + 1);
     dispatch(setAgeFilter({ age: 0, ageType: "", gender: "", country: "" }));
-    refreshLeaderboard(0, 0, "", "", "");
+    refreshLeaderboard(0, 0, "", "", "", 0);
   }, [refreshLeaderboard]);
 
   useEffect(() => {
     if (onActionsChanged) {
       const actions = [];
 
-      // 1. Sort / Clear filters
-      if (!isSorted && appliedAge === 0) {
-        actions.push({
-          id: "sort-by-activity",
-          label: "Sort by Activity",
-          icon: Funnel,
-          onClick: handleSortBySkill,
-        });
-      } else {
-        actions.push({
-          id: "clear-all-filters",
-          label: "Clear All Filters",
-          icon: Funnel,
-          onClick: handleClearAll,
-          tone: "danger",
-        });
-      }
+      // 1. Sort action
+      actions.push({
+        id: "sort-by-activity",
+        label: selectedSkillFilter > 0 ? "Sorted" : "Sort by Activity",
+        icon: Funnel,
+        onClick: handleSortBySkill,
+      });
 
       // 2. Age filter
       actions.push({
@@ -570,14 +564,28 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
             onSearch={handleAgeSearch}
             user={false}
             resetSignal={playerSearchResetSignal}
-            isActive={appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)}
+            isActive={appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry) || appliedWitnessBy === 1}
             defaultAge={appliedAge}
             defaultAgeType={appliedAgeType}
             defaultGender={appliedGender}
             defaultCountry={appliedCountry}
+            defaultWitness={appliedWitnessBy}
+            showWitness={true}
           />
         )
       });
+
+      // 3. Separate Clear All Filters action
+      const hasActiveFilters = isSorted || selectedSkillFilter > 0 || appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry) || appliedWitnessBy === 1;
+      if (hasActiveFilters) {
+        actions.push({
+          id: "clear-all-filters",
+          label: "Clear All Filters",
+          icon: XCircle,
+          onClick: handleClearAll,
+          tone: "danger",
+        });
+      }
 
       // 3. Print Skills sheet action
       const hasSkills = rows.some((r) => r.description && r.description.trim() !== "");
@@ -622,8 +630,11 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
     };
   }, [
     isSorted,
+    selectedSkillFilter,
     appliedAge,
     appliedGender,
+    appliedCountry,
+    appliedWitnessBy,
     playerSearchResetSignal,
     onActionsChanged,
     handleAgeSearch,

@@ -80,21 +80,25 @@ const BasicLeaderboardUserRemove = ({ ladderId, ladderType, myRank, onClose, onS
     }
   };
 
- const handleCheckRank = () => {
-  if (!rankInput) {
-    toast.warning("Please enter your rank");
-    return;
-  }
-  console.log(myRank, 'parsedUser==>1')
+  const handleCheckRank = () => {
+    if (!rankInput) {
+      toast.warning("Please enter your rank");
+      return;
+    }
+    const val = Number(rankInput);
+    if (val < 1) {
+      toast.error("Rank must be 1 or greater");
+      return;
+    }
 
-  if (Number(rankInput) !== Number(myRank)) {
-    toast.error(" Rank does not match your current rank");
-    return;
-  }
+    if (Number(rankInput) !== Number(myRank)) {
+      toast.error(" Rank does not match your current rank");
+      return;
+    }
 
-  // ✅ Rank matched → open confirm dialog
-  setShowConfirm(true);
-};
+    // ✅ Rank matched → open confirm dialog
+    setShowConfirm(true);
+  };
 
 
   return (
@@ -103,35 +107,40 @@ const BasicLeaderboardUserRemove = ({ ladderId, ladderType, myRank, onClose, onS
       animate="visible"
       variants={fadeIn}
       transition={{ duration: 0.3 }}
-      className="w-full max-w-md p-8 rounded-3xl bg-gradient-to-b from-gray-900/90 to-gray-800/90 
-                  border border-white/20 shadow-2xl backdrop-blur-sm"
+      className="w-full max-w-md p-8 rounded-3xl bg-card border border-border shadow-2xl backdrop-blur-sm text-foreground"
     >
       {/* Header */}
       <div className="text-center mb-8">
         <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center 
-                       rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 shadow-xl">
+                       rounded-2xl bg-gradient-to-br from-primary to-secondary shadow-xl shadow-primary/20">
           <User className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Remove Yourself</h2>
-        {/* <p className="text-gray-300 text-lg">Leave this leaderboard permanently</p> */}
+        <h2 className="text-2xl font-bold text-foreground mb-2">Remove Yourself</h2>
       </div>
 
       <div className="mb-6">
-  <label className="block text-gray-300 mb-2 text-sm font-semibold">
-    Enter your current rank to confirm
-  </label>
-  <Input
-    type="number"
-    placeholder="Enter your rank"
-    value={rankInput}
-    onChange={(e) => setRankInput(e.target.value)}
-    className="h-12 text-lg bg-gray-900 border-gray-600 text-white"
-  />
-  <p className="text-xs text-gray-400 mt-2 text-center">
-    Your current rank: #{myRank}
-  </p>
-</div>
-
+        <label className="block text-muted-foreground mb-2 text-sm font-semibold">
+          Enter your current rank to confirm
+        </label>
+        <Input
+          type="number"
+          min="1"
+          placeholder="Enter your rank"
+          value={rankInput}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val !== "") {
+              const num = Number(val);
+              if (num < 1) return;
+            }
+            setRankInput(val);
+          }}
+          className="h-12 text-lg bg-muted border-input text-foreground focus-visible:ring-primary"
+        />
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          Your current rank: #{myRank}
+        </p>
+      </div>
 
       {/* Buttons */}
       <div className="flex gap-4">
@@ -139,47 +148,43 @@ const BasicLeaderboardUserRemove = ({ ladderId, ladderType, myRank, onClose, onS
           onClick={onClose}
           disabled={isLoading}
           variant="outline"
-          className="flex-1 h-14 text-lg font-bold border-gray-600 hover:bg-gray-800/50"
+          className="flex-1 h-14 text-lg font-bold border-border bg-transparent text-foreground hover:bg-muted transition-colors rounded-xl"
         >
           Cancel
         </Button>
         
         <Button
-  onClick={handleCheckRank}   // ✅ pehle sirf check hoga
-  disabled={isLoading}
-  className="flex-1 h-14 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold text-lg"
->
-  Confirm
-</Button>
-
+          onClick={handleCheckRank}   // ✅ pehle sirf check hoga
+          disabled={isLoading}
+          className="flex-1 h-14 bg-primary text-primary-foreground font-bold text-lg hover:bg-primary/90 transition-all rounded-xl shadow-md shadow-primary/10"
+        >
+          Confirm
+        </Button>
       </div>
 
-
-
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-  <AlertDialogContent className="bg-gray-900 text-white border border-red-500/30">
-    <AlertDialogHeader>
-      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-      <AlertDialogDescription className="text-gray-300">
-        This will permanently remove you from this leaderboard.
-      </AlertDialogDescription>
-    </AlertDialogHeader>
+        <AlertDialogContent className="bg-card text-foreground border border-border rounded-2xl max-w-sm w-[calc(100vw-2rem)]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-bold text-foreground">Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground">
+              This will permanently remove you from this leaderboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
 
-    <AlertDialogFooter>
-      <AlertDialogCancel className="bg-gray-700 text-white">
-        Cancel
-      </AlertDialogCancel>
+          <AlertDialogFooter className="mt-4 gap-2 flex-col sm:flex-row">
+            <AlertDialogCancel className="bg-muted text-foreground border border-border hover:bg-accent hover:text-accent-foreground rounded-xl h-10 px-4">
+              Cancel
+            </AlertDialogCancel>
 
-      <AlertDialogAction
-        onClick={handleSelfRemove}   // ✅ final API call
-        className="bg-red-600 hover:bg-red-700"
-      >
-        Yes, remove me
-      </AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
-
+            <AlertDialogAction
+              onClick={handleSelfRemove}   // ✅ final API call
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl h-10 px-4"
+            >
+              Yes, remove me
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 };

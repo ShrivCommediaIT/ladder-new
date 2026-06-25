@@ -108,7 +108,7 @@ export const PlayerLists = () => {
     return (age && age !== "" && age !== 0) || (ageType && ageType !== "under") || (gender && gender !== "") || (country && country !== "");
   };
 
-  const refreshSkillLeaderboard = (skillNo = 0) => {
+  const refreshSkillLeaderboard = (skillNo = 0, witness = witnessBy) => {
     if (!ladderId) return;
     let laddartype, fetchSlice;
     if (typeFromParams === "positive" || ladderTypeFromParams === "positive") { laddartype = "positive"; fetchSlice = fetchPositiveLeaderboard; }
@@ -117,6 +117,9 @@ export const PlayerLists = () => {
     else if (isMiniLeague) { laddartype = "minileague"; fetchSlice = fetchMiniLeague; }
     else { laddartype = "skill"; fetchSlice = fetchSkillLeaderboard; }
     const payload = { ladder_id: ladderId, type: laddartype, sortbyskillnumber: skillNo };
+    if (witness === 1) {
+      payload.witness_by = 1;
+    }
     dispatch(fetchSlice(payload));
     if (isMiniLeague) dispatch(fetchLeaderboard({ ...payload, type: "minileague" }));
   };
@@ -196,8 +199,10 @@ export const PlayerLists = () => {
     }
   };
 
-  const handleAgeSearch = (age, ageType, gender, country) => {
+  const handleAgeSearch = (age, ageType, gender, country, witness) => {
     const ageNum = age ? Number(age) : "";
+    const witnessVal = witness !== undefined ? witness : 0;
+    setWitnessBy(witnessVal);
     const filter = { age: ageNum, ageType, gender, country };
     if (isSkill) dispatch(setSkillAgeFilter(filter));
     else if (isPositive) dispatch(setPositiveAgeFilter(filter));
@@ -205,6 +210,9 @@ export const PlayerLists = () => {
     else { dispatch(setAgeFilter(filter)); setLocalAge(ageNum); setLocalAgeType(ageType); setLocalGender(gender); setLocalCountry(country || ""); }
     const laddartype = typeFromParams === "positive" ? "positive" : typeFromParams === "negative" ? "negative" : isSkill ? "skill" : resolvedType;
     const payload = { ladder_id: ladderId, type: laddartype, dob: ageNum > 0 ? ageNum : undefined, gender: gender || undefined, ...(ageNum > 0 && ageType ? { age_type: ageType } : {}), ...(country ? { country } : {}) };
+    if (witnessVal === 1) {
+      payload.witness_by = 1;
+    }
     let fetchSlice = laddartype === "positive" ? fetchPositiveLeaderboard : laddartype === "negative" ? fetchNegativeLeaderboard : ["best5", "best3", "winlose", "bestof5", "bestof3", "roster"].includes(laddartype) ? fetchLeaderboard : fetchSkillLeaderboard;
     dispatch(fetchSlice(payload));
     if (isRoster) dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: ageNum > 0 ? ageNum : undefined, age_type: ageNum > 0 && ageType ? ageType : undefined, gender: gender || undefined, country: country || undefined }));
@@ -320,31 +328,6 @@ export const PlayerLists = () => {
     });
   }
 
-  // Witnessed button
-  if (isSkill || isPositive || isNegative) {
-    quickActions.push({
-      id: "witnessed",
-      label: witnessBy === 1 ? "Witnessed" : "Witnessed Only",
-      icon: Eye,
-      tone: witnessBy === 1 ? "success" : "default",
-      onClick: () => {
-        const newWitnessBy = witnessBy === 1 ? 0 : 1;
-        setWitnessBy(newWitnessBy);
-        if (newWitnessBy === 1) {
-          const cleared = { age: 0, ageType: "", gender: "" };
-          if (isSkill) dispatch(setSkillAgeFilter(cleared));
-          else if (isPositive) dispatch(setPositiveAgeFilter(cleared));
-          else if (isNegative) dispatch(setNegativeAgeFilter(cleared));
-          else { dispatch(setAgeFilter(cleared)); setLocalAge(0); setLocalAgeType(""); setLocalGender(""); }
-          setAgeFilterResetSignal((p) => p + 1);
-          setIsSorted(false);
-          setCurrentSkillNo(0);
-        }
-        refreshSkillLeaderboard(0);
-      },
-    });
-  }
-
   // Age Filter button
   if (!isMiniLeague) {
     quickActions.push({
@@ -354,11 +337,12 @@ export const PlayerLists = () => {
           onSearch={handleAgeSearch}
           user={false}
           resetSignal={ageFilterResetSignal}
-          isActive={hasFiltersApplied()}
+          isActive={hasFiltersApplied() || witnessBy === 1}
           defaultAge={appliedAge}
           defaultAgeType={appliedAgeType}
           defaultGender={appliedGender}
           defaultCountry={appliedCountry}
+          defaultWitness={witnessBy}
         />
       ),
     });
