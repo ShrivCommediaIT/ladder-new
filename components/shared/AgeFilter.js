@@ -20,7 +20,9 @@ const AgeFilter = ({
   defaultAge = "",
   defaultAgeType = "",
   defaultGender = "",
-  defaultCountry = ""
+  defaultCountry = "",
+  defaultWitness = 0,
+  showWitness = false
 }) => {
   const [open, setOpen] = useState(false);
   const [dobInput, setDobInput] = useState("");
@@ -28,6 +30,7 @@ const AgeFilter = ({
   const [gender, setGender] = useState("");
   const [ageType, setAgeType] = useState("");
   const [country, setCountry] = useState("");
+  const [witness, setWitness] = useState(0);
   const searchParams = useSearchParams();
   const ladderType = searchParams.get("type");
 
@@ -38,6 +41,7 @@ const AgeFilter = ({
       setGender(defaultGender || "");
       setAgeType(defaultAgeType || "");
       setCountry(defaultCountry || "");
+      setWitness(defaultWitness || 0);
 
       if (defaultAge && defaultAge !== 0) {
         const age = parseInt(defaultAge, 10);
@@ -50,7 +54,7 @@ const AgeFilter = ({
         setDobInput("");
       }
     }
-  }, [open, defaultAge, defaultAgeType, defaultGender, defaultCountry]);
+  }, [open, defaultAge, defaultAgeType, defaultGender, defaultCountry, defaultWitness]);
 
   useEffect(() => {
     if (resetSignal !== undefined) {
@@ -59,6 +63,7 @@ const AgeFilter = ({
       setGender("");
       setAgeType("");
       setCountry("");
+      setWitness(0);
     }
   }, [resetSignal]);
 
@@ -93,8 +98,12 @@ const AgeFilter = ({
     const ageTypeValue = ageValue ? ageType : "";
     const genderValue = gender || "";
     const countryValue = country || "";
+    const witnessValue = showWitness ? (witness || 0) : 0;
 
-    if (!ageValue && !genderValue && !countryValue) {
+    const wasActive = !!(defaultAge || defaultGender || defaultCountry || (showWitness && defaultWitness));
+    const isAnySelected = !!(ageValue || genderValue || countryValue || witnessValue);
+
+    if (!isAnySelected && !wasActive) {
       toast.error("Please select at least one filter before searching.");
       return;
     }
@@ -104,7 +113,7 @@ const AgeFilter = ({
       return;
     }
 
-    onSearch(ageValue || "", ageTypeValue, genderValue, countryValue);
+    onSearch(ageValue || "", ageTypeValue, genderValue, countryValue, witnessValue);
     setOpen(false);
     toast.success("Searching by Filter!");
   };
@@ -257,6 +266,23 @@ const AgeFilter = ({
             </Button>
           )}
         </div>
+
+        {/* Show only Witnessed Toggle Button */}
+        {showWitness && (
+          <div className="w-full flex justify-center mb-4 mt-2">
+            <button
+              type="button"
+              onClick={() => setWitness(witness === 1 ? 0 : 1)}
+              className={`w-[75%] py-2 rounded-xl font-bold text-sm transition-all border ${
+                witness === 1
+                  ? "bg-blue-100 text-blue-900 border-blue-200 dark:bg-blue-950/80 dark:text-blue-200 dark:border-blue-800 shadow-sm"
+                  : "border-border bg-transparent text-muted-foreground hover:border-primary hover:text-foreground"
+              }`}
+            >
+              Show only Witnessed
+            </button>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-2 w-full mt-4">
