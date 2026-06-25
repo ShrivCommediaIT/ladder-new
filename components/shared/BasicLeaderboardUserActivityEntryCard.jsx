@@ -806,10 +806,6 @@ export default function BasicLeaderboardActivityEntryCard({
         </div>
 
         {/* ACTIVITY BUTTONS */}
-        {type != "positive" &&
-          type != "negative" &&
-          ladderType != "positive" &&
-          ladderType != "negative" && (
             <div className="flex flex-wrap gap-1.5 mb-2">
               {activityNumbers.map((n) => (
                 <button
@@ -828,8 +824,7 @@ export default function BasicLeaderboardActivityEntryCard({
                 </button>
               ))}
             </div>
-          )}
-
+            
         {/* SCORE ENTRY */}
 
         <div

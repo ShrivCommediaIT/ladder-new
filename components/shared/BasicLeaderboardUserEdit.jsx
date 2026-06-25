@@ -97,7 +97,7 @@ export const BasicLeaderboardUserEdit = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[480px] mx-auto bg-background text-foreground border border-border shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-2xl mx-auto bg-background text-foreground border border-border shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
         <DialogTitle className="px-4 py-3 border-b border-border text-center font-bold text-base text-foreground">
           Player Control Panel
         </DialogTitle>
