@@ -8,7 +8,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CheckCircle2, ShieldCheck, CreditCard, Zap, Coins, Award } from "lucide-react";
+import { CheckCircle2, CreditCard, Zap, Coins } from "lucide-react";
 
 export default function AdminQuickActions() {
   const { resolvedTheme } = useTheme();
@@ -25,66 +25,7 @@ export default function AdminQuickActions() {
     window.open("https://wa.me/441134180902", "_blank", "noopener,noreferrer");
   };
 
-  // Load and render PayPal SDK hosted buttons dynamically when Dialog is open
-  useEffect(() => {
-    if (!showPaymentPlans) return;
 
-    const scriptId = "paypal-hosted-buttons-sdk";
-    const scriptSrc = "https://www.paypal.com/sdk/js?client-id=BAAc2_cQyRDE1kjkpMPKFbAJgSS7H4EX2qcxO7brl9fOl0hvYya7c92nDBIus93UObSqywxRScV34mrX5g&components=hosted-buttons&disable-funding=venmo,paylater&currency=GBP";
-
-    const initializeButtons = () => {
-      if (window.paypal && window.paypal.HostedButtons) {
-        const container1 = document.getElementById("paypal-container-XT89PWWRFSPNQ");
-        if (container1) {
-          container1.innerHTML = "";
-          try {
-            window.paypal.HostedButtons({
-              hostedButtonId: "XT89PWWRFSPNQ",
-            }).render("#paypal-container-XT89PWWRFSPNQ");
-          } catch (e) {
-            console.error("Paypal render error 1", e);
-          }
-        }
-
-        const container2 = document.getElementById("paypal-container-HXX74PMDL43FE");
-        if (container2) {
-          container2.innerHTML = "";
-          try {
-            window.paypal.HostedButtons({
-              hostedButtonId: "HXX74PMDL43FE",
-            }).render("#paypal-container-HXX74PMDL43FE");
-          } catch (e) {
-            console.error("Paypal render error 2", e);
-          }
-        }
-      }
-    };
-
-    if (window.paypal && window.paypal.HostedButtons) {
-      setTimeout(initializeButtons, 100);
-      return;
-    }
-
-    let script = document.getElementById(scriptId);
-    if (!script) {
-      script = document.createElement("script");
-      script.id = scriptId;
-      script.src = scriptSrc;
-      script.async = true;
-      document.body.appendChild(script);
-    }
-
-    const handleLoad = () => {
-      setTimeout(initializeButtons, 150);
-    };
-    script.addEventListener("load", handleLoad);
-
-    return () => {
-      if (script) {
-        script.removeEventListener("load", handleLoad);
-      }
-    };
-  }, [showPaymentPlans]);
 
   return (
     <>
@@ -151,141 +92,133 @@ export default function AdminQuickActions() {
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Clubs Card */}
-                <div className="relative group overflow-hidden rounded-[20px] border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/30 flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                        For Clubs
-                      </span>
-                      <span className="text-[10px] font-semibold bg-muted px-2 py-0.5 rounded text-muted-foreground">
-                        Invoice Billing
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="text-lg font-black text-foreground">
-                        Club Membership
-                      </h4>
-                      <p className="text-xs text-muted-foreground">
-                        Full dashboard & administrative tools
-                      </p>
-                    </div>
-                    <div className="pt-2 border-t border-border space-y-2 text-xs sm:text-sm text-foreground/90">
-                      <div className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span><strong>30 days</strong> of free trial access.</span>
+                {/* Clubs Column */}
+                <div className="flex flex-col gap-4">
+                  {/* Clubs Card */}
+                  <div className="relative group overflow-hidden rounded-[20px] border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/30 flex flex-col justify-between flex-1">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                          For Clubs
+                        </span>
+                        <span className="text-[10px] font-semibold bg-muted px-2 py-0.5 rounded text-muted-foreground">
+                          Invoice Billing
+                        </span>
                       </div>
-                      <div className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span>Service agreement sent on active status.</span>
+                      <div className="space-y-1">
+                        <h4 className="text-lg font-black text-foreground">
+                          Club Membership
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Full dashboard & administrative tools
+                        </p>
                       </div>
-                      <div className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span><strong>14 days</strong> payment term by bank transfer or PayPal.</span>
+                      <div className="pt-2 border-t border-border space-y-2 text-xs sm:text-sm text-foreground/90">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                          <span><strong>30 days</strong> of free trial access.</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                          <span>Service agreement sent on active status.</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                          <span><strong>14 days</strong> payment term by bank transfer or PayPal.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Examples for Clubs */}
+                  <div className="rounded-[20px] border border-[#16215c] bg-[#050B3B] p-5 shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-px bg-blue-500/30 flex-1"></div>
+                      <span className="text-xs font-extrabold tracking-wider text-blue-400 uppercase">Examples</span>
+                      <div className="h-px bg-blue-500/30 flex-1"></div>
+                    </div>
+                    <div className="space-y-4 text-xs sm:text-sm text-slate-200">
+                      <div className="space-y-1">
+                        <p className="font-bold text-white">Example 1 - 190 on the roster</p>
+                        <p className="text-slate-300">First 150 users @ £2.00 = £300</p>
+                        <p className="text-slate-300">Remaining 40 users @ £1.60 = £64</p>
+                        <p className="font-extrabold text-sky-400 mt-1">TOTAL = £364 per month</p>
+                      </div>
+                      <div className="space-y-1 pt-3 border-t border-blue-950/40">
+                        <p className="font-bold text-white">Example 2 - 340 on the roster</p>
+                        <p className="text-slate-300">First 150 users @ £2.00 = £300</p>
+                        <p className="text-slate-300">Next 150 users @ £1.60 = £240</p>
+                        <p className="text-slate-300">Remaining 40 users @ £1.30 = £52</p>
+                        <p className="font-extrabold text-sky-400 mt-1">TOTAL = £592 per month</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Coaches Card */}
-                <div className="relative group overflow-hidden rounded-[20px] border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/30 flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                        For Coaches
-                      </span>
-                      <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">
-                        Active Pay-As-You-Go
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="text-lg font-black text-foreground">
-                        Coaching Groups
-                      </h4>
-                      <p className="text-xs text-muted-foreground">
-                        Billed based on roster count
-                      </p>
-                    </div>
-                    <div className="pt-2 border-t border-border space-y-2 text-xs sm:text-sm text-foreground/90">
-                      <div className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span>Only <strong>£2 per pupil</strong> in the roster.</span>
+                {/* Coaches Column */}
+                <div className="flex flex-col gap-4">
+                  {/* Coaches Card */}
+                  <div className="relative group overflow-hidden rounded-[20px] border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/30 flex flex-col justify-between flex-1">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                          For Coaches
+                        </span>
+                        <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">
+                          Active Pay-As-You-Go
+                        </span>
                       </div>
-                      <div className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span>Billed end of month in arrears.</span>
+                      <div className="space-y-1">
+                        <h4 className="text-lg font-black text-foreground">
+                          Coaching Groups
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Billed based on roster count
+                        </p>
                       </div>
-                      <div className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span>Payable by direct bank transfer or PayPal.</span>
+                      <div className="pt-2 border-t border-border space-y-2 text-xs sm:text-sm text-foreground/90">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                          <span>Only <strong>£2 per pupil</strong> in the roster.</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                          <span>Billed end of month in arrears.</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                          <span>Payable by direct bank transfer or PayPal.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Examples for Coaches */}
+                  <div className="rounded-[20px] border border-[#16215c] bg-[#050B3B] p-5 shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-px bg-blue-500/30 flex-1"></div>
+                      <span className="text-xs font-extrabold tracking-wider text-blue-400 uppercase">Examples</span>
+                      <div className="h-px bg-blue-500/30 flex-1"></div>
+                    </div>
+                    <div className="space-y-4 text-xs sm:text-sm text-slate-200">
+                      <div className="space-y-1">
+                        <p className="font-bold text-white">Example 1 - 12 on the roster</p>
+                        <p className="text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Fee for month:</p>
+                        <p className="text-slate-300">12 students @ £2.00 = £24.00</p>
+                      </div>
+                      <div className="space-y-1 pt-3 border-t border-blue-950/40">
+                        <p className="font-bold text-white">Example 2 - 30 on the roster</p>
+                        <p className="text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Fee for month:</p>
+                        <p className="text-slate-300">30 students @ £2.00 = £60.00</p>
+                      </div>
+                      <div className="space-y-1 pt-3 border-t border-blue-950/40">
+                        <p className="font-bold text-white">Example 3 - 45 on the roster</p>
+                        <p className="text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Fee for month:</p>
+                        <p className="text-slate-300">45 students @ £2.00 = £90.00</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* SECTION 2: AD-HOC LICENSES */}
-            <div className="space-y-3 mt-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-                <Award className="h-3.5 w-3.5 text-primary" /> One-Off Licenses & Competitions
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Competition Product */}
-                <div className="rounded-[20px] border border-border p-5 bg-card flex flex-col justify-between space-y-4 hover:border-primary/30 transition-all duration-300">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-block text-[10px] font-extrabold tracking-widest uppercase bg-primary/10 text-primary px-2.5 py-1 rounded-full">
-                        Competition Card
-                      </span>
-                      <span className="text-lg font-black text-foreground">£2</span>
-                    </div>
-                    <h4 className="font-extrabold text-foreground text-sm sm:text-base leading-snug">
-                      SSP International Competitions
-                    </h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Instant competition listing license. Only single purchases allowed.
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-center min-h-[48px] w-full bg-background rounded-xl p-2.5 border border-border">
-                    <div id="paypal-container-XT89PWWRFSPNQ" className="w-full text-center"></div>
-                  </div>
-                </div>
-
-                {/* Talent Board Product */}
-                <div className="rounded-[20px] border border-border p-5 bg-card flex flex-col justify-between space-y-4 hover:border-secondary/30 transition-all duration-300">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="inline-block text-[10px] font-extrabold tracking-widest uppercase bg-secondary/10 text-secondary px-2.5 py-1 rounded-full">
-                        Leaderboard Card
-                      </span>
-                      <span className="text-lg font-black text-foreground">£5</span>
-                    </div>
-                    <h4 className="font-extrabold text-foreground text-sm sm:text-base leading-snug">
-                      SSP Talent Board
-                    </h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Talent leaderboard list upload. Multiple purchases available.
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-center min-h-[48px] w-full bg-background rounded-xl p-2.5 border border-border">
-                    <div id="paypal-container-HXX74PMDL43FE" className="w-full text-center"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Support Note */}
-            <div className="rounded-[16px] bg-primary/5 border border-primary/15 p-4 flex items-start gap-3 mt-6">
-              <ShieldCheck className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <h5 className="font-bold text-foreground text-xs uppercase tracking-wider">
-                  Secure Checkout
-                </h5>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  All online payments are securely processed by PayPal. For custom setups or billing inquiries, please contact our support team.
-                </p>
               </div>
             </div>
           </div>
