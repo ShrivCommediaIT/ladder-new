@@ -14,7 +14,7 @@ import BasicLeaderboardShort from "../admin/BasicLeaderboardShort";
 import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Funnel, X } from "lucide-react";
+import { Funnel, X, XCircle } from "lucide-react";
 import { fetchNegativeLeaderboard, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
@@ -334,7 +334,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
 
-  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedCountry } = useSelector(
+  const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy } = useSelector(
     (state) => state.negativeLeaderBoard || {},
   );
   const showAgeRank = Number(appliedAge) > 0;
@@ -394,7 +394,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry, witness = appliedWitnessBy) => {
       if (ladderId) {
         const payload = {
           ladder_id: ladderId,
@@ -415,18 +415,23 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
           payload.country = country;
         }
 
+        if (witness === 1) {
+          payload.witness_by = 1;
+        }
+
         setIsRefreshing(true);
         dispatch(fetchNegativeLeaderboard(payload)).finally(() => {
           setIsRefreshing(false);
         });
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, appliedCountry],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy],
   );
 
-  const handleAgeSearch = useCallback((age, ageType, gender, country) => {
+  const handleAgeSearch = useCallback((age, ageType, gender, country, witness) => {
     const ageNum = age ? Number(age) : "";
-    const isClearing = (age === null || age === "") && !country;
+    const witnessVal = witness !== undefined ? witness : 0;
+    const isClearing = (age === null || age === "") && !country && !witnessVal;
 
     if (isClearing) {
       setIsSorted(false);
@@ -437,7 +442,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
     }
 
     dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
-    refreshLeaderboard(isClearing ? 0 : selectedPositiveFilter, ageNum, ageType, gender, country);
+    refreshLeaderboard(isClearing ? 0 : selectedPositiveFilter, ageNum, ageType, gender, country, witnessVal);
   }, [dispatch, selectedPositiveFilter, refreshLeaderboard]);
 
   const handleClearFilters = useCallback(() => {
@@ -446,7 +451,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
     setSelectedSkillFilter(0);
     setSelectedPositiveFilter(0);
     dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
-    refreshLeaderboard(0, 0, "", "", "");
+    refreshLeaderboard(0, 0, "", "", "", 0);
     setResetSignal((p) => p + 1);
   }, [dispatch, refreshLeaderboard]);
 
@@ -454,23 +459,15 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
     if (onActionsChanged) {
       const actions = [];
 
-      if (!isSorted && appliedAge === 0) {
-        actions.push({
-          id: "sort-by-skill",
-          label: "Sort by Skill",
-          icon: Funnel,
-          onClick: handleSortBySkill,
-        });
-      } else {
-        actions.push({
-          id: "clear-all-filters",
-          label: "Clear All Filters",
-          icon: Funnel,
-          onClick: handleClearFilters,
-          tone: "danger",
-        });
-      }
+      // 1. Sort action
+      actions.push({
+        id: "sort-by-skill",
+        label: selectedPositiveFilter > 0 ? "Sorted" : "Sort by Skill",
+        icon: Funnel,
+        onClick: handleSortBySkill,
+      });
 
+      // 2. Age filter
       actions.push({
         id: "age-filter",
         node: (
@@ -478,18 +475,32 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
             onSearch={handleAgeSearch}
             user={false}
             resetSignal={resetSignal}
-            isActive={appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)}
+            isActive={appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry) || appliedWitnessBy === 1}
             defaultAge={appliedAge}
             defaultAgeType={appliedAgeType}
             defaultGender={appliedGender}
             defaultCountry={appliedCountry}
+            defaultWitness={appliedWitnessBy}
+            showWitness={true}
           />
         )
       });
 
+      // 3. Separate Clear All Filters action
+      const hasActiveFilters = isSorted || selectedPositiveFilter > 0 || appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry) || appliedWitnessBy === 1;
+      if (hasActiveFilters) {
+        actions.push({
+          id: "clear-all-filters",
+          label: "Clear All Filters",
+          icon: XCircle,
+          onClick: handleClearFilters,
+          tone: "danger",
+        });
+      }
+
       onActionsChanged(actions);
     }
-  }, [isSorted, appliedAge, appliedGender, appliedCountry, resetSignal, onActionsChanged, handleAgeSearch]);
+  }, [isSorted, selectedPositiveFilter, appliedAge, appliedGender, appliedCountry, appliedWitnessBy, resetSignal, onActionsChanged, handleAgeSearch]);
 
   // MANUAL REFRESH HANDLERS (only when explicitly called)
   const handleSelfRemove = useCallback(() => {

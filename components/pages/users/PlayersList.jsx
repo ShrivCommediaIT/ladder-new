@@ -32,7 +32,7 @@ import AgeFilter from "@/components/shared/AgeFilter";
 
 
 
-import { Funnel } from "lucide-react";
+import { Funnel, XCircle } from "lucide-react";
 
 export default function PlayersList({ ladderId: propLadderId, ladderType: propLadderType, onActionsChanged }) {
   const dispatch = useDispatch();
@@ -149,7 +149,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
         actions.push({
           id: "clear-all-filters",
           label: "Clear All Filters",
-          icon: Funnel,
+          icon: XCircle,
           onClick: handleClearFilters,
           tone: "danger",
         });

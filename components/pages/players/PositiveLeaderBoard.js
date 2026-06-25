@@ -393,10 +393,12 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     }
   }, [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy]);
 
-  const handleAgeSearch = (age, ageType, gender, country) => {
+  const handleAgeSearch = (age, ageType, gender, country, witness) => {
     const ageNum = age ? Number(age) : "";
+    const witnessVal = witness !== undefined ? witness : 0;
+    setLocalWitnessBy(witnessVal);
     dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
-    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender, 0, country);
+    refreshLeaderboard(selectedPositiveFilter, ageNum, ageType, gender, witnessVal, country);
   };
 
   useEffect(() => { if (onPlayerAdded) refreshLeaderboard(); }, [onPlayerAdded, refreshLeaderboard]);
@@ -464,22 +466,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     { id: "add-remove", label: "Add / Remove", icon: Plus, onClick: () => setAddRemoveOpen(true) },
     { id: "skill-sort", label: isSorted ? "Sorted" : "Skill Sort", icon: Funnel, onClick: () => setOpenSkillSortDialog(true) },
     { id: "setup", label: "Setup", icon: Zap, onClick: () => setOpenSkillSetupDialog(true) },
-    {
-      id: "witnessed", label: localWitnessBy === 1 ? "Witnessed" : "Witnessed Only", icon: Eye,
-      tone: localWitnessBy === 1 ? "success" : "default",
-      onClick: () => {
-        const next = localWitnessBy === 1 ? 0 : 1; setLocalWitnessBy(next);
-        if (next === 1) {
-          dispatch(setAgeFilter({ age: 0, ageType: "", gender: "" }));
-          setAgeFilterResetSignal((p) => p + 1);
-          setIsSorted(false);
-          refreshLeaderboard(0, 0, "", "", 1);
-        } else {
-          refreshLeaderboard(0, appliedAge, appliedAgeType, appliedGender, 0);
-        }
-      },
-    },
-    { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters} defaultAge={appliedAge} defaultAgeType={appliedAgeType} defaultGender={appliedGender} defaultCountry={appliedCountry} /> },
+    { id: "age-filter", node: <AgeFilter onSearch={handleAgeSearch} user={false} resetSignal={ageFilterResetSignal} isActive={hasFilters || localWitnessBy === 1} defaultAge={appliedAge} defaultAgeType={appliedAgeType} defaultGender={appliedGender} defaultCountry={appliedCountry} defaultWitness={localWitnessBy} showWitness={true} /> },
     {
       id: "clear", label: "Clear All", icon: XCircle, tone: "danger",
       onClick: () => {
