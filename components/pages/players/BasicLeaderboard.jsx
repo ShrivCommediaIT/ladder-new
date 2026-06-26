@@ -665,7 +665,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
       {/* Skill Setup Dialog */}
       <Dialog open={openSkillSetupDialog} onOpenChange={setOpenSkillSetupDialog}>
-        <DialogContent showCloseButton={false} className="bg-transparent border-none shadow-none flex items-center justify-center">
+        <DialogContent showCloseButton={false} className="bg-transparent border-none shadow-none flex items-center justify-center max-w-[95vw] md:max-w-4xl lg:max-w-5xl xl:max-w-6xl w-full">
           <BasicLeaderboardSetUpSkill
             onClose={() => setOpenSkillSetupDialog(false)}
             onSkillsUpdated={refreshLeaderboard}

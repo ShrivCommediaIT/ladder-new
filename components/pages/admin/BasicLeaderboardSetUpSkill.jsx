@@ -273,7 +273,7 @@ export default function BasicLeaderboardSetUpSkill({
 
   return (
     <>
-        <Card className="w-full max-w-[350px] sm:max-w-[600px] sm:w-xl bg-card border border-border rounded-xl overflow-hidden shadow-xl text-card-foreground p-0">
+        <Card className="w-full max-w-[95vw] md:max-w-4xl lg:max-w-5xl xl:max-w-6xl bg-card border border-border rounded-xl overflow-hidden shadow-xl text-card-foreground p-0 transition-all duration-300">
           <div className="bg-muted text-foreground py-3 border-b border-border relative">
             <h2 className="text-md font-semibold text-center">
               {type === "skill" ? "Skills/Performance Set Up" : type === "negative" ? "Set Up" : "LeaderBoard Set Up"}
@@ -292,159 +292,171 @@ export default function BasicLeaderboardSetUpSkill({
             </p>
           )}
 
-          {/* FIXED: Single line header with proper alignment */}
-          <div className="sm:px-2 px-8 py-1 border-b border-border">
-            <div className="flex items-end gap-2 text-foreground text-xs font-medium ">
-              {(type !== "negative") ? <div className="w-20 flex items-center">Skill No.</div> : (type === "negative") ? <div className="w-20 flex items-center">Activity No.</div> : null}
-              <div className="w-[120px] flex flex-col justify-end">
-                <span>Target</span>
-                <span className="text-[9px] text-muted-foreground font-normal normal-case leading-none">(Optional)</span>
+          {/* Responsive scrollable table container */}
+          <div className="w-full overflow-x-auto custom-scroll">
+            <div className="min-w-[760px] md:min-w-full">
+              {/* FIXED: Single line header with proper alignment */}
+              <div className="flex items-center gap-3 py-2.5 px-4 border-b border-border text-foreground text-xs font-semibold uppercase tracking-wider bg-muted/30">
+                <div className="w-16 text-center shrink-0">No.</div>
+                <div className="w-28 shrink-0">
+                  <div>Target</div>
+                  <div className="text-[9px] text-muted-foreground font-normal normal-case leading-none">(Optional)</div>
+                </div>
+                <div className="flex-1 min-w-[200px]">
+                  {(type !== "positive" && type !== "negative") ? "Skill Name" : "Activity"}
+                </div>
+                {(type !== "negative") && (
+                  <div className="w-40 shrink-0">Units Of Measurement</div>
+                )}
+                <div className="w-10 shrink-0"></div> {/* Space for delete button */}
               </div>
-              <div className="w-[200px]">{(type !== "positive" && type !== "negative") ? "Skill Name" : "Activity"}</div>
-              {(type !== "negative") && <div className="w-[120px] translate">Units Of Measurement</div>}
+
+              {/* Rows List */}
+              <div className="max-h-[50vh] sm:max-h-[60vh] overflow-y-auto py-1 divide-y divide-border/40 custom-scroll">
+                {(type !== "negative") ?
+                  rows.map((row) => (
+                    <div key={row.id} className="flex items-center gap-3 py-2 px-4 hover:bg-muted/10 transition-colors">
+                      {/* Column 1: No. */}
+                      <div className="w-16 shrink-0 flex justify-center">
+                        <div className="bg-primary/10 text-primary border border-primary/20 font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center">
+                          {row.id}
+                        </div>
+                      </div>
+
+                      {/* Column 2: Target */}
+                      <div className="w-28 shrink-0">
+                        {(type === "negative" || ladderType === "negative") ? (
+                          <TargetTimerInput
+                            value={row.target}
+                            onChange={(val) => updateRow(row.id, { target: val })}
+                          />
+                        ) : (
+                          <Textarea
+                            rows={1}
+                            placeholder="Target"
+                            value={row.target !== "" ? row.target : ""}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
+                                updateRow(row.id, { target: val });
+                              }
+                            }}
+                            className="bg-background text-foreground text-xs rounded-md border border-input w-full h-10 p-2 resize-none leading-tight focus-visible:ring-1 focus-visible:ring-primary"
+                          />
+                        )}
+                      </div>
+
+                      {/* Column 3: Description */}
+                      <div className="flex-1 min-w-[200px]">
+                        <Textarea
+                          rows={1}
+                          placeholder={`Skill ${row.id} description`}
+                          value={String(row.description || "")}
+                          onChange={(e) =>
+                            updateRow(row.id, { description: e.target.value })
+                          }
+                          className="bg-background text-foreground text-xs w-full rounded-md border border-input p-2 resize-none leading-tight focus-visible:ring-1 focus-visible:ring-primary h-10"
+                        />
+                      </div>
+
+                      {/* Column 4: Unit */}
+                      <div className="w-40 shrink-0">
+                        <Textarea
+                          rows={1}
+                          placeholder="Unit"
+                          value={row.unit}
+                          onChange={(e) =>
+                            updateRow(row.id, { unit: e.target.value })
+                          }
+                          className="bg-background text-foreground text-xs rounded-md border border-input w-full h-10 p-2 resize-none leading-tight focus-visible:ring-1 focus-visible:ring-primary"
+                        />
+                      </div>
+
+                      {/* Column 5: Action */}
+                      <div className="w-10 shrink-0 flex justify-center">
+                        {Boolean(row.dbId) ? (
+                          <button
+                            className="flex items-center justify-center rounded-full text-red-500 hover:scale-105 hover:bg-red-500/10 cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-muted border border-border"
+                            title="Delete Activity"
+                            onClick={() => handleDeleteClick(row.id)}
+                            disabled={deletingId === row.id}
+                          >
+                            {deletingId === row.id ? (
+                              <span className="animate-spin text-sm text-red-500">⌛</span>
+                            ) : (
+                              <FaTrash size={14} />
+                            )}
+                          </button>
+                        ) : (
+                          <div className="w-8 h-8" />
+                        )}
+                      </div>
+                    </div>
+                  )) :
+                  rows.map((row) => (
+                    <div key={row.id} className="flex items-center gap-3 py-2 px-4 hover:bg-muted/10 transition-colors">
+                      {/* Column 1: No. */}
+                      <div className="w-16 shrink-0 flex justify-center">
+                        <div className="bg-primary/10 text-primary border border-primary/20 font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center">
+                          {row.id}
+                        </div>
+                      </div>
+
+                      {/* Column 2: Target */}
+                      <div className="w-28 shrink-0">
+                        <TargetTimerInput
+                          value={row.target}
+                          onChange={(val) => updateRow(row.id, { target: val })}
+                        />
+                      </div>
+
+                      {/* Column 3: Description */}
+                      <div className="flex-1 min-w-[200px]">
+                        <Textarea
+                          rows={1}
+                          placeholder={`Activity ${row.id} description`}
+                          value={String(row.description || "")}
+                          onChange={(e) =>
+                            updateRow(row.id, { description: e.target.value })
+                          }
+                          className="bg-background text-foreground text-xs w-full rounded-md border border-input p-2 resize-none leading-tight focus-visible:ring-1 focus-visible:ring-primary h-10"
+                        />
+                      </div>
+
+                      {/* Column 4: Action */}
+                      <div className="w-10 shrink-0 flex justify-center">
+                        {Boolean(row.dbId) ? (
+                          <button
+                            className="flex items-center justify-center rounded-full text-red-500 hover:scale-105 hover:bg-red-500/10 cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-muted border border-border"
+                            title="Delete Activity"
+                            onClick={() => handleDeleteClick(row.id)}
+                            disabled={deletingId === row.id}
+                          >
+                            {deletingId === row.id ? (
+                              <span className="animate-spin text-sm text-red-500">⌛</span>
+                            ) : (
+                              <FaTrash size={14} />
+                            )}
+                          </button>
+                        ) : (
+                          <div className="w-8 h-8" />
+                        )}
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
             </div>
           </div>
 
-          <div className="max-h-[50vh] sm:max-h-[60vh] overflow-y-auto py-2 space-y-1.5 custom-scroll">
-            {(type !== "negative") ?
-              rows.map((row) => (
-                <div key={row.id} className="flex items-start p-3">
-
-                  {/* Skill No. + +/- */}
-                  <div className="flex flex-col w-20 pt-1">
-                    <div className="bg-primary/10 text-primary border border-primary/20 font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
-                      {row.id}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 w-[250px] items-start flex-1">
-                    {(type === "negative" || ladderType === "negative") ? (
-                      <TargetTimerInput
-                        value={row.target}
-                        onChange={(val) => updateRow(row.id, { target: val })}
-                      />
-                    ) : (
-                      <Textarea
-                        rows={1}
-                        placeholder="Target"
-                        value={row.target !== "" ? row.target : ""}  // ✅ raw string, no Math.abs/Number
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          // ✅ max 2 digits after decimal
-                          if (val === "" || /^\d*\.?\d{0,2}$/.test(val)) {
-                            updateRow(row.id, { target: val });
-                          }
-                        }}
-                        className="bg-background text-foreground text-xs rounded-md border border-input w-[100px] h-10 p-2 resize-none leading-tight"
-                      />
-                    )}
-
-                    <Textarea
-                      rows={1}
-                      placeholder={`Skill ${row.id} description`}
-                      value={String(row.description || "")}
-                      onChange={(e) =>
-                        updateRow(row.id, { description: e.target.value })
-                      }
-                      className="bg-background text-foreground text-xs w-[300px] rounded-md border border-input p-2 resize-none leading-tight"
-                    />
-
-                    <Textarea
-                      rows={1}
-                      placeholder="Unit"
-                      value={row.unit}
-                      onChange={(e) =>
-                        updateRow(row.id, { unit: e.target.value })
-                      }
-                      className="bg-background text-foreground text-xs rounded-md border border-input w-[200px] h-10 p-2 resize-none leading-tight"
-                    />
-                  </div>
-                  {Boolean(row.dbId) ? (
-                    <button
-                      className="ml-2 flex items-center justify-center align-items-center rounded-full text-red-500 text-xl shadow hover:scale-105 hover:bg-red-500/10 cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-muted border border-border shrink-0"
-                      title="Delete Activity"
-                      onClick={() => handleDeleteClick(row.id)}
-                      disabled={deletingId === row.id}
-                    >
-                      {deletingId === row.id ? (
-                        <span className="animate-spin text-sm text-red-500">⌛</span>
-                      ) : (
-                        <FaTrash size={14} />
-                      )}
-                    </button>
-                  ) : (
-                    <div className="ml-2 w-8 h-8 shrink-0" />
-                  )}
-                </div>
-              )) :
-              rows.map((row) => (
-                <div key={row.id} className="flex items-start p-3">
-                  {/* Activity No. */}
-                  <div className="flex flex-col w-20 pt-1">
-                    <div className="bg-primary/10 text-primary border border-primary/20 font-bold rounded-md text-sm w-8 h-8 flex items-center justify-center mx-auto mb-2">
-                      {row.id}
-                    </div>
-                  </div>
-
-                  {/* Activity fields */}
-                  <div className="flex gap-2 w-[250px] items-start flex-1">
-                    <TargetTimerInput
-                      value={row.target}
-                      onChange={(val) => updateRow(row.id, { target: val })}
-                    />
-
-                    <Textarea
-                      rows={1}
-                      placeholder={`Activity ${row.id} description`}
-                      value={String(row.description || "")}
-                      onChange={(e) =>
-                        updateRow(row.id, { description: e.target.value })
-                      }
-                      className="bg-background text-foreground text-xs w-[300px] rounded-md border border-input p-2 resize-none leading-tight"
-                    />
-
-                    {(type !== "negative" && ladderType !== "negative") && (
-                      <Textarea
-                        rows={1}
-                        placeholder="Unit"
-                        value={row.unit}
-                        onChange={(e) =>
-                          updateRow(row.id, { unit: e.target.value })
-                        }
-                        className="bg-background text-foreground text-xs rounded-md border border-input w-[200px] h-10 p-2 resize-none leading-tight"
-                      />)}
-                  </div>
-                  {Boolean(row.dbId) ? (
-                    <button
-                      className="ml-2 flex items-center justify-center align-items-center rounded-full text-red-500 text-xl shadow hover:scale-105 hover:bg-red-500/10 cursor-pointer focus:outline-none transition-all duration-200 w-8 h-8 bg-muted border border-border shrink-0"
-                      title="Delete Activity"
-                      onClick={() => handleDeleteClick(row.id)}
-                      disabled={deletingId === row.id}
-                    >
-                      {deletingId === row.id ? (
-                        <span className="animate-spin text-sm text-red-500">⌛</span>
-                      ) : (
-                        <FaTrash size={14} />
-                      )}
-                    </button>
-                  ) : (
-                    <div className="ml-2 w-8 h-8 shrink-0" />
-                  )}
-                </div>
-              ))
-            }
-
-          </div>
-
-
-          <div className={`bg-muted flex justify-between   items-center w-full px-8 py-3 border-t border-border`}>
-              <div className="flex items-center  mx-4">
-                <BasicLeaderboardPrintSkillsSheet
-                  skills={safeSkillsForPrint}
-                  ladderId={ladderId}
-                />
-              </div> 
-            <div className="flex  gap-4">
+          <div className="bg-muted flex justify-between items-center w-full px-8 py-3 border-t border-border">
+            <div className="flex items-center mx-4">
+              <BasicLeaderboardPrintSkillsSheet
+                skills={safeSkillsForPrint}
+                ladderId={ladderId}
+              />
+            </div> 
+            <div className="flex gap-4">
               <Button
                 size="sm"
                 disabled={saving}
