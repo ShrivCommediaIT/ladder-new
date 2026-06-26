@@ -275,8 +275,8 @@ const AgeFilter = ({
               onClick={() => setWitness(witness === 1 ? 0 : 1)}
               className={`w-[75%] py-2 rounded-xl font-bold text-sm transition-all border ${
                 witness === 1
-                  ? "bg-blue-100 text-blue-900 border-blue-200 dark:bg-blue-950/80 dark:text-blue-200 dark:border-blue-800 shadow-sm"
-                  : "border-border bg-transparent text-muted-foreground hover:border-primary hover:text-foreground"
+                  ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/50 hover:bg-emerald-500/20 hover:border-emerald-500" 
+                  :  "bg-blue-100 text-blue-900 border-blue-200 dark:bg-blue-950/80 dark:text-blue-200 dark:border-blue-800 shadow-sm"
               }`}
             >
               Show only Witnessed

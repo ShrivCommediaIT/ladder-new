@@ -180,7 +180,7 @@ useEffect(() => {
     const hostedButtonId = process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID;
 
     const scriptId = "paypal-hosted-buttons-sdk";
-    const scriptSrc = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo,paylater&currency=GBP`;
+    const scriptSrc = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=GBP`;
 
     let retries = 0;
     const initializeButtons = () => {
@@ -1033,7 +1033,7 @@ useEffect(() => {
                   />
                 )}
 
-                <div className="space-y-3 pt-2">
+                {/* <div className="space-y-3 pt-2">
                   <div className="flex items-center justify-between text-xs">
                     <button
                       type="button"
@@ -1078,7 +1078,7 @@ useEffect(() => {
                       </button>
                     </div>
                   )}
-                </div>
+                </div> */}
               </div>
 
               <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-muted-foreground/60 font-medium">
