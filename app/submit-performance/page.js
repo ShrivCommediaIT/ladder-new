@@ -179,8 +179,15 @@ useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
     const hostedButtonId = process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID;
 
+    if (!clientId || !hostedButtonId) {
+      toast.error("PayPal credentials are not configured in your environment.");
+      setPaypalLoading(false);
+      return;
+    }
+
     const scriptId = "paypal-hosted-buttons-sdk";
-    const scriptSrc = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=GBP`;
+    const currency = process.env.NEXT_PUBLIC_PAYPAL_CURRENCY || "GBP";
+    const scriptSrc = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=${currency}`;
 
     let retries = 0;
     const initializeButtons = () => {
@@ -415,17 +422,18 @@ useEffect(() => {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors };
   };
 
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
+    const { isValid, errors: validationErrors } = validateForm();
+    if (!isValid) {
       toast.error("Please fill in all required fields and fix validation errors");
       setTimeout(() => {
-        const firstErrorKey = Object.keys(errors)[0];
+        const firstErrorKey = Object.keys(validationErrors)[0];
         const element = document.getElementsByName(firstErrorKey)[0];
         if (element) {
           element.scrollIntoView({ behavior: "smooth", block: "center" });
