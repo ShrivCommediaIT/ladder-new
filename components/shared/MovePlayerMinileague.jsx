@@ -57,7 +57,8 @@ const MovePlayerMinileague = ({
   const [score, setScore] = useState("");
   const [betDescription, setBetDescription] = useState("");
   const [selfAlert, setSelfAlert] = useState(false);
-
+  const storedAdminDetails = sessionStorage.getItem("adminDetails");
+  const adminDetails = storedAdminDetails ? JSON.parse(storedAdminDetails) : null;
   // NEW: Win/Loss states
   const [isWin, setIsWin] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -254,6 +255,8 @@ const MovePlayerMinileague = ({
         move_from_section: fromSectionName,
         move_to_section: toSectionName,
       };
+
+      console.log("Payload for moveMiniLeague:", payload);
 
       const moveMiniLeagueRes = await dispatch(moveMiniLeague(payload)).unwrap();
             
