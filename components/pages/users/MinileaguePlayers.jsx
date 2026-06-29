@@ -371,7 +371,7 @@ const MinileaguePlayers = ({ ladderId }) => {
           <DialogHeader>
             <DialogTitle>Notice</DialogTitle>
           </DialogHeader>
-          <p className="py-2 text-gray-800">{dialogMessage}</p>
+          <p className="py-2 text-primary">{dialogMessage}</p>
           <DialogFooter>
             <Button onClick={() => setIsDialogOpen(false)}>OK</Button>
           </DialogFooter>
