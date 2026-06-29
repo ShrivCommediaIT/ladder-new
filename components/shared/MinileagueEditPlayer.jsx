@@ -157,17 +157,25 @@ export const MinileagueEditPlayer = ({
 
   /* ---------------- UI ---------------- */
 
-  const allTabs = [
-    { value: "result", label: "Result" },
-    { value: "challenge", label: "Challenge" },
-    { value: "stats", label: "Stats" },
-    { value: "edit", label: "Edit" },
-    { value: "load", label: "Upload" },
-  ];
+  const allTabs = useMemo(
+    () => [
+      { value: "result", label: "Result" },
+      { value: "challenge", label: "Challenge" },
+      { value: "stats", label: "Stats" },
+      { value: "edit", label: "Edit" },
+      { value: "load", label: "Upload" },
+    ],
+    [],
+  );
 
-  const tabs = userLevel 
-    ? allTabs.filter((t) => t.value === "edit") 
-    : allTabs;
+  const isSelf = Number(loggedInUserId) === Number(playerId);
+
+  const tabs = useMemo(() => {
+    if (!userLevel || isSelf) return allTabs;
+    return allTabs.filter(
+      (tab) => tab.value === "challenge" || tab.value === "stats",
+    );
+  }, [allTabs, isSelf, userLevel]);
 
   const [selectedTab, setSelectedTab] = useState("result");
 
@@ -180,12 +188,12 @@ export const MinileagueEditPlayer = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[480px] mx-auto bg-white text-slate-900 border border-slate-200 dark:bg-slate-950 dark:text-white dark:border-slate-800 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="w-[calc(100%-1rem)] max-w-[95vw] sm:max-w-[640px] md:max-w-[760px] lg:max-w-[900px] xl:max-w-[1040px] mx-auto bg-white text-slate-900 border border-slate-200 dark:bg-slate-950 dark:text-white dark:border-slate-800 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto p-0">
         <DialogTitle className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-center font-bold text-base text-slate-800 dark:text-slate-200">
           Player Control Panel
         </DialogTitle>
 
-        <div className="p-4 overflow-y-auto max-h-[80vh]">
+        <div className="p-3 sm:p-4 md:p-5 overflow-y-auto max-h-[80vh]">
           <Tabs value={selectedTab} onValueChange={setSelectedTab}>
             {/* DESKTOP */}
             <div className="hidden sm:block mb-4">
@@ -218,7 +226,7 @@ export const MinileagueEditPlayer = ({
               </Select>
             </div>
 
-            <div className="mt-2 p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
+            <div className="mt-2 p-3 sm:p-4 md:p-5 border border-slate-200 dark:border-slate-800 rounded-xl">
               <TabsContent value="result">
                 <MovePlayerMinileague
                   onClose={onClose}

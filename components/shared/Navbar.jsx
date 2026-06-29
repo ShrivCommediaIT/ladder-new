@@ -844,7 +844,7 @@ const Navbar = ({
                         unoptimized
                       />
                     </div>
-                    <span className="mt-2 text-xs font-semibold uppercase tracking-wider text-blue-500 font-bold">New Logo</span>
+                    <span className="mt-2 text-xs  uppercase tracking-wider text-blue-500 font-bold">New Logo</span>
                   </div>
                 </div>
 
