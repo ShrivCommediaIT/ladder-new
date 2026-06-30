@@ -15,7 +15,7 @@ import { useSearchParams } from "next/navigation";
 
 const StatsExplainedDialog = () => {
   const searchParams = useSearchParams();
-  
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -130,7 +130,7 @@ const StatsExplainedDialog = () => {
             {/* Calculation Box */}
             <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 backdrop-blur-sm border border-blue-500/50 px-3 py-3 sm:px-4 sm:py-4 rounded-xl sm:rounded-md mt-4 sm:mt-6">
               <p className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight mb-2 sm:mb-3">
-                Total points are divided by the total number of games played
+                Total are divided by the total number of games played
               </p>
               <div className="w-full h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent mx-auto my-2 sm:my-3 max-w-xs"></div>
               <p className="font-bold text-center text-sm sm:text-md lg:text-lg text-white drop-shadow-sm">

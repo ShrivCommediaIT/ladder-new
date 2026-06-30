@@ -471,7 +471,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                       {/* Name */}
                       <div>
                         <Label className="text-p3 block mb-2.5 font-semibold text-foreground">
-                          Name
+                          Name or Username 
                         </Label>
                         <Input
                           {...registerForm.register("name")}
@@ -481,7 +481,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                             backgroundColor: "var(--input-bg)",
                             boxShadow: "inset 0 0 0 1px var(--input-border)",
                           }}
-                          placeholder="Enter your full name"
+                          placeholder="Enter your Name or Username"
                         />
                         {registerErrors.name?.message && (
                           <p className="text-red-400 text-xs mt-1">{registerErrors.name.message}</p>

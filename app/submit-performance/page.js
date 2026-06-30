@@ -100,7 +100,7 @@ export default function SubmitPerformancePage() {
   const [admin, setAdmin] = useState(null);
   const [subAdmin, setSubAdmin] = useState(null);
   const [dbData, setDbData] = useState([]);
-  
+
   // States for Manual Transaction ID Entry
   const [manualTxId, setManualTxId] = useState("");
   const [showManualTx, setShowManualTx] = useState(false);
@@ -129,46 +129,46 @@ export default function SubmitPerformancePage() {
       localStorage.setItem("pending_performance_data", JSON.stringify(formData));
     }
   }, [formData]);
-  
 
 
-useEffect(() => {
-  const fetchData = async () => {
-    if (typeof window !== "undefined") {
-      const adminDetailsStr = sessionStorage.getItem("adminDetails");
-      const subDetailsStr = sessionStorage.getItem("subAdmin");
 
-      const adminDetails = adminDetailsStr
-        ? JSON.parse(adminDetailsStr)
-        : null;
+  useEffect(() => {
+    const fetchData = async () => {
+      if (typeof window !== "undefined") {
+        const adminDetailsStr = sessionStorage.getItem("adminDetails");
+        const subDetailsStr = sessionStorage.getItem("subAdmin");
 
-      const subDetails = subDetailsStr
-        ? JSON.parse(subDetailsStr)
-        : null;
+        const adminDetails = adminDetailsStr
+          ? JSON.parse(adminDetailsStr)
+          : null;
 
-      setAdmin(adminDetails);
-      setSubAdmin(subDetails);
+        const subDetails = subDetailsStr
+          ? JSON.parse(subDetailsStr)
+          : null;
 
-      const requestParams = {};
+        setAdmin(adminDetails);
+        setSubAdmin(subDetails);
 
-      if (adminDetails) {
-        requestParams.admin_id = adminDetails.id;
+        const requestParams = {};
+
+        if (adminDetails) {
+          requestParams.admin_id = adminDetails.id;
+        }
+
+        const response = await getRequest(
+          API_ENDPOINTS.GET_PERFORMANCE_RESULT_LIST,
+          requestParams
+        );
+
+        if (response?.status === 200 && response?.data) {
+          const pageData = response.data.data || [];
+          setDbData(pageData);
+        }
       }
+    };
 
-      const response = await getRequest(
-        API_ENDPOINTS.GET_PERFORMANCE_RESULT_LIST,
-        requestParams
-      );
-
-      if (response?.status === 200 && response?.data) {
-        const pageData = response.data.data || [];
-        setDbData(pageData);
-      }
-    }
-  };
-
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
   // Load and render PayPal SDK subscription buttons dynamically when modal is open
   useEffect(() => {
@@ -319,8 +319,8 @@ useEffect(() => {
   useEffect(() => {
     if (typeof window !== "undefined" && allowed) {
       const urlParams = new URLSearchParams(window.location.search);
-      const isSuccess = 
-        urlParams.get("payment") === "success" || 
+      const isSuccess =
+        urlParams.get("payment") === "success" ||
         urlParams.get("status") === "success" ||
         urlParams.get("st") === "COMPLETED" ||
         urlParams.get("st") === "Completed";
@@ -496,11 +496,11 @@ useEffect(() => {
       }, 100);
       return;
     }
-    // if (dbData.length >= 50) {
+    if (dbData.length > 50) {
       setShowPaymentModal(true);
-    // } else {
-      // await submitFormData();
-    // }
+    } else {
+      await submitFormData();
+    }
   };
 
 
@@ -510,7 +510,7 @@ useEffect(() => {
     try {
       let currentAdmin = admin;
       let currentSubAdmin = subAdmin;
-      
+
       if (typeof window !== "undefined") {
         if (!currentAdmin) {
           const adminDetailsStr = sessionStorage.getItem("adminDetails");
@@ -1107,7 +1107,7 @@ useEffect(() => {
                     <p className="text-xs text-muted-foreground font-semibold">Initializing PayPal Payment...</p>
                   </div>
                 )}
-                
+
                 {!showManualTx && (
                   <div
                     id={`paypal-container-${process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`}
