@@ -282,8 +282,8 @@ useEffect(() => {
       if (user) {
         setFormData(prev => ({
           ...prev,
-          coach_name: user.name || "",
-          email: user.email || ""
+          coach_name: prev.coach_name || user.name || "",
+          email: prev.email || user.email || ""
         }));
       }
     }
