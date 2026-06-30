@@ -289,6 +289,32 @@ useEffect(() => {
     }
   }, [allowed]);
 
+  // BroadcastChannel listener to receive payment success from other tabs/popups
+  useEffect(() => {
+    if (typeof window !== "undefined" && allowed) {
+      const channel = new BroadcastChannel("paypal_payment_channel");
+      channel.onmessage = async (event) => {
+        const { status, txId } = event.data;
+        if (status === "success" && txId) {
+          const savedDataStr = localStorage.getItem("pending_performance_data");
+          if (savedDataStr) {
+            try {
+              const savedData = JSON.parse(savedDataStr);
+              toast.info("Payment confirmed in check-out window! Completing submission...");
+              setShowPaymentModal(false);
+              await submitFormData(txId, savedData);
+            } catch (e) {
+              console.error("Error parsing saved data from channel message:", e);
+            }
+          }
+        }
+      };
+      return () => {
+        channel.close();
+      };
+    }
+  }, [allowed]);
+
   // Detect return from PayPal redirect with success query parameters
   useEffect(() => {
     if (typeof window !== "undefined" && allowed) {
@@ -301,6 +327,28 @@ useEffect(() => {
       const txId = urlParams.get("tx") || urlParams.get("paymentId") || "PAYPAL_REDIRECT_" + Date.now();
 
       if (isSuccess) {
+        // Broadcast success to notify the original parent tab
+        try {
+          const channel = new BroadcastChannel("paypal_payment_channel");
+          channel.postMessage({ status: "success", txId: txId });
+          channel.close();
+        } catch (e) {
+          console.error("Failed to post message to BroadcastChannel:", e);
+        }
+
+        // If this page is opened in a new tab / popup from a parent tab with access to opener,
+        // redirect the parent page to the success URL and close this tab.
+        if (window.opener && window.opener !== window) {
+          try {
+            window.opener.location.href = window.location.href;
+            window.close();
+            return;
+          } catch (e) {
+            console.error("Failed to redirect parent window:", e);
+          }
+        }
+
+        // Fallback: If no parent tab was listening or if opener didn't exist/work, submit from this tab directly
         const savedDataStr = localStorage.getItem("pending_performance_data");
         if (savedDataStr) {
           try {
