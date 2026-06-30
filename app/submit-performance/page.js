@@ -293,7 +293,11 @@ useEffect(() => {
   useEffect(() => {
     if (typeof window !== "undefined" && allowed) {
       const urlParams = new URLSearchParams(window.location.search);
-      const isSuccess = urlParams.get("payment") === "success" || urlParams.get("status") === "success";
+      const isSuccess = 
+        urlParams.get("payment") === "success" || 
+        urlParams.get("status") === "success" ||
+        urlParams.get("st") === "COMPLETED" ||
+        urlParams.get("st") === "Completed";
       const txId = urlParams.get("tx") || urlParams.get("paymentId") || "PAYPAL_REDIRECT_" + Date.now();
 
       if (isSuccess) {
