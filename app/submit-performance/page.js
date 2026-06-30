@@ -498,8 +498,10 @@ useEffect(() => {
       payload.append("gender", dataToSubmit.gender);
       payload.append("country", dataToSubmit.country);
       payload.append("club_name", dataToSubmit.club_name || "");
-      payload.append("coach_name", dataToSubmit.coach_name);
-      payload.append("email", dataToSubmit.email);
+      const emailToSubmit = dataToSubmit.email || currentSubAdmin?.email || currentAdmin?.email || "";
+      const coachNameToSubmit = dataToSubmit.coach_name || currentSubAdmin?.name || currentAdmin?.name || "";
+      payload.append("coach_name", coachNameToSubmit);
+      payload.append("email", emailToSubmit);
       payload.append("venue", dataToSubmit.venue || "");
       payload.append("wind", dataToSubmit.wind || "");
       payload.append("video_link", dataToSubmit.video_link || "");
