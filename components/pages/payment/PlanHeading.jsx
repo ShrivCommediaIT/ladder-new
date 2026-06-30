@@ -58,33 +58,33 @@ export default function PlanHeading() {
   const [isONboardingFlowVisible, setIsONboardingFlowVisible] = useState(false);
   const [views, setViews] = useState(20000);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
-  const [activeVideoId, setActiveVideoId] = useState("u8uIqPDPWmo");
+  const [activeVideoId, setActiveVideoId] = useState("VXRyfRLpBpY");
 
   const demoVideos = [
     {
-      id: "u8uIqPDPWmo",
+      id: "VXRyfRLpBpY",
       title: "Start up (How to)",
       description: "Learn how to set up your club and get started with SSP.",
     },
     {
-      id: "9TlbfBtM9JI",
+      id: "uDmBtGrz_Eg",
       title: "Leaderboards, Colours and Filters",
-      description: "Learn how to use the leaderboards, colours and filters.",
+      description: "Learn how to use the leaderboards, colours and filters. work",
     },
     {
-      id: "NpUEYIXdaNI",
-      title: "The Benefits of the SSP Participation Eco System",
-      description: "Learn how the SSP Participation Ecosystem rewards and engages players of all ages.",
+      id: "CCiU5nA7Sdo",
+      title: "Main Dashboard Explained",
+      description: "A comprehensive overview of the main admin dashboard and its features.",
     },
     {
-      id: "IdkhONLRAe8",
-      title: "Main Admin Dashboard Explained",
-      description: "A comprehensive guide to managing your sports organization from the main admin panel.",
-    },
-    {
-      id: "p2BPSnIN1uA",
-      title: "Section Admin Dashboard & Creating Solutions",
+      id: "1lBalDCSAPg",
+      title: "Section Dashboard and Creating Solutions",
       description: "How to set up mini-leagues, challenge boards, and custom leaderboards as a Section Admin.",
+    },
+    {
+      id: "2bielTgi72U",
+      title: "The Benefits of the SSP Participation Eco-System",
+      description: "Learn how the SSP Participation Ecosystem rewards and engages players of all ages.",
     },
   ];
 
