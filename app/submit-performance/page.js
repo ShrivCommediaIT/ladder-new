@@ -187,7 +187,9 @@ useEffect(() => {
 
     const scriptId = "paypal-hosted-buttons-sdk";
     const currency = process.env.NEXT_PUBLIC_PAYPAL_CURRENCY || "GBP";
-    const scriptSrc = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=${currency}`;
+    const env = process.env.NEXT_PUBLIC_PAYPAL_ENV || "production";
+    const domain = env === "sandbox" ? "sandbox.paypal.com" : "www.paypal.com";
+    const scriptSrc = `https://${domain}/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=${currency}`;
 
     let retries = 0;
     const initializeButtons = () => {
@@ -289,7 +291,7 @@ useEffect(() => {
 
   // Detect return from PayPal redirect with success query parameters
   useEffect(() => {
-    if (typeof window !== "undefined" && admin) {
+    if (typeof window !== "undefined" && allowed) {
       const urlParams = new URLSearchParams(window.location.search);
       const isSuccess = urlParams.get("payment") === "success" || urlParams.get("status") === "success";
       const txId = urlParams.get("tx") || urlParams.get("paymentId") || "PAYPAL_REDIRECT_" + Date.now();
@@ -307,7 +309,7 @@ useEffect(() => {
         }
       }
     }
-  }, [admin]);
+  }, [allowed]);
 
   if (!allowed) return null;
 
@@ -454,15 +456,33 @@ useEffect(() => {
     const dataToSubmit = customFormData || formData;
     setLoading(true);
     try {
+      let currentAdmin = admin;
+      let currentSubAdmin = subAdmin;
+      
+      if (typeof window !== "undefined") {
+        if (!currentAdmin) {
+          const adminDetailsStr = sessionStorage.getItem("adminDetails");
+          currentAdmin = adminDetailsStr ? JSON.parse(adminDetailsStr) : null;
+        }
+        if (!currentAdmin) {
+          const userDataStr = sessionStorage.getItem("userData");
+          currentAdmin = userDataStr ? JSON.parse(userDataStr) : null;
+        }
+        if (!currentSubAdmin) {
+          const subDetailsStr = sessionStorage.getItem("subAdmin");
+          currentSubAdmin = subDetailsStr ? JSON.parse(subDetailsStr) : null;
+        }
+      }
+
       const payload = new FormData();
-      if (subAdmin == null) {
-        payload.append("admin_id", admin?.id || "");
-        payload.append("user_id", admin?.id || "");
-        payload.append("user_type", admin?.user_type || "");
+      if (currentSubAdmin == null) {
+        payload.append("admin_id", currentAdmin?.id || "");
+        payload.append("user_id", currentAdmin?.id || "");
+        payload.append("user_type", currentAdmin?.user_type || "");
       } else {
-        payload.append("admin_id", admin?.id || "");
-        payload.append("user_id", subAdmin?.id || "");
-        payload.append("user_type", subAdmin?.user_type || "");
+        payload.append("admin_id", currentAdmin?.id || "");
+        payload.append("user_id", currentSubAdmin?.id || "");
+        payload.append("user_type", currentSubAdmin?.user_type || "");
       }
       payload.append("sport", dataToSubmit.sport === "Other" ? dataToSubmit.customSport : dataToSubmit.sport);
       payload.append("activity", dataToSubmit.activity);
