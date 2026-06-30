@@ -152,28 +152,28 @@ const PlayerCard = ({
               textClass="text-[10px] sm:text-xs md:text-sm"
             />
             {(showAgeRank || showGenderRank || showCountryRank) && (() => {
-                const activeRankLabels = [
-                  showAgeRank && " Age ",
-                  showGenderRank && " Gender ",
-                  showCountryRank && " Country ",
-                ].filter(Boolean);
+              const activeRankLabels = [
+                showAgeRank && " Age ",
+                showGenderRank && " Gender ",
+                showCountryRank && " Country ",
+              ].filter(Boolean);
 
-                return (
-                  <div className="flex flex-col  mt-2">
-                    <p
-                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
-                      
-                    >
-                      Rank By:-
-                    </p>
-                    <p
-                      className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
-                    >
-                      {`(${activeRankLabels.join(",")})`}
-                    </p>
-                  </div>
-                );
-              })()}
+              return (
+                <div className="flex flex-col  mt-2">
+                  <p
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+
+                  >
+                    Rank By:-
+                  </p>
+                  <p
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+                  >
+                    {`(${activeRankLabels.join(",")})`}
+                  </p>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Info block */}
@@ -245,9 +245,9 @@ const PlayerCard = ({
                         key={i}
                         className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
                          ${scoreData.witnessBy && "underline decoration-dark decoration-[2px]"}
-                            ${ scoreData.isTargetAchieved
-                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
-                              : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
+                            ${scoreData.isTargetAchieved
+                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
+                            : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
@@ -277,12 +277,12 @@ const PlayerCard = ({
           className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
-          {/* Total Points badge */}
+          {/* Total badge */}
           <span
             className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
             style={{ color: "var(--best-board-muted)" }}
           >
-            Total Points
+            Total
           </span>
           <div
             className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
@@ -326,7 +326,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   const ladderId = propLadderId || searchParams.get("ladder_id");
   const { data = [], loading, ladderDetails, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy } = useSelector((state) => state.positiveLeaderBoard || {});
   const showAgeRank = Number(appliedAge) > 0;
-  const showGenderRank = appliedGender != ""; 
+  const showGenderRank = appliedGender != "";
   const showCountryRank = appliedCountry != "";
   const isInverted = ladderDetails?.inverted == 0;
   const hasFilters = (appliedAge && appliedAge !== 0) || (appliedGender && appliedGender !== "") || (appliedCountry && appliedCountry !== "");

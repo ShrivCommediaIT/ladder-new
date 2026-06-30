@@ -101,7 +101,7 @@ const PlayerCard = ({
 
   const getRankBySkillNumber = (ranks, skillNumber) => {
     const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
-    return  rankObj?.rank || "-";
+    return rankObj?.rank || "-";
   };
 
   return (
@@ -302,12 +302,12 @@ const PlayerCard = ({
           className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
-          {/* Total Points badge */}
+          {/* Total badge */}
           <span
             className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
             style={{ color: "var(--best-board-muted)" }}
           >
-            Total Points
+            Total
           </span>
           <div
             className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
@@ -526,9 +526,9 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
 
       refreshLeaderboard(skillNo);
     },
-    [refreshLeaderboard], 
+    [refreshLeaderboard],
 
-    
+
   );
 
   const handleSortBySkill = useCallback(() => {

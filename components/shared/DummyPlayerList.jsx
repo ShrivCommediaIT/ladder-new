@@ -184,11 +184,10 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
                       {r}
                     </div>
                     <div
-                      className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${
-                        found
+                      className={`w-6 h-6 sm:w-8 sm:h-7 flex items-center justify-center border-b-2 rounded font-bold ${found
                           ? "bg-blue-600 dark:bg-blue-500 border border-blue-500 dark:border-blue-400 text-white shadow-sm"
                           : "bg-black/5 dark:bg-white/5 border border-dashed border-black/10 dark:border-white/15 text-zinc-400 dark:text-white/40"
-                      }`}
+                        }`}
                     >
                       {found ? found.point : ""}
                     </div>
@@ -204,7 +203,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
           className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
-          {/* Total Points */}
+          {/* Total */}
           <div
             className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
             style={{
@@ -401,10 +400,9 @@ const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true,
                     <div
                       key={i}
                       className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all border
-                        ${
-                          witnessBy
-                            ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
-                            : isTargetAchieved
+                        ${witnessBy
+                          ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
+                          : isTargetAchieved
                             ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] shadow-md"
                             : "bg-[var(--best-board-warning)] text-[#0f172a] border-[var(--best-board-border-strong)] hover:brightness-95"
                         }`}
@@ -447,7 +445,7 @@ const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true,
           className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
-          {/* Total Points */}
+          {/* Total */}
           <div
             className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
             style={{
@@ -673,7 +671,7 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
 
   // Redux data
   const ladderDetails = useSelector(state => state.player?.players?.[ladderId]?.ladderDetails || null);
-  
+
   // Determine active type (Prop > URL param > API type > Default)
   const type = (propLadderType || ladderTypeFromUrl || ladderDetails?.type || "bestof5").toLowerCase();
   const ladderType = type;
@@ -710,21 +708,21 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
   const appliedAgePositive = useSelector(state => state.positiveLeaderBoard?.appliedAge);
   const appliedAgeNegative = useSelector(state => state.negativeLeaderBoard?.appliedAge);
 
-  const displayLadderDetails = 
+  const displayLadderDetails =
     type === "minileague" ? minileagueLadderDetails :
-    type === "skill" ? skillLadderDetails :
-    type === "positive" ? positiveLadderDetails :
-    type === "negative" ? negativeLadderDetails :
-    type === "roster" ? rosterLadderDetails :
-    ladderDetails;
+      type === "skill" ? skillLadderDetails :
+        type === "positive" ? positiveLadderDetails :
+          type === "negative" ? negativeLadderDetails :
+            type === "roster" ? rosterLadderDetails :
+              ladderDetails;
 
-  const totalPlayersCount = 
+  const totalPlayersCount =
     type === "minileague" ? minileagueSections.reduce((acc, sec) => acc + (sec?.users_record?.length || 0), 0) :
-    type === "skill" ? skillData.length :
-    type === "positive" ? positiveData.length :
-    type === "negative" ? negativeData.length :
-    type === "roster" ? rosterData.length :
-    standardPlayers.length;
+      type === "skill" ? skillData.length :
+        type === "positive" ? positiveData.length :
+          type === "negative" ? negativeData.length :
+            type === "roster" ? rosterData.length :
+              standardPlayers.length;
 
   useEffect(() => {
     if (!ladderId) return;
@@ -842,7 +840,7 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
               return (
                 <SkillPlayerCard
                   key={player.id || idx}
-                  player={{...player, isInverted: displayLadderDetails?.inverted == 0}}
+                  player={{ ...player, isInverted: displayLadderDetails?.inverted == 0 }}
                   rank={player.rank || idx + 1}
                   showAgeRank={showAgeRank}
                   ageRank={idx + 1}
@@ -881,7 +879,7 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
               return (
                 <SkillPlayerCard
                   key={player.id || idx}
-                  player={{...player, isInverted: displayLadderDetails?.inverted == 0}}
+                  player={{ ...player, isInverted: displayLadderDetails?.inverted == 0 }}
                   rank={player.rank || idx + 1}
                   showAgeRank={showAgeRank}
                   ageRank={idx + 1}
@@ -921,7 +919,7 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
               return (
                 <SkillPlayerCard
                   key={player.id || idx}
-                  player={{...player, isInverted: displayLadderDetails?.inverted == 0}}
+                  player={{ ...player, isInverted: displayLadderDetails?.inverted == 0 }}
                   rank={player.rank || idx + 1}
                   showAgeRank={showAgeRank}
                   ageRank={idx + 1}

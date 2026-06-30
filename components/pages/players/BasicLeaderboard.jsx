@@ -108,7 +108,7 @@ const PlayerCard = ({
 
   const getRankBySkillNumber = (ranks, skillNumber) => {
     const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
-    return  rankObj?.rank || "-";
+    return rankObj?.rank || "-";
   };
 
   const skillsToRender = appliedWitnessBy === 1
@@ -264,9 +264,9 @@ const PlayerCard = ({
                         key={i}
                         className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
                           ${scoreData.witnessBy && "underline decoration-dark decoration-[2px]"}
-                            ${ scoreData.isTargetAchieved
-                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
-                              : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
+                            ${scoreData.isTargetAchieved
+                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
+                            : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
                           }`}
                         title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                       >
@@ -313,12 +313,12 @@ const PlayerCard = ({
           className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
-          {/* Total Points badge */}
+          {/* Total badge */}
           <span
             className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
             style={{ color: "var(--best-board-muted)" }}
           >
-            Total Points
+            Total
           </span>
           <div
             className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
