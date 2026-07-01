@@ -18,7 +18,7 @@ import { BasicLeaderboardUserEdit } from "@/components/shared/BasicLeaderboardUs
 import { fetchNegativeLeaderboard, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import AgeFilter from "@/components/shared/AgeFilter";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
-import { convertTimeToSeconds } from "@/helper/helperFunction";
+import { convertTimeToSeconds, formatSecondsToTime } from "@/helper/helperFunction";
 import ControlsSection from "@/components/shared/ControlsSection";
 import InfoSection from "@/components/shared/InfoSection";
 import LadderPageLayout from "@/components/shared/LadderPageLayout";
@@ -330,7 +330,7 @@ const PlayerCard = ({
               className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center"
               style={{ color: "var(--best-board-highlight)" }}
             >
-              {Math.abs(Number(player?.total_point || 0)).toFixed(2)}
+              {formatSecondsToTime(player?.total_point)}
             </span>
           </div>
 
