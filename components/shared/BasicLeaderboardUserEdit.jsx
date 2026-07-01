@@ -29,6 +29,7 @@ export const BasicLeaderboardUserEdit = ({
   ladderId: propLadderId,
   skillNumber,
   skillActivityId,
+  onPaymentRequired,
 }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -149,6 +150,7 @@ export const BasicLeaderboardUserEdit = ({
                     initialActivity={skillNumber}
                     playerName={selectedPlayer?.name || "Player"}
                     selectedPlayer={selectedPlayer}
+                    onPaymentRequired={onPaymentRequired}
                   />
                 </div>
               </TabsContent>

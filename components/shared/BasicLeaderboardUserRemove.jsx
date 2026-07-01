@@ -31,7 +31,6 @@ const BasicLeaderboardUserRemove = ({ ladderId, ladderType, myRank, onClose, onS
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  console.log(myRank && myRank, 'parsedUser==>2')
 
   const [rankInput, setRankInput] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);

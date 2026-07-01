@@ -29,7 +29,8 @@ export default function BasicLeaderboardActivityEntryCard({
   initialActivity,
   onClose,
   playerName,
-  selectedPlayer
+  selectedPlayer,
+  onPaymentRequired
 }) {
   const [selectedActivity, setSelectedActivity] = useState(
     initialActivity || 1,
@@ -501,6 +502,43 @@ export default function BasicLeaderboardActivityEntryCard({
       } else {
         const num = Math.abs(Number(inputScore) || 0);
         finalScore = num;
+      }
+    }
+
+    // Verify subscription status for Positive Leaderboard score postings
+    if (type === "positive" || ladderType === "positive") {
+      let sessionUser = null;
+      if (typeof window !== "undefined") {
+        try {
+          const storedUser = sessionStorage.getItem("user");
+          if (storedUser) {
+            sessionUser = JSON.parse(storedUser);
+          }
+        } catch (err) {
+          console.error("Failed to parse user in activity card", err);
+        }
+      }
+
+      if (sessionUser && Number(sessionUser.id) === Number(playerId)) {
+        if (sessionUser.payment_status !== 1 && sessionUser.payment_status !== "1") {
+          // Only check/block if the page has provided the payment handler callback (e.g. positiveLeaderBoardUser)
+          if (onPaymentRequired) {
+            toast.info("Subscription required. Redirecting to payment...");
+            let bestToSubmit = bestScore;
+            if (bestScore === undefined || bestScore === null || bestScore === "" || bestScore === 0) {
+              bestToSubmit = finalScore;
+            }
+            onPaymentRequired({
+              playerId,
+              skillActivityId,
+              score: finalScore,
+              bestScore: bestToSubmit,
+              witnessBy: witnessBy || "",
+              url: URl
+            });
+            return;
+          }
+        }
       }
     }
 

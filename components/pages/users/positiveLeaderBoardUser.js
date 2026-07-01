@@ -20,7 +20,7 @@ import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 import AgeFilter from "@/components/shared/AgeFilter";
-import { getRequest } from "@/services/apiService";
+import { getRequest, postUrlEncoded } from "@/services/apiService";
 import { toast } from "react-toastify";
 
 
@@ -389,6 +389,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [pendingSkillClickArgs, setPendingSkillClickArgs] = useState(null);
+  const [pendingPostArgs, setPendingPostArgs] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isSorted, setIsSorted] = useState(false);
@@ -591,9 +592,9 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           const parsedUser = JSON.parse(storedUser);
           if (parsedUser && parsedUser.id) {
             setCurrentUserId(Number(parsedUser.id));
-
+            console.log(parsedUser.payment_status, 'parsedUser==>2')
             // Auto-show payment modal on mount/login if user has not paid
-            if (parsedUser.payment_status === 0 || parsedUser.payment_status === "0" || parsedUser.payment_status == null) {
+            if (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1") {
               setShowPaymentModal(true);
             }
           }
@@ -637,8 +638,45 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           toast.success("Payment status updated successfully!");
           setShowPaymentModal(false);
 
-          // Open the edit modal if there was a pending click
-          if (pendingSkillClickArgs) {
+          // Auto-submit the pending result if it exists!
+          if (pendingPostArgs) {
+            toast.info("Submitting your score...");
+            try {
+              const params = new URLSearchParams();
+              params.append("user_id", String(pendingPostArgs.playerId));
+              params.append("skill_activity_id", String(pendingPostArgs.skillActivityId));
+              params.append("score", String(pendingPostArgs.score));
+              params.append("witness_by", String(pendingPostArgs.witnessBy || ""));
+              params.append("best_result", String(pendingPostArgs.bestScore || pendingPostArgs.score));
+
+              let adminId = "";
+              try {
+                const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
+                adminId = adminDetails?.id || "";
+              } catch (e) {}
+              params.append("admin_id", adminId);
+              params.append("ladder_id", ladderId);
+
+              // Find the player name
+              const player = data.find((p) => p.id === pendingPostArgs.playerId);
+              params.append("user_name", player?.name || "Player");
+
+              const res = await postUrlEncoded(pendingPostArgs.url || "user/postResultSkillboard", params);
+
+              if (res?.status === 200 || res?.status === "success") {
+                toast.success("Score posted successfully!");
+              } else {
+                toast.error(res?.error_message || "Score submitted but got response error.");
+              }
+              refreshLeaderboard();
+            } catch (postErr) {
+              console.error("Auto post score error:", postErr);
+              toast.error("Failed to auto-submit score. Please try submitting again.");
+            } finally {
+              setPendingPostArgs(null);
+            }
+          } else if (pendingSkillClickArgs) {
+            // Legacy/Mount fallback: Open the edit modal if there was a pending click
             setSelectedPlayerId(pendingSkillClickArgs.playerId);
             setSelectedSkillNumber(pendingSkillClickArgs.skillNumber);
             setSelectedSkillActivityId(pendingSkillClickArgs.skillActivityId);
@@ -663,7 +701,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [showPaymentModal, pendingSkillClickArgs]);
+  }, [showPaymentModal, pendingSkillClickArgs, pendingPostArgs, data, ladderId, refreshLeaderboard]);
 
 
   const handleSkillClick = useCallback(
@@ -681,30 +719,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
       );
       if (!skillObj) return;
 
-      // Check payment status using session storage
-      let sessionUser = null;
-      if (typeof window !== "undefined") {
-        try {
-          const storedUser = sessionStorage.getItem("user");
-          if (storedUser) {
-            sessionUser = JSON.parse(storedUser);
-          }
-        } catch (err) {
-          console.error("Failed to parse user from sessionStorage", err);
-        }
-      }
-
-      if (sessionUser && Number(sessionUser.id) === Number(playerId)) {
-        if (sessionUser.payment_status === 0 || sessionUser.payment_status === "0") {
-          setPendingSkillClickArgs({
-            playerId,
-            skillNumber,
-            skillActivityId: skillObj.id,
-          });
-          setShowPaymentModal(true);
-          return;
-        }
-      }
+      // Block checks removed here; check is now performed upon result submission
 
       setSelectedPlayerId(playerId);
       setSelectedSkillNumber(skillNumber);
@@ -799,6 +814,11 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           ladderId={ladderId}
           skillNumber={selectedSkillNumber}
           skillActivityId={selectedSkillActivityId}
+          onPaymentRequired={(args) => {
+            setOpenEdit(false);
+            setPendingPostArgs(args);
+            setShowPaymentModal(true);
+          }}
         />
       )}
 
