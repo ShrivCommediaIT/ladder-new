@@ -667,7 +667,10 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
               const player = data.find((p) => p.id === pendingPostArgs.playerId);
               params.append("user_name", player?.name || "Player");
 
-              const res = await postUrlEncoded(pendingPostArgs.url || "user/postResultSkillboard", params);
+              const targetUrl = pendingPostArgs.url
+                ? (pendingPostArgs.url.startsWith('/') ? pendingPostArgs.url : `/${pendingPostArgs.url}`)
+                : "/user/postResultSkillboard";
+              const res = await postUrlEncoded(targetUrl, params);
 
               if (res?.status === 200 || res?.status === "success") {
                 toast.success("Score posted successfully!");
