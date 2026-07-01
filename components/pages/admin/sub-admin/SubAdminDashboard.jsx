@@ -26,7 +26,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Link from "next/link";
-import { Layers, Users, UploadCloud, ListChecks, Play, ShieldCheck, Sparkles, Target, FolderKanban, ArrowRight, Mail, Plus } from "lucide-react";
+import { Layers, Users, UploadCloud, ListChecks, Play, ShieldCheck, Sparkles, Target, FolderKanban, ArrowRight, Mail, Plus, Eye, EyeOff } from "lucide-react";
 import AdminQuickActions from "@/components/shared/AdminQuickActions";
 
 const cardToneClasses = [
@@ -60,7 +60,7 @@ import LadderList from "../LadderList";
 import LadderInfo from "../LadderInfo";
 import Navbar from "@/components/shared/Navbar";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { importSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { importRoster } from "@/redux/slices/rosterSlice";
@@ -71,7 +71,7 @@ export default function SubAdminDashboard() {
   const [csvFile, setCsvFile] = useState(null);
   const [ladderType, setLadderType] = useState("winlose");
   const [duplicateWarning, setDuplicateWarning] = useState(null);
-  const [showDemo, setShowDemo] = useState(true);
+  const [showDemo, setShowDemo] = useState(false);
   const [withoutCsv, setWithoutCsv] = useState(false);
 
 
@@ -227,6 +227,7 @@ export default function SubAdminDashboard() {
     if (result.duplicateNames.length > 0) {
       setDuplicateWarning(result);
       setCsvFile(null);
+      e.target.value = "";
 
       toast.error(
         `Duplicate names found: ${[...new Set(result.duplicateNames)].join(", ")}`,
@@ -236,6 +237,7 @@ export default function SubAdminDashboard() {
     }
 
     setCsvFile(file);
+    e.target.value = "";
   };
 
   const handleCreateLadder = async () => {
@@ -464,15 +466,49 @@ export default function SubAdminDashboard() {
               transition={{ duration: 0.45, delay: 0.15 }}
               className="overflow-hidden rounded-[24px] sm:rounded-[30px] border border-border bg-card p-4 backdrop-blur-xl sm:p-5"
             >
-              <div className="mb-4 px-1">
-                <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
-                  Solutions Available
-                </p>
-                <h2 className="mt-2 text-h2 font-bold text-foreground">
-                  DEMO SOLUTIONS (Use to test)
-                </h2>
+              <div className="mb-4 px-1 flex items-center justify-between">
+                <div>
+                  <p className="text-p3 font-semibold uppercase tracking-[0.18em] text-primary/80">
+                    Solutions Available
+                  </p>
+                  <h2 className="mt-2 text-h2 font-bold text-foreground">
+                    DEMO SOLUTIONS (Use to test)
+                  </h2>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => setShowDemo(!showDemo)}
+                  className="text-white hover:opacity-90 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-xs font-semibold shadow-sm hover:brightness-110 active:scale-95"
+                  style={{
+                    backgroundColor: "color-mix(in srgb, var(--primary), var(--secondary))"
+                  }}
+                >
+                  {showDemo ? (
+                    <>
+                      <EyeOff className="h-3.5 w-3.5" />
+                      <span>Hide</span>
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="h-3.5 w-3.5" />
+                      <span>Show</span>
+                    </>
+                  )}
+                </Button>
               </div>
-              <LadderInfo ladders={demoLadders} />
+              <AnimatePresence initial={false}>
+                {showDemo && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    <LadderInfo ladders={demoLadders} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.section>
 
             <motion.section
