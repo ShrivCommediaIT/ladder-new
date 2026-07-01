@@ -520,11 +520,11 @@ export default function SubscriptionPlan({ ladderId }) {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-6 text-xs sm:text-sm font-bold text-blue-600 pt-4 pb-4">
-          <Link href="https://ne-games.com/privacy_policy" target="_blank" className="underline">Data and Privacy Policy</Link>
+          <Link href="/privacy-policy" className="underline">Data and Privacy Policy</Link>
           <span className="hidden sm:block text-black">|</span>
-          <Link href="/refundPolicy.pdf" target="_blank" className="underline">Refund Policy</Link>
+          <Link href="/refund-policy" className="underline">Refund Policy</Link>
           <span className="hidden sm:block text-black">|</span>
-          <Link href="https://ne-games.com/terms_and_conditions" target="_blank" className="underline">Terms and Conditions</Link>
+          <Link href="/terms-and-conditions" className="underline">Terms and Conditions</Link>
         </div>
       </section>
       {/* Monthly Coupon Dialog */}
