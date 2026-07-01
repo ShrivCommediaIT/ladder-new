@@ -505,8 +505,8 @@ export default function BasicLeaderboardActivityEntryCard({
       }
     }
 
-    // Verify subscription status for Positive Leaderboard score postings
-    if (type === "positive" || ladderType === "positive") {
+    // Verify subscription status for Positive and Negative Leaderboard score postings
+    if (type === "positive" || ladderType === "positive" || type === "negative" || ladderType === "negative") {
       let sessionUser = null;
       let adminDetails = null;
       if (typeof window !== "undefined") {
