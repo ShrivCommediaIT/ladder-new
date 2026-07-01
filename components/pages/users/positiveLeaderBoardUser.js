@@ -593,7 +593,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
             setCurrentUserId(Number(parsedUser.id));
 
             // Auto-show payment modal on mount/login if user has not paid
-            if (parsedUser.payment_status === 0 || parsedUser.payment_status === "0") {
+            if (parsedUser.payment_status === 0 || parsedUser.payment_status === "0" || parsedUser.payment_status == null) {
               setShowPaymentModal(true);
             }
           }
@@ -640,12 +640,12 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
                 layout: 'vertical',
                 label: 'subscribe'
               },
-              createSubscription: function(data, actions) {
+              createSubscription: function (data, actions) {
                 return actions.subscription.create({
                   plan_id: PAYPAL_PLAN_ID
                 });
               },
-              onApprove: async function(data, actions) {
+              onApprove: async function (data, actions) {
                 toast.success("Subscription approved! Updating payment status...");
                 try {
                   let sessionUser = null;
@@ -684,7 +684,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
                   setPaypalLoading(false);
                 }
               },
-              onError: function(err) {
+              onError: function (err) {
                 toast.error("PayPal Subscription payment failed or was cancelled.");
                 console.error("PayPal integration error:", err);
                 setPaypalLoading(false);
@@ -921,15 +921,15 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
             <div className="bg-primary/10 p-3 rounded-full">
               <Image src={Logo} alt="Logo" className="h-10 w-10 object-contain" />
             </div>
-            
+
             <h3 className="text-xl font-bold text-foreground">
               Subscription Required
             </h3>
-            
+
             <p className="text-sm text-muted-foreground leading-relaxed">
               To submit scores for this leaderboard, you need an active subscription.
             </p>
-            
+
             <div className="bg-muted/50 w-full p-4 rounded-xl border border-border">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary/80">
                 Competition Access
