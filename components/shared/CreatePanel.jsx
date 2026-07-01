@@ -156,7 +156,10 @@ const CreatePanel = ({
         <Button
           onClick={handleCreate}
           disabled={!ladderName || (!withoutCsv && !csvFile) || loading}
-          className="w-full h-12 rounded-2xl text-p1 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl active:scale-95 transition-all"
+          className="w-full h-12 rounded-2xl text-p1 font-bold text-white shadow-xl active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none hover:opacity-90 hover:brightness-110"
+          style={{
+            backgroundColor: "color-mix(in srgb, var(--primary), var(--secondary))"
+          }}
         >
           {loading
             ? "Creating..."
