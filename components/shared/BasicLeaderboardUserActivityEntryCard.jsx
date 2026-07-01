@@ -508,18 +508,26 @@ export default function BasicLeaderboardActivityEntryCard({
     // Verify subscription status for Positive Leaderboard score postings
     if (type === "positive" || ladderType === "positive") {
       let sessionUser = null;
+      let adminDetails = null;
       if (typeof window !== "undefined") {
         try {
           const storedUser = sessionStorage.getItem("user");
           if (storedUser) {
             sessionUser = JSON.parse(storedUser);
           }
+          const storedAdmin = sessionStorage.getItem("adminDetails");
+          if (storedAdmin) {
+            adminDetails = JSON.parse(storedAdmin);
+          }
         } catch (err) {
-          console.error("Failed to parse user in activity card", err);
+          console.error("Failed to parse user or admin in activity card", err);
         }
       }
 
-      if (sessionUser && Number(sessionUser.id) === Number(playerId)) {
+      const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+      const isAdminMatched = adminDetails && Number(adminDetails.id) === requiredAdminId;
+
+      if (isAdminMatched && sessionUser && Number(sessionUser.id) === Number(playerId)) {
         if (sessionUser.payment_status !== 1 && sessionUser.payment_status !== "1") {
           // Only check/block if the page has provided the payment handler callback (e.g. positiveLeaderBoardUser)
           if (onPaymentRequired) {

@@ -360,8 +360,8 @@ const PlayerCard = ({
 
 /* ---------------- MAIN COMPONENT ---------------- */
 const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActionsChanged }) => {
-  const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_CLIENT_ID || "AYScJLLFzh9r-mZwpVWVvLmNwWuuME4ayvP1W-ym9H8J2nbpbW8MAz5kAdF5uzcajbQpNojCT5q-RPae";
-  const PAYPAL_PLAN_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID || "P-98386085E3963253DNIPRKEQ";
+  const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_CLIENT_ID;
+  const PAYPAL_PLAN_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID;
 
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -593,9 +593,15 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           if (parsedUser && parsedUser.id) {
             setCurrentUserId(Number(parsedUser.id));
             console.log(parsedUser.payment_status, 'parsedUser==>2')
-            // Auto-show payment modal on mount/login if user has not paid
-            if (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1") {
-              setShowPaymentModal(true);
+            // Auto-show payment modal on mount/login if user has not paid AND matches allowed admin ID
+            const storedAdmin = sessionStorage.getItem("adminDetails");
+            const adminDetails = storedAdmin ? JSON.parse(storedAdmin) : null;
+            const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+
+            if (adminDetails && Number(adminDetails.id) === requiredAdminId) {
+              if (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1") {
+                setShowPaymentModal(true);
+              }
             }
           }
         } catch (err) {
