@@ -12,3 +12,25 @@ export  const convertTimeToSeconds = (timeStr) => {
     }
     return "0";
   };
+
+export const formatSecondsToTime = (val) => {
+  if (val === "" || val === null || val === undefined) return "00:00.00";
+  const num = Math.abs(Number(val));
+  if (isNaN(num)) return "00:00.00";
+
+  const totalSeconds = Math.floor(num);
+  const mPart = Math.floor(totalSeconds / 60);
+  const sPart = totalSeconds % 60;
+
+  const parts = String(val).split(".");
+  let msPart = "00";
+  if (parts.length > 1) {
+    msPart = parts[1].padEnd(2, "0").substring(0, 2);
+  }
+
+  const mm = String(mPart).padStart(2, "0");
+  const ss = String(sPart).padStart(2, "0");
+  const ms = msPart;
+
+  return `${mm}:${ss}.${ms}`;
+};

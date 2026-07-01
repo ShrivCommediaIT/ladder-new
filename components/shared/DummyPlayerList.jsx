@@ -12,6 +12,7 @@ import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlic
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import Logo from "@/public/logo.jpg";
+import { formatSecondsToTime } from "@/helper/helperFunction";
 import PlayerPerformationRanking from "./PlayerPerformationRanking";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
@@ -488,7 +489,7 @@ const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true,
               className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
               style={{ color: "var(--best-board-highlight)" }}
             >
-              {Math.abs(player.total_point || 0)}
+              {isNegative ? formatSecondsToTime(player?.total_point) : Math.abs(player?.total_point || 0)}
             </span>
             <span
               className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
