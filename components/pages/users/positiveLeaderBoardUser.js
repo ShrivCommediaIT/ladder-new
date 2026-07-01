@@ -20,7 +20,7 @@ import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 import AgeFilter from "@/components/shared/AgeFilter";
-import { getRequest } from "@/services/apiService";
+import { getRequest, postUrlEncoded } from "@/services/apiService";
 import { toast } from "react-toastify";
 
 
@@ -389,6 +389,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [pendingSkillClickArgs, setPendingSkillClickArgs] = useState(null);
+  const [pendingPostArgs, setPendingPostArgs] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isSorted, setIsSorted] = useState(false);
@@ -591,9 +592,9 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           const parsedUser = JSON.parse(storedUser);
           if (parsedUser && parsedUser.id) {
             setCurrentUserId(Number(parsedUser.id));
-
+            console.log(parsedUser.payment_status, 'parsedUser==>2')
             // Auto-show payment modal on mount/login if user has not paid
-            if (parsedUser.payment_status === 0 || parsedUser.payment_status === "0") {
+            if (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1") {
               setShowPaymentModal(true);
             }
           }
@@ -604,155 +605,103 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
     }
   }, []);
 
-  // PayPal Subscription SDK Loader and Button Renderer
+  // PayPal Subscription Event Listener
   useEffect(() => {
     if (!showPaymentModal) return;
 
     setPaypalLoading(true);
 
-    const scriptId = "paypal-subscription-sdk";
-    const env = process.env.NEXT_PUBLIC_PAYPAL_ENV || "production";
-    const domain = env === "sandbox" ? "sandbox.paypal.com" : "www.paypal.com";
-    const scriptSrc = `https://${domain}/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription`;
+    const handleMessage = async (event) => {
+      if (event.data?.type === 'PAYPAL_SUBSCRIPTION_APPROVED') {
+        const subId = event.data.subscriptionId;
+        toast.success("Subscription approved! Updating payment status...");
+        try {
+          let sessionUser = null;
+          if (typeof window !== "undefined") {
+            const storedUser = sessionStorage.getItem("user");
+            if (storedUser) {
+              sessionUser = JSON.parse(storedUser);
+            }
+          }
 
-    // Clean up any other/older paypal scripts to avoid configuration mismatch
-    const otherScripts = ["paypal-hosted-buttons-sdk", "paypal-subscription-sdk"];
-    otherScripts.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.remove();
-    });
+          const response = await getRequest("/user/updatePlayerPaymentStatus", {
+            payment_status: 1,
+            id: sessionUser?.id,
+            user_id: sessionUser?.user_id || sessionUser?.id
+          });
 
-    if (window.paypal) {
-      delete window.paypal;
-    }
+          if (sessionUser) {
+            sessionUser.payment_status = 1;
+            sessionStorage.setItem("user", JSON.stringify(sessionUser));
+          }
 
-    let retries = 0;
-    const initializeButtons = () => {
-      if (window.paypal && window.paypal.Buttons) {
-        const container = document.getElementById(`paypal-button-container-${PAYPAL_PLAN_ID}`);
-        if (container) {
-          container.innerHTML = "";
-          try {
-            window.paypal.Buttons({
-              style: {
-                shape: 'rect',
-                color: 'blue',
-                layout: 'vertical',
-                label: 'subscribe'
-              },
-              createSubscription: function(data, actions) {
-                return actions.subscription.create({
-                  plan_id: PAYPAL_PLAN_ID
-                });
-              },
-              onApprove: async function(data, actions) {
-                toast.success("Subscription approved! Updating payment status...");
-                try {
-                  let sessionUser = null;
-                  if (typeof window !== "undefined") {
-                    const storedUser = sessionStorage.getItem("user");
-                    if (storedUser) {
-                      sessionUser = JSON.parse(storedUser);
-                    }
-                  }
+          toast.success("Payment status updated successfully!");
+          setShowPaymentModal(false);
 
-                  const response = await getRequest("/user/updatePlayerPaymentStatus", {
-                    payment_status: 1,
-                    id: sessionUser?.id,
-                    user_id: sessionUser?.user_id || sessionUser?.id
-                  });
+          // Auto-submit the pending result if it exists!
+          if (pendingPostArgs) {
+            toast.info("Submitting your score...");
+            try {
+              const params = new URLSearchParams();
+              params.append("user_id", String(pendingPostArgs.playerId));
+              params.append("skill_activity_id", String(pendingPostArgs.skillActivityId));
+              params.append("score", String(pendingPostArgs.score));
+              params.append("witness_by", String(pendingPostArgs.witnessBy || ""));
+              params.append("best_result", String(pendingPostArgs.bestScore || pendingPostArgs.score));
 
-                  if (sessionUser) {
-                    sessionUser.payment_status = 1;
-                    sessionStorage.setItem("user", JSON.stringify(sessionUser));
-                  }
+              let adminId = "";
+              try {
+                const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
+                adminId = adminDetails?.id || "";
+              } catch (e) {}
+              params.append("admin_id", adminId);
+              params.append("ladder_id", ladderId);
 
-                  toast.success("Payment status updated successfully!");
-                  setShowPaymentModal(false);
+              // Find the player name
+              const player = data.find((p) => p.id === pendingPostArgs.playerId);
+              params.append("user_name", player?.name || "Player");
 
-                  // Open the edit modal if there was a pending click
-                  if (pendingSkillClickArgs) {
-                    setSelectedPlayerId(pendingSkillClickArgs.playerId);
-                    setSelectedSkillNumber(pendingSkillClickArgs.skillNumber);
-                    setSelectedSkillActivityId(pendingSkillClickArgs.skillActivityId);
-                    setOpenEdit(true);
-                  }
-                } catch (apiErr) {
-                  console.error("API update error:", apiErr);
-                  toast.error("Failed to update payment status. Please try again or contact support.");
-                } finally {
-                  setPaypalLoading(false);
-                }
-              },
-              onError: function(err) {
-                toast.error("PayPal Subscription payment failed or was cancelled.");
-                console.error("PayPal integration error:", err);
-                setPaypalLoading(false);
+              const res = await postUrlEncoded(pendingPostArgs.url || "user/postResultSkillboard", params);
+
+              if (res?.status === 200 || res?.status === "success") {
+                toast.success("Score posted successfully!");
+              } else {
+                toast.error(res?.error_message || "Score submitted but got response error.");
               }
-            }).render(`#paypal-button-container-${PAYPAL_PLAN_ID}`)
-              .then(() => {
-                setPaypalLoading(false);
-              })
-              .catch((err) => {
-                console.error("PayPal render promise error:", err);
-                setPaypalLoading(false);
-              });
-          } catch (e) {
-            console.error("Paypal render error", e);
-            setPaypalLoading(false);
+              refreshLeaderboard();
+            } catch (postErr) {
+              console.error("Auto post score error:", postErr);
+              toast.error("Failed to auto-submit score. Please try submitting again.");
+            } finally {
+              setPendingPostArgs(null);
+            }
+          } else if (pendingSkillClickArgs) {
+            // Legacy/Mount fallback: Open the edit modal if there was a pending click
+            setSelectedPlayerId(pendingSkillClickArgs.playerId);
+            setSelectedSkillNumber(pendingSkillClickArgs.skillNumber);
+            setSelectedSkillActivityId(pendingSkillClickArgs.skillActivityId);
+            setOpenEdit(true);
           }
-        } else {
-          if (retries < 50) {
-            retries++;
-            setTimeout(initializeButtons, 100);
-          } else {
-            setPaypalLoading(false);
-          }
-        }
-      } else {
-        if (retries < 50) {
-          retries++;
-          setTimeout(initializeButtons, 100);
-        } else {
+        } catch (apiErr) {
+          console.error("API update error:", apiErr);
+          toast.error("Failed to update payment status. Please contact support.");
+        } finally {
           setPaypalLoading(false);
-          toast.error("PayPal SDK failed to initialize.");
         }
+      } else if (event.data?.type === 'PAYPAL_SUBSCRIPTION_ERROR') {
+        toast.error("PayPal Subscription payment failed or was cancelled.");
+        console.error("PayPal integration error:", event.data.error);
+        setPaypalLoading(false);
+      } else if (event.data?.type === 'PAYPAL_SUBSCRIPTION_RENDERED') {
+        setPaypalLoading(false);
       }
     };
 
-    if (window.paypal && window.paypal.Buttons) {
-      setTimeout(initializeButtons, 100);
-      return;
-    }
-
-    let script = document.getElementById(scriptId);
-    if (!script) {
-      script = document.createElement("script");
-      script.id = scriptId;
-      script.src = scriptSrc;
-      script.async = true;
-      script.setAttribute("data-sdk-integration-source", "button-factory");
-      document.body.appendChild(script);
-    }
-
-    const handleLoad = () => {
-      setTimeout(initializeButtons, 200);
-    };
-    const handleError = () => {
-      toast.error("Failed to load PayPal SDK");
-      setPaypalLoading(false);
-    };
-
-    script.addEventListener("load", handleLoad);
-    script.addEventListener("error", handleError);
-
+    window.addEventListener('message', handleMessage);
     return () => {
-      if (script) {
-        script.removeEventListener("load", handleLoad);
-        script.removeEventListener("error", handleError);
-      }
+      window.removeEventListener('message', handleMessage);
     };
-  }, [showPaymentModal, pendingSkillClickArgs]);
+  }, [showPaymentModal, pendingSkillClickArgs, pendingPostArgs, data, ladderId, refreshLeaderboard]);
 
 
   const handleSkillClick = useCallback(
@@ -770,30 +719,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
       );
       if (!skillObj) return;
 
-      // Check payment status using session storage
-      let sessionUser = null;
-      if (typeof window !== "undefined") {
-        try {
-          const storedUser = sessionStorage.getItem("user");
-          if (storedUser) {
-            sessionUser = JSON.parse(storedUser);
-          }
-        } catch (err) {
-          console.error("Failed to parse user from sessionStorage", err);
-        }
-      }
-
-      if (sessionUser && Number(sessionUser.id) === Number(playerId)) {
-        if (sessionUser.payment_status === 0 || sessionUser.payment_status === "0") {
-          setPendingSkillClickArgs({
-            playerId,
-            skillNumber,
-            skillActivityId: skillObj.id,
-          });
-          setShowPaymentModal(true);
-          return;
-        }
-      }
+      // Block checks removed here; check is now performed upon result submission
 
       setSelectedPlayerId(playerId);
       setSelectedSkillNumber(skillNumber);
@@ -888,6 +814,11 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           ladderId={ladderId}
           skillNumber={selectedSkillNumber}
           skillActivityId={selectedSkillActivityId}
+          onPaymentRequired={(args) => {
+            setOpenEdit(false);
+            setPendingPostArgs(args);
+            setShowPaymentModal(true);
+          }}
         />
       )}
 
@@ -921,15 +852,15 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
             <div className="bg-primary/10 p-3 rounded-full">
               <Image src={Logo} alt="Logo" className="h-10 w-10 object-contain" />
             </div>
-            
+
             <h3 className="text-xl font-bold text-foreground">
               Subscription Required
             </h3>
-            
+
             <p className="text-sm text-muted-foreground leading-relaxed">
               To submit scores for this leaderboard, you need an active subscription.
             </p>
-            
+
             <div className="bg-muted/50 w-full p-4 rounded-xl border border-border">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary/80">
                 Competition Access
@@ -952,7 +883,69 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
             )}
 
             <div className="w-full pt-2">
-              <div id={`paypal-button-container-${PAYPAL_PLAN_ID}`} className="w-full min-h-[150px]"></div>
+              {showPaymentModal && (
+                <iframe
+                  id="paypal-subscription-iframe"
+                  srcDoc={`
+                    <!DOCTYPE html>
+                    <html>
+                      <head>
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <style>
+                          body {
+                            margin: 0;
+                            padding: 0;
+                            background: transparent;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 150px;
+                          }
+                          #paypal-button-container {
+                            width: 100%;
+                          }
+                        </style>
+                      </head>
+                      <body>
+                        <div id="paypal-button-container"></div>
+                        
+                        <script src="https://${(process.env.NEXT_PUBLIC_PAYPAL_ENV || "production") === "sandbox" ? "sandbox.paypal.com" : "www.paypal.com"}/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+                        
+                        <script>
+                          if (window.paypal && window.paypal.Buttons) {
+                            window.paypal.Buttons({
+                              style: {
+                                shape: 'rect',
+                                color: 'blue',
+                                layout: 'vertical',
+                                label: 'subscribe'
+                              },
+                              createSubscription: function(data, actions) {
+                                return actions.subscription.create({
+                                  plan_id: '${PAYPAL_PLAN_ID}'
+                                });
+                              },
+                              onApprove: function(data, actions) {
+                                window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_APPROVED', subscriptionId: data.subscriptionID }, '*');
+                              },
+                              onError: function(err) {
+                                window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_ERROR', error: err.message || err.toString() }, '*');
+                              }
+                            }).render('#paypal-button-container').then(function() {
+                              window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_RENDERED' }, '*');
+                            }).catch(function(err) {
+                              window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_ERROR', error: err.toString() }, '*');
+                            });
+                          } else {
+                            window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_ERROR', error: 'PayPal SDK failed to load' }, '*');
+                          }
+                        </script>
+                      </body>
+                    </html>
+                  `}
+                  className="w-full min-h-[160px] border-none bg-transparent"
+                />
+              )}
             </div>
           </div>
         </DialogContent>
