@@ -20,6 +20,8 @@ import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 import AgeFilter from "@/components/shared/AgeFilter";
+import { getRequest } from "@/services/apiService";
+import { toast } from "react-toastify";
 
 
 
@@ -358,6 +360,9 @@ const PlayerCard = ({
 
 /* ---------------- MAIN COMPONENT ---------------- */
 const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActionsChanged }) => {
+  const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_CLIENT_ID || "AYScJLLFzh9r-mZwpVWVvLmNwWuuME4ayvP1W-ym9H8J2nbpbW8MAz5kAdF5uzcajbQpNojCT5q-RPae";
+  const PAYPAL_PLAN_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID || "P-98386085E3963253DNIPRKEQ";
+
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
@@ -380,6 +385,10 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
   const [selectedSkillActivityId, setSelectedSkillActivityId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paypalLoading, setPaypalLoading] = useState(false);
+  const [pendingSkillClickArgs, setPendingSkillClickArgs] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isSorted, setIsSorted] = useState(false);
@@ -582,13 +591,168 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           const parsedUser = JSON.parse(storedUser);
           if (parsedUser && parsedUser.id) {
             setCurrentUserId(Number(parsedUser.id));
+
+            // Auto-show payment modal on mount/login if user has not paid
+            if (parsedUser.payment_status === 0 || parsedUser.payment_status === "0") {
+              setShowPaymentModal(true);
+            }
           }
         } catch (err) {
-          console.error("Failed to parse user from localStorage", err);
+          console.error("Failed to parse user from sessionStorage", err);
         }
       }
     }
   }, []);
+
+  // PayPal Subscription SDK Loader and Button Renderer
+  useEffect(() => {
+    if (!showPaymentModal) return;
+
+    setPaypalLoading(true);
+
+    const scriptId = "paypal-subscription-sdk";
+    const env = process.env.NEXT_PUBLIC_PAYPAL_ENV || "production";
+    const domain = env === "sandbox" ? "sandbox.paypal.com" : "www.paypal.com";
+    const scriptSrc = `https://${domain}/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription`;
+
+    // Clean up any other/older paypal scripts to avoid configuration mismatch
+    const otherScripts = ["paypal-hosted-buttons-sdk", "paypal-subscription-sdk"];
+    otherScripts.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    });
+
+    if (window.paypal) {
+      delete window.paypal;
+    }
+
+    let retries = 0;
+    const initializeButtons = () => {
+      if (window.paypal && window.paypal.Buttons) {
+        const container = document.getElementById(`paypal-button-container-${PAYPAL_PLAN_ID}`);
+        if (container) {
+          container.innerHTML = "";
+          try {
+            window.paypal.Buttons({
+              style: {
+                shape: 'rect',
+                color: 'blue',
+                layout: 'vertical',
+                label: 'subscribe'
+              },
+              createSubscription: function(data, actions) {
+                return actions.subscription.create({
+                  plan_id: PAYPAL_PLAN_ID
+                });
+              },
+              onApprove: async function(data, actions) {
+                toast.success("Subscription approved! Updating payment status...");
+                try {
+                  let sessionUser = null;
+                  if (typeof window !== "undefined") {
+                    const storedUser = sessionStorage.getItem("user");
+                    if (storedUser) {
+                      sessionUser = JSON.parse(storedUser);
+                    }
+                  }
+
+                  const response = await getRequest("/user/updatePlayerPaymentStatus", {
+                    payment_status: 1,
+                    id: sessionUser?.id,
+                    user_id: sessionUser?.user_id || sessionUser?.id
+                  });
+
+                  if (sessionUser) {
+                    sessionUser.payment_status = 1;
+                    sessionStorage.setItem("user", JSON.stringify(sessionUser));
+                  }
+
+                  toast.success("Payment status updated successfully!");
+                  setShowPaymentModal(false);
+
+                  // Open the edit modal if there was a pending click
+                  if (pendingSkillClickArgs) {
+                    setSelectedPlayerId(pendingSkillClickArgs.playerId);
+                    setSelectedSkillNumber(pendingSkillClickArgs.skillNumber);
+                    setSelectedSkillActivityId(pendingSkillClickArgs.skillActivityId);
+                    setOpenEdit(true);
+                  }
+                } catch (apiErr) {
+                  console.error("API update error:", apiErr);
+                  toast.error("Failed to update payment status. Please try again or contact support.");
+                } finally {
+                  setPaypalLoading(false);
+                }
+              },
+              onError: function(err) {
+                toast.error("PayPal Subscription payment failed or was cancelled.");
+                console.error("PayPal integration error:", err);
+                setPaypalLoading(false);
+              }
+            }).render(`#paypal-button-container-${PAYPAL_PLAN_ID}`)
+              .then(() => {
+                setPaypalLoading(false);
+              })
+              .catch((err) => {
+                console.error("PayPal render promise error:", err);
+                setPaypalLoading(false);
+              });
+          } catch (e) {
+            console.error("Paypal render error", e);
+            setPaypalLoading(false);
+          }
+        } else {
+          if (retries < 50) {
+            retries++;
+            setTimeout(initializeButtons, 100);
+          } else {
+            setPaypalLoading(false);
+          }
+        }
+      } else {
+        if (retries < 50) {
+          retries++;
+          setTimeout(initializeButtons, 100);
+        } else {
+          setPaypalLoading(false);
+          toast.error("PayPal SDK failed to initialize.");
+        }
+      }
+    };
+
+    if (window.paypal && window.paypal.Buttons) {
+      setTimeout(initializeButtons, 100);
+      return;
+    }
+
+    let script = document.getElementById(scriptId);
+    if (!script) {
+      script = document.createElement("script");
+      script.id = scriptId;
+      script.src = scriptSrc;
+      script.async = true;
+      script.setAttribute("data-sdk-integration-source", "button-factory");
+      document.body.appendChild(script);
+    }
+
+    const handleLoad = () => {
+      setTimeout(initializeButtons, 200);
+    };
+    const handleError = () => {
+      toast.error("Failed to load PayPal SDK");
+      setPaypalLoading(false);
+    };
+
+    script.addEventListener("load", handleLoad);
+    script.addEventListener("error", handleError);
+
+    return () => {
+      if (script) {
+        script.removeEventListener("load", handleLoad);
+        script.removeEventListener("error", handleError);
+      }
+    };
+  }, [showPaymentModal, pendingSkillClickArgs]);
 
 
   const handleSkillClick = useCallback(
@@ -596,7 +760,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
       if (playerId != currentUserId) {
         setDialogMessage("You can only edit your own profile");
         setIsDialogOpen(true);
-        return
+        return;
       }
 
       const player = data.find((p) => p.id === playerId);
@@ -605,6 +769,32 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
         (s) => s.skill_number === skillNumber,
       );
       if (!skillObj) return;
+
+      // Check payment status using session storage
+      let sessionUser = null;
+      if (typeof window !== "undefined") {
+        try {
+          const storedUser = sessionStorage.getItem("user");
+          if (storedUser) {
+            sessionUser = JSON.parse(storedUser);
+          }
+        } catch (err) {
+          console.error("Failed to parse user from sessionStorage", err);
+        }
+      }
+
+      if (sessionUser && Number(sessionUser.id) === Number(playerId)) {
+        if (sessionUser.payment_status === 0 || sessionUser.payment_status === "0") {
+          setPendingSkillClickArgs({
+            playerId,
+            skillNumber,
+            skillActivityId: skillObj.id,
+          });
+          setShowPaymentModal(true);
+          return;
+        }
+      }
+
       setSelectedPlayerId(playerId);
       setSelectedSkillNumber(skillNumber);
       setSelectedSkillActivityId(skillObj.id);
@@ -722,6 +912,49 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
             onClose={handleRemoveClose}
             onSuccessRefresh={handleRemoveSuccess}
           />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+        <DialogContent className="bg-card border border-border text-foreground p-6 rounded-2xl max-w-md w-[95%]">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="bg-primary/10 p-3 rounded-full">
+              <Image src={Logo} alt="Logo" className="h-10 w-10 object-contain" />
+            </div>
+            
+            <h3 className="text-xl font-bold text-foreground">
+              Subscription Required
+            </h3>
+            
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              To submit scores for this leaderboard, you need an active subscription.
+            </p>
+            
+            <div className="bg-muted/50 w-full p-4 rounded-xl border border-border">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary/80">
+                Competition Access
+              </p>
+              <h4 className="text-base font-bold mt-1 text-foreground">
+                SSP International competitions
+              </h4>
+              <p className="text-p3 text-muted-foreground mt-1">
+                (£2 quarterly subscriptions)
+              </p>
+            </div>
+
+            {paypalLoading && (
+              <div className="flex items-center justify-center space-x-2 py-4">
+                <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-100" />
+                <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-200" />
+                <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-300" />
+                <span className="text-xs text-muted-foreground">Loading PayPal...</span>
+              </div>
+            )}
+
+            <div className="w-full pt-2">
+              <div id={`paypal-button-container-${PAYPAL_PLAN_ID}`} className="w-full min-h-[150px]"></div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </>
