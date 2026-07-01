@@ -18,7 +18,7 @@ import { Funnel, X, XCircle } from "lucide-react";
 import { fetchNegativeLeaderboard, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
-import { convertTimeToSeconds } from "@/helper/helperFunction";
+import { convertTimeToSeconds, formatSecondsToTime } from "@/helper/helperFunction";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 import AgeFilter from "@/components/shared/AgeFilter";
 
@@ -315,7 +315,7 @@ const PlayerCard = ({
               className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center"
               style={{ color: "var(--best-board-highlight)" }}
             >
-              {Math.abs(Number(player?.total_point || 0)).toFixed(2)}
+              {formatSecondsToTime(player?.total_point)}
             </span>
           </div>
 
