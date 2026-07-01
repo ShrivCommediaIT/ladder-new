@@ -21,6 +21,8 @@ import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import { convertTimeToSeconds, formatSecondsToTime } from "@/helper/helperFunction";
 import LeaderboardActionButtons from "@/components/shared/LeaderboardActionButtons";
 import AgeFilter from "@/components/shared/AgeFilter";
+import { getRequest, postUrlEncoded } from "@/services/apiService";
+import { toast } from "react-toastify";
 
 
 
@@ -342,6 +344,13 @@ const PlayerCard = ({
 
 /* ---------------- MAIN COMPONENT ---------------- */
 const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
+  const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_CLIENT_ID;
+  const PAYPAL_PLAN_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID;
+
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paypalLoading, setPaypalLoading] = useState(false);
+  const [pendingPostArgs, setPendingPostArgs] = useState(null);
+
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
@@ -362,6 +371,17 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
           const parsedUser = JSON.parse(storedUser);
           if (parsedUser && parsedUser.id) {
             setCurrentUserId(Number(parsedUser.id));
+
+            // Auto-show payment modal on mount/login if user has not paid AND matches allowed admin ID
+            const storedAdmin = sessionStorage.getItem("adminDetails");
+            const adminDetails = storedAdmin ? JSON.parse(storedAdmin) : null;
+            const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+
+            if (adminDetails && Number(adminDetails.id) === requiredAdminId) {
+              if (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1") {
+                setShowPaymentModal(true);
+              }
+            }
           }
         } catch (err) {
           console.error("Failed to parse user from sessionStorage", err);
@@ -369,6 +389,8 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
       }
     }
   }, []);
+
+
 
   // ALL STATES FIRST
   const [openEdit, setOpenEdit] = useState(false);
@@ -466,6 +488,98 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
     refreshLeaderboard(0, 0, "", "", "", 0);
     setResetSignal((p) => p + 1);
   }, [dispatch, refreshLeaderboard]);
+
+  // PayPal Subscription Event Listener
+  useEffect(() => {
+    if (!showPaymentModal) return;
+
+    setPaypalLoading(true);
+
+    const handleMessage = async (event) => {
+      if (event.data?.type === 'PAYPAL_SUBSCRIPTION_APPROVED') {
+        const subId = event.data.subscriptionId;
+        toast.success("Subscription approved! Updating payment status...");
+        try {
+          let sessionUser = null;
+          if (typeof window !== "undefined") {
+            const storedUser = sessionStorage.getItem("user") || sessionStorage.getItem("userData");
+            if (storedUser) {
+              sessionUser = JSON.parse(storedUser);
+            }
+          }
+
+          const response = await getRequest("/user/updatePlayerPaymentStatus", {
+            payment_status: 1,
+            id: sessionUser?.id,
+            user_id: sessionUser?.user_id || sessionUser?.id
+          });
+
+          if (sessionUser) {
+            sessionUser.payment_status = 1;
+            sessionStorage.setItem("user", JSON.stringify(sessionUser));
+          }
+
+          toast.success("Payment status updated successfully!");
+          setShowPaymentModal(false);
+
+          // Auto-submit the pending result if it exists!
+          if (pendingPostArgs) {
+            toast.info("Submitting your score...");
+            try {
+              const params = new URLSearchParams();
+              params.append("user_id", String(pendingPostArgs.playerId));
+              params.append("skill_activity_id", String(pendingPostArgs.skillActivityId));
+              params.append("score", String(pendingPostArgs.score));
+              params.append("witness_by", String(pendingPostArgs.witnessBy || ""));
+              params.append("best_result", String(pendingPostArgs.bestScore || pendingPostArgs.score));
+
+              let adminId = "";
+              try {
+                const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
+                adminId = adminDetails?.id || "";
+              } catch (e) {}
+              params.append("admin_id", adminId);
+              params.append("ladder_id", ladderId);
+
+              // Find the player name
+              const targetUrl = pendingPostArgs.url
+                ? (pendingPostArgs.url.startsWith('/') ? pendingPostArgs.url : `/${pendingPostArgs.url}`)
+                : "/user/postResultSkillboard";
+              const res = await postUrlEncoded(targetUrl, params);
+
+              if (res?.status === 200 || res?.status === "success") {
+                toast.success("Score posted successfully!");
+              } else {
+                toast.error(res?.error_message || "Score submitted but got response error.");
+              }
+              refreshLeaderboard(selectedSkillFilter);
+            } catch (postErr) {
+              console.error("Auto post score error:", postErr);
+              toast.error("Failed to auto-submit score. Please try submitting again.");
+            } finally {
+              setPendingPostArgs(null);
+            }
+          }
+        } catch (apiErr) {
+          console.error("API update error:", apiErr);
+          toast.error("Failed to update payment status. Please contact support.");
+        } finally {
+          setPaypalLoading(false);
+        }
+      } else if (event.data?.type === 'PAYPAL_SUBSCRIPTION_ERROR') {
+        toast.error("PayPal Subscription payment failed or was cancelled.");
+        console.error("PayPal integration error:", event.data.error);
+        setPaypalLoading(false);
+      } else if (event.data?.type === 'PAYPAL_SUBSCRIPTION_RENDERED') {
+        setPaypalLoading(false);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [showPaymentModal, pendingPostArgs, data, ladderId, refreshLeaderboard, selectedSkillFilter]);
 
   useEffect(() => {
     if (onActionsChanged) {
@@ -684,6 +798,11 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
           ladderId={ladderId}
           skillNumber={selectedSkillNumber}
           skillActivityId={selectedSkillActivityId}
+          onPaymentRequired={(args) => {
+            setOpenEdit(false);
+            setPendingPostArgs(args);
+            setShowPaymentModal(true);
+          }}
         />
       )}
     </>
