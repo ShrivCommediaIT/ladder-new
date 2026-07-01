@@ -62,6 +62,8 @@ export default function ClientLayoutWrapper({ children }) {
 
   const isAuthOrLandingRoute = pathname === "/" ||
                                pathname === "/terms-and-conditions" ||
+                               pathname === "/privacy-policy" ||
+                               pathname === "/refund-policy" ||
                                pathname?.startsWith("/login") ||
                                pathname?.startsWith("/register") ||
                                pathname?.startsWith("/reset-password") ||
