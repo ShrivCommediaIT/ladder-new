@@ -77,6 +77,11 @@ const PlayerRow = ({ player, rank, canEdit, onOpenPlayer, onChallenge }) => (
             Gender: {player.gender === "male" || player.gender === "Male" ? "M" : "F"}
           </span>
         ) : null}
+        {player?.country ? (
+          <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]">
+            Country: {player.country}
+          </span>
+        ) : null}
       </div>
     </div>
 

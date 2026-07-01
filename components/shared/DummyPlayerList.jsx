@@ -57,6 +57,13 @@ const DefaultPlayerCard = ({ player, rank }) => {
               Gender: {player.gender === "male" || player.gender === "Male" ? "M" : "F"}
             </span>
           )}
+          {player.country && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]"
+            >
+              Country: {player.country}
+            </span>
+          )}
         </div>
       </div>
 
@@ -145,6 +152,18 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
               }}
             >
               Gender: {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+          {player.country && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "white",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              Country: {player.country}
             </span>
           )}
         </div>
@@ -313,6 +332,18 @@ const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true,
               }}
             >
               Gender: {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+          {player.country && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "white",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              Country: {player.country}
             </span>
           )}
         </div>
@@ -538,6 +569,18 @@ const RosterPlayerCard = ({ player, rank }) => {
               }}
             >
               Gender: {player.gender === "male" ? "M" : "F"}
+            </span>
+          )}
+          {player.country && (
+            <span
+              className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
+              style={{
+                background: "var(--best-board-accent-soft)",
+                color: "white",
+                border: "1px solid var(--best-board-border-strong)",
+              }}
+            >
+              Country: {player.country}
             </span>
           )}
         </div>

@@ -196,6 +196,7 @@ export default function AdminPage() {
     if (result.duplicateNames.length > 0) {
       setDuplicateWarning(result);
       setCsvFile(null);
+      event.target.value = "";
       toast.error(
         `Duplicate names found: ${[...new Set(result.duplicateNames)].join(", ")}`,
       );
@@ -203,6 +204,7 @@ export default function AdminPage() {
     }
 
     setCsvFile(file);
+    event.target.value = "";
   };
 
   const ladderExists = (name) => {
