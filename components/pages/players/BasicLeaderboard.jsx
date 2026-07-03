@@ -30,14 +30,16 @@ import PlayerRankBadge from "@/components/shared/PlayerRankBadge";
 const PlayerCard = ({
   player,
   overallRank,
-  showAgeRank,
-  ageRank,
   onSkillClick,
   onTargetAchieved,
   currentUser,
   isInverted,
   appliedWitnessBy,
   selectedSkillFilter,
+  showAgeRank,
+  showGenderRank,
+  showCountryRank,
+  showWitnessRank,
 }) => {
   const playerImageUrl =
     player?.image && player.image !== "null" && player.image !== "undefined" && player.image !== ""
@@ -189,6 +191,25 @@ const PlayerCard = ({
               imgSize={56}
               textClass="text-[10px] sm:text-xs md:text-sm"
             />
+            {(showAgeRank || showGenderRank || showCountryRank || showWitnessRank) && (() => {
+              const activeRankLabels = [
+                showAgeRank && " Age ",
+                showGenderRank && " Gender ",
+                showCountryRank && " Country ",
+                showWitnessRank && " Witness ",
+              ].filter(Boolean);
+
+              return (
+                <div className="flex flex-col mt-2">
+                  <p className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-[var(--primary)] text-center">
+                    Rank By:-
+                  </p>
+                  <p className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-[var(--primary)] text-center">
+                    {`(${activeRankLabels.join(",")})`}
+                  </p>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Info block */}
@@ -211,22 +232,6 @@ const PlayerCard = ({
                   {player?.phone || "N/A"}
                 </div>
               </div>
-              {showAgeRank && (
-                <div className="flex flex-col items-center">
-                  <div
-                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
-                    style={{ background: "var(--best-board-success)" }}
-                  >
-                    {ageRank}
-                  </div>
-                  <p
-                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
-                    style={{ color: "var(--best-board-success)" }}
-                  >
-                    Age Rank
-                  </p>
-                </div>
-              )}
             </div>
 
 
@@ -431,17 +436,16 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
 
         if (witness === 1) {
           params.witness_by = 1;
-        } else {
-          if (age && age > 0) {
-            params.dob = age;
-            if (ageType) params.age_type = ageType;
-          }
-          if (gender) {
-            params.gender = gender;
-          }
-          if (country) {
-            params.country = country;
-          }
+        }
+        if (age && age > 0) {
+          params.dob = age;
+          if (ageType) params.age_type = ageType;
+        }
+        if (gender) {
+          params.gender = gender;
+        }
+        if (country) {
+          params.country = country;
         }
 
         Promise.all([
@@ -515,11 +519,12 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     if (sortMode === "name") {
       return [...baseList].sort((a, b) => (a?.name || "").localeCompare(b?.name || ""));
     }
-    if (isSorted || selectedSkillFilter > 0) {
+    const hasFiltersActive = hasFilters || localWitnessBy === 1;
+    if (isSorted || selectedSkillFilter > 0 || hasFiltersActive) {
       return baseList;
     }
     return [...baseList].sort((a, b) => Number(a?.rank || 0) - Number(b?.rank || 0));
-  }, [data, searchQuery, sortMode, isSorted, selectedSkillFilter]);
+  }, [data, searchQuery, sortMode, isSorted, selectedSkillFilter, hasFilters, localWitnessBy]);
 
   const handleDeleteActivity = useCallback(
     async (id) => {
@@ -644,21 +649,26 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
             {processedPlayers.length === 0 ? (
               <div className="best-board-card rounded-xl px-6 py-10 text-center font-bold text-[var(--best-board-muted)]">No players found</div>
             ) : (
-              processedPlayers.map((player, index) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  overallRank={player.rank || index + 1}
-                  showAgeRank={showAgeRank}
-                  ageRank={index + 1}
-                  onSkillClick={handleSkillClick}
-                  onTargetAchieved={handleTargetAchieved}
-                  currentUser={currentUser}
-                  isInverted={isInverted}
-                  appliedWitnessBy={appliedWitnessBy}
-                  selectedSkillFilter={selectedSkillFilter}
-                />
-              ))
+              processedPlayers.map((player, index) => {
+                const isFiltered = hasFilters || localWitnessBy === 1;
+                return (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    overallRank={isFiltered ? player.sr : player.rank}
+                    onSkillClick={handleSkillClick}
+                    onTargetAchieved={handleTargetAchieved}
+                    currentUser={currentUser}
+                    isInverted={isInverted}
+                    appliedWitnessBy={appliedWitnessBy}
+                    selectedSkillFilter={selectedSkillFilter}
+                    showAgeRank={showAgeRank}
+                    showGenderRank={appliedGender !== ""}
+                    showCountryRank={appliedCountry !== ""}
+                    showWitnessRank={localWitnessBy === 1}
+                  />
+                );
+              })
             )}
           </div>
         </div>

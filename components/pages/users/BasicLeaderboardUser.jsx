@@ -41,13 +41,15 @@ const getRankBySkillNumber = (ranks, skillNumber) => {
 const PlayerCard = ({
   player,
   overallRank,
-  appliedAge,
-  ageRank,
   onSkillClick,
-  isInverted,
   isEditable,
   loggedInUser,
   selectedSkillFilter,
+  isInverted,
+  showAgeRank,
+  showGenderRank,
+  showCountryRank,
+  showWitnessRank,
 }) => {
   const playerImageUrl =
     player?.image && player.image !== "null" && player.image !== "undefined" && player.image !== ""
@@ -97,7 +99,7 @@ const PlayerCard = ({
     };
   };
 
-  const showAgeRank = Boolean(appliedAge);
+
 
   const getRankBySkillNumber = (ranks, skillNumber) => {
     const rankObj = ranks?.find((r) => r.skill_number === skillNumber);
@@ -178,6 +180,25 @@ const PlayerCard = ({
               imgSize={56}
               textClass="text-[10px] sm:text-xs md:text-sm"
             />
+            {(showAgeRank || showGenderRank || showCountryRank || showWitnessRank) && (() => {
+              const activeRankLabels = [
+                showAgeRank && " Age ",
+                showGenderRank && " Gender ",
+                showCountryRank && " Country ",
+                showWitnessRank && " Witness ",
+              ].filter(Boolean);
+
+              return (
+                <div className="flex flex-col mt-2">
+                  <p className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-[var(--primary)] text-center">
+                    Rank By:-
+                  </p>
+                  <p className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-[var(--primary)] text-center">
+                    {`(${activeRankLabels.join(",")})`}
+                  </p>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Info block */}
@@ -200,22 +221,7 @@ const PlayerCard = ({
                   {player?.phone || "N/A"}
                 </div>
               </div>
-              {showAgeRank && (
-                <div className="flex flex-col items-center">
-                  <div
-                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
-                    style={{ background: "var(--best-board-success)" }}
-                  >
-                    {ageRank}
-                  </div>
-                  <p
-                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
-                    style={{ color: "var(--best-board-success)" }}
-                  >
-                    Age Rank
-                  </p>
-                </div>
-              )}
+
             </div>
 
 
@@ -730,18 +736,21 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
             <div className="text-center py-10 text-gray-400 font-bold">No players found</div>
           ) : filteredPlayers.map((player, index) => {
             const isEditablePlayer = player.id === currentUserId;
+            const isFiltered = hasFiltersApplied;
             return (
               <PlayerCard
                 key={player.id}
                 player={player}
-                overallRank={player.rank || index + 1}
-                appliedAge={appliedAge}
-                ageRank={index + 1}
+                overallRank={isFiltered ? player.sr : player.rank}
                 isInverted={isInverted}
                 onSkillClick={handleSkillClick}
                 isEditable={isEditablePlayer}
                 loggedInUser={loggedInUser}
                 selectedSkillFilter={selectedSkillFilter}
+                showAgeRank={Number(appliedAge) > 0}
+                showGenderRank={appliedGender !== ""}
+                showCountryRank={appliedCountry !== ""}
+                showWitnessRank={appliedWitnessBy === 1}
               />
             );
           })}

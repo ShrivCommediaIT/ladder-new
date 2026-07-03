@@ -117,6 +117,12 @@ export const PlayerLists = () => {
     else if (isMiniLeague) { laddartype = "minileague"; fetchSlice = fetchMiniLeague; }
     else { laddartype = "skill"; fetchSlice = fetchSkillLeaderboard; }
     const payload = { ladder_id: ladderId, type: laddartype, sortbyskillnumber: skillNo };
+    if (appliedAge > 0) {
+      payload.dob = appliedAge;
+      if (appliedAgeType) payload.age_type = appliedAgeType;
+    }
+    if (appliedGender) payload.gender = appliedGender;
+    if (appliedCountry) payload.country = appliedCountry;
     if (witness === 1) {
       payload.witness_by = 1;
     }
@@ -186,7 +192,7 @@ export const PlayerLists = () => {
   };
 
   const handleClearAll = () => {
-    setIsSorted(false); setCurrentSkillNo(0);
+    setIsSorted(false); setCurrentSkillNo(0); setWitnessBy(0);
     const clearedFilter = { age: 0, ageType: "", gender: "", country: "" };
     if (isSkill) dispatch(setSkillAgeFilter(clearedFilter));
     else if (isPositive) dispatch(setPositiveAgeFilter(clearedFilter));

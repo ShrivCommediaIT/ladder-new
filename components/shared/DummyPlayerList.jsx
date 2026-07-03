@@ -267,7 +267,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
 /* ─────────────────────────────────────────────
    3. SKILL / POSITIVE / NEGATIVE CARD
 ───────────────────────────────────────────── */
-const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true, isNegative = false }) => {
+const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, isFiltered = false, activeFilters = [] }) => {
   const src = player?.image ? `${IMAGE_BASE_URL}/${player.image}` : Logo;
 
   const getScore = (scores, skills, skillNumber, isInverted) => {
@@ -357,24 +357,18 @@ const SkillPlayerCard = ({ player, rank, showAgeRank, ageRank, showRanks = true,
           <div className="flex items-center gap-2 sm:gap-3 mb-2">
             <div className="flex flex-col items-center gap-1 flex-shrink-0">
               <PlayerRankBadge
-                rank={rank}
+                rank={isFiltered ? player.sr : player.rank}
                 sizeClass="h-10 w-10 sm:h-12 sm:w-12"
                 imgSize={48}
                 textClass="text-[9px] sm:text-xs"
               />
-              {showAgeRank && (
-                <div className="flex flex-col items-center">
-                  <div
-                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-white text-[9px] sm:text-[10px]"
-                    style={{ background: "var(--best-board-success)" }}
-                  >
-                    {ageRank}
-                  </div>
-                  <p
-                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap"
-                    style={{ color: "var(--best-board-success)" }}
-                  >
-                    Age
+              {isFiltered && activeFilters.length > 0 && (
+                <div className="flex flex-col mt-1">
+                  <p className="text-[6px] sm:text-[7px] font-bold whitespace-nowrap text-[var(--primary)] text-center">
+                    Rank By:-
+                  </p>
+                  <p className="text-[6px] sm:text-[7px] font-bold whitespace-nowrap text-[var(--primary)] text-center">
+                    {`(${activeFilters.join(",")})`}
                   </p>
                 </div>
               )}
@@ -748,9 +742,36 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
   const negativeLadderDetails = useSelector(state => state.negativeLeaderBoard?.ladderDetails || null);
   const rosterLadderDetails = useSelector(state => state.rosterLeaderboard?.ladderDetails || null);
 
-  const appliedAgeSkill = useSelector(state => state.skillLeaderboard?.appliedAge);
-  const appliedAgePositive = useSelector(state => state.positiveLeaderBoard?.appliedAge);
-  const appliedAgeNegative = useSelector(state => state.negativeLeaderBoard?.appliedAge);
+  const {
+    appliedAge: appliedAgeSkill,
+    appliedAgeType: skillAgeType,
+    appliedGender: skillGender,
+    appliedCountry: skillCountry,
+    appliedWitnessBy: skillWitness,
+  } = useSelector((state) => state.skillLeaderboard || {});
+
+  const {
+    appliedAge: appliedAgePositive,
+    appliedAgeType: positiveAgeType,
+    appliedGender: positiveGender,
+    appliedCountry: positiveCountry,
+    appliedWitnessBy: positiveWitness,
+  } = useSelector((state) => state.positiveLeaderBoard || {});
+
+  const {
+    appliedAge: appliedAgeNegative,
+    appliedAgeType: negativeAgeType,
+    appliedGender: negativeGender,
+    appliedCountry: negativeCountry,
+    appliedWitnessBy: negativeWitness,
+  } = useSelector((state) => state.negativeLeaderBoard || {});
+
+  const {
+    appliedAge: defaultAge,
+    appliedAgeType: defaultAgeType,
+    appliedGender: defaultGender,
+    appliedCountry: defaultCountry,
+  } = useSelector((state) => state.player || {});
 
   const displayLadderDetails =
     type === "minileague" ? minileagueLadderDetails :
@@ -774,22 +795,84 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
     if (type === "minileague") {
       dispatch(fetchMiniLeague({ ladder_id: ladderId }));
     } else if (type === "skill") {
-      dispatch(fetchSkillLeaderboard({ ladder_id: ladderId, type: "skill" }));
+      const payload = { ladder_id: ladderId, type: "skill" };
+      if (appliedAgeSkill > 0) {
+        payload.dob = appliedAgeSkill;
+        if (skillAgeType) payload.age_type = skillAgeType;
+      }
+      if (skillGender) payload.gender = skillGender;
+      if (skillCountry) payload.country = skillCountry;
+      if (skillWitness === 1) payload.witness_by = 1;
+      dispatch(fetchSkillLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
     } else if (type === "positive") {
-      dispatch(fetchPositiveLeaderboard({ ladder_id: ladderId, type: "positive" }));
+      const payload = { ladder_id: ladderId, type: "positive" };
+      if (appliedAgePositive > 0) {
+        payload.dob = appliedAgePositive;
+        if (positiveAgeType) payload.age_type = positiveAgeType;
+      }
+      if (positiveGender) payload.gender = positiveGender;
+      if (positiveCountry) payload.country = positiveCountry;
+      if (positiveWitness === 1) payload.witness_by = 1;
+      dispatch(fetchPositiveLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
     } else if (type === "negative") {
-      dispatch(fetchNegativeLeaderboard({ ladder_id: ladderId, type: "negative" }));
+      const payload = { ladder_id: ladderId, type: "negative" };
+      if (appliedAgeNegative > 0) {
+        payload.dob = appliedAgeNegative;
+        if (negativeAgeType) payload.age_type = negativeAgeType;
+      }
+      if (negativeGender) payload.gender = negativeGender;
+      if (negativeCountry) payload.country = negativeCountry;
+      if (negativeWitness === 1) payload.witness_by = 1;
+      dispatch(fetchNegativeLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
     } else if (type === "roster") {
-      dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, type: "roster" }));
+      const payload = { ladder_id: ladderId, type: "roster" };
+      if (defaultAge > 0) {
+        payload.dob = defaultAge;
+        if (defaultAgeType) payload.age_type = defaultAgeType;
+      }
+      if (defaultGender) payload.gender = defaultGender;
+      if (defaultCountry) payload.country = defaultCountry;
+      dispatch(fetchRosterLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
     } else {
-      dispatch(fetchLeaderboard({ ladder_id: ladderId, type: ladderType }));
+      const payload = { ladder_id: ladderId, type: ladderType };
+      if (defaultAge > 0) {
+        payload.dob = defaultAge;
+        if (defaultAgeType) payload.age_type = defaultAgeType;
+      }
+      if (defaultGender) payload.gender = defaultGender;
+      if (defaultCountry) payload.country = defaultCountry;
+      dispatch(fetchLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
     }
-  }, [ladderId, dispatch, type]);
+  }, [
+    ladderId,
+    dispatch,
+    type,
+    ladderType,
+    appliedAgeSkill,
+    skillAgeType,
+    skillGender,
+    skillCountry,
+    skillWitness,
+    appliedAgePositive,
+    positiveAgeType,
+    positiveGender,
+    positiveCountry,
+    positiveWitness,
+    appliedAgeNegative,
+    negativeAgeType,
+    negativeGender,
+    negativeCountry,
+    negativeWitness,
+    defaultAge,
+    defaultAgeType,
+    defaultGender,
+    defaultCountry,
+  ]);
 
   const generateGrades = (playersArr, gradebars, groupSize) => {
     if (!playersArr?.length) return [];
@@ -880,14 +963,20 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
         ) : (
           <div className="px-4 space-y-2">
             {filtered.map((player, idx) => {
-              const showAgeRank = Number(appliedAgeSkill) > 0;
+              const activeFilters = [
+                Number(appliedAgeSkill) > 0 && "Age",
+                skillGender && "Gender",
+                skillCountry && "Country",
+                skillWitness === 1 && "Witness",
+              ].filter(Boolean);
+              const isFiltered = activeFilters.length > 0;
               return (
                 <SkillPlayerCard
                   key={player.id || idx}
                   player={{ ...player, isInverted: displayLadderDetails?.inverted == 0 }}
-                  rank={player.rank || idx + 1}
-                  showAgeRank={showAgeRank}
-                  ageRank={idx + 1}
+                  rank={player.rank}
+                  isFiltered={isFiltered}
+                  activeFilters={activeFilters}
                 />
               );
             })}
@@ -919,15 +1008,21 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
         ) : (
           <div className="px-4 space-y-2">
             {filtered.map((player, idx) => {
-              const showAgeRank = Number(appliedAgePositive) > 0;
+              const activeFilters = [
+                Number(appliedAgePositive) > 0 && "Age",
+                positiveGender && "Gender",
+                positiveCountry && "Country",
+                positiveWitness === 1 && "Witness",
+              ].filter(Boolean);
+              const isFiltered = activeFilters.length > 0;
               return (
                 <SkillPlayerCard
                   key={player.id || idx}
                   player={{ ...player, isInverted: displayLadderDetails?.inverted == 0 }}
-                  rank={player.rank || idx + 1}
-                  showAgeRank={showAgeRank}
-                  ageRank={idx + 1}
+                  rank={player.rank}
                   showRanks={false}
+                  isFiltered={isFiltered}
+                  activeFilters={activeFilters}
                 />
               );
             })}
@@ -959,16 +1054,22 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
         ) : (
           <div className="px-4 space-y-2">
             {filtered.map((player, idx) => {
-              const showAgeRank = Number(appliedAgeNegative) > 0;
+              const activeFilters = [
+                Number(appliedAgeNegative) > 0 && "Age",
+                negativeGender && "Gender",
+                negativeCountry && "Country",
+                negativeWitness === 1 && "Witness",
+              ].filter(Boolean);
+              const isFiltered = activeFilters.length > 0;
               return (
                 <SkillPlayerCard
                   key={player.id || idx}
                   player={{ ...player, isInverted: displayLadderDetails?.inverted == 0 }}
-                  rank={player.rank || idx + 1}
-                  showAgeRank={showAgeRank}
-                  ageRank={idx + 1}
+                  rank={player.rank}
                   showRanks={false}
                   isNegative={true}
+                  isFiltered={isFiltered}
+                  activeFilters={activeFilters}
                 />
               );
             })}
