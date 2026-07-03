@@ -260,6 +260,19 @@ export const PlayerLists = () => {
     if (!hasSeenInfo) { setShowInfo(true); sessionStorage.setItem("adminInfoShown", "true"); }
   }, []);
 
+  // Scroll to top when ladderId changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [ladderId]);
+
+  // Scroll to top when globalLoading finishes to ensure page doesn't remain scrolled to middle after content loads
+  useEffect(() => {
+    if (!globalLoading) {
+      window.scrollTo(0, 0);
+    }
+  }, [globalLoading]);
+
+
   const currentLadderId = ladder?.ladder_id || ladderId;
   const playerEntry = useSelector((state) => ladderId ? state.player?.players?.[Number(ladderId)] : null);
   const currentLadderName = playerEntry?.ladderDetails?.name || miniLeagueData?.name || "Football Ladder";
