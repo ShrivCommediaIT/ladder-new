@@ -4,6 +4,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { setUser, resetUserState } from "@/redux/slices/userSlice";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -89,6 +91,7 @@ function TabButton({ active, children, onClick }) {
 export default function LoginUser({ ladderId, ladderType }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const dispatch = useDispatch();
 
   const [mode, setMode] = useState("login");
   const [showLoginPassword, setShowLoginPassword] = useState(false);
@@ -164,21 +167,30 @@ export default function LoginUser({ ladderId, ladderType }) {
         return;
       }
 
+      // Clear any previous session & reset redux user state
+      sessionStorage.clear();
+      dispatch(resetUserState());
+
+      const userPayload = {
+        ...userData,
+        ladder_id: finalLadderId,
+        ladder_type: finalLadderType,
+        isLoggedIn: true,
+        ShowBot: false
+      };
+
       sessionStorage.setItem(
         "user",
-        JSON.stringify({
-          ...userData,
-          ladder_id: finalLadderId,
-          ladder_type: finalLadderType,
-          isLoggedIn: true,
-          ShowBot: false
-        })
+        JSON.stringify(userPayload)
       );
 
       sessionStorage.setItem(
         "adminDetails",
         JSON.stringify({ id: res?.admin_id })
       );
+
+      // Sync user to Redux to avoid displaying stale data from prior logins
+      dispatch(setUser(userPayload));
 
       toast.success("Login successful!");
 
