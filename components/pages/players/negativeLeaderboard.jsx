@@ -41,6 +41,8 @@ const PlayerCard = ({
   onSkillClick,
   onTargetAchieved,
   selectedPositiveFilter,
+  isFiltered,
+  appliedWitnessBy,
 }) => {
   const playerImageUrl =
     player?.image && player.image !== "null" && player.image !== "undefined" && player.image !== ""
@@ -180,28 +182,29 @@ const PlayerCard = ({
           <div className="flex flex-col items-center justify-center gap-1 flex-shrink-0">
 
             <PlayerRankBadge
-              rank={selectedPositiveFilter > 0 ? getRankBySkillNumber(player.ranks, selectedPositiveFilter) : ((showAgeRank || showGenderRank || showCountryRank) ? rank : overallRank)}
+              rank={selectedPositiveFilter > 0 ? getRankBySkillNumber(player.ranks, selectedPositiveFilter) : (isFiltered ? player.sr : player.rank)}
               sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
               imgSize={56}
               textClass="text-[10px] sm:text-xs md:text-sm"
             />
-            {(showAgeRank || showGenderRank || showCountryRank) && (() => {
+            {(showAgeRank || showGenderRank || showCountryRank || appliedWitnessBy === 1) && (() => {
               const activeRankLabels = [
                 showAgeRank && " Age ",
                 showGenderRank && " Gender ",
                 showCountryRank && " Country ",
+                appliedWitnessBy === 1 && " Witness ",
               ].filter(Boolean);
 
               return (
                 <div className="flex flex-col  mt-2">
                   <p
-                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-[var(--primary)]"
 
                   >
                     Rank By:-
                   </p>
                   <p
-                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-[var(--primary)]"
                   >
                     {`(${activeRankLabels.join(",")})`}
                   </p>
@@ -426,14 +429,13 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         if (skillNo && skillNo !== 0) payload.sortbyskillnumber = skillNo;
         if (witness === 1) {
           payload.witness_by = 1;
-        } else {
-          if (age && age > 0) {
-            payload.dob = age;
-            if (ageType) payload.age_type = ageType;
-          }
-          if (gender) payload.gender = gender;
-          if (country) payload.country = country;
         }
+        if (age && age > 0) {
+          payload.dob = age;
+          if (ageType) payload.age_type = ageType;
+        }
+        if (gender) payload.gender = gender;
+        if (country) payload.country = country;
         Promise.all([
           dispatch(fetchNegativeLeaderboard(payload)),
           dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })),
@@ -514,11 +516,12 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     if (sortMode === "name") {
       return [...baseList].sort((a, b) => (a?.name || "").localeCompare(b?.name || ""));
     }
-    if (isSorted || selectedPositiveFilter > 0) {
+    const hasFiltersActive = hasFilters || localWitnessBy === 1;
+    if (isSorted || selectedPositiveFilter > 0 || hasFiltersActive) {
       return baseList;
     }
     return [...baseList].sort((a, b) => Number(a?.rank || 0) - Number(b?.rank || 0));
-  }, [data, searchQuery, sortMode, isSorted, selectedPositiveFilter]);
+  }, [data, searchQuery, sortMode, isSorted, selectedPositiveFilter, hasFilters, localWitnessBy]);
 
   const handleDeleteActivity = useCallback(
     async (id) => {
@@ -684,6 +687,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
                   currentUser={currentUser}
                   appliedWitnessBy={appliedWitnessBy}
                   selectedPositiveFilter={selectedPositiveFilter}
+                  isFiltered={hasFilters || localWitnessBy === 1}
                 />
               ))
             )}
