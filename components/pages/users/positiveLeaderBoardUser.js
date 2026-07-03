@@ -600,9 +600,10 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
             const storedAdmin = sessionStorage.getItem("adminDetails");
             const adminDetails = storedAdmin ? JSON.parse(storedAdmin) : null;
             const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+            const adminIdFromStore = Number(adminDetails?.id || ladderDetails?.created_by);
 
-            if (adminDetails && Number(adminDetails.id) === requiredAdminId) {
-              if (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1") {
+            if (adminIdFromStore === requiredAdminId) {
+              if (parsedUser.payment_status === null || parsedUser.payment_status === "null" || !parsedUser.payment_status || parsedUser.payment_status === 0 || parsedUser.payment_status === "0" || (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1")) {
                 setShowPaymentModal(true);
               }
             }
@@ -612,7 +613,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
         }
       }
     }
-  }, []);
+  }, [ladderDetails]);
 
   // PayPal Subscription Event Listener
   useEffect(() => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useSelector } from "react-redux";
 import { getRequest, postRequest, postUrlEncoded } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { Card } from "@/components/ui/card";
@@ -32,6 +33,15 @@ export default function BasicLeaderboardActivityEntryCard({
   selectedPlayer,
   onPaymentRequired
 }) {
+  const createdBy = useSelector((state) => 
+    state.player?.players?.[ladderId]?.ladderDetails?.created_by ||
+    state.player?.players?.[Number(ladderId)]?.ladderDetails?.created_by ||
+    state.skillLeaderboard?.ladderDetails?.created_by ||
+    state.positiveLeaderBoard?.ladderDetails?.created_by ||
+    state.negativeLeaderBoard?.ladderDetails?.created_by ||
+    state.rosterLeaderboard?.ladderDetails?.created_by ||
+    state.minileague?.data?.created_by
+  );
   const [selectedActivity, setSelectedActivity] = useState(
     initialActivity || 1,
   );
@@ -525,10 +535,11 @@ export default function BasicLeaderboardActivityEntryCard({
       }
 
       const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
-      const isAdminMatched = adminDetails && Number(adminDetails.id) === requiredAdminId;
+      const adminIdToCheck = Number(adminDetails?.id || createdBy);
+      const isAdminMatched = adminIdToCheck === requiredAdminId;
 
       if (isAdminMatched && sessionUser && Number(sessionUser.id) === Number(playerId)) {
-        if (sessionUser.payment_status !== 1 && sessionUser.payment_status !== "1") {
+        if (sessionUser.payment_status === null || sessionUser.payment_status === "null" || !sessionUser.payment_status || sessionUser.payment_status === 0 || sessionUser.payment_status === "0" || (sessionUser.payment_status !== 1 && sessionUser.payment_status !== "1")) {
           // Only check/block if the page has provided the payment handler callback (e.g. positiveLeaderBoardUser)
           if (onPaymentRequired) {
             toast.info("Subscription required. Redirecting to payment...");
