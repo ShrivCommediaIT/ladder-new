@@ -34,12 +34,14 @@ const PlayerCard = ({
   rank,
   showGenderRank,
   showCountryRank,
-  isInverted,
   onSkillClick,
   onTargetAchieved,
   isEditable,
   currentUser,
+  isInverted,
   selectedPositiveFilter,
+  isFiltered,
+  appliedWitnessBy,
 }) => {
   const playerImageUrl =
     player?.image && player.image !== "null" && player.image !== "undefined" && player.image !== ""
@@ -168,28 +170,29 @@ const PlayerCard = ({
           <div className="flex flex-col items-center justify-center gap-1 flex-shrink-0">
 
             <PlayerRankBadge
-              rank={selectedPositiveFilter > 0 ? getRankBySkillNumber(player.ranks, selectedPositiveFilter) : ((showAgeRank || showGenderRank || showCountryRank) ? rank : overallRank)}
+              rank={selectedPositiveFilter > 0 ? getRankBySkillNumber(player.ranks, selectedPositiveFilter) : (isFiltered ? player.sr : player.rank)}
               sizeClass="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14"
               imgSize={56}
               textClass="text-[10px] sm:text-xs md:text-sm"
             />
-            {(showAgeRank || showGenderRank || showCountryRank) && (() => {
+            {(showAgeRank || showGenderRank || showCountryRank || appliedWitnessBy === 1) && (() => {
               const activeRankLabels = [
                 showAgeRank && " Age ",
                 showGenderRank && " Gender ",
                 showCountryRank && " Country ",
+                appliedWitnessBy === 1 && " Witness ",
               ].filter(Boolean);
 
               return (
                 <div className="flex flex-col  mt-2">
                   <p
-                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-[var(--primary)]"
 
                   >
                     Rank By:-
                   </p>
                   <p
-                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-foreground"
+                    className="text-[7px] sm:text-[8px] font-bold mt-0.5 whitespace-nowrap text-[var(--primary)]"
                   >
                     {`(${activeRankLabels.join(",")})`}
                   </p>
@@ -662,7 +665,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
     setSelectedSkillFilter(0);
     setSelectedPositiveFilter(0);
     dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
-    refreshLeaderboard(0, 0, "under", "", "");
+    refreshLeaderboard(0, 0, "under", "", "", 0);
   }, [refreshLeaderboard, dispatch]);
 
   const handleSkillClick = useCallback(
@@ -751,6 +754,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
                     isEditable={isEditablePlayer}
                     loggedInUser={loggedInUser}
                     selectedPositiveFilter={selectedPositiveFilter}
+                    isFiltered={showAgeRank || showGenderRank || showCountryRank || appliedWitnessBy === 1}
                   />
                 );
               })
