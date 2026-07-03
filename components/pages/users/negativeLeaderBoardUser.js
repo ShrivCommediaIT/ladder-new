@@ -379,9 +379,10 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
             const storedAdmin = sessionStorage.getItem("adminDetails");
             const adminDetails = storedAdmin ? JSON.parse(storedAdmin) : null;
             const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+            const adminIdFromStore = Number(adminDetails?.id || ladderDetails?.created_by);
 
-            if (adminDetails && Number(adminDetails.id) === requiredAdminId) {
-              if (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1") {
+            if (adminIdFromStore === requiredAdminId) {
+              if (parsedUser.payment_status === null || parsedUser.payment_status === "null" || !parsedUser.payment_status || parsedUser.payment_status === 0 || parsedUser.payment_status === "0" || (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1")) {
                 setShowPaymentModal(true);
               }
             }
@@ -391,7 +392,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
         }
       }
     }
-  }, []);
+  }, [ladderDetails]);
 
 
 
@@ -809,6 +810,111 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
           }}
         />
       )}
+
+      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+        <DialogContent className="bg-card border border-border text-foreground p-6 rounded-2xl max-w-md w-[95%]">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="bg-primary/10 p-3 rounded-full">
+              <Image src={Logo} alt="Logo" className="h-10 w-10 object-contain" />
+            </div>
+
+            <h3 className="text-xl font-bold text-foreground">
+              Subscription Required
+            </h3>
+
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              To submit scores for this leaderboard, you need an active subscription.
+            </p>
+
+            <div className="bg-muted/50 w-full p-4 rounded-xl border border-border">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary/80">
+                Competition Access
+              </p>
+              <h4 className="text-base font-bold mt-1 text-foreground">
+                SSP International competitions
+              </h4>
+              <p className="text-p3 text-muted-foreground mt-1">
+                (£2 quarterly subscriptions)
+              </p>
+            </div>
+
+            {paypalLoading && (
+              <div className="flex items-center justify-center space-x-2 py-4">
+                <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-100" />
+                <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-200" />
+                <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-300" />
+                <span className="text-xs text-muted-foreground">Loading PayPal...</span>
+              </div>
+            )}
+
+            <div className="w-full pt-2">
+              {showPaymentModal && (
+                <iframe
+                  id="paypal-subscription-iframe"
+                  srcDoc={`
+                    <!DOCTYPE html>
+                    <html>
+                      <head>
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <style>
+                          body {
+                            margin: 0;
+                            padding: 0;
+                            background: transparent;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 150px;
+                          }
+                          #paypal-button-container {
+                            width: 100%;
+                          }
+                        </style>
+                      </head>
+                      <body>
+                        <div id="paypal-button-container"></div>
+                        
+                        <script src="https://${(process.env.NEXT_PUBLIC_PAYPAL_ENV || "production") === "sandbox" ? "sandbox.paypal.com" : "www.paypal.com"}/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+                        
+                        <script>
+                          if (window.paypal && window.paypal.Buttons) {
+                            window.paypal.Buttons({
+                              style: {
+                                shape: 'rect',
+                                color: 'blue',
+                                layout: 'vertical',
+                                label: 'subscribe'
+                              },
+                              createSubscription: function(data, actions) {
+                                return actions.subscription.create({
+                                  plan_id: '${PAYPAL_PLAN_ID}'
+                                });
+                              },
+                              onApprove: function(data, actions) {
+                                window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_APPROVED', subscriptionId: data.subscriptionID }, '*');
+                              },
+                              onError: function(err) {
+                                window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_ERROR', error: err.message || err.toString() }, '*');
+                              }
+                            }).render('#paypal-button-container').then(function() {
+                              window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_RENDERED' }, '*');
+                            }).catch(function(err) {
+                              window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_ERROR', error: err.toString() }, '*');
+                            });
+                          } else {
+                            window.parent.postMessage({ type: 'PAYPAL_SUBSCRIPTION_ERROR', error: 'PayPal SDK failed to load' }, '*');
+                          }
+                        </script>
+                      </body>
+                    </html>
+                  `}
+                  className="w-full min-h-[160px] border-none bg-transparent"
+                />
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
