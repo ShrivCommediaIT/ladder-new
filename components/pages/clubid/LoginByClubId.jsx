@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { resetUserState } from "@/redux/slices/userSlice";
 import { ToastContainer, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -54,6 +56,7 @@ const formSchema = z.object({
 
 export default function LoginByClubForm() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [userData, setUserData] = useState({ login_id: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -120,6 +123,9 @@ export default function LoginByClubForm() {
       }
 
       // ✅ Success storage logic
+      sessionStorage.clear();
+      dispatch(resetUserState());
+
       const storageKey =
         values.userType === "sub_admin" ? "subAdmin" : "userData";
 

@@ -229,6 +229,10 @@ export default function AuthPage({ initialMode = "login" }) {
     };
 
     try {
+      // Clear any previous session & reset redux user state
+      sessionStorage.clear();
+      dispatch(resetUserState());
+
       const res = await dispatch(loginUser(payload)).unwrap();
 
       if (res?.data?.user_type === "user") {

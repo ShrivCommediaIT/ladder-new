@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { getRequest, putRequest, deleteRequest, postFormData } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import {
@@ -20,6 +21,7 @@ import {
   Pencil,
   Save,
   XCircle,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import {
@@ -705,12 +707,23 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                 <span className="h-2.5 w-2.5 rounded-full bg-primary" />
                 Verified Results
               </div>
-              <h1
-                className="mt-4 bg-clip-text text-3xl font-black tracking-tight text-transparent sm:text-4xl lg:text-5xl"
-                style={{ backgroundImage: brandGradient }}
-              >
-                SSP Talent Board
-              </h1>
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-4">
+                <h1
+                  className="bg-clip-text text-3xl font-black tracking-tight text-transparent sm:text-4xl lg:text-5xl"
+                  style={{ backgroundImage: brandGradient }}
+                >
+                  SSP Talent Board  
+                </h1>
+                <Link
+                  href="/register-page"
+                  className="inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs sm:text-sm font-bold shadow-md transition-all duration-200 hover:scale-[1.03]
+                    border-zinc-300 bg-zinc-100 text-zinc-900 hover:bg-zinc-200/80
+                    dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700 ms-7"
+                >
+                  Submit a performance
+                  <ArrowRight className="h-3.5 w-3.5 " />
+                </Link>
+              </div>
               <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
                 Entries on the SSP Talent Board are submitted by participating articipating clubs, coaches and organisations to help showcase emerging talent and notable sporting achievements. Interested parties are encouraged to contact the submitting club or organisation directly for further information.  SSP reserves the right to remove or hide any entry that appears unsuitable, inaccurate, incomplete, or inappropriate
               </p>
