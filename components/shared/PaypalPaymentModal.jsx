@@ -178,9 +178,9 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={useIframe}>
-      <DialogContent className="bg-card border border-border text-foreground p-6 rounded-2xl max-w-md w-[95%]">
-        <div className="flex flex-col items-center text-center space-y-4">
-          <div className="bg-primary/10 p-3 rounded-full">
+      <DialogContent className="bg-card border border-border text-foreground p-6 rounded-2xl max-w-md w-[95%] max-h-[90vh] flex flex-col">
+        <div className="w-full overflow-y-auto pr-1 flex flex-col items-center text-center space-y-4 max-h-[80vh]">
+          <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
             <Image src={topLogo} alt="Logo" className="h-16 w-16 object-contain" />
           </div>
 
@@ -192,7 +192,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
             To submit scores for this leaderboard, you need an active subscription.
           </p>
 
-          <div className="bg-muted/50 w-full p-4 rounded-xl border border-border">
+          <div className="bg-muted/50 w-full p-4 rounded-xl border border-border flex-shrink-0">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary/80">
               Competition Access
             </p>
@@ -205,7 +205,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
           </div>
 
           {paypalLoading && (
-            <div className="flex items-center justify-center space-x-2 py-4">
+            <div className="flex items-center justify-center space-x-2 py-4 flex-shrink-0">
               <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-100" />
               <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-200" />
               <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-300" />
@@ -213,7 +213,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
             </div>
           )}
 
-          <div className="w-full pt-2 flex justify-center">
+          <div className="w-full pt-2 flex justify-center flex-shrink-0">
             {open && (
               useIframe ? (
                 <iframe
