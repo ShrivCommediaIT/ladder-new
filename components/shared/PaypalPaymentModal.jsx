@@ -191,6 +191,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
             )}
           </div>
         </div>
+        
       </DialogContent>
     </Dialog>
   );
