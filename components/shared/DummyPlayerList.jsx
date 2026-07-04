@@ -426,12 +426,11 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, i
                     <div
                       key={i}
                       className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all border
-                        ${witnessBy
-                          ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] underline decoration-white decoration-[2px]"
-                          : isTargetAchieved
-                            ? "bg-[var(--best-board-success)] text-white border-[var(--best-board-success)] shadow-md"
+                          ${witnessBy ? (isTargetAchieved ? "underline decoration-white decoration-[2px]" : "underline decoration-dark decoration-[2px]") : ""}
+                          ${isTargetAchieved
+                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
                             : "bg-[var(--best-board-warning)] text-[#0f172a] border-[var(--best-board-border-strong)] hover:brightness-95"
-                        }`}
+                          }`}
                       title={`Best Score: ${score} | Target: ${skill.target || "N/A"}${isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                     >
                       {Math.abs(score || 0).toFixed(2)}
