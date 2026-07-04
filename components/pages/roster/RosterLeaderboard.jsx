@@ -61,14 +61,9 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <PlayerStatusToggle player={player} user={false} />
+        <PlayerStatusToggle player={player} user={false} showTokenStatus={true} />
 
         <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
-          {player?.token_status && (
-            <span className="text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full best-board-tag-soft">
-              Status: {player.token_status}
-            </span>
-          )}
           {player.age !== null && player.age !== undefined && player.age !== "" && (
             <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap best-board-tag-accent">
               Age : {player.age}
