@@ -103,7 +103,15 @@ function UserPageRedirectRouter() {
           console.error("Failed to post message to BroadcastChannel:", e);
         }
 
-        // If running in a separate tab or popup (not inside an iframe), close it
+        // Clean up URL query parameters so we don't trigger success again
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("payment_status");
+          url.searchParams.delete("payment_success");
+          window.history.replaceState({}, document.title, url.toString());
+        }
+
+        // If running in a separate tab or popup (not inside an iframe), close it or set processing to false as fallback
         if (window.top === window.self) {
           setTimeout(() => {
             try {
@@ -111,7 +119,12 @@ function UserPageRedirectRouter() {
             } catch (err) {
               console.error("Failed to close window", err);
             }
+            // Set processing to false as a fallback so the main tab renders the leaderboard!
+            setPaymentProcessing(false);
           }, 1500);
+        } else {
+          // If it's inside an iframe, just set processing to false (it will be closed by the parent tab anyway)
+          setPaymentProcessing(false);
         }
       };
 
