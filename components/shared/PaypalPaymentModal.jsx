@@ -6,6 +6,7 @@ import { getRequest } from "@/services/apiService";
 import topLogo from "@/public/topLogo.png";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/slices/userSlice";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_CLIENT_ID;
 const PAYPAL_PLAN_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID;
@@ -26,7 +27,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
         }
       }
 
-      await getRequest("/user/updatePlayerPaymentStatus", {
+      await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
         payment_status: 1,
         id: sessionUser?.id,
         user_id: sessionUser?.user_id || sessionUser?.id,

@@ -100,6 +100,7 @@ export const API_ENDPOINTS = {
 
   // ── Subscription ─────────────────────────────
   BUY_SUBSCRIPTION:       "/user/buySubscription",
+  UPDATE_PLAYER_PAYMENT_STATUS: "/user/updatePlayerPaymentStatus",
 
   // ── Progress Flow ────────────────────────────
   GET_PROGRESS_FLOW:      "/user/getProgressFlow",
