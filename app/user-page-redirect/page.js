@@ -48,17 +48,30 @@ function UserPageRedirectRouter() {
   useEffect(() => {
     if (!ladderId) {
       try {
-        const storedUser = sessionStorage.getItem("user");
-        if (storedUser) {
-          const parsed = JSON.parse(storedUser);
-          if (parsed.ladder_id && parsed.ladder_type) {
-            const paymentStatus = searchParams.get("payment_status");
-            const paymentSuccess = searchParams.get("payment_success");
-            let target = `/user-page-redirect?ladder_id=${parsed.ladder_id}&ladder_type=${parsed.ladder_type}`;
-            if (paymentStatus) target += `&payment_status=${paymentStatus}`;
-            if (paymentSuccess) target += `&payment_success=${paymentSuccess}`;
-            router.replace(target);
+        let finalLadderId = null;
+        let finalLadderType = null;
+
+        if (typeof window !== "undefined") {
+          finalLadderId = localStorage.getItem("paypal_redirect_ladder_id");
+          finalLadderType = localStorage.getItem("paypal_redirect_ladder_type");
+        }
+
+        if (!finalLadderId || !finalLadderType) {
+          const storedUser = sessionStorage.getItem("user") || (typeof window !== "undefined" ? localStorage.getItem("paypal_user_backup") : null);
+          if (storedUser) {
+            const parsed = JSON.parse(storedUser);
+            finalLadderId = parsed.ladder_id;
+            finalLadderType = parsed.ladder_type;
           }
+        }
+
+        if (finalLadderId && finalLadderType) {
+          const paymentStatus = searchParams.get("payment_status");
+          const paymentSuccess = searchParams.get("payment_success");
+          let target = `/user-page-redirect?ladder_id=${finalLadderId}&ladder_type=${finalLadderType}`;
+          if (paymentStatus) target += `&payment_status=${paymentStatus}`;
+          if (paymentSuccess) target += `&payment_success=${paymentSuccess}`;
+          router.replace(target);
         }
       } catch (e) {
         console.error("Redirect fallback error", e);
@@ -69,7 +82,13 @@ function UserPageRedirectRouter() {
   // ---------------- GET USER FROM LOCALSTORAGE ----------------
   useEffect(() => {
     try {
-      const storedUser = sessionStorage.getItem("user");
+      let storedUser = sessionStorage.getItem("user");
+      if (!storedUser && typeof window !== "undefined") {
+        storedUser = localStorage.getItem("paypal_user_backup");
+        if (storedUser) {
+          sessionStorage.setItem("user", storedUser);
+        }
+      }
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
