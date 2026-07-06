@@ -97,9 +97,20 @@ export default function AdminPage() {
     dispatch(fetchLadders({ userId: admin.id }));
   }, [admin?.id, dispatch]);
 
+  const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+  const adminId = admin?.id || admin?.user_id;
+  const isAdminHiddenRoster = adminId ? Number(adminId) === requiredAdminId : false;
+
   const activeLadders = useMemo(
-    () => allLadders.filter((ladder) => ladder.created_by !== "demo"),
-    [allLadders],
+    () =>
+      allLadders.filter((ladder) => {
+        const isDemo = ladder.created_by === "demo";
+        const isRoster = ladder.type?.toLowerCase() === "roster";
+        if (isDemo) return false;
+        if (isAdminHiddenRoster && isRoster) return false;
+        return true;
+      }),
+    [allLadders, isAdminHiddenRoster],
   );
 
   const demoLadders = useMemo(
@@ -122,12 +133,16 @@ export default function AdminPage() {
         activeLadders.length > 0 ? "Ready to edit and manage" : "Create your first roster",
       icon: Layers3,
     },
-    {
-      title: "Roster Boards",
-      value: rosterCount,
-      detail: rosterCount > 0 ? "Player lists uploaded" : "Awaiting first upload",
-      icon: Users2,
-    },
+    ...(!isAdminHiddenRoster
+      ? [
+          {
+            title: "Roster Boards",
+            value: rosterCount,
+            detail: rosterCount > 0 ? "Player lists uploaded" : "Awaiting first upload",
+            icon: Users2,
+          },
+        ]
+      : []),
     {
       title: "Demo Templates",
       value: demoLadders.length,
