@@ -73,7 +73,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
 
     const clientId = PAYPAL_CLIENT_ID;
     const hostedButtonId = PAYPAL_PLAN_ID;
-    const currency = PAYPAL_CURRENCY || "USD";
+    const currency = PAYPAL_CURRENCY || "GBP";
 
     if (!clientId || !hostedButtonId) {
       toast.error("PayPal credentials are not configured in your environment.");
