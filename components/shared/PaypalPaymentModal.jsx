@@ -4,12 +4,15 @@ import { toast } from "react-toastify";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { getRequest } from "@/services/apiService";
 import topLogo from "@/public/topLogo.png";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/slices/userSlice";
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_CLIENT_ID;
 const PAYPAL_PLAN_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID;
 const PAYPAL_CURRENCY = process.env.NEXT_PUBLIC_PAYPAL_CURRENCY;
 
 const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
+  const dispatch = useDispatch();
   const [paypalLoading, setPaypalLoading] = useState(false);
 
   const handlePaymentSuccess = async () => {
@@ -32,6 +35,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
       if (sessionUser) {
         sessionUser.payment_status = 1;
         sessionStorage.setItem("user", JSON.stringify(sessionUser));
+        dispatch(setUser(sessionUser));
       }
 
       toast.success("Payment status updated successfully!");
@@ -63,8 +67,10 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
 
     setPaypalLoading(true);
 
+    const env = process.env.NEXT_PUBLIC_PAYPAL_ENV || "production";
+    const domain = env === "sandbox" ? "sandbox.paypal.com" : "www.paypal.com";
     const scriptId = "paypal-subscription-buttons-sdk";
-    const scriptSrc = `https://www.paypal.com/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=${currency}`;
+    const scriptSrc = `https://${domain}/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=${currency}`;
 
     let retries = 0;
     const initializeButtons = () => {
