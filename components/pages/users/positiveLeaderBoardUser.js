@@ -590,7 +590,6 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           const parsedUser = JSON.parse(storedUser);
           if (parsedUser && parsedUser.id) {
             setCurrentUserId(Number(parsedUser.id));
-            console.log(parsedUser.payment_status, 'parsedUser==>2')
 
             // Check if returning from a successful PayPal return redirect
             const paymentSuccess = searchParams.get("payment_success") === "true" || searchParams.get("payment_status") === "success";
