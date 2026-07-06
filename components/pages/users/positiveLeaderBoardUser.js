@@ -1,6 +1,6 @@
 "use client";
 import PlayerRankBadge from "@/components/shared/PlayerRankBadge";
-import { IMAGE_BASE_URL } from "@/constants/api";
+import { IMAGE_BASE_URL, API_ENDPOINTS } from "@/constants/api";
 
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import Image from "next/image";
@@ -590,7 +590,6 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           const parsedUser = JSON.parse(storedUser);
           if (parsedUser && parsedUser.id) {
             setCurrentUserId(Number(parsedUser.id));
-            console.log(parsedUser.payment_status, 'parsedUser==>2')
 
             // Check if returning from a successful PayPal return redirect
             const paymentSuccess = searchParams.get("payment_success") === "true" || searchParams.get("payment_status") === "success";
@@ -598,7 +597,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
               const handleReturnSuccess = async () => {
                 toast.success("Payment completed! Updating status...");
                 try {
-                  await getRequest("/user/updatePlayerPaymentStatus", {
+                  await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
                     payment_status: 1,
                     id: parsedUser.id,
                     user_id: parsedUser.user_id || parsedUser.id
