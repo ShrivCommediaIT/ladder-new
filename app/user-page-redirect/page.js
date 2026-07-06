@@ -103,8 +103,8 @@ function UserPageRedirectRouter() {
           console.error("Failed to post message to BroadcastChannel:", e);
         }
 
-        // If running in a popup/new tab, close it after 1.5 seconds
-        if (window.opener && window.opener !== window) {
+        // If running in a separate tab or popup (not inside an iframe), close it
+        if (window.top === window.self) {
           setTimeout(() => {
             try {
               window.close();
@@ -351,6 +351,18 @@ function UserPageRedirectRouter() {
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500 mx-auto"></div>
           <p className="text-lg font-medium text-green-400">Payment Completed Successfully!</p>
           <p className="text-sm text-gray-400">Updating status and returning to game tab...</p>
+          <button
+            onClick={() => {
+              try {
+                window.close();
+              } catch (e) {
+                console.error("Manual close blocked:", e);
+              }
+            }}
+            className="mt-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition cursor-pointer"
+          >
+            Close Tab
+          </button>
         </div>
       </div>
     );
