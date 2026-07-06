@@ -230,6 +230,21 @@ export const PlayerLists = () => {
   const dangerBtnClass = "rounded-lg h-16 w-full border border-[color:color-mix(in_srgb,var(--best-board-danger)_35%,transparent)] bg-[color:color-mix(in_srgb,var(--best-board-danger)_16%,transparent)] px-4 text-white shadow-none transition hover:-translate-y-0.5 hover:bg-[color:color-mix(in_srgb,var(--best-board-danger)_24%,transparent)] flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight";
 
   useEffect(() => {
+    if (resolvedType === "roster") {
+      const storedAdmin = sessionStorage.getItem("adminDetails");
+      const storedUserData = sessionStorage.getItem("userData");
+      const adminDetails = storedAdmin ? JSON.parse(storedAdmin) : null;
+      const userData = storedUserData ? JSON.parse(storedUserData) : null;
+      const adminId = adminDetails?.id || adminDetails?.user_id || userData?.id || userData?.user_id;
+      const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+      const isAdmin = adminDetails?.user_type === "admin" || userData?.user_type === "admin";
+      if (isAdmin && adminId && Number(adminId) === requiredAdminId) {
+        router.push("/admin-page");
+      }
+    }
+  }, [resolvedType, router]);
+
+  useEffect(() => {
     if (ladderId) dispatch(fetchGradebars(ladderId));
   }, [ladderId, dispatch]);
 

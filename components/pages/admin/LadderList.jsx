@@ -48,6 +48,11 @@ const LadderList = ({ userId }) => {
       ? JSON.parse(sessionStorage.getItem("userData") || "null")
       : null;
 
+  const storedAdminDetails =
+    typeof window !== "undefined"
+      ? JSON.parse(sessionStorage.getItem("adminDetails") || "null")
+      : null;
+
   const refreshLadders = (force = false) => {
     if (loading) return;
     if (!force && allLadders && allLadders.length > 0) return;
@@ -90,13 +95,23 @@ const LadderList = ({ userId }) => {
 
 let filteredLadders = [];
 
+const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+const adminId = admin?.id || admin?.user_id || storedAdminDetails?.id || storedAdminDetails?.user_id;
+const isAdminHiddenRoster = adminId ? Number(adminId) === requiredAdminId : false;
+
 if (subAdmin?.user_type === "sub_admin") {
   filteredLadders = allLadders?.filter(
     (ladder) => ladder.created_by !== "demo" && ladder.type?.toLowerCase() !== "roster"
   );
 } else if (admin?.user_type === "admin") {    
   filteredLadders = allLadders?.filter(
-    (ladder) => ladder.created_by !== "demo"
+    (ladder) => {
+      const isDemo = ladder.created_by === "demo";
+      const isRoster = ladder.type?.toLowerCase() === "roster";
+      if (isDemo) return false;
+      if (isAdminHiddenRoster && isRoster) return false;
+      return true;
+    }
   );
 } 
 
