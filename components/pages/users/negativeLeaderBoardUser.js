@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Funnel, X, XCircle } from "lucide-react";
 import { fetchNegativeLeaderboard, setAgeFilter } from "@/redux/slices/negativeLeaderBoardSlice";
+import { setUser } from "@/redux/slices/userSlice";
 import PlayerEditInfoModel from "@/components/shared/playerEditInfoModel";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import { convertTimeToSeconds, formatSecondsToTime } from "@/helper/helperFunction";
@@ -351,6 +352,7 @@ const PlayerCard = ({
 const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [pendingPostArgs, setPendingPostArgs] = useState(null);
+  const handlePaymentSuccessRef = useRef(null);
 
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -386,7 +388,16 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
                   });
                   parsedUser.payment_status = 1;
                   sessionStorage.setItem("user", JSON.stringify(parsedUser));
+                  dispatch(setUser(parsedUser));
                   toast.success("Payment status updated successfully!");
+
+                  try {
+                    const channel = new BroadcastChannel("paypal_payment_channel");
+                    channel.postMessage({ status: "success" });
+                    channel.close();
+                  } catch (e) {
+                    console.error("Failed to post message to BroadcastChannel:", e);
+                  }
 
                   // Refresh page URL to clear query params
                   const url = new URL(window.location.href);
@@ -550,7 +561,6 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
         } else {
           toast.error(res?.error_message || "Score submitted but got response error.");
         }
-        refreshLeaderboard(selectedSkillFilter);
       } catch (postErr) {
         console.error("Auto post score error:", postErr);
         toast.error("Failed to auto-submit score. Please try submitting again.");
@@ -558,7 +568,10 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
         setPendingPostArgs(null);
       }
     }
+    refreshLeaderboard(selectedSkillFilter);
   }, [pendingPostArgs, selectedSkillFilter, ladderId, refreshLeaderboard]);
+
+  handlePaymentSuccessRef.current = handlePaymentSuccess;
 
   useEffect(() => {
     if (onActionsChanged) {
@@ -684,6 +697,37 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
       refreshLeaderboard(0);
     }
   }, [ladderId]); // REMOVED refreshLeaderboard from deps
+
+  // Listen to BroadcastChannel for payment success from checkout tab
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const channel = new BroadcastChannel("paypal_payment_channel");
+      channel.onmessage = async (event) => {
+        const { status } = event.data;
+        if (status === "success") {
+          toast.success("Payment completed in checkout window! Syncing status...");
+          try {
+            const storedUser = sessionStorage.getItem("user");
+            if (storedUser) {
+              const parsed = JSON.parse(storedUser);
+              parsed.payment_status = 1;
+              sessionStorage.setItem("user", JSON.stringify(parsed));
+              dispatch(setUser(parsed));
+            }
+            setShowPaymentModal(false);
+            if (handlePaymentSuccessRef.current) {
+              await handlePaymentSuccessRef.current();
+            }
+          } catch (e) {
+            console.error("Error syncing payment channel message:", e);
+          }
+        }
+      };
+      return () => {
+        channel.close();
+      };
+    }
+  }, [dispatch]);
 
   const filteredPlayers = data.filter((player) => {
     if (!searchQuery) return true;
