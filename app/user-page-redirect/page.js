@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 import UserDetailsTypeUser from "@/components/shared/UserDetailsTypeUser";
 import MinileaguePlayers from "@/components/pages/users/MinileaguePlayers";
@@ -29,6 +29,7 @@ import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsA
 function UserPageRedirectRouter() {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // ---------------- URL PARAMS ----------------
   const ladderId = searchParams.get("ladder_id");
@@ -42,6 +43,28 @@ function UserPageRedirectRouter() {
   // User Action Modals State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
+
+  // ---------------- REDIRECT FALLBACK FOR PAYPAL RETURN ----------------
+  useEffect(() => {
+    if (!ladderId) {
+      try {
+        const storedUser = sessionStorage.getItem("user");
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          if (parsed.ladder_id && parsed.ladder_type) {
+            const paymentStatus = searchParams.get("payment_status");
+            const paymentSuccess = searchParams.get("payment_success");
+            let target = `/user-page-redirect?ladder_id=${parsed.ladder_id}&ladder_type=${parsed.ladder_type}`;
+            if (paymentStatus) target += `&payment_status=${paymentStatus}`;
+            if (paymentSuccess) target += `&payment_success=${paymentSuccess}`;
+            router.replace(target);
+          }
+        }
+      } catch (e) {
+        console.error("Redirect fallback error", e);
+      }
+    }
+  }, [ladderId, searchParams, router]);
 
   // ---------------- GET USER FROM LOCALSTORAGE ----------------
   useEffect(() => {
