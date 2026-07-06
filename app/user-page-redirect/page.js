@@ -60,7 +60,11 @@ function UserPageRedirectRouter() {
     const paymentSuccess = searchParams.get("payment_success");
     const isSuccess = paymentStatus === "success" || paymentSuccess === "true";
 
-    if (isSuccess && typeof window !== "undefined" && !paymentProcessing) {
+    // Only handle payment completion in page.js if it is NOT the main tab redirect.
+    // Main tab redirects are handled directly by the leaderboard components to preserve score posting.
+    const isMainTabRedirect = typeof window !== "undefined" && !window.opener && window.top === window.self;
+
+    if (isSuccess && typeof window !== "undefined" && !isMainTabRedirect && !paymentProcessing) {
       setPaymentProcessing(true);
 
       const processPaymentCompletion = async () => {
