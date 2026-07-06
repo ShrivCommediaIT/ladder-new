@@ -414,7 +414,11 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
                   url.searchParams.delete("payment_success");
                   window.history.replaceState({}, document.title, url.toString());
 
-                  refreshLeaderboard();
+                  if (handlePaymentSuccessRef.current) {
+                    await handlePaymentSuccessRef.current();
+                  } else {
+                    refreshLeaderboard();
+                  }
                 } catch (e) {
                   console.error("Failed to update status on return redirect", e);
                 }
@@ -541,16 +545,30 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
   }, [dispatch, refreshLeaderboard]);
 
   const handlePaymentSuccess = useCallback(async () => {
+    let activePostArgs = pendingPostArgs;
+
+    // Fallback: Read pending post args from localStorage if page reloaded
+    if (!activePostArgs && typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("paypal_pending_post_args");
+        if (saved) {
+          activePostArgs = JSON.parse(saved);
+        }
+      } catch (e) {
+        console.error("Failed to parse saved post args", e);
+      }
+    }
+
     // Auto-submit the pending result if it exists!
-    if (pendingPostArgs) {
+    if (activePostArgs) {
       toast.info("Submitting your score...");
       try {
         const params = new URLSearchParams();
-        params.append("user_id", String(pendingPostArgs.playerId));
-        params.append("skill_activity_id", String(pendingPostArgs.skillActivityId));
-        params.append("score", String(pendingPostArgs.score));
-        params.append("witness_by", String(pendingPostArgs.witnessBy || ""));
-        params.append("best_result", String(pendingPostArgs.bestScore || pendingPostArgs.score));
+        params.append("user_id", String(activePostArgs.playerId));
+        params.append("skill_activity_id", String(activePostArgs.skillActivityId));
+        params.append("score", String(activePostArgs.score));
+        params.append("witness_by", String(activePostArgs.witnessBy || ""));
+        params.append("best_result", String(activePostArgs.bestScore || activePostArgs.score));
 
         let adminId = "";
         try {
@@ -560,13 +578,16 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
         params.append("admin_id", adminId);
         params.append("ladder_id", ladderId);
 
-        const targetUrl = pendingPostArgs.url
-          ? (pendingPostArgs.url.startsWith('/') ? pendingPostArgs.url : `/${pendingPostArgs.url}`)
+        const targetUrl = activePostArgs.url
+          ? (activePostArgs.url.startsWith('/') ? activePostArgs.url : `/${activePostArgs.url}`)
           : "/user/postResultSkillboard";
         const res = await postUrlEncoded(targetUrl, params);
 
         if (res?.status === 200 || res?.status === "success") {
           toast.success("Score posted successfully!");
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("paypal_pending_post_args");
+          }
         } else {
           toast.error(res?.error_message || "Score submitted but got response error.");
         }
@@ -834,6 +855,9 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
           onPaymentRequired={(args) => {
             setOpenEdit(false);
             setPendingPostArgs(args);
+            if (typeof window !== "undefined") {
+              localStorage.setItem("paypal_pending_post_args", JSON.stringify(args));
+            }
             setShowPaymentModal(true);
           }}
         />
