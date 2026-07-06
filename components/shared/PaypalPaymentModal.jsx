@@ -56,6 +56,21 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
   useEffect(() => {
     if (!open) return;
 
+    // Backup session info to localStorage for cross-tab redirect support
+    if (typeof window !== "undefined") {
+      const storedUser = sessionStorage.getItem("user");
+      if (storedUser) {
+        localStorage.setItem("paypal_user_backup", storedUser);
+      }
+      const urlParams = new URLSearchParams(window.location.search);
+      const ladderId = urlParams.get("ladder_id");
+      const ladderType = urlParams.get("ladder_type") || urlParams.get("type");
+      if (ladderId && ladderType) {
+        localStorage.setItem("paypal_redirect_ladder_id", ladderId);
+        localStorage.setItem("paypal_redirect_ladder_type", ladderType);
+      }
+    }
+
     const clientId = PAYPAL_CLIENT_ID;
     const hostedButtonId = PAYPAL_PLAN_ID;
     const currency = PAYPAL_CURRENCY || "GBP";
