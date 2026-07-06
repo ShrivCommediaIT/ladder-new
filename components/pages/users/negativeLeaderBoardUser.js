@@ -368,7 +368,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
   const isInverted = ladderDetails?.inverted == 0;
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = sessionStorage.getItem("user") || sessionStorage.getItem("userData");
+      const storedUser = sessionStorage.getItem("user") || sessionStorage.getItem("userData") || localStorage.getItem("paypal_user_backup");
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);

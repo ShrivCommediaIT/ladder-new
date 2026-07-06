@@ -584,7 +584,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
   // FIXED: ONLY LOAD ONCE WHEN ladderId CHANGES (NO INFINITE LOOP)
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedUser = sessionStorage.getItem("user");
+      const storedUser = sessionStorage.getItem("user") || localStorage.getItem("paypal_user_backup");
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser);
