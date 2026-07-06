@@ -616,6 +616,15 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
                     console.error("Failed to post message to BroadcastChannel:", e);
                   }
 
+                  // Auto-close checkout tab to return user to original tab
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                    } catch (err) {
+                      console.error("Failed to close window", err);
+                    }
+                  }, 1500);
+
                   // Refresh page URL to clear query params
                   const url = new URL(window.location.href);
                   url.searchParams.delete("payment_status");
