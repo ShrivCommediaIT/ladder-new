@@ -1,10 +1,12 @@
 "use client";
 
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
+import { getRequest } from "@/services/apiService";
+import { setUser } from "@/redux/slices/userSlice";
 
 import UserDetailsTypeUser from "@/components/shared/UserDetailsTypeUser";
 import MinileaguePlayers from "@/components/pages/users/MinileaguePlayers";
@@ -39,10 +41,83 @@ function UserPageRedirectRouter() {
   const [isDesktop, setIsDesktop] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isIframe, setIsIframe] = useState(false);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
 
   // User Action Modals State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
+
+  // ---------------- FRAME BREAKOUT & CENTRALIZED PAYMENT RETURN ----------------
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.top !== window.self) {
+      setIsIframe(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment_status");
+    const paymentSuccess = searchParams.get("payment_success");
+    const isSuccess = paymentStatus === "success" || paymentSuccess === "true";
+
+    if (isSuccess && typeof window !== "undefined" && !paymentProcessing) {
+      setPaymentProcessing(true);
+
+      const processPaymentCompletion = async () => {
+        toast.info("Payment completed! Updating status...");
+        
+        let parsedUser = null;
+        try {
+          const storedUser = sessionStorage.getItem("user") || localStorage.getItem("paypal_user_backup");
+          if (storedUser) {
+            parsedUser = JSON.parse(storedUser);
+          }
+        } catch (e) {
+          console.error("Failed to parse user session", e);
+        }
+
+        if (parsedUser && parsedUser.id) {
+          try {
+            await getRequest("/user/updatePlayerPaymentStatus", {
+              payment_status: 1,
+              id: parsedUser.id,
+              user_id: parsedUser.user_id || parsedUser.id
+            });
+
+            parsedUser.payment_status = 1;
+            sessionStorage.setItem("user", JSON.stringify(parsedUser));
+            localStorage.setItem("paypal_user_backup", JSON.stringify(parsedUser));
+            dispatch(setUser(parsedUser));
+            toast.success("Payment status updated successfully!");
+          } catch (e) {
+            console.error("Failed to update status on return redirect", e);
+          }
+        }
+
+        // Broadcast success to parent tab
+        try {
+          const channel = new BroadcastChannel("paypal_payment_channel");
+          channel.postMessage({ status: "success" });
+          channel.close();
+        } catch (e) {
+          console.error("Failed to post message to BroadcastChannel:", e);
+        }
+
+        // If running in a popup/new tab, close it after 1.5 seconds
+        if (window.opener && window.opener !== window) {
+          setTimeout(() => {
+            try {
+              window.close();
+            } catch (err) {
+              console.error("Failed to close window", err);
+            }
+          }, 1500);
+        }
+      };
+
+      processPaymentCompletion();
+    }
+  }, [searchParams, dispatch, paymentProcessing]);
 
   // ---------------- REDIRECT FALLBACK FOR PAYPAL RETURN ----------------
   useEffect(() => {
@@ -257,6 +332,30 @@ function UserPageRedirectRouter() {
   };
 
   // ---------------- GUARDS ----------------
+  if (isIframe) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white p-4 text-center">
+        <div className="space-y-4">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500 mx-auto"></div>
+          <p className="text-lg font-medium">Processing payment completion...</p>
+          <p className="text-sm text-gray-400">This window will close automatically shortly.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (paymentProcessing) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white p-4 text-center">
+        <div className="space-y-4">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500 mx-auto"></div>
+          <p className="text-lg font-medium text-green-400">Payment Completed Successfully!</p>
+          <p className="text-sm text-gray-400">Updating status and returning to game tab...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-800 text-white">
