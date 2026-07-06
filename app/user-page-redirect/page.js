@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getRequest } from "@/services/apiService";
 import { setUser } from "@/redux/slices/userSlice";
+import { API_ENDPOINTS } from "@/constants/api";
 
 import UserDetailsTypeUser from "@/components/shared/UserDetailsTypeUser";
 import MinileaguePlayers from "@/components/pages/users/MinileaguePlayers";
@@ -82,7 +83,7 @@ function UserPageRedirectRouter() {
 
         if (parsedUser && parsedUser.id) {
           try {
-            await getRequest("/user/updatePlayerPaymentStatus", {
+            await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
               payment_status: 1,
               id: parsedUser.id,
               user_id: parsedUser.user_id || parsedUser.id
