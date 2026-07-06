@@ -82,7 +82,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
 
     setPaypalLoading(true);
 
-    const env = process.env.NEXT_PUBLIC_PAYPAL_ENV ;
+    const env = process.env.NEXT_PUBLIC_PAYPAL_ENV || "production";
     const domain = env === "sandbox" ? "sandbox.paypal.com" : "www.paypal.com";
     const scriptId = "paypal-subscription-buttons-sdk";
     const scriptSrc = `https://${domain}/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=${currency}`;
@@ -212,7 +212,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
             )}
           </div>
         </div>
-        
+
       </DialogContent>
     </Dialog>
   );
