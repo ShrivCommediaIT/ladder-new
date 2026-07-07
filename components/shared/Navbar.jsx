@@ -437,7 +437,9 @@ const Navbar = ({
                 <Image
                   src={topLogo}
                   alt="Sports Solutions Pro"
-                  className="md:h-10 h-10 w-auto"
+                  width={40}
+                  height={40}
+                  className="md:h-10 md:w-10 h-10 w-10 object-contain"
                   priority
                 />
                 <div className="flex items-center text-sm md:text-base font-extrabold uppercase tracking-wide gap-1">
@@ -528,7 +530,7 @@ const Navbar = ({
                 </div>
               </div>
             ) : (
-              <Image src={topLogo} alt="Sports Solutions Pro" className="md:h-10 h-10 w-auto" priority />
+              <Image src={topLogo} alt="Sports Solutions Pro" width={40} height={40} className="md:h-10 md:w-10 h-10 w-10 object-contain" priority />
             )}
 
 

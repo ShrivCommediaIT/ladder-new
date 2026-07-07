@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import topLogo from "@/public/topLogo.png";
@@ -43,8 +42,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import PerformanceDatabase from "@/components/shared/PerformanceDatabase";
-import OnboardingFlow from "@/components/shared/OnboardingFlow";
+import dynamic from "next/dynamic";
+
+const PerformanceDatabase = dynamic(() => import("@/components/shared/PerformanceDatabase"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center p-8 bg-card rounded-2xl border border-border">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        <p className="text-sm text-muted-foreground animate-pulse">Loading Performance Board...</p>
+      </div>
+    </div>
+  ),
+});
+
+const OnboardingFlow = dynamic(() => import("@/components/shared/OnboardingFlow"), {
+  ssr: false,
+});
+
 import Footer from "@/components/shared/Footer";
 import {
   Dialog,
@@ -372,7 +387,7 @@ export default function PlanHeading() {
       <nav className="sticky top-0 z-50 border-b border-[var(--landing-border)] bg-[var(--landing-surface)] backdrop-blur-md">
         <div className="mx-auto flex h-20 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center">
-            <Image src={topLogo} alt="Sports Solutions Pro" className="lg:h-15 h-10 w-auto" priority />
+            <Image src={topLogo} alt="Sports Solutions Pro" width={60} height={60} className="lg:h-[60px] lg:w-[60px] h-[40px] w-[40px] object-contain" priority />
           </Link>
 
           <div className="hidden items-center gap-8 lg:flex">
@@ -470,11 +485,8 @@ export default function PlanHeading() {
         <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center flex flex-col items-center">
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45 }}
-                className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-semibold text-[var(--landing-primary)] shadow-sm"
+              <div
+                className="animate-fade-in-up inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-semibold text-[var(--landing-primary)] shadow-sm"
                 style={{
                   borderColor: "var(--landing-badge-border)",
                   background: "var(--landing-badge-bg)",
@@ -482,52 +494,44 @@ export default function PlanHeading() {
               >
                 <span className="mr-2 flex h-2 w-2 rounded-full bg-[var(--landing-secondary)]" />
                 The #1 platform for sports clubs
-              </motion.div>
+              </div>
 
               {mounted && (
-                <motion.div
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, delay: 0.05 }}
-                  className="views-badge inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-black backdrop-blur"
+                <div
+                  className="animate-fade-in-up views-badge inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-black backdrop-blur"
+                  style={{ animationDelay: "0.05s" }}
                 >
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
                   <span>Live Page Views: <span className="views-badge-highlight font-mono tracking-wider">{views.toLocaleString()}</span></span>
-                </motion.div>
+                </div>
               )}
             </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.05 }}
-              className="mt-6 mb-8 text-5xl font-extrabold leading-[1.1] tracking-tight text-foreground md:text-7xl"
+            <h1
+              className="animate-fade-in-up mt-6 mb-8 text-5xl font-extrabold leading-[1.1] tracking-tight text-foreground md:text-7xl"
+              style={{ animationDelay: "0.05s" }}
             >
               PRO SOFTWARE
               <br />
               <span className="bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] bg-clip-text text-transparent">
                 For Clubs and Coaches
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="mx-auto mb-10 max-w-3xl text-xl leading-relaxed text-[var(--landing-muted)] md:text-2xl"
+            <p
+              className="animate-fade-in-up mx-auto mb-10 max-w-3xl text-xl leading-relaxed text-[var(--landing-muted)] md:text-2xl"
+              style={{ animationDelay: "0.1s" }}
             >
               Automated ladders, mini-leagues, leaderboards and challenge boards, all in one
               platform built for sports clubs.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-              className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
+            <div
+              className="animate-fade-in-up mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
+              style={{ animationDelay: "0.15s" }}
             >
               <Button
                 asChild
@@ -550,23 +554,28 @@ export default function PlanHeading() {
               >
                 Watch Demo
               </Button>
-            </motion.div>
-            {/* App Promotion & Info Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.18 }}
-              id={"ssp-international-competitions"}
-              className="mx-auto mb-16 max-w-[980px] flex flex-col select-none relative scroll-mt-20"
-            >
+            </div>
+          </div>
+
+          {/* App Promotion & Info Card */}
+          <div
+            id="ssp-international-competitions"
+            className="animate-fade-in-up mx-auto mb-16 w-full max-w-[980px] flex flex-col select-none relative scroll-mt-20"
+            style={{ animationDelay: "0.18s" }}
+          >
               {/* Unified Banner & Bottom Bar Container */}
               <div className="relative w-full overflow-hidden rounded-[16px] border border-cyan-500/35 bg-[#020713] p-1 shadow-[0_0_24px_rgba(0,145,255,0.28)]">
                 
                 {/* Top Banner Graphic */}
                 <div className="relative overflow-hidden rounded-t-[12px] bg-black">
-                  <img
+                  <Image
                     src="/ssp-internstional.png"
                     alt="SSP International Competitions"
+                    width={700}
+                    height={350}
+                    sizes="(max-width: 768px) 100vw, 700px"
+                    quality={70}
+                    priority
                     className="w-full h-auto block"
                   />
                   
@@ -666,12 +675,13 @@ export default function PlanHeading() {
                       <span className="text-[8px] font-bold text-slate-300 tracking-wide">FOLLOW US</span>
                       <span className="text-[8px] font-bold text-slate-300 tracking-wide mt-0.5">ON</span>
                     </div>
-                    <a
-                      href="https://www.facebook.com/profile.php?id=61580051563946"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-8 h-8 rounded-full bg-white hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer"
-                    >
+                     <a
+                       href="https://www.facebook.com/profile.php?id=61580051563946"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       aria-label="Follow us on Facebook"
+                       className="w-8 h-8 rounded-full bg-white hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer"
+                     >
                       <svg className="h-5 w-5 fill-[#1877F2]" viewBox="0 0 24 24">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                       </svg>
@@ -684,6 +694,7 @@ export default function PlanHeading() {
                   {/* 5. Terms & Conditions */}
                   <Link
                     href="/terms-and-conditions"
+                    prefetch={false}
                     className="flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-black tracking-wide text-[11px] sm:text-xs group cursor-pointer transition-colors"
                   >
                     <div className="flex flex-col text-left leading-tight">
@@ -697,36 +708,30 @@ export default function PlanHeading() {
                 </div>
                 </div>
                 <div className="mt-1 overflow-hidden rounded-b-[12px] border border-cyan-500/35 bg-[#030716] px-2 py-2 shadow-[inset_0_0_18px_rgba(0,153,255,0.18)]">
-                 <img src="/ssp-internstional-bottom.PNG" alt="SSP International Competitions - Bottom Bar" className="w-full h-auto block" />
+                  <Image src="/ssp-internstional-bottom.PNG" alt="SSP International Competitions - Bottom Bar" width={700} height={90} sizes="(max-width: 768px) 100vw, 700px" quality={70} className="w-full h-auto block" />
                 </div>
               </div>
 
-              {/* Popover overlay for /poster1.png */}
+              {/* Dialog modal overlay for /ssp-internstional-1.png */}
               {showPoster && (
-                <div
-                  className={`absolute left-4 right-4 bg-slate-900/95 border border-cyan-500/40 rounded-2xl p-2.5 shadow-2xl backdrop-blur-md transition-all duration-300 ${
-                    popupPosition === "top"
-                      ? "bottom-[102%] mb-2"
-                      : "top-[78px] mt-2"
-                  }`}
-                >
-                  <div className="flex justify-between items-center mb-1.5 px-1">
-                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-300">Competition Details</span>
-                    <button
-                      onClick={() => setShowPoster(false)}
-                      className="text-slate-400 hover:text-white transition-colors cursor-pointer"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
-                    <img src="ssp-internstional-1.png" alt="SSP Competition Guide" className="w-full h-auto block" />
-                  </div>
-                </div>
+                <Dialog open={showPoster} onOpenChange={setShowPoster}>
+                  <DialogContent className={`w-[95vw] sm:w-[85vw] md:max-w-2xl lg:max-w-3xl p-4 sm:p-5 rounded-2xl border shadow-2xl backdrop-blur-md max-h-[85vh] overflow-y-auto ${
+                    mounted && theme !== "dark" ? "bg-white text-gray-900 border-gray-200" : "bg-zinc-950/95 text-white border-zinc-800"
+                  }`}>
+                    <DialogTitle className="text-lg sm:text-xl font-bold mb-3 pr-6">SSP Competition Guide</DialogTitle>
+                    <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
+                      <Image
+                        src="/ssp-internstional-1.png"
+                        alt="SSP Competition Guide"
+                        width={800}
+                        height={1200}
+                        className="w-full h-auto block"
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
               )}
-            </motion.div>
-
-          </div>
+            </div>
         </div>
       </section>
 

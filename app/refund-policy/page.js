@@ -123,7 +123,7 @@ export default function RefundPolicy() {
         <nav className="sticky top-0 z-50 border-b border-[var(--landing-border)] bg-[var(--landing-surface)] backdrop-blur-md">
           <div className="mx-auto flex h-20 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">
             <Link href="/" className="flex items-center">
-              <Image src={topLogo} alt="Sports Solutions Pro" className="lg:h-15 h-10 w-auto" priority />
+              <Image src={topLogo} alt="Sports Solutions Pro" width={60} height={60} className="lg:h-[60px] lg:w-[60px] h-[40px] w-[40px] object-contain" priority />
             </Link>
 
             <div className="hidden items-center gap-8 lg:flex">

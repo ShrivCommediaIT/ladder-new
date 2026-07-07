@@ -100,12 +100,16 @@ export default function Footer() {
   return (
     <footer
       id="contact"
-      className="relative overflow-hidden bg-top bg-no-repeat text-white"
-      style={{
-        backgroundImage: "url('/footer.png')",
-        backgroundSize: "cover",
-      }}
+      className="relative overflow-hidden text-white"
     >
+      <Image
+        src="/footer.png"
+        alt="Footer Background"
+        fill
+        sizes="100vw"
+        className="object-cover object-top"
+        priority={false}
+      />
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/50"></div>
 
@@ -468,6 +472,7 @@ export default function Footer() {
               <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 lg:justify-end">
                 <Link
                   href="/privacy-policy"
+                  prefetch={false}
                   className="text-sm text-sky-400 hover:text-sky-300"
                 >
                   Privacy Policy
@@ -477,6 +482,7 @@ export default function Footer() {
 
                 <Link
                   href="/terms-and-conditions"
+                  prefetch={false}
                   className="text-sm text-sky-400 hover:text-sky-300"
                 >
                   Terms & Conditions
@@ -486,6 +492,7 @@ export default function Footer() {
 
                 <Link
                   href="/refund-policy"
+                  prefetch={false}
                   className="text-sm text-sky-400 hover:text-sky-300"
                 >
                   Cancellation & Refund Policy

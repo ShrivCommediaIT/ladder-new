@@ -88,7 +88,7 @@ export default function ClientLayoutWrapper({ children }) {
       </Provider>
       {!pathname?.startsWith("/super-admin") && (
         <>
-          <Script id="chatling-config" strategy="afterInteractive">
+          <Script id="chatling-config" strategy="lazyOnload">
             {`window.chtlConfig = { chatbotId: "7385437887" };`}
           </Script>
           <Script
@@ -96,7 +96,7 @@ export default function ClientLayoutWrapper({ children }) {
             data-id="7385437887"
             id="chtl-script"
             src="https://chatling.ai/js/embed.js"
-            strategy="afterInteractive"
+            strategy="lazyOnload"
           />
         </>
       )}
