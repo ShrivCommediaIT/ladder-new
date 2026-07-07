@@ -714,7 +714,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                 >
                   SSP Talent Board  
                 </h1>
-                <Link
+                {!isAdmin && <Link
                   href="/register-page"
                   className="inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs sm:text-sm font-bold shadow-md transition-all duration-200 hover:scale-[1.03]
                     border-zinc-300 bg-zinc-100 text-zinc-900 hover:bg-zinc-200/80
@@ -722,7 +722,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                 >
                   Submit a performance
                   <ArrowRight className="h-3.5 w-3.5 " />
-                </Link>
+                </Link>}
               </div>
               <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
                 Entries on the SSP Talent Board are submitted by participating articipating clubs, coaches and organisations to help showcase emerging talent and notable sporting achievements. Interested parties are encouraged to contact the submitting club or organisation directly for further information.  SSP reserves the right to remove or hide any entry that appears unsuitable, inaccurate, incomplete, or inappropriate
