@@ -4,7 +4,11 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { resetUserState } from "@/redux/slices/userSlice";
-import PlanHeading from "@/components/pages/payment/PlanHeading";
+import dynamic from "next/dynamic";
+
+const PlanHeading = dynamic(() => import("@/components/pages/payment/PlanHeading"), {
+  ssr: true,
+});
 
 export default function Home() {
   const dispatch = useDispatch();

@@ -701,7 +701,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
 
       <div className="relative mx-auto max-w-[1440px] space-y-8">
         <div className={`${shellClass} p-6 sm:p-8`}>
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
                 <span className="h-2.5 w-2.5 rounded-full bg-primary" />
@@ -714,7 +714,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                 >
                   SSP Talent Board  
                 </h1>
-                <Link
+                {!isAdmin && <Link
                   href="/register-page"
                   className="inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs sm:text-sm font-bold shadow-md transition-all duration-200 hover:scale-[1.03]
                     border-zinc-300 bg-zinc-100 text-zinc-900 hover:bg-zinc-200/80
@@ -722,18 +722,18 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                 >
                   Submit a performance
                   <ArrowRight className="h-3.5 w-3.5 " />
-                </Link>
+                </Link>}
               </div>
               <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
                 Entries on the SSP Talent Board are submitted by participating articipating clubs, coaches and organisations to help showcase emerging talent and notable sporting achievements. Interested parties are encouraged to contact the submitting club or organisation directly for further information.  SSP reserves the right to remove or hide any entry that appears unsuitable, inaccurate, incomplete, or inappropriate
               </p>
             </div>
 
-            <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3 lg:w-auto">
+            <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-3 xl:w-auto">
               {stats.map(({ label, value, icon: Icon, tone, iconColor }) => (
                 <div
                   key={label}
-                  className="min-w-[180px] rounded-[22px] border border-border bg-[color:color-mix(in_srgb,var(--card),var(--primary)_4%)] p-4"
+                  className="w-full xl:min-w-[170px] rounded-[22px] border border-border bg-[color:color-mix(in_srgb,var(--card),var(--primary)_4%)] p-4"
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -761,8 +761,8 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
         <form onSubmit={handleSearch} className={`${panelClass} space-y-6 p-6 sm:p-8`}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             <div className="space-y-1.5 min-w-0">
-              <label className={mutedLabelClass}>Sport</label>
-              <select value={sport} onChange={(e) => setSport(e.target.value)} className={selectClass}>
+              <label htmlFor="filter-sport" className={mutedLabelClass}>Sport</label>
+              <select id="filter-sport" value={sport} onChange={(e) => setSport(e.target.value)} className={selectClass}>
                 <option value="">All Sports</option>
                 {sportsOptions.map((sp, idx) => (
                   <option key={idx} value={sp}>{sp}</option>
@@ -771,8 +771,8 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
             </div>
 
             <div className="space-y-1.5 min-w-0">
-              <label className={mutedLabelClass}>Age Group</label>
-              <select value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} className={selectClass}>
+              <label htmlFor="filter-age-group" className={mutedLabelClass}>Age Group</label>
+              <select id="filter-age-group" value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} className={selectClass}>
                 <option value="">All Ages</option>
                 <option value="under13">Under 13s</option>
                 <option value="under15">Under 15s</option>
@@ -784,8 +784,8 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
             </div>
 
             <div className="space-y-1.5 min-w-0">
-              <label className={mutedLabelClass}>Gender</label>
-              <select value={gender} onChange={(e) => setGender(e.target.value)} className={selectClass}>
+              <label htmlFor="filter-gender" className={mutedLabelClass}>Gender</label>
+              <select id="filter-gender" value={gender} onChange={(e) => setGender(e.target.value)} className={selectClass}>
                 <option value="">All Genders</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -794,8 +794,8 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
             </div>
 
             <div className="space-y-1.5 min-w-0">
-              <label className={mutedLabelClass}>Country</label>
-              <select value={country} onChange={(e) => setCountry(e.target.value)} className={selectClass}>
+              <label htmlFor="filter-country" className={mutedLabelClass}>Country</label>
+              <select id="filter-country" value={country} onChange={(e) => setCountry(e.target.value)} className={selectClass}>
                 <option value="">All Countries</option>
                 {countriesOptions.map((ct, idx) => (
                   <option key={idx} value={ct}>{ct}</option>
@@ -843,13 +843,13 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
             </div>
 
             <div className="space-y-1.5 min-w-0">
-              <label className={mutedLabelClass}>Date From</label>
-              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={fieldClass} />
+              <label htmlFor="filter-date-from" className={mutedLabelClass}>Date From</label>
+              <input id="filter-date-from" type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={fieldClass} />
             </div>
 
             <div className="space-y-1.5 min-w-0">
-              <label className={mutedLabelClass}>Date To</label>
-              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className={fieldClass} />
+              <label htmlFor="filter-date-to" className={mutedLabelClass}>Date To</label>
+              <input id="filter-date-to" type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className={fieldClass} />
             </div>
             <div className="space-y-1.5 min-w-0">
               <button
@@ -890,8 +890,9 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
 
 
               <div className="flex flex-1 min-w-[150px] items-center gap-2 sm:flex-none">
-                <span className="whitespace-nowrap text-xs font-bold uppercase tracking-wider text-muted-foreground">Sort By</span>
+                <label htmlFor="filter-sort-by" className="whitespace-nowrap text-xs font-bold uppercase tracking-wider text-muted-foreground">Sort By</label>
                 <select
+                  id="filter-sort-by"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   className="h-10 w-full rounded-lg border border-input bg-[var(--input-bg)] px-3 text-xs font-medium text-foreground transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20"
@@ -1017,6 +1018,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                               e.stopPropagation();
                               handlePlayVideo(item.video_link);
                             }}
+                            aria-label={`Play performance video of ${item.full_name}`}
                             className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-primary shadow-md transition-all hover:scale-110 hover:bg-primary hover:text-white active:scale-95"
                           >
                             <Play className="h-3.5 w-3.5 fill-current" />
@@ -1072,6 +1074,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                 </h3>
                 <button
                   onClick={() => setActiveVideo(null)}
+                  aria-label="Close video player"
                   className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-[var(--input-bg)] text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
                 >
                   <X className="h-4 w-4" />
