@@ -16,7 +16,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import PerformanceDatabase from "@/components/shared/PerformanceDatabase";
+import dynamic from "next/dynamic";
+
+const PerformanceDatabase = dynamic(() => import("@/components/shared/PerformanceDatabase"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center p-8 bg-card rounded-2xl border border-border">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        <p className="text-sm text-muted-foreground animate-pulse">Loading Performance Board...</p>
+      </div>
+    </div>
+  ),
+});
 
 const countries = [
   "India", "United States", "United Kingdom", "Canada", "Australia",
