@@ -44,6 +44,7 @@ export default function AdminQuickActions() {
               sizes="(max-width: 767px) 100vw, (max-width: 1279px) 45vw, 40vw"
               className="object-fill"
               priority
+              quality={70}
             />
           </div>
         </button>

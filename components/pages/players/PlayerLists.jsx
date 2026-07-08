@@ -6,18 +6,33 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
 import PlayersLists1 from "./PlayersLists1";
-import ActivityLog from "./ActivityList";
 import LeaderBoard from "./LeaderBoard";
 import LadderRulesCard from "./LadderRulesCard";
-import MusicDownloadList from "./MusicDownloadList";
 import AdminEditPhone from "@/components/shared/AdminEditPhone";
 import Info from "@/components/shared/Info";
 import AgeFilter from "@/components/shared/AgeFilter";
 import QuickActionsCard from "@/components/shared/QuickActionsCard";
-import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
-import UploadPlayerLists from "@/components/pages/uploadCsv/UploadPlayerLists";
-import BasicLeaderboardSetUpSkill from "@/components/pages/admin/BasicLeaderboardSetUpSkill";
-import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
+
+import dynamic from "next/dynamic";
+
+const ActivityLog = dynamic(() => import("./ActivityList"), {
+  ssr: false,
+});
+const MusicDownloadList = dynamic(() => import("./MusicDownloadList"), {
+  ssr: false,
+});
+const AddRemoveBox = dynamic(() => import("@/components/pages/admin/AddRemoveBox"), {
+  ssr: false,
+});
+const UploadPlayerLists = dynamic(() => import("@/components/pages/uploadCsv/UploadPlayerLists"), {
+  ssr: false,
+});
+const BasicLeaderboardSetUpSkill = dynamic(() => import("@/components/pages/admin/BasicLeaderboardSetUpSkill"), {
+  ssr: false,
+});
+const BasicLeaderboardShort = dynamic(() => import("@/components/pages/admin/BasicLeaderboardShort"), {
+  ssr: false,
+});
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";

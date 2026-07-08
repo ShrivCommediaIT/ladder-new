@@ -323,6 +323,7 @@ export default function AuthPage({ initialMode = "login" }) {
                 alt="Badminton player in action"
                 fill
                 priority
+                fetchPriority="high"
                 sizes="(max-width: 1024px) 100vw, 58vw"
                 className="object-cover object-center"
               />
@@ -390,6 +391,7 @@ export default function AuthPage({ initialMode = "login" }) {
                     <div className="pt-1.5">
                       <Link
                         href="/#talent-board"
+                        prefetch={false}
                         className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-bold border-b border-cyan-400/40 hover:border-cyan-400 transition-all pb-0.5 text-xs"
                       >
                         Click Here
@@ -790,6 +792,7 @@ export default function AuthPage({ initialMode = "login" }) {
                       Already have a Club ID?{" "}
                       <Link
                         href={clubIdPage}
+                        prefetch={false}
                         className="font-semibold"
                         style={{ color: "var(--primary)" }}
                       >
