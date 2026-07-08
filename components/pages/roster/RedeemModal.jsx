@@ -4,7 +4,8 @@ import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 
 const REDEEM_OPTIONS = [
-    { discountPercent: 20, tokenCost: 20 }
+    { discountPercent: 20, tokenCost: 20 },
+    { discountPercent: 10, tokenCost: 10 }
 ];
 
 const MIN_TOKENS_TO_REDEEM = Math.min(...REDEEM_OPTIONS.map((option) => option.tokenCost));
@@ -66,6 +67,13 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
             return;
         }
 
+        const discountPercent = selectedOption.discountPercent;
+        const url = `https://oliversports.co.uk/discount/!SSP${discountPercent}!`;
+        
+        window.open(url, "_blank", "noopener,noreferrer");
+        onClose();
+
+        /*
         setIsRedeeming(true);
         try {
             const admin = JSON.parse(sessionStorage.getItem("adminDetails") || "{}");
@@ -106,6 +114,7 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
         } finally {
             setIsRedeeming(false);
         }
+        */
     };
 
     const handleCopy = () => {
@@ -142,11 +151,11 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
                 {step === "select" && (
                     <div className="p-6 space-y-5">
                         <div className="text-sm text-muted-foreground">
-                            Continue to make your purchase with {selectedOption.discountPercent}% discount
+                            Continue to make your purchase with {selectedOption?.discountPercent}% discount
                         </div>
 
                         <div className="text-sm text-muted-foreground">
-                            20 Tokens will be automatically deducted. This is irreversible.
+                            {selectedOption?.tokenCost} Tokens will be automatically deducted. This is irreversible.
                         </div>
 
                         <div className="space-y-3">
@@ -297,10 +306,12 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
                                     <div className="flex justify-end">
                                         <span className="text-primary font-semibold">Discount</span>
                                     </div>
-                                    <div className="flex justify-between text-muted-foreground">
-                                        <span>20 Tokens</span>
-                                        <span>20%</span>
-                                    </div>
+                                    {REDEEM_OPTIONS.map((option) => (
+                                        <div key={option.tokenCost} className="flex justify-between text-muted-foreground">
+                                            <span>{option.tokenCost} Tokens</span>
+                                            <span>{option.discountPercent}%</span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
