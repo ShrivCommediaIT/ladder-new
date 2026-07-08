@@ -25,8 +25,34 @@ const roboto = Roboto({
 });
 
 export const metadata = {
-  title: "Sports Solutions Pro",
-  description: "The #1 platform for sports clubs",
+  title: "Sports Solutions Pro - Sports Competition Platform for Clubs & Coaches",
+  description: "Run automated ladders, mini-leagues, live rankings, challenge boards, and international competitions for sports clubs, academies, schools, and organizations.",
+  keywords: [
+    "sports competition platform",
+    "club competition manager",
+    "automated sports ladders",
+    "sports league software",
+    "tennis ladder app",
+    "badminton ladder builder",
+    "sports rankings tracking",
+    "coaching challenge boards",
+    "grassroots sports engagement",
+    "sports solutions pro"
+  ],
+  authors: [{ name: "Sports Solutions Pro" }],
+  robots: "index, follow",
+  openGraph: {
+    title: "Sports Solutions Pro - Sports Competition Platform",
+    description: "The smart way to run automated ladders, mini-leagues, live rankings, and challenge boards for modern sports clubs and academies.",
+    url: "https://sportssolutionspro.com",
+    siteName: "Sports Solutions Pro",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sports Solutions Pro - Sports Competition Platform",
+    description: "Run automated ladders, mini-leagues, live rankings, and challenge boards for modern sports clubs and academies.",
+  }
 };
 
 export default function RootLayout({ children }) {
