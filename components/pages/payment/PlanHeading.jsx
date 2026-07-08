@@ -70,6 +70,7 @@ import {
 export default function PlanHeading() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [activeSection, setActiveSection] = useState("intro");
   const [isONboardingFlowVisible, setIsONboardingFlowVisible] = useState(false);
   const [views, setViews] = useState(20000);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
@@ -152,7 +153,7 @@ export default function PlanHeading() {
       active = false;
     };
   }, [mounted]);
-  
+
   const { theme, setTheme } = useTheme();
 
   const buttonRef = useRef(null);
@@ -179,6 +180,44 @@ export default function PlanHeading() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const handleScroll = () => {
+      const sections = [
+        "intro",
+        "what-it-should-do",
+        "why-more-than-mgmt",
+        "operational-value",
+        "participation-matters",
+        "data-use",
+        "visibility-pathways",
+        "choosing-platform"
+      ];
+
+      const scrollPosition = window.scrollY + 250;
+
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [mounted]);
 
   useEffect(() => {
     const handleUserScroll = () => {
@@ -276,7 +315,7 @@ export default function PlanHeading() {
         description:
           "Real-time updates visible to every member. Creates motivation and competitive buzz.",
       },
-     
+
       {
         icon: PhoneCall,
         color: "text-[var(--landing-secondary)]",
@@ -361,6 +400,93 @@ export default function PlanHeading() {
     [],
   );
 
+  const newsSections = useMemo(
+    () => [
+      {
+        id: "what-it-should-do",
+        title: "What a sports competition platform should do",
+        shortTitle: "Platform Role",
+        icon: SlidersHorizontal,
+        paragraphs: [
+          "A useful platform should not simply store results. It should actively support the way modern clubs run participation-based sport. That means handling digital ladders, mini-leagues, fixtures, leaderboards, challenge boards and player statistics in a way that is visible to coaches, players and wider sports communities.",
+          "For a coach, this changes the daily workflow. Instead of manually updating standings after training or match play, results can feed directly into live rankings. Instead of informal skill tests that are forgotten by the following week, challenge boards can track measurable progress over time. Instead of performance data staying inside one training group, standout results can be surfaced and compared more widely.",
+          "For players, the impact is different but just as important. Visibility drives participation. If athletes can see where they stand, what they need to improve, and how often activity is rewarded, they are far more likely to stay involved. This is especially true outside elite settings, where traditional win-loss structures do not always keep lower-standard or developing players engaged."
+        ]
+      },
+      {
+        id: "why-more-than-mgmt",
+        title: "Why clubs need more than sports management software",
+        shortTitle: "Management vs Competition",
+        icon: Shield,
+        paragraphs: [
+          "A club management system and a competition platform serve different operational jobs. One handles the business of sport. The other handles the active sporting environment.",
+          "That difference is often blurred during procurement. Clubs may assume that if their current software includes fixtures or score entry, it covers competition management. In reality, there is a major gap between basic scheduling and an interactive competition ecosystem. Live ladders, internal rankings, challenge formats, real-time performance updates and reward-driven engagement usually require much more specialised infrastructure.",
+          "This is where a platform that sits alongside existing systems becomes commercially sensible. It avoids forcing clubs to replace software that already works for administration, while adding the specific competition tools they are missing. For organisations with multiple age groups, academy pathways or community programmes, that layered approach is usually more practical than trying to force one system to do everything."
+        ]
+      },
+      {
+        id: "operational-value",
+        title: "The operational value of live competition structures",
+        shortTitle: "Operational Value",
+        icon: Activity,
+        paragraphs: [
+          "When competition formats are managed digitally, clubs gain control as well as visibility. Fixtures become easier to organise, results are standardised, and rankings update without repeated manual intervention. That reduces admin time, but the bigger gain is consistency.",
+          "A ladder only works if participants trust it. A challenge board only motivates if updates are current. A leaderboard only creates energy if players believe it reflects what is happening now, not last week. Real-time structures remove uncertainty and keep the competitive environment active between training sessions, matches and events.",
+          "This can be especially effective in academy and coaching settings. Skills and performance challenge boards give coaches a repeatable way to measure technical development. Sprint times, skill execution tasks, attendance-based competition activity and match outputs can all become part of a visible progression model. Players do not just hear that they are improving - they can see it."
+        ]
+      },
+      {
+        id: "participation-matters",
+        title: "Participation matters as much as winning",
+        shortTitle: "Participation First",
+        icon: Trophy,
+        paragraphs: [
+          "One of the biggest weaknesses in traditional competition design is that it tends to reward only the top end. The best players remain engaged because they are winning, but the wider player base can lose momentum if the structure offers limited recognition for effort, consistency or development.",
+          "That is where participation-led competition becomes more valuable than a simple league table. A platform should allow clubs to recognise not only sporting success but also activity. Regular involvement, completed challenges, match participation and measurable effort can all contribute to a more inclusive environment.",
+          "This matters commercially as well as developmentally. Clubs do not grow by serving only their strongest players. They grow by keeping more participants active for longer. Parents are more likely to stay engaged when progress is visible. Players are more likely to return when there is always another challenge to enter, another ranking to improve, or another target to work towards.",
+          "A participation token model strengthens this further when it is implemented properly. Rewarding involvement as well as outcome creates a broader motivational base, particularly in grassroots sport where confidence and retention are often fragile. If players can earn value through activity, not just podium finishes, competition becomes more accessible and more sustainable across mixed standards."
+        ]
+      },
+      {
+        id: "data-use",
+        title: "Data is not just for reporting",
+        shortTitle: "Leveraging Data",
+        icon: ChartColumn,
+        paragraphs: [
+          "Clubs increasingly collect data, but many still struggle to use it in a practical way. A sports competition platform for clubs should turn everyday sporting activity into usable operational insight.",
+          "That includes obvious metrics such as scores, fixtures completed, rankings movement and player statistics. But the more useful layer is behavioural data - who participates consistently, which formats generate the most activity, where drop-off points occur, and which groups respond best to challenge-based engagement.",
+          "For coaches, this helps shape session planning and player support. For club operators, it supports more targeted communication and programme design. For academies and leagues, it can highlight where competitive structures are working well and where formats need adjustment.",
+          "There is a trade-off here. More data is only useful if the platform presents it clearly. If reports are hard to interpret or require constant manual input, the value disappears quickly. The best systems keep data connected to action. If participation drops, organisers can see it early. If a player is progressing rapidly, coaches can use that evidence to increase visibility and opportunity."
+        ]
+      },
+      {
+        id: "visibility-pathways",
+        title: "Visibility creates stronger player pathways",
+        shortTitle: "Player Pathways",
+        icon: Goal,
+        paragraphs: [
+          "For many organisations, competition is not only about engagement. It is also about talent identification and player promotion. A digital platform makes that easier by giving exceptional performance a clearer route to wider exposure.",
+          "This is particularly relevant for coaches and academies managing ambitious players who need recognition beyond their immediate environment. If top performances can be surfaced through dedicated showcase structures, clubs can support athlete progression without relying entirely on local networks or informal referrals.",
+          "At the same time, visibility should not be reserved only for elite prospects. Broad performance tracking gives every player a reference point. Some will use it to pursue talent pathways. Others will use it to measure personal development. Both outcomes matter, and a strong platform should support both without forcing one model of success on every participant.",
+          "Sports Solutions Pro is built around that wider view of competition. Rather than acting as another club management system, it extends existing operations with ladders, rankings, challenge boards, live score tracking, talent visibility and participation rewards designed for clubs, coaches and active sports communities."
+        ]
+      },
+      {
+        id: "choosing-platform",
+        title: "Choosing the right platform for your environment",
+        shortTitle: "Right Solution",
+        icon: ShieldCheck,
+        paragraphs: [
+          "Not every club needs the same setup. A school sports department may prioritise fixtures and internal rankings. A tennis academy may need ladders and challenge boards. A league organiser may focus on result submission, live tables and participant communication. A football development programme may want performance tracking tied to coaching benchmarks.",
+          "The key question is not whether a platform has a long feature list. It is whether it supports the structure of competition you are actually trying to run. If your main objective is reducing admin, one solution may fit. If your objective is increasing participation, improving visibility and keeping players engaged between formal events, you need something designed around live competitive activity.",
+          "It also helps to be realistic about implementation. A platform should improve control, not create another operational burden. That means clear workflows, practical reporting and formats coaches can use without excessive setup time. The strongest systems fit into existing sports environments and make them perform better.",
+          "Clubs that build better competition experiences tend to see more than tidier admin. They create stronger habits, more visible progress and a clearer reason for players to stay involved. If your current setup can record a result but cannot sustain engagement, that is usually the moment to rethink what a competition platform should be doing for you."
+        ]
+      }
+    ],
+    []
+  );
+
   const navItems = useMemo(
     () => [
       { label: "SSP International Competitions", href: "#ssp-international-competitions" },
@@ -368,6 +494,7 @@ export default function PlanHeading() {
       { label: "Features", href: "#features" },
       { label: "Pricing", href: "#pricing" },
       { label: "Clubs/Coaches", href: "#features" },
+      { label: "News and Information", href: "#news-and-information" },
       { label: "Contact", href: "#contact" },
     ],
     [],
@@ -377,7 +504,7 @@ export default function PlanHeading() {
     "border-0 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] text-white shadow-lg transition-all duration-300 hover:opacity-95 hover:shadow-xl";
 
   const navLinkClass =
-    "text-[15px] font-medium transition-colors text-[var(--landing-nav-text)] hover:text-[var(--landing-nav-hover)]";
+    "text-[13px] xl:text-[15px] font-semibold transition-colors text-[var(--landing-nav-text)] hover:text-[var(--landing-nav-hover)] whitespace-nowrap";
 
   const themeToggleClass =
     "flex h-11 w-11 items-center justify-center rounded-full border border-[var(--landing-border)] bg-[var(--landing-surface)] text-[var(--landing-text)] shadow-sm backdrop-blur transition-all duration-200 hover:scale-[1.03] hover:bg-[var(--landing-outline-button-hover)]";
@@ -390,7 +517,7 @@ export default function PlanHeading() {
             <Image src={topLogo} alt="Sports Solutions Pro" width={60} height={60} className="lg:h-[60px] lg:w-[60px] h-[40px] w-[40px] object-contain" priority />
           </Link>
 
-          <div className="hidden items-center gap-8 lg:flex">
+          <div className="hidden items-center gap-3 xl:gap-5 lg:flex">
             {navItems.map((item) => (
               <a key={item.label} href={item.href} className={navLinkClass}>
                 {item.label}
@@ -398,7 +525,7 @@ export default function PlanHeading() {
             ))}
           </div>
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-2 xl:gap-3 lg:flex">
             {mounted && (
               <div className="views-badge flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold shadow-sm backdrop-blur">
                 <span className="relative flex h-2 w-2">
@@ -563,36 +690,36 @@ export default function PlanHeading() {
             className="animate-fade-in-up mx-auto mb-16 w-full max-w-[980px] flex flex-col select-none relative scroll-mt-20"
             style={{ animationDelay: "0.18s" }}
           >
-              {/* Unified Banner & Bottom Bar Container */}
-              <div className="relative w-full overflow-hidden rounded-[16px] border border-cyan-500/35 bg-[#020713] p-1 shadow-[0_0_24px_rgba(0,145,255,0.28)]">
-                
-                {/* Top Banner Graphic */}
-                <div className="relative overflow-hidden rounded-t-[12px] bg-black">
-                  <Image
-                    src="/ssp-internstional.png"
-                    alt="SSP International Competitions"
-                    width={700}
-                    height={350}
-                    sizes="(max-width: 768px) 100vw, 700px"
-                    quality={70}
-                    priority
-                    fetchPriority="high"
-                    className="w-full h-auto block"
-                  />
-                  
-                  {/* Info button in top right */}
-                  <button
-                    ref={buttonRef}
-                    onClick={handleInfoClick}
-                    className="absolute right-3 top-3 z-20 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-white/40 bg-black/45 p-1.5 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/65 active:scale-95 sm:h-8 sm:w-8"
-                    title="Info for First Time Users"
-                  >
-                    <Info className="h-4 w-4" />
-                  </button>
+            {/* Unified Banner & Bottom Bar Container */}
+            <div className="relative w-full overflow-hidden rounded-[16px] border border-cyan-500/35 bg-[#020713] p-1 shadow-[0_0_24px_rgba(0,145,255,0.28)]">
 
-                  {/* Custom HTML/CSS Bottom Bar (Directly overlaying on the image at the bottom) */}
-                  <div className="relative mx-2 mb-2 mt-2 flex w-[calc(100%-1rem)] flex-wrap items-center justify-around gap-3 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] p-3 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] md:absolute md:bottom-2 md:left-2 md:right-2 md:mx-0 md:mt-0 md:w-auto md:flex-nowrap md:justify-between md:gap-2 md:px-4 md:py-2">
-                  
+              {/* Top Banner Graphic */}
+              <div className="relative overflow-hidden rounded-t-[12px] bg-black">
+                <Image
+                  src="/ssp-internstional.png"
+                  alt="SSP International Competitions"
+                  width={700}
+                  height={350}
+                  sizes="(max-width: 768px) 100vw, 700px"
+                  quality={70}
+                  priority
+                  fetchPriority="high"
+                  className="w-full h-auto block"
+                />
+
+                {/* Info button in top right */}
+                <button
+                  ref={buttonRef}
+                  onClick={handleInfoClick}
+                  className="absolute right-3 top-3 z-20 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-white/40 bg-black/45 p-1.5 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/65 active:scale-95 sm:h-8 sm:w-8"
+                  title="Info for First Time Users"
+                >
+                  <Info className="h-4 w-4" />
+                </button>
+
+                {/* Custom HTML/CSS Bottom Bar (Directly overlaying on the image at the bottom) */}
+                <div className="relative mx-2 mb-2 mt-2 flex w-[calc(100%-1rem)] flex-wrap items-center justify-around gap-3 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] p-3 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] md:absolute md:bottom-2 md:left-2 md:right-2 md:mx-0 md:mt-0 md:w-auto md:flex-nowrap md:justify-between md:gap-2 md:px-4 md:py-2">
+
                   {/* 1. Download The App */}
                   <div className="flex items-center gap-2.5">
                     <div className="border-2 border-white/80 rounded-lg p-1 w-8 h-10 flex items-center justify-center text-white shrink-0 shadow-inner">
@@ -639,7 +766,7 @@ export default function PlanHeading() {
                       className="bg-black hover:bg-slate-900 border border-white/15 rounded-lg px-3 py-1 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md w-[124px] h-[28px] cursor-pointer"
                     >
                       <svg className="h-3.5 w-3.5 fill-white shrink-0" viewBox="0 0 24 24">
-                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.5-.63.73-1.18 1.87-1.03 2.97 1.12.09 2.27-.6 2.98-1.41z"/>
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.5-.63.73-1.18 1.87-1.03 2.97 1.12.09 2.27-.6 2.98-1.41z" />
                       </svg>
                       <div className="text-left leading-tight flex flex-col justify-center">
                         <span className="text-[5.5px] uppercase tracking-wider text-gray-300 leading-none">Download on the</span>
@@ -676,15 +803,15 @@ export default function PlanHeading() {
                       <span className="text-[8px] font-bold text-slate-300 tracking-wide">FOLLOW US</span>
                       <span className="text-[8px] font-bold text-slate-300 tracking-wide mt-0.5">ON</span>
                     </div>
-                     <a
-                       href="https://www.facebook.com/profile.php?id=61580051563946"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       aria-label="Follow us on Facebook"
-                       className="w-8 h-8 rounded-full bg-white hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer"
-                     >
+                    <a
+                      href="https://www.facebook.com/profile.php?id=61580051563946"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Follow us on Facebook"
+                      className="w-8 h-8 rounded-full bg-white hover:scale-105 active:scale-95 flex items-center justify-center transition-all shadow-md cursor-pointer"
+                    >
                       <svg className="h-5 w-5 fill-[#1877F2]" viewBox="0 0 24 24">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                       </svg>
                     </a>
                   </div>
@@ -707,32 +834,31 @@ export default function PlanHeading() {
                     </svg>
                   </Link>
                 </div>
-                </div>
-                <div className="mt-1 overflow-hidden rounded-b-[12px] border border-cyan-500/35 bg-[#030716] px-2 py-2 shadow-[inset_0_0_18px_rgba(0,153,255,0.18)]">
-                  <Image src="/ssp-internstional-bottom.PNG" alt="SSP International Competitions - Bottom Bar" width={700} height={90} sizes="(max-width: 768px) 100vw, 700px" quality={70} className="w-full h-auto block" />
-                </div>
               </div>
-
-              {/* Dialog modal overlay for /ssp-internstional-1.png */}
-              {showPoster && (
-                <Dialog open={showPoster} onOpenChange={setShowPoster}>
-                  <DialogContent className={`w-[95vw] sm:w-[85vw] md:max-w-2xl lg:max-w-3xl p-4 sm:p-5 rounded-2xl border shadow-2xl backdrop-blur-md max-h-[85vh] overflow-y-auto ${
-                    mounted && theme !== "dark" ? "bg-white text-gray-900 border-gray-200" : "bg-zinc-950/95 text-white border-zinc-800"
-                  }`}>
-                    <DialogTitle className="text-lg sm:text-xl font-bold mb-3 pr-6">SSP Competition Guide</DialogTitle>
-                    <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
-                      <Image
-                        src="/ssp-internstional-1.png"
-                        alt="SSP Competition Guide"
-                        width={800}
-                        height={1200}
-                        className="w-full h-auto block"
-                      />
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              )}
+              <div className="mt-1 overflow-hidden rounded-b-[12px] border border-cyan-500/35 bg-[#030716] px-2 py-2 shadow-[inset_0_0_18px_rgba(0,153,255,0.18)]">
+                <Image src="/ssp-internstional-bottom.PNG" alt="SSP International Competitions - Bottom Bar" width={700} height={90} sizes="(max-width: 768px) 100vw, 700px" quality={70} className="w-full h-auto block" />
+              </div>
             </div>
+
+            {/* Dialog modal overlay for /ssp-internstional-1.png */}
+            {showPoster && (
+              <Dialog open={showPoster} onOpenChange={setShowPoster}>
+                <DialogContent className={`w-[95vw] sm:w-[85vw] md:max-w-2xl lg:max-w-3xl p-4 sm:p-5 rounded-2xl border shadow-2xl backdrop-blur-md max-h-[85vh] overflow-y-auto ${mounted && theme !== "dark" ? "bg-white text-gray-900 border-gray-200" : "bg-zinc-950/95 text-white border-zinc-800"
+                  }`}>
+                  <DialogTitle className="text-lg sm:text-xl font-bold mb-3 pr-6">SSP Competition Guide</DialogTitle>
+                  <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
+                    <Image
+                      src="/ssp-internstional-1.png"
+                      alt="SSP Competition Guide"
+                      width={800}
+                      height={1200}
+                      className="w-full h-auto block"
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
         </div>
       </section>
 
@@ -797,6 +923,190 @@ export default function PlanHeading() {
         </div>
       </section>
 
+      {/* News and Information Section */}
+      <section
+        id="news-and-information"
+        className="py-20 scroll-mt-20 border-t border-[var(--landing-border)]"
+        style={{
+          background: "var(--landing-section-alt)",
+        }}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="mx-auto mb-16 max-w-3xl text-center">
+            <h2 className="mb-4 text-3xl font-extrabold text-foreground md:text-5xl tracking-tight">
+              News &amp; Information
+            </h2>
+            <div className="mx-auto h-1.5 w-24 rounded-full bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] mb-6" />
+            <p className="text-xl text-[var(--landing-muted)]">
+              Insights, strategies, and guidelines for modern sports clubs and academies.
+            </p>
+          </div>
+
+          {/* Desktop & Mobile Layout */}
+          <div className="flex flex-col gap-10 lg:flex-row">
+            {/* Sidebar (Table of Contents) */}
+            <div className="lg:w-1/4 lg:shrink-0">
+              {/* Desktop Sticky Sidebar */}
+              <div className="sticky top-24 hidden lg:block rounded-2xl border border-[var(--landing-border)] bg-[var(--landing-surface)] p-6 backdrop-blur-md shadow-sm">
+                <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-[var(--landing-primary)]">
+                  Table of Contents
+                </h3>
+                <ul className="space-y-1.5 text-sm font-medium">
+                  <li>
+                    <a
+                      href="#intro"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById("intro")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }}
+                      className={`block rounded-lg px-3 py-2 transition-all duration-200 ${activeSection === "intro"
+                          ? "bg-[var(--landing-primary)] text-white shadow-sm"
+                          : "text-[var(--landing-nav-text)] hover:bg-[var(--landing-outline-button-hover)] hover:text-[var(--landing-primary)]"
+                        }`}
+                    >
+                      Introduction
+                    </a>
+                  </li>
+                  {newsSections.map((section) => (
+                    <li key={section.id}>
+                      <a
+                        href={`#${section.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }}
+                        className={`block rounded-lg px-3 py-2 transition-all duration-200 ${activeSection === section.id
+                            ? "bg-[var(--landing-primary)] text-white shadow-sm"
+                            : "text-[var(--landing-nav-text)] hover:bg-[var(--landing-outline-button-hover)] hover:text-[var(--landing-primary)]"
+                          }`}
+                      >
+                        {section.shortTitle}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Mobile / Tablet Horizontal Scroll Menu */}
+              <div className="lg:hidden sticky top-[80px] z-20 -mx-4 overflow-x-auto px-4 py-3 bg-[var(--landing-bg)] border-b border-[var(--landing-border)] scrollbar-none flex gap-2">
+                <a
+                  href="#intro"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById("intro")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                  className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all border ${activeSection === "intro"
+                      ? "bg-[var(--landing-primary)] border-transparent text-white shadow-sm"
+                      : "bg-[var(--landing-surface)] border-[var(--landing-border)] text-[var(--landing-muted)] hover:text-foreground"
+                    }`}
+                >
+                  Introduction
+                </a>
+                {newsSections.map((section) => (
+                  <a
+                    key={section.id}
+                    href={`#${section.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                    className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all border ${activeSection === section.id
+                        ? "bg-[var(--landing-primary)] border-transparent text-white shadow-sm"
+                        : "bg-[var(--landing-surface)] border-[var(--landing-border)] text-[var(--landing-muted)] hover:text-foreground"
+                      }`}
+                  >
+                    {section.shortTitle}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Articles Content Column */}
+            <div className="flex-1 space-y-12">
+              {/* Introduction Card */}
+              <div
+                id="intro"
+                className="scroll-mt-32 rounded-2xl border border-[var(--landing-border)] bg-[var(--landing-surface)] p-6 sm:p-8 shadow-sm backdrop-blur-md transition-shadow hover:shadow-md"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--landing-primary)] to-[var(--landing-secondary)] text-white shadow-md">
+                    <Info className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">Overview &amp; Context</h3>
+                </div>
+                <div className="space-y-4 text-[var(--landing-text)] leading-relaxed">
+                  <p className="text-lg font-medium text-foreground">
+                    A fixtures spreadsheet works - until it does not. The point where coaches are chasing scores on WhatsApp, parents are asking for updated rankings, and players lose interest between sessions is usually the point a club realises it needs more than basic admin software. A sports competition platform for clubs fills that gap by giving organisations a structured way to run live, visible, participation-led competition without replacing the systems they already use for memberships, bookings or finance.
+                  </p>
+                  <p className="text-base text-[var(--landing-muted)]">
+                    That distinction matters. Many clubs already have management software, but those systems are often built for administration first. Competition is treated as a schedule, a results log or a bolt-on module. For clubs, academies, schools and league organisers trying to increase activity levels, maintain motivation and create stronger player pathways, that is not enough. They need a platform designed around competitive interaction itself - rankings, challenge formats, score tracking, performance visibility and ongoing engagement.
+                  </p>
+                </div>
+              </div>
+
+              {/* Mapped Sections */}
+              {newsSections.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <div
+                    key={section.id}
+                    id={section.id}
+                    className="scroll-mt-32 rounded-2xl border border-[var(--landing-border)] bg-[var(--landing-surface)] p-6 sm:p-8 shadow-sm backdrop-blur-md transition-shadow hover:shadow-md"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--landing-primary)] to-[var(--landing-secondary)] text-white shadow-md">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-foreground">{section.title}</h3>
+                    </div>
+
+                    <div className="space-y-4 text-[var(--landing-muted)] leading-relaxed">
+                      {section.paragraphs.map((para, idx) => {
+                        const isCalloutOne = section.id === "why-more-than-mgmt" && idx === 0;
+                        const isCalloutTwo = section.id === "participation-matters" && idx === 2;
+                        const isCalloutThree = section.id === "data-use" && idx === 1;
+
+                        if (isCalloutOne) {
+                          return (
+                            <div key={idx} className="my-6 rounded-xl border border-blue-500/20 bg-blue-500/5 p-5 text-foreground font-medium shadow-inner flex gap-3.5 items-start">
+                              <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+                              <p className="text-base leading-relaxed">{para}</p>
+                            </div>
+                          );
+                        }
+                        if (isCalloutTwo) {
+                          return (
+                            <div key={idx} className="my-6 rounded-xl border border-amber-500/20 bg-amber-500/5 p-5 text-foreground font-medium shadow-inner flex gap-3.5 items-start">
+                              <Trophy className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                              <p className="text-base leading-relaxed">{para}</p>
+                            </div>
+                          );
+                        }
+                        if (isCalloutThree) {
+                          return (
+                            <div key={idx} className="my-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5 text-foreground font-medium shadow-inner flex gap-3.5 items-start">
+                              <ChartColumn className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                              <p className="text-base leading-relaxed">{para}</p>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <p key={idx} className="text-base">
+                            {para}
+                          </p>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section
         id="clubs"
         className="py-10 scroll-mt-20"
@@ -808,13 +1118,13 @@ export default function PlanHeading() {
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <h2 className="mb-6 text-4xl font-extrabold text-foreground">Ready to  Inspire?</h2>
           <p className="mx-auto mb-10 max-w-2xl text-xl text-[var(--landing-nav-text)]">
-           Competition - Participation - Rewards
+            Competition - Participation - Rewards
           </p>
-           <p className="mx-auto mb-10 max-w-2xl text-xl text-[var(--landing-nav-text)]">
-           Set up in minutes - Demos Provided - No Cost - Free trial
+          <p className="mx-auto mb-10 max-w-2xl text-xl text-[var(--landing-nav-text)]">
+            Set up in minutes - Demos Provided - No Cost - Free trial
           </p>
           <Button asChild size="lg" className={`${buttonClass} h-16 rounded-full px-10 text-xl`}>
-            <Link  onClick={handleNavigationToAuth} href="#">
+            <Link onClick={handleNavigationToAuth} href="#">
               Get Started Free <ArrowRight className="h-6 w-6" />
             </Link>
           </Button>
@@ -828,11 +1138,10 @@ export default function PlanHeading() {
 
       {isDemoModalOpen && (
         <Dialog open={isDemoModalOpen} onOpenChange={setIsDemoModalOpen}>
-          <DialogContent className={`w-[95vw] sm:w-[90vw] md:max-w-4xl lg:max-w-5xl p-4 sm:p-6 rounded-2xl border shadow-2xl backdrop-blur-md max-h-[90vh] overflow-y-auto ${
-            mounted && theme !== "dark" ? "bg-white text-gray-900 border-gray-200" : "bg-zinc-950/95 text-white border-zinc-800"
-          }`}>
+          <DialogContent className={`w-[95vw] sm:w-[90vw] md:max-w-4xl lg:max-w-5xl p-4 sm:p-6 rounded-2xl border shadow-2xl backdrop-blur-md max-h-[90vh] overflow-y-auto ${mounted && theme !== "dark" ? "bg-white text-gray-900 border-gray-200" : "bg-zinc-950/95 text-white border-zinc-800"
+            }`}>
             <DialogTitle className="text-xl sm:text-2xl font-bold mb-4 pr-6">SSP Demo & Explainer Videos</DialogTitle>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Main Video Player */}
               <div className="md:col-span-2 flex flex-col gap-3">
@@ -853,7 +1162,7 @@ export default function PlanHeading() {
                   {demoVideos.find((v) => v.id === activeVideoId)?.description}
                 </p>
               </div>
-              
+
               {/* Video List */}
               <div className="flex flex-col gap-3 max-h-[350px] overflow-y-auto pr-1">
                 <span className="text-xs font-semibold uppercase tracking-wider text-primary mb-1">Select Video</span>
@@ -864,13 +1173,12 @@ export default function PlanHeading() {
                       <button
                         key={video.id}
                         onClick={() => setActiveVideoId(video.id)}
-                        className={`w-full text-left p-3 rounded-xl border transition-all flex flex-col gap-1 ${
-                          isActive 
+                        className={`w-full text-left p-3 rounded-xl border transition-all flex flex-col gap-1 ${isActive
                             ? "bg-blue-600/10 border-blue-500 text-blue-500 shadow-md"
                             : mounted && theme !== "dark"
                               ? "bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-800"
                               : "bg-zinc-900/50 hover:bg-zinc-900 border-zinc-800 text-zinc-300"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start gap-2 w-full">
                           <div className={`mt-1 rounded-full p-1 shrink-0 ${isActive ? "bg-blue-500 text-white" : "bg-zinc-800 text-zinc-400"}`}>
