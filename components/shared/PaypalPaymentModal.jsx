@@ -150,9 +150,24 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
       }
     };
 
-    if (window.paypal && window.paypal.HostedButtons) {
+    if (window.paypal && window.paypal.HostedButtons && document.getElementById(scriptId)) {
       setTimeout(initializeButtons, 100);
       return;
+    }
+
+    if (typeof window !== "undefined") {
+      const otherScriptId = isGuestUser ? "paypal-subscription-buttons-sdk" : "paypal-guest-subscription-sdk";
+      const otherScript = document.getElementById(otherScriptId);
+      if (otherScript) {
+        otherScript.remove();
+      }
+      const hostedButtonsScript = document.getElementById("paypal-hosted-buttons-sdk");
+      if (hostedButtonsScript) {
+        hostedButtonsScript.remove();
+      }
+      if (window.paypal) {
+        delete window.paypal;
+      }
     }
 
     let script = document.getElementById(scriptId);
