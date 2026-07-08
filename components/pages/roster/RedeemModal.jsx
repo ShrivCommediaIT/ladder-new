@@ -317,7 +317,7 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
                             <div className="text-sm text-foreground">
                                 View Store Price to redeem (no discount) -
                                 <span
-                                    onClick={handleRedeemClick}
+                                    onClick={() => window.open("https://oliversports.co.uk/", "_blank", "noopener,noreferrer")}
                                     className="text-primary underline cursor-pointer hover:text-primary/80"
                                 >
                                      {" "}Click here

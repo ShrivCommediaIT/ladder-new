@@ -22,6 +22,8 @@ export const API_ENDPOINTS = {
   // ── Auth ─────────────────────────────────────
   LOGIN:              "/user/login",
   REGISTER:           "/user/register",
+  GUEST_REGISTER:     "/guest/register",
+  GUEST_LOGIN:        "/guest/login",
   FORGOT_PASSWORD:    "/user/forgot/password",
   RESET_PASSWORD:     "/user/changeforgotpassword",
   CHANGE_PASSWORD:    "/user/change/password",

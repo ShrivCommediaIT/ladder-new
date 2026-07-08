@@ -188,8 +188,13 @@ export default function SubmitPerformancePage() {
 
     setPaypalLoading(true);
 
-    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-    const hostedButtonId = process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID;
+    const isGuestUser = guestUser !== null;
+    const clientId = isGuestUser
+      ? process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_CLIENT_ID
+      : process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    const hostedButtonId = isGuestUser
+      ? process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID
+      : process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID;
 
     if (!clientId || !hostedButtonId) {
       toast.error("PayPal credentials are not configured in your environment.");
@@ -197,7 +202,7 @@ export default function SubmitPerformancePage() {
       return;
     }
 
-    const scriptId = "paypal-hosted-buttons-sdk";
+    const scriptId = isGuestUser ? "paypal-subscription-buttons-sdk" : "paypal-hosted-buttons-sdk";
     const currency = process.env.NEXT_PUBLIC_PAYPAL_CURRENCY || "GBP";
     const env = process.env.NEXT_PUBLIC_PAYPAL_ENV || "production";
     const domain = env === "sandbox" ? "sandbox.paypal.com" : "www.paypal.com";
@@ -284,7 +289,9 @@ export default function SubmitPerformancePage() {
     };
   }, [showPaymentModal]);
 
-  // Pre-fill coach/submitter details from logged-in admin if available
+  const [guestUser, setGuestUser] = useState(null);
+
+  // Pre-fill coach/submitter details from logged-in admin or guest if available
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedAdmin = sessionStorage.getItem("userData");
@@ -292,10 +299,18 @@ export default function SubmitPerformancePage() {
       const user = storedAdmin ? JSON.parse(storedAdmin) : (storedSubAdmin ? JSON.parse(storedSubAdmin) : null);
 
       if (user) {
+        const isGuestType = user.user_type === "guest";
+        if (isGuestType) {
+          setGuestUser(user);
+        }
         setFormData(prev => ({
           ...prev,
-          coach_name: prev.coach_name || user.name || "",
-          email: prev.email || user.email || ""
+          coach_name: prev.coach_name || user.name || user.user_id || "",
+          email: prev.email || (isGuestType ? (user.user_id.includes("@") ? user.user_id : "") : (user.email || "")),
+          full_name: prev.full_name || (isGuestType ? user.user_id : ""),
+          age: prev.age || (isGuestType ? user.age || "" : ""),
+          gender: prev.gender || (isGuestType ? user.gender || "" : ""),
+          country: prev.country || (isGuestType ? user.country || "" : ""),
         }));
       }
     }
@@ -491,7 +506,10 @@ export default function SubmitPerformancePage() {
     return { isValid: Object.keys(newErrors).length === 0, errors: newErrors };
   };
 
-
+  const handleGuestSignOut = () => {
+    sessionStorage.clear();
+    router.replace("/");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -508,11 +526,13 @@ export default function SubmitPerformancePage() {
       }, 100);
       return;
     }
-    if (dbData.length > 50) {
-      setShowPaymentModal(true);
-    } else {
+    // if (guestUser) {
+    //   setShowPaymentModal(true);
+    // } else if (dbData.length > 50) {
+    //   setShowPaymentModal(true);
+    // } else {
       await submitFormData();
-    }
+    // }
   };
 
 
@@ -538,13 +558,15 @@ export default function SubmitPerformancePage() {
         }
       }
 
+   
+
       const payload = new FormData();
       if (currentSubAdmin == null) {
-        payload.append("admin_id", currentAdmin?.id || "");
+        payload.append("admin_id", currentAdmin?.id);
         payload.append("user_id", currentAdmin?.id || "");
         payload.append("user_type", currentAdmin?.user_type || "");
       } else {
-        payload.append("admin_id", currentAdmin?.id || "");
+        payload.append("admin_id", currentAdmin?.id);
         payload.append("user_id", currentSubAdmin?.id || "");
         payload.append("user_type", currentSubAdmin?.user_type || "");
       }
@@ -631,6 +653,21 @@ export default function SubmitPerformancePage() {
       <ToastContainer position="top-right" autoClose={3000} theme="dark" hideProgressBar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8">
+        {guestUser && (
+          <div className="mb-6 p-4 rounded-2xl border border-green-500/30 bg-green-500/10 text-green-800 dark:text-green-300 font-bold flex items-center justify-between shadow-md backdrop-blur-xl">
+            <span className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse" />
+              Logged in as Submitter: <span className="underline decoration-green-500/50 decoration-2">{guestUser.user_id}</span> (Guest User)
+            </span>
+            <button
+              type="button"
+              onClick={handleGuestSignOut}
+              className="text-xs px-4 py-2 rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all font-bold cursor-pointer"
+            >
+              Sign Out
+            </button>
+          </div>
+        )}
         {/* HEADER INFORMATION CARD */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center mb-8">
           <div className="lg:col-span-2">
@@ -1101,14 +1138,18 @@ export default function SubmitPerformancePage() {
                 </DialogTitle>
               </div>
               <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
-                <span className="font-extrabold text-sm">£5</span>
+                <span className="font-extrabold text-sm">{guestUser ? "£2" : "£5"}</span>
               </div>
             </div>
             <div className="p-6 space-y-6">
               <div className="space-y-2">
-                <h4 className="text-sm font-bold text-foreground">Annual Submission Subscription</h4>
+                <h4 className="text-sm font-bold text-foreground">
+                  {guestUser ? "SSP Guest Submission" : "Annual Submission Subscription"}
+                </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  To complete your submission to the SSP Talent Board, an annual subscription of £5.00 GBP is required. This keeps your listing active for 12 months, allowing you to update it at any time.
+                  {guestUser
+                    ? "To complete your submission to the SSP Talent Board, a guest submission fee of £2.00 GBP is required."
+                    : "To complete your submission to the SSP Talent Board, an annual subscription of £5.00 GBP is required. This keeps your listing active for 12 months, allowing you to update it at any time."}
                 </p>
               </div>
 
@@ -1122,7 +1163,7 @@ export default function SubmitPerformancePage() {
 
                 {!showManualTx && (
                   <div
-                    id={`paypal-container-${process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`}
+                    id={`paypal-container-${guestUser ? process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID : process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`}
                     className="min-h-[150px] w-full transition-all duration-300"
                   />
                 )}

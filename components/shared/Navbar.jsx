@@ -315,13 +315,15 @@ const Navbar = ({
   };
 
   const isPlayersPage = (activeTab === "players" || userLevel) && !!ladderId;
-  const userInitial = user?.name?.trim()?.[0]?.toUpperCase() || "?";
-  const displayName = user?.name || "Guest";
+  const userInitial = user?.name?.trim()?.[0]?.toUpperCase() || user?.user_id?.trim()?.[0]?.toUpperCase() || "?";
+  const displayName = user?.name || user?.user_id || "Guest";
   const roleLabel =
     user?.user_type === "admin"
       ? "Admin"
       : user?.user_type === "sub_admin"
       ? "Section Admin"
+      : user?.user_type === "guest"
+      ? "Guest User"
       : "Player";
 
   useEffect(() => {
@@ -349,6 +351,10 @@ const Navbar = ({
         } else if (admin?.user_type === "admin") {
           mergedUser = { ...admin, ...adminDetails };
         } else if (adminDetails?.user_type === "admin") {
+          mergedUser = { ...adminDetails };
+        } else if (admin?.user_type === "guest") {
+          mergedUser = { ...admin };
+        } else if (adminDetails?.user_type === "guest") {
           mergedUser = { ...adminDetails };
         } else if (normalUser) {
           mergedUser = { ...normalUser };
@@ -397,6 +403,10 @@ const Navbar = ({
     }
     if (user?.user_type === "sub_admin") {
       router.push(clubIdPage);
+      return;
+    }
+    if (user?.user_type === "guest") {
+      router.push("/");
       return;
     }
 
@@ -578,8 +588,18 @@ const Navbar = ({
                       }}
                     >
                       <div className="border-b border-white/10 px-4 py-2">
-                        <p className="truncate text-sm font-semibold text-white">{displayName}</p>
-                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{roleLabel}</p>
+                        {user?.user_type === "guest" ? (
+                          <>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Logged in as Submitter:</p>
+                            <p className="truncate text-sm font-black text-white mt-0.5">{user.user_id}</p>
+                            <p className="text-[10px] font-bold text-green-400 uppercase tracking-wider mt-0.5">(Guest User)</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="truncate text-sm font-semibold text-white">{displayName}</p>
+                            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{roleLabel}</p>
+                          </>
+                        )}
                       </div>
 
                       {!userLevel && (
@@ -681,8 +701,18 @@ const Navbar = ({
           >
             {/* User profile header in mobile menu */}
             <div className="border-b border-white/10 px-3 py-2.5 mb-2">
-              <p className="truncate text-sm font-semibold text-white">{displayName}</p>
-              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{roleLabel}</p>
+              {user?.user_type === "guest" ? (
+                <>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Logged in as Submitter:</p>
+                  <p className="truncate text-sm font-black text-white mt-0.5">{user.user_id}</p>
+                  <p className="text-[10px] font-bold text-green-400 uppercase tracking-wider mt-0.5">(Guest User)</p>
+                </>
+              ) : (
+                <>
+                  <p className="truncate text-sm font-semibold text-white">{displayName}</p>
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{roleLabel}</p>
+                </>
+              )}
             </div>
 
             {!userLevel && (
