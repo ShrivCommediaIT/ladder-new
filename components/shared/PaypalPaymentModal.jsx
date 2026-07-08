@@ -10,11 +10,14 @@ import { API_ENDPOINTS } from "@/constants/api";
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_CLIENT_ID;
 const PAYPAL_PLAN_ID = process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID;
+const PAYPAL_GUEST_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_GUEST_CLIENT_ID;
+const PAYPAL_GUEST_HOSTED_BUTTON_ID = process.env.NEXT_PUBLIC_PAYPAL_GUEST_HOSTED_BUTTON_ID;
 const PAYPAL_CURRENCY = process.env.NEXT_PUBLIC_PAYPAL_CURRENCY;
 
 const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
   const dispatch = useDispatch();
   const [paypalLoading, setPaypalLoading] = useState(false);
+  const [activeHostedButtonId, setActiveHostedButtonId] = useState(PAYPAL_PLAN_ID);
 
   const handlePaymentSuccess = async () => {
     toast.success("Subscription approved! Updating payment status...");
@@ -72,8 +75,19 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
       }
     }
 
-    const clientId = PAYPAL_CLIENT_ID;
-    const hostedButtonId = PAYPAL_PLAN_ID;
+    const isGuestUser = typeof window !== "undefined" && (() => {
+      try {
+        const storedAdmin = sessionStorage.getItem("userData");
+        if (storedAdmin) {
+          const user = JSON.parse(storedAdmin);
+          return user && user.user_type === "guest";
+        }
+      } catch (e) {}
+      return false;
+    })();
+
+    const clientId = isGuestUser ? PAYPAL_GUEST_CLIENT_ID : PAYPAL_CLIENT_ID;
+    const hostedButtonId = isGuestUser ? PAYPAL_GUEST_HOSTED_BUTTON_ID : PAYPAL_PLAN_ID;
     const currency = PAYPAL_CURRENCY || "GBP";
 
     if (!clientId || !hostedButtonId) {
@@ -81,11 +95,13 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
       return;
     }
 
+    setActiveHostedButtonId(hostedButtonId);
+
     setPaypalLoading(true);
 
     const env = process.env.NEXT_PUBLIC_PAYPAL_ENV || "production";
     const domain = env === "sandbox" ? "sandbox.paypal.com" : "www.paypal.com";
-    const scriptId = "paypal-subscription-buttons-sdk";
+    const scriptId = isGuestUser ? "paypal-guest-subscription-sdk" : "paypal-subscription-buttons-sdk";
     const scriptSrc = `https://${domain}/sdk/js?client-id=${clientId}&components=hosted-buttons&disable-funding=venmo&currency=${currency}`;
 
     let retries = 0;
@@ -207,7 +223,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
           <div className="w-full pt-2 flex justify-center flex-shrink-0">
             {open && (
               <div
-                id={`paypal-container-${PAYPAL_PLAN_ID}`}
+                id={`paypal-container-${activeHostedButtonId}`}
                 className="w-full max-w-[380px] mx-auto text-center pb-5 h-[650px]"
               />
             )}
