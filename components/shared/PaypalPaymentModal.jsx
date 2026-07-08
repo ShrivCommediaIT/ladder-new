@@ -82,7 +82,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
           const user = JSON.parse(storedAdmin);
           return user && user.user_type === "guest";
         }
-      } catch (e) {}
+      } catch (e) { }
       return false;
     })();
 
