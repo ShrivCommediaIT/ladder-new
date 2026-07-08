@@ -526,13 +526,13 @@ export default function SubmitPerformancePage() {
       }, 100);
       return;
     }
-    // if (guestUser) {
-    //   setShowPaymentModal(true);
-    // } else if (dbData.length > 50) {
-    //   setShowPaymentModal(true);
-    // } else {
+    if (guestUser) {
+      setShowPaymentModal(true);
+    } else if (dbData.length > 50) {
+      setShowPaymentModal(true);
+    } else {
       await submitFormData();
-    // }
+    }
   };
 
 
