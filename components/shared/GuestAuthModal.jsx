@@ -129,6 +129,7 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
           toast.success("Registration successful!");
           
           // Auto log in guest
+          sessionStorage.clear();
           const guestUserData = {
             id: res.data?.id || res.id || payload.user_id,
             user_id: payload.user_id,
@@ -137,6 +138,7 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
             gender: payload.gender,
             country: payload.country,
             dob: calculatedDob,
+            admin_id: res.data?.admin_id || res.admin_id || "",
             user_type: "guest",
             isLoggedIn: true,
           };
@@ -164,6 +166,7 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
         if (res && (res.status === 200 || res.status === true || res.success)) {
           toast.success("Login successful!");
           
+          sessionStorage.clear();
           const guestUserData = {
             id: res.data?.id || res.id || payload.user_id,
             user_id: payload.user_id,
@@ -172,6 +175,7 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
             gender: res.data?.gender || "",
             country: res.data?.country || "",
             dob: res.data?.dob || "",
+            admin_id: res.data?.admin_id || res.admin_id || "",
             user_type: "guest",
             isLoggedIn: true,
           };
