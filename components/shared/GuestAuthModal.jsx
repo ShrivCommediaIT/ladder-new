@@ -213,6 +213,7 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
+        aria-describedby={undefined}
         className="w-[95vw] sm:max-w-md rounded-[28px] border p-0 overflow-hidden shadow-2xl backdrop-blur-xl transition-all duration-300 bg-background text-foreground"
         style={{
           background: "var(--auth-card-bg)",

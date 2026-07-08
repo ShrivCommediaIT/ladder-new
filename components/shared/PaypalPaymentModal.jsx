@@ -200,7 +200,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border border-border text-foreground p-6 rounded-2xl max-w-md w-[95%] max-h-[90vh] flex flex-col">
+      <DialogContent aria-describedby={undefined} className="bg-card border border-border text-foreground p-6 rounded-2xl max-w-md w-[95%] max-h-[90vh] flex flex-col">
         <div className="w-full overflow-y-auto pr-1 flex flex-col items-center text-center space-y-4 max-h-[80vh]">
           <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
             <Image src={topLogo} alt="Logo" className="h-16 w-16 object-contain" />

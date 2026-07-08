@@ -188,7 +188,7 @@ export default function SubmitPerformancePage() {
 
   // Load and render PayPal SDK subscription buttons dynamically when modal is open
   useEffect(() => {
-    if (!showPaymentModal) return;
+    if (!showPaymentModal || guestUser) return;
 
     setPaypalLoading(true);
 
