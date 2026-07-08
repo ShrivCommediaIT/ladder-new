@@ -18,28 +18,28 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
 
   const handlePaymentSuccess = async () => {
     toast.success("Subscription approved! Updating payment status...");
-    try {
-      let sessionUser = null;
-      if (typeof window !== "undefined") {
-        const storedUser = sessionStorage.getItem("user");
-        if (storedUser) {
-          sessionUser = JSON.parse(storedUser);
-        }
+    let sessionUser = null;
+    if (typeof window !== "undefined") {
+      const storedUser = sessionStorage.getItem("user");
+      if (storedUser) {
+        sessionUser = JSON.parse(storedUser);
       }
+    }
 
-      await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
-        payment_status: 1,
-        id: sessionUser?.id,
-        user_id: sessionUser?.user_id || sessionUser?.id,
-      });
+    try {
+      if (sessionUser && sessionUser.id) {
+        await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
+          payment_status: 1,
+          id: sessionUser?.id,
+          user_id: sessionUser?.user_id || sessionUser?.id,
+        });
 
-      if (sessionUser) {
         sessionUser.payment_status = 1;
         sessionStorage.setItem("user", JSON.stringify(sessionUser));
         dispatch(setUser(sessionUser));
+        toast.success("Payment status updated successfully!");
       }
 
-      toast.success("Payment status updated successfully!");
       onOpenChange(false);
 
       if (onSuccess) {
