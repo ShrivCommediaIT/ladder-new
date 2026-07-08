@@ -15,13 +15,20 @@ export default function useAuthGuard(options = {}) {
     let isAllowed = false;
 
     if (onlyAdmin) {
-      // sirf admin
-      isAllowed = admin && admin.isLoggedIn === true;
+      // sirf admin (guest is not admin)
+      isAllowed = admin && admin.isLoggedIn === true && admin.user_type !== "guest";
     } else {
       // admin ya sub admin dono
       isAllowed =
         (admin && admin.isLoggedIn === true) ||
         (subAdmin && subAdmin.isLoggedIn === true);
+    }
+
+    if (isAllowed) {
+      const isGuest = admin?.user_type === "guest" || subAdmin?.user_type === "guest";
+      if (isGuest && typeof window !== "undefined" && window.location.pathname !== "/submit-performance") {
+        isAllowed = false;
+      }
     }
 
     if (!isAllowed) {

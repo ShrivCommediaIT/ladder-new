@@ -26,3 +26,13 @@ export const loginClubUser = async ({ club_id, pin }) => {
     user_type: "admin",
   });
 };
+
+// 📝 Guest Register (URL-encoded)
+export const guestRegister = async (data) => {
+  return await postRequest(API_ENDPOINTS.GUEST_REGISTER, data);
+};
+
+// 🔐 Guest Login (URL-encoded)
+export const guestLogin = async (data) => {
+  return await postRequest(API_ENDPOINTS.GUEST_LOGIN, data);
+};

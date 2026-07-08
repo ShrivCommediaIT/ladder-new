@@ -30,6 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import GuestAuthModal from "./GuestAuthModal";
 
 const brandGradient = "var(--background-image-gradient-brand)";
 const shellClass =
@@ -200,6 +201,8 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
   const [activitiesOptions, setActivitiesOptions] = useState([]);
   const [countriesOptions, setCountriesOptions] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
+  const [guestAuthModalOpen, setGuestAuthModalOpen] = useState(false);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmModalConfig, setConfirmModalConfig] = useState({
     title: "",
@@ -305,8 +308,8 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
           date_to: currentFilters.dateTo || undefined,
           witness: currentFilters.witness || undefined,
         };
-
-        if (adminId) {
+        const resolvedAdminId = process.env.NEXT_PUBLIC_ADMIN_ID
+        if (adminId != resolvedAdminId) {
           params.admin_id = adminId;
         }
 
@@ -368,15 +371,25 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
       if (adminDetailsStr) {
         try {
           const adminDetails = JSON.parse(adminDetailsStr);
-          setIsAdmin(!!(adminDetails && adminDetails.id));
+          setIsAdmin(!!(adminDetails && adminDetails.id && adminDetails.user_type !== "guest"));
+          setIsGuest(!!(adminDetails && adminDetails.id && adminDetails.user_type === "guest"));
         } catch {
           setIsAdmin(false);
+          setIsGuest(false);
         }
       } else {
         setIsAdmin(false);
+        setIsGuest(false);
       }
     }
   }, [currentPage, fetchResults, refreshTrigger]);
+
+  const handlePerformanceSubmitClick = (e) => {
+    if (!isGuest) {
+      e.preventDefault();
+      setGuestAuthModalOpen(true);
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -714,8 +727,9 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                 >
                   SSP Talent Board  
                 </h1>
-                {!isAdmin && <Link
-                  href="/register-page"
+                {!isAdmin && !isGuest && <Link
+                  href="/submit-performance"
+                  onClick={handlePerformanceSubmitClick}
                   className="inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs sm:text-sm font-bold shadow-md transition-all duration-200 hover:scale-[1.03]
                     border-zinc-300 bg-zinc-100 text-zinc-900 hover:bg-zinc-200/80
                     dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700 ms-7"
@@ -1352,6 +1366,14 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
             </div>
           </DialogContent>
         </Dialog>
+
+        <GuestAuthModal
+          open={guestAuthModalOpen}
+          onOpenChange={setGuestAuthModalOpen}
+          onSuccess={() => {
+            setIsGuest(true);
+          }}
+        />
       </div>
     </section>
   );
