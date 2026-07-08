@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import dynamic from "next/dynamic";
+import PaypalPaymentModal from "@/components/shared/PaypalPaymentModal";
 
 const PerformanceDatabase = dynamic(() => import("@/components/shared/PerformanceDatabase"), {
   ssr: false,
@@ -1125,106 +1126,67 @@ export default function SubmitPerformancePage() {
         </form>
 
         {/* PayPal Sandbox Payment Dialog */}
-        <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
-          <DialogContent className="w-[95vw] sm:max-w-md bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
-            {/* Header Banner */}
-            <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-1 bg-primary/15 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
-                  <ShieldCheck className="h-3.5 w-3.5" /> Secure Checkout
+        {guestUser ? (
+          <PaypalPaymentModal
+            open={showPaymentModal}
+            onOpenChange={setShowPaymentModal}
+            onSuccess={async () => {
+              await submitFormData("PAYPAL_SUB_" + Date.now());
+            }}
+          />
+        ) : (
+          <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+            <DialogContent className="w-[95vw] sm:max-w-md bg-background border border-border text-foreground rounded-[28px] p-0 shadow-2xl backdrop-blur-xl overflow-hidden flex flex-col">
+              {/* Header Banner */}
+              <div className="relative p-6 pb-4 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1 bg-primary/15 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
+                    <ShieldCheck className="h-3.5 w-3.5" /> Secure Checkout
+                  </div>
+                  <DialogTitle className="text-xl font-black text-foreground">
+                    Talent Board Submission
+                  </DialogTitle>
                 </div>
-                <DialogTitle className="text-xl font-black text-foreground">
-                  Talent Board Submission
-                </DialogTitle>
+                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
+                  <span className="font-extrabold text-sm">£5</span>
+                </div>
               </div>
-              <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
-                <span className="font-extrabold text-sm">{guestUser ? "£2" : "£5"}</span>
-              </div>
-            </div>
-            <div className="p-6 space-y-6">
-              <div className="space-y-2">
-                <h4 className="text-sm font-bold text-foreground">
-                  {guestUser ? "SSP Guest Submission" : "Annual Submission Subscription"}
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {guestUser
-                    ? "To complete your submission to the SSP Talent Board, a guest submission fee of £2.00 GBP is required."
-                    : "To complete your submission to the SSP Talent Board, an annual subscription of £5.00 GBP is required. This keeps your listing active for 12 months, allowing you to update it at any time."}
-                </p>
-              </div>
+              <div className="p-6 space-y-6">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-bold text-foreground">
+                    Annual Submission Subscription
+                  </h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    To complete your submission to the SSP Talent Board, an annual subscription of £5.00 GBP is required. This keeps your listing active for 12 months, allowing you to update it at any time.
+                  </p>
+                </div>
 
-              <div className="border-t border-border pt-4 space-y-4">
-                {paypalLoading && !showManualTx && (
-                  <div className="flex flex-col items-center justify-center py-6 space-y-3">
-                    <div className="w-8 h-8 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
-                    <p className="text-xs text-muted-foreground font-semibold">Initializing PayPal Payment...</p>
-                  </div>
-                )}
-
-                {!showManualTx && (
-                  <div
-                    id={`paypal-container-${guestUser ? process.env.NEXT_PUBLIC_PAYPAL_SUBSCRIPTION_PLAN_ID : process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`}
-                    className="min-h-[150px] w-full transition-all duration-300"
-                  />
-                )}
-
-                {/* <div className="space-y-3 pt-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setShowManualTx(!showManualTx)}
-                      className="text-xs font-semibold text-primary hover:underline transition-all cursor-pointer"
-                    >
-                      {showManualTx ? "← Back to PayPal Payment" : "Already paid? Submit Transaction ID manually"}
-                    </button>
-                  </div>
-
-                  {showManualTx && (
-                    <div className="space-y-3 rounded-2xl border border-border/80 bg-muted/30 p-4 transition-all duration-200">
-                      <div className="space-y-1">
-                        <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                          PayPal Transaction ID / Receipt Number
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g. 8MC47407H2048743K"
-                          value={manualTxId}
-                          onChange={(e) => setManualTxId(e.target.value.trim())}
-                          className="w-full h-11 px-3 rounded-xl border border-input bg-background text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        disabled={loading || !manualTxId}
-                        onClick={async () => {
-                          if (!manualTxId) return;
-                          await submitFormData(manualTxId);
-                        }}
-                        className="w-full h-11 rounded-xl bg-primary text-white font-bold text-sm shadow-md hover:bg-primary/95 active:scale-98 transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-                      >
-                        {loading ? (
-                          <>
-                            <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                            Submitting...
-                          </>
-                        ) : (
-                          "Verify & Submit Result"
-                        )}
-                      </button>
+                <div className="border-t border-border pt-4 space-y-4">
+                  {paypalLoading && !showManualTx && (
+                    <div className="flex flex-col items-center justify-center py-6 space-y-3">
+                      <div className="w-8 h-8 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+                      <p className="text-xs text-muted-foreground font-semibold">Initializing PayPal Payment...</p>
                     </div>
                   )}
-                </div> */}
-              </div>
 
-              <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-muted-foreground/60 font-medium">
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span>Secured by PayPal • SSL Encrypted</span>
+                  {!showManualTx && (
+                    <div
+                      id={`paypal-container-${process.env.NEXT_PUBLIC_PAYPAL_HOSTED_BUTTON_ID}`}
+                      className="min-h-[150px] w-full transition-all duration-300"
+                    />
+                  )}
+                </div>
+
+                <div className="flex items-center justify-center gap-2 pt-2 text-[10px] text-muted-foreground/60 font-medium">
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>Secured by PayPal • SSL Encrypted</span>
+                </div>
               </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        )}
 
       </div>
       <PerformanceDatabase refreshTrigger={refreshKey} />
