@@ -129,6 +129,7 @@ export default function GuestAuthPage({ initialMode = "register" }) {
           toast.success("Registration successful!");
           
           // Auto log in guest
+          sessionStorage.clear();
           const guestUserData = {
             id: res.data?.id || res.id || payload.user_id,
             user_id: payload.user_id,
@@ -137,6 +138,7 @@ export default function GuestAuthPage({ initialMode = "register" }) {
             gender: payload.gender,
             country: payload.country,
             dob: calculatedDob,
+            admin_id: res.data?.admin_id || res.admin_id || "",
             user_type: "guest",
             isLoggedIn: true,
           };
@@ -161,6 +163,7 @@ export default function GuestAuthPage({ initialMode = "register" }) {
         if (res && (res.status === 200 || res.status === true || res.success)) {
           toast.success("Login successful!");
           
+          sessionStorage.clear();
           const guestUserData = {
             id: res.data?.id || res.id || payload.user_id,
             user_id: payload.user_id,
@@ -169,6 +172,7 @@ export default function GuestAuthPage({ initialMode = "register" }) {
             gender: res.data?.gender || "",
             country: res.data?.country || "",
             dob: res.data?.dob || "",
+            admin_id: res.data?.admin_id || res.admin_id || "",
             user_type: "guest",
             isLoggedIn: true,
           };
