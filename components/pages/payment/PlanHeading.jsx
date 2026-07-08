@@ -576,6 +576,7 @@ export default function PlanHeading() {
                     sizes="(max-width: 768px) 100vw, 700px"
                     quality={70}
                     priority
+                    fetchPriority="high"
                     className="w-full h-auto block"
                   />
                   
