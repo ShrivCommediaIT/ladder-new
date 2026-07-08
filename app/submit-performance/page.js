@@ -81,6 +81,10 @@ export default function SubmitPerformancePage() {
   const allowed = useAuthGuard();
   const router = useRouter();
 
+  const [admin, setAdmin] = useState(null);
+  const [subAdmin, setSubAdmin] = useState(null);
+  const [guestUser, setGuestUser] = useState(null);
+
   // Form State
   const [formData, setFormData] = useState({
     sport: "",
@@ -110,8 +114,6 @@ export default function SubmitPerformancePage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [admin, setAdmin] = useState(null);
-  const [subAdmin, setSubAdmin] = useState(null);
   const [dbData, setDbData] = useState([]);
 
   // States for Manual Transaction ID Entry
@@ -164,7 +166,8 @@ export default function SubmitPerformancePage() {
 
         const requestParams = {};
 
-        if (adminDetails) {
+        const isGuestUser = adminDetails?.user_type === "guest";
+        if (adminDetails && !isGuestUser) {
           requestParams.admin_id = adminDetails.id;
         }
 
@@ -288,9 +291,7 @@ export default function SubmitPerformancePage() {
         script.removeEventListener("error", handleError);
       }
     };
-  }, [showPaymentModal]);
-
-  const [guestUser, setGuestUser] = useState(null);
+  }, [showPaymentModal, guestUser]);
 
   // Pre-fill coach/submitter details from logged-in admin or guest if available
   useEffect(() => {
