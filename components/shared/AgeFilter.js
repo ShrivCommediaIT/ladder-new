@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { calculateAge } from "@/lib/utils";
+
 import { Filter } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import CountrySelect from "@/components/shared/CountrySelect";
@@ -115,7 +116,6 @@ const AgeFilter = ({
 
     onSearch(ageValue || "", ageTypeValue, genderValue, countryValue, witnessValue);
     setOpen(false);
-    toast.success("Searching by Filter!");
   };
 
   return (
