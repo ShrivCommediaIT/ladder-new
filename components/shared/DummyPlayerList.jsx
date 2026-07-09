@@ -267,8 +267,12 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
 /* ─────────────────────────────────────────────
    3. SKILL / POSITIVE / NEGATIVE CARD
 ───────────────────────────────────────────── */
-const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, isFiltered = false, activeFilters = [] }) => {
+const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, isFiltered = false, activeFilters = [], appliedWitnessBy = 0 }) => {
   const src = player?.image ? `${IMAGE_BASE_URL}/${player.image}` : Logo;
+
+  const skillsToRender = appliedWitnessBy === 1
+    ? (player.skills || []).filter(skill => player.scores?.some(s => Number(s.skill_number) === Number(skill.skill_number)))
+    : (player.skills || []);
 
   const getScore = (scores, skills, skillNumber, isInverted) => {
     const scoreObj = scores?.find(s => s.skill_number === skillNumber);
@@ -386,11 +390,11 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, i
             </div>
           </div>
 
-          {player.skills?.length > 0 ? (
+          {skillsToRender?.length > 0 ? (
             <>
               {/* ── SKILL NUMBER ROW ── */}
               <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
-                {player.skills.map((skill, i) => (
+                {skillsToRender.map((skill, i) => (
                   <div
                     key={i}
                     className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded relative"
@@ -412,7 +416,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, i
 
               {/* ── SCORE ROW ── */}
               <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
-                {player.skills.map((skill, i) => {
+                {skillsToRender.map((skill, i) => {
                   const { score, isTargetAchieved } = getScore(
                     player.scores || [],
                     player.skills || [],
@@ -442,7 +446,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, i
               {/* ── RANK ROW ── */}
               {showRanks && (
                 <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {player.skills.map((skill, i) => (
+                  {skillsToRender.map((skill, i) => (
                     <div
                       key={i}
                       className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center rounded font-bold text-[9px] sm:text-[10px] border"
@@ -976,6 +980,7 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
                   rank={player.rank}
                   isFiltered={isFiltered}
                   activeFilters={activeFilters}
+                  appliedWitnessBy={skillWitness}
                 />
               );
             })}
@@ -1022,6 +1027,7 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
                   showRanks={false}
                   isFiltered={isFiltered}
                   activeFilters={activeFilters}
+                  appliedWitnessBy={positiveWitness}
                 />
               );
             })}
@@ -1069,6 +1075,7 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
                   isNegative={true}
                   isFiltered={isFiltered}
                   activeFilters={activeFilters}
+                  appliedWitnessBy={negativeWitness}
                 />
               );
             })}

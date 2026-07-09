@@ -236,11 +236,11 @@ const PlayerCard = ({
 
 
             {/* Skills section */}
-            {player.skills?.length > 0 ? (
+            {skillsToRender?.length > 0 ? (
               <>
                 {/* ── SKILL NUMBER ROW ── */}
                 <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {player.skills.map((skill, i) => {
+                  {skillsToRender.map((skill, i) => {
                     const isNeg = skill.skill_sign === "-";
                     return (
                       <div
@@ -270,7 +270,7 @@ const PlayerCard = ({
 
                 {/* ── SCORE ROW ── */}
                 <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {player.skills.map((skill, i) => {
+                  {skillsToRender.map((skill, i) => {
                     const scoreData = getScoreBySkillNumber(
                       player.scores || [],
                       player.skills || [],
@@ -295,7 +295,7 @@ const PlayerCard = ({
 
                 {/* Ranks */}
                 <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-1 mt-1 scrollbar-none">
-                  {player.skills.map((skill, i) => (
+                  {skillsToRender.map((skill, i) => (
                     <div
                       key={i}
                       className="w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded font-bold text-[9px] sm:text-[10px] border shadow-sm"
