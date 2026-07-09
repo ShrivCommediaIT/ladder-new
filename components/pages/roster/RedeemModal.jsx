@@ -4,8 +4,8 @@ import { getRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 
 const REDEEM_OPTIONS = [
-    { discountPercent: 20, tokenCost: 20 },
-    { discountPercent: 10, tokenCost: 10 }
+    { discountPercent: 20, tokenCost: 20 }
+    // { discountPercent: 10, tokenCost: 10 }
 ];
 
 const MIN_TOKENS_TO_REDEEM = Math.min(...REDEEM_OPTIONS.map((option) => option.tokenCost));
@@ -19,9 +19,6 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
     const [selectedOption, setSelectedOption] = React.useState(null);
 
     const availableTokens = Number(data?.availableTokens) || 0;
-    const availableRedeemOptions = REDEEM_OPTIONS.filter(
-        (option) => availableTokens >= option.tokenCost
-    );
 
     React.useEffect(() => {
         if (!open) {
@@ -43,7 +40,8 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
             return;
         }
 
-        setSelectedOption(availableRedeemOptions[0] || null);
+        const firstAffordable = REDEEM_OPTIONS.find((option) => availableTokens >= option.tokenCost);
+        setSelectedOption(firstAffordable || null);
         setStep("select");
     };
 
@@ -73,7 +71,7 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
         window.open(url, "_blank", "noopener,noreferrer");
         onClose();
 
-        /*
+        
         setIsRedeeming(true);
         try {
             const admin = JSON.parse(sessionStorage.getItem("adminDetails") || "{}");
@@ -88,19 +86,19 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
                     toastId: "redeem_success"
                 });
 
-                const code =
-                    res.coupon_code ||
-                    res.coupon ||
-                    res.code ||
-                    (res.data && (res.data.coupon_code || res.data.coupon || res.data.code)) ||
-                    `SSP-DISCOUNT-${selectedOption.discountPercent}`;
+                // const code =
+                //     res.coupon_code ||
+                //     res.coupon ||
+                //     res.code ||
+                //     (res.data && (res.data.coupon_code || res.data.coupon || res.data.code)) ||
+                //     `SSP-DISCOUNT-${selectedOption.discountPercent}`;
 
-                setCouponCode(code);
-                setStep("success");
+                // setCouponCode(code);
+                // setStep("success");
 
-                if (onRedeemSuccess) {
-                    onRedeemSuccess();
-                }
+                // if (onRedeemSuccess) {
+                //     onRedeemSuccess();
+                // }
             } else {
                 toast.error(res.message || "Failed to redeem tokens.", {
                     toastId: "redeem_fail"
@@ -114,7 +112,8 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
         } finally {
             setIsRedeeming(false);
         }
-        */
+        
+   
     };
 
     const handleCopy = () => {
@@ -159,23 +158,27 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
                         </div>
 
                         <div className="space-y-3">
-                            {availableRedeemOptions.map((option) => {
+                            {REDEEM_OPTIONS.map((option) => {
                                 const isSelected =
                                     selectedOption?.discountPercent === option.discountPercent;
+                                const isAffordable = availableTokens >= option.tokenCost;
 
                                 return (
                                     <button
                                         key={option.discountPercent}
                                         type="button"
-                                        onClick={() => setSelectedOption(option)}
-                                        className={`w-full rounded-lg border px-4 py-3 text-left transition-colors cursor-pointer ${
-                                            isSelected
-                                                ? "border-primary bg-primary/10"
-                                                : "border-border hover:border-primary/50 hover:bg-muted"
+                                        disabled={!isAffordable}
+                                        onClick={() => isAffordable && setSelectedOption(option)}
+                                        className={`w-full rounded-lg border px-4 py-3 text-left transition-colors ${
+                                            !isAffordable
+                                                ? "border-muted bg-muted/20 text-muted-foreground opacity-50 cursor-not-allowed"
+                                                : isSelected
+                                                ? "border-primary bg-primary/10 cursor-pointer"
+                                                : "border-border hover:border-primary/50 hover:bg-muted cursor-pointer"
                                         }`}
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span className="font-bold text-primary">
+                                            <span className={`font-bold ${isAffordable ? "text-primary" : "text-muted-foreground"}`}>
                                                 {option.discountPercent}% Discount
                                             </span>
                                             <span className="text-xs text-muted-foreground">
@@ -326,7 +329,7 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
                             </div>
 
                             <div className="text-sm text-foreground">
-                                View Store Price to redeem (no discount) -
+                                View Sponsor Prices without discounts (no discount) -
                                 <span
                                     onClick={() => window.open("https://oliversports.co.uk/", "_blank", "noopener,noreferrer")}
                                     className="text-primary underline cursor-pointer hover:text-primary/80"
