@@ -230,9 +230,24 @@ export const PlayerLists = () => {
     else if (isNegative) dispatch(setNegativeAgeFilter(filter));
     else { dispatch(setAgeFilter(filter)); setLocalAge(ageNum); setLocalAgeType(ageType); setLocalGender(gender); setLocalCountry(country || ""); }
     const laddartype = typeFromParams === "positive" ? "positive" : typeFromParams === "negative" ? "negative" : isSkill ? "skill" : resolvedType;
-    const payload = { ladder_id: ladderId, type: laddartype, dob: ageNum > 0 ? ageNum : undefined, gender: gender || undefined, ...(ageNum > 0 && ageType ? { age_type: ageType } : {}), ...(country ? { country } : {}) };
+    const payload = { ladder_id: ladderId, type: laddartype };
+    if (ageNum > 0) {
+      payload.dob = ageNum;
+      if (ageType) payload.age_type = ageType;
+    }
+    if (gender) {
+      payload.gender = gender;
+    }
+    if (country) {
+      payload.country = country;
+    }
     if (witnessVal === 1) {
       payload.witness_by = 1;
+    }
+    if (isSkill || isPositive || isNegative) {
+      if (Number(currentSkillNo) > 0) {
+        payload.sortbyskillnumber = Number(currentSkillNo);
+      }
     }
     let fetchSlice = laddartype === "positive" ? fetchPositiveLeaderboard : laddartype === "negative" ? fetchNegativeLeaderboard : ["best5", "best3", "winlose", "bestof5", "bestof3", "roster"].includes(laddartype) ? fetchLeaderboard : fetchSkillLeaderboard;
     dispatch(fetchSlice(payload));

@@ -106,6 +106,10 @@ const PlayerCard = ({
     return rankObj?.rank || "-";
   };
 
+  const skillsToRender = showWitnessRank
+    ? (player.skills || []).filter(skill => player.scores?.some(s => Number(s.skill_number) === Number(skill.skill_number)))
+    : (player.skills || []);
+
   return (
     <div
       className="mb-3 rounded-xl transition-all duration-200 group overflow-hidden cursor-default"
@@ -226,11 +230,11 @@ const PlayerCard = ({
 
 
             {/* Skills section */}
-            {player.skills?.length > 0 ? (
+            {skillsToRender?.length > 0 ? (
               <>
                 {/* ── SKILL NUMBER ROW ── */}
                 <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {player.skills.map((skill, i) => {
+                  {skillsToRender.map((skill, i) => {
                     const isNeg = skill.skill_sign === "-";
                     return (
                       <div
@@ -260,7 +264,7 @@ const PlayerCard = ({
 
                 {/* ── SCORE ROW ── */}
                 <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {player.skills.map((skill, i) => {
+                  {skillsToRender.map((skill, i) => {
                     const scoreData = getScoreBySkillNumber(
                       player.scores || [],
                       player.skills || [],
@@ -285,7 +289,7 @@ const PlayerCard = ({
 
                 {/* Ranks */}
                 <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-1 mt-1 scrollbar-none">
-                  {player.skills.map((skill, i) => (
+                  {skillsToRender.map((skill, i) => (
                     <div
                       key={i}
                       className="w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded font-bold text-[9px] sm:text-[10px] border shadow-sm"
@@ -479,12 +483,20 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
       const payload = {
         ladder_id: ladderId,
         type: "skill",
-        sortbyskillnumber: skillNo,
-        dob: age,
-        age_type: ageType,
-        gender: gender,
-        country: country,
       };
+      if (skillNo && skillNo !== 0) {
+        payload.sortbyskillnumber = skillNo;
+      }
+      if (age && age > 0) {
+        payload.dob = age;
+        if (ageType) payload.age_type = ageType;
+      }
+      if (gender) {
+        payload.gender = gender;
+      }
+      if (country) {
+        payload.country = country;
+      }
       if (witness === 1) {
         payload.witness_by = 1;
       }

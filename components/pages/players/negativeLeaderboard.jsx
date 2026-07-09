@@ -113,6 +113,10 @@ const PlayerCard = ({
     return rankObj ? rankObj.rank : rank;
   };
 
+  const skillsToRender = appliedWitnessBy === 1
+    ? (player.skills || []).filter(skill => player.scores?.some(s => Number(s.skill_number) === Number(skill.skill_number)))
+    : (player.skills || []);
+
   return (
     <div
       className="mb-3 rounded-xl transition-all duration-200 group overflow-hidden cursor-default"
@@ -238,11 +242,11 @@ const PlayerCard = ({
 
 
             {/* Skills section */}
-            {player.skills?.length > 0 ? (
+            {skillsToRender?.length > 0 ? (
               <>
                 {/* ── SKILL NUMBER ROW ── */}
                 <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {player.skills.map((skill, i) => {
+                  {skillsToRender.map((skill, i) => {
                     const isNeg = skill.skill_sign === "-";
                     return (
                       <div
@@ -272,7 +276,7 @@ const PlayerCard = ({
 
                 {/* ── SCORE ROW ── */}
                 <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {player.skills.map((skill, i) => {
+                  {skillsToRender.map((skill, i) => {
                     const scoreData = getScoreBySkillNumber(
                       player.scores || [],
                       player.skills || [],
