@@ -421,6 +421,7 @@ const Navbar = ({
   };
 
   const handleDashboard = () => {
+    toast.dismiss();
     if (user?.user_type === "admin") {
       router.push(adminPage);
     } else if (user?.user_type === "sub_admin") {

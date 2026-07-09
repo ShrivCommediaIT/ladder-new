@@ -316,12 +316,20 @@ export const PlayerLists = () => {
     window.scrollTo(0, 0);
   }, [ladderId]);
 
+  // Dismiss all active toasts when this page unmounts (e.g. navigating back to dashboard)
+  useEffect(() => {
+    return () => {
+      toast.dismiss();
+    };
+  }, []);
+
   // Scroll to top when globalLoading finishes to ensure page doesn't remain scrolled to middle after content loads
   useEffect(() => {
     if (!globalLoading) {
       window.scrollTo(0, 0);
     }
   }, [globalLoading]);
+
 
 
   const currentLadderId = ladder?.ladder_id || ladderId;
