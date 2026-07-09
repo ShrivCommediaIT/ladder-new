@@ -25,8 +25,11 @@ const roboto = Roboto({
 });
 
 export const metadata = {
-  title: "Sports Solutions Pro - Sports Competition Platform for Clubs & Coaches",
+  title: "Sports Solutions Pro - Sports Competition Platform",
   description: "Run automated ladders, mini-leagues, live rankings, challenge boards, and international competitions for sports clubs, academies, schools, and organizations.",
+  alternates: {
+    canonical: "https://sportssolutionspro.com",
+  },
   keywords: [
     "sports competition platform",
     "club competition manager",
@@ -55,9 +58,61 @@ export const metadata = {
   }
 };
 
+const schemaData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://sportssolutionspro.com/#organization",
+      "name": "Sports Solutions Pro",
+      "url": "https://sportssolutionspro.com",
+      "logo": "https://sportssolutionspro.com/topLogo.png",
+      "sameAs": [
+        "https://www.facebook.com/profile.php?id=61580051563946",
+        "https://www.instagram.com/sports_solutions_pro",
+        "https://x.com/Sports_Sol_Pro",
+        "https://www.youtube.com/@sportssolutionspro",
+        "https://www.linkedin.com/company/sports-solutions-pro/"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://sportssolutionspro.com/#website",
+      "url": "https://sportssolutionspro.com",
+      "name": "Sports Solutions Pro",
+      "description": "Run automated ladders, mini-leagues, live rankings, and challenge boards for sports clubs, academies, schools, and organizations.",
+      "publisher": {
+        "@id": "https://sportssolutionspro.com/#organization"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://sportssolutionspro.com/#software",
+      "name": "Sports Solutions Pro",
+      "applicationCategory": "SportsApplication",
+      "operatingSystem": "All",
+      "url": "https://sportssolutionspro.com",
+      "publisher": {
+        "@id": "https://sportssolutionspro.com/#organization"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "24.00",
+        "priceCurrency": "GBP"
+      }
+    }
+  ]
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${ubuntu.variable} ${roboto.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        />
+      </head>
       <body>
         <ClientLayoutWrapper>
           {children}
