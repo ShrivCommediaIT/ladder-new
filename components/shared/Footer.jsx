@@ -15,6 +15,7 @@ import {
   FaPhoneAlt,
   FaChevronRight,
   FaHandshake,
+  FaReddit,
 } from "react-icons/fa";
 
 import { FaWhatsapp, FaXTwitter } from "react-icons/fa6";
@@ -425,6 +426,21 @@ export default function Footer() {
                 </div>
                 <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
                   WhatsApp
+                </span>
+              </a>
+
+              {/* Reddit */}
+              <a
+                href="https://www.reddit.com/user/sportssolutionspro/?solution=abab287f2e6761d8abab287f2e6761d8&js_challenge=1&token=7afd7253fec22262ff1c52b1703fe9eca4922c4fa38cbea4d3145dd533587040&jsc_orig_r="
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FF4500] text-white sm:h-12 sm:w-12">
+                  <FaReddit size={18} />
+                </div>
+                <span className="mt-1 text-[10px] leading-none text-gray-300 sm:text-[11px]">
+                  Reddit
                 </span>
               </a>
             </div>
