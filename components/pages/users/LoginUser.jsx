@@ -237,9 +237,33 @@ export default function LoginUser({ ladderId, ladderType }) {
       });
       if(res.status == 200){
         toast.success("Account created successfully!");
-        registerForm.reset();
-        switchMode("login");
-      }else{
+        if (finalLadderType == "negative" || finalLadderType == "positive") {
+            const userData = res?.data;
+            const userPayload = {
+            ...userData,
+            ladder_id: finalLadderId,
+            ladder_type: finalLadderType,
+            isLoggedIn: true,
+            ShowBot: false
+          };
+
+          sessionStorage.setItem(
+            "user",
+            JSON.stringify(userPayload)
+          );
+
+          sessionStorage.setItem(
+            "adminDetails",
+            JSON.stringify({ id: res?.admin_id })
+          );
+          router.push(
+            `/user-page-redirect?ladder_id=${finalLadderId}&tab=ladder&ladder_type=${finalLadderType}`
+          );
+        } else {
+          registerForm.reset();
+          switchMode("login");
+        }
+      } else {
         toast.error(res?.error_message || "Registration failed.");
       }
     } catch (err) {
@@ -648,7 +672,7 @@ export default function LoginUser({ ladderId, ladderType }) {
                         }}
                         disabled={loading}
                       >
-                        {loading ? "Creating account..." : "Register"}
+                        {loading ? "Creating account..." : finalLadderType === "negative" || finalLadderType === "positive" ? "Register And Go" : "Register"}
                         {!loading && <ArrowRight className="h-5 w-5" />}
                       </Button>
                     </form>

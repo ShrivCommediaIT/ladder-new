@@ -184,7 +184,6 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
         const payload = {
           user_id: formData.user_id.trim(),
           password: formData.password,
-          user_type: "guest",
         };
 
         const res = await guestLogin(payload);
@@ -201,18 +200,16 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
             country: res.data?.country || "",
             dob: res.data?.dob || "",
             admin_id: res.data?.admin_id || res.admin_id || "",
-            user_type: "guest",
+            user_type: res.data?.user_type || "",
             isLoggedIn: true,
           };
           sessionStorage.setItem("userData", JSON.stringify(guestUserData));
           sessionStorage.setItem("adminDetails", JSON.stringify(guestUserData));
-
           onOpenChange(false);
           if (onSuccess) onSuccess();
-
-          setTimeout(() => {
-            router.push("/submit-performance");
-          }, 400);
+            setTimeout(() => {
+              router.push("/submit-performance");
+            }, 400);
         } else {
           const errMsg =
             parseError(res?.error_message) ||
