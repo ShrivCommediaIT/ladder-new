@@ -13,9 +13,11 @@ import {
   Eye,
   EyeOff,
   X,
+  MailIcon,
 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { guestRegister, guestLogin } from "@/services/authService";
+import { checkPasswordStrength, isValidEmail } from "@/lib/utils";
 
 const countries = [
   "United Kingdom", "United States", "Canada", "Australia", "India",
@@ -28,12 +30,15 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
   const router = useRouter();
   const [mode, setMode] = useState("register");
   const [loading, setLoading] = useState(false);
-  const [showPin, setShowPin] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
-    user_id: "",
+    name: "",
+    user_id: "",     // email
     password: "",
+    confirmPassword: "",
     age: "",
     gender: "",
     country: "",
@@ -41,6 +46,8 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
   });
 
   const [errors, setErrors] = useState({});
+
+  const passwordStrength = formData.password ? checkPasswordStrength(formData.password) : null;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -59,17 +66,31 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
   const validateForm = () => {
     const newErrors = {};
 
+    if (mode === "register") {
+      if (!formData.name.trim()) {
+        newErrors.name = "Name is required";
+      }
+    }
+
     if (!formData.user_id.trim()) {
-      newErrors.user_id = "Username is required";
+      newErrors.user_id = "Email is required";
+    } else if (!isValidEmail(formData.user_id)) {
+      newErrors.user_id = "Please enter a valid email address";
     }
 
     if (!formData.password) {
-      newErrors.password = "6 Pin of your choice is required";
-    } else if (!/^\d{6}$/.test(formData.password)) {
-      newErrors.password = "Pin must be exactly 6 digits";
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     if (mode === "register") {
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = "Please confirm your password";
+      } else if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = "Passwords do not match";
+      }
+
       if (!formData.age) {
         newErrors.age = "Age is required";
       } else {
@@ -86,7 +107,6 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
       if (!formData.country) {
         newErrors.country = "Country is required";
       }
-
     }
 
     setErrors(newErrors);
@@ -115,6 +135,7 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
         const calculatedDob = `${birthYear}-01-01`;
 
         const payload = {
+          name: formData.name.trim(),
           user_id: formData.user_id.trim(),
           password: formData.password,
           age: formData.age,
@@ -127,13 +148,13 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
         const res = await guestRegister(payload);
         if (res && (res.status === 200 || res.status === true || res.success)) {
           toast.success("Registration successful!");
-          
+
           // Auto log in guest
           sessionStorage.clear();
           const guestUserData = {
             id: res.data?.id || res.id || payload.user_id,
             user_id: payload.user_id,
-            name: payload.user_id,
+            name: payload.name,
             age: payload.age,
             gender: payload.gender,
             country: payload.country,
@@ -144,15 +165,19 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
           };
           sessionStorage.setItem("userData", JSON.stringify(guestUserData));
           sessionStorage.setItem("adminDetails", JSON.stringify(guestUserData));
-          
+
           onOpenChange(false);
           if (onSuccess) onSuccess();
-          
+
           setTimeout(() => {
             router.push("/submit-performance");
           }, 400);
         } else {
-          toast.error(parseError(res?.error_message) || res?.message || "Registration failed.");
+          const errMsg =
+            parseError(res?.error_message) ||
+            res?.message ||
+            "Registration failed.";
+          toast.error(errMsg);
         }
       } else {
         // Login Mode
@@ -165,7 +190,7 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
         const res = await guestLogin(payload);
         if (res && (res.status === 200 || res.status === true || res.success)) {
           toast.success("Login successful!");
-          
+
           sessionStorage.clear();
           const guestUserData = {
             id: res.data?.id || res.id || payload.user_id,
@@ -181,25 +206,32 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
           };
           sessionStorage.setItem("userData", JSON.stringify(guestUserData));
           sessionStorage.setItem("adminDetails", JSON.stringify(guestUserData));
-          
+
           onOpenChange(false);
           if (onSuccess) onSuccess();
-          
+
           setTimeout(() => {
             router.push("/submit-performance");
           }, 400);
         } else {
-          toast.error(parseError(res?.error_message) || res?.message || "Invalid Username or Pin.");
+          const errMsg =
+            parseError(res?.error_message) ||
+            res?.message ||
+            "Invalid Email or Password.";
+          toast.error(errMsg);
         }
       }
     } catch (err) {
       console.error("Guest Auth error:", err);
-      toast.error(
+      // Axios throws 4xx/5xx as errors — extract the API error_message from response body
+      const apiData = err.response?.data;
+      const errMsg =
+        parseError(apiData?.error_message) ||
+        apiData?.message ||
         parseError(err.response?.data?.error_message) ||
-        err.response?.data?.message ||
         err.message ||
-        "Authentication error."
-      );
+        "Authentication error.";
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }
@@ -212,7 +244,7 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+      <DialogContent
         aria-describedby={undefined}
         className="w-[95vw] sm:max-w-md rounded-[28px] border p-0 overflow-hidden shadow-2xl backdrop-blur-xl transition-all duration-300 bg-background text-foreground"
         style={{
@@ -259,13 +291,13 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
               style={
                 mode === "register"
                   ? {
-                      background: "var(--background-image-gradient-brand)",
-                      color: "#ffffff",
-                      boxShadow: "var(--brand-tab-shadow)",
-                    }
+                    background: "var(--background-image-gradient-brand)",
+                    color: "#ffffff",
+                    boxShadow: "var(--brand-tab-shadow)",
+                  }
                   : {
-                      color: "var(--muted-foreground)",
-                    }
+                    color: "var(--muted-foreground)",
+                  }
               }
             >
               Register
@@ -280,13 +312,13 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
               style={
                 mode === "login"
                   ? {
-                      background: "var(--background-image-gradient-brand)",
-                      color: "#ffffff",
-                      boxShadow: "var(--brand-tab-shadow)",
-                    }
+                    background: "var(--background-image-gradient-brand)",
+                    color: "#ffffff",
+                    boxShadow: "var(--brand-tab-shadow)",
+                  }
                   : {
-                      color: "var(--muted-foreground)",
-                    }
+                    color: "var(--muted-foreground)",
+                  }
               }
             >
               Already have account
@@ -295,18 +327,46 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            
-            {/* USER ID (Username) */}
+
+            {/* NAME — Register only */}
+            {mode === "register" && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider block">
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <UserRound className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]/60" />
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter your name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full h-11 pl-11 pr-4 rounded-xl border text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+                    style={{
+                      backgroundColor: "var(--input-bg)",
+                      borderColor: errors.name ? "red" : "var(--input-border)",
+                      color: "var(--foreground)",
+                    }}
+                  />
+                </div>
+                {errors.name && (
+                  <span className="text-red-500 text-xs block font-semibold animate-pulse">{errors.name}</span>
+                )}
+              </div>
+            )}
+
+            {/* EMAIL (user_id) */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider block">
-                Choose Username <span className="text-red-500">*</span>
+                Email Id <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <UserRound className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]/60" />
+                <MailIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]/60" />
                 <input
-                  type="text"
+                  type="email"
                   name="user_id"
-                  placeholder="Enter username"
+                  placeholder="Enter your email address"
                   value={formData.user_id}
                   onChange={handleInputChange}
                   className="w-full h-11 pl-11 pr-4 rounded-xl border text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
@@ -322,18 +382,18 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
               )}
             </div>
 
-            {/* PASSWORD (6 Pin of choice) */}
+            {/* PASSWORD */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider block">
-                6 Pin  <span className="text-red-500">*</span>
+                Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]/60" />
                 <input
-                  type={showPin ? "text" : "password"}
+                  type={showPassword ? "text" : "password"}
                   name="password"
-                  maxLength={6}
-                  placeholder="Enter 6-digit pin"
+                  placeholder="Enter your password"
+                  maxLength={15}
                   value={formData.password}
                   onChange={handleInputChange}
                   className="w-full h-11 pl-11 pr-12 rounded-xl border text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
@@ -345,16 +405,69 @@ export default function GuestAuthModal({ open, onOpenChange, onSuccess }) {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPin(!showPin)}
+                  onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]/60 hover:text-[var(--foreground)] transition-colors"
                 >
-                  {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
               {errors.password && (
                 <span className="text-red-500 text-xs block font-semibold animate-pulse">{errors.password}</span>
               )}
+
+              {/* Password Strength Indicator — Register only */}
+              {mode === "register" && passwordStrength && (
+                <div className="mt-2 space-y-1.5 rounded-xl bg-black/10 p-3 border border-white/10">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-[var(--muted-foreground)]">Password Strength:</span>
+                    <span className={`font-bold transition-all duration-300 ${passwordStrength.color}`}>
+                      {passwordStrength.label}
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full bg-[var(--muted)] rounded-full overflow-hidden flex gap-1">
+                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${passwordStrength.score >= 1 ? passwordStrength.bgColor : "bg-white/10"}`} />
+                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${passwordStrength.score >= 2 ? passwordStrength.bgColor : "bg-white/10"}`} />
+                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${passwordStrength.score >= 3 ? passwordStrength.bgColor : "bg-white/10"}`} />
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* CONFIRM PASSWORD — Register only */}
+            {mode === "register" && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider block">
+                  Confirm Password <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]/60" />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder="Re-enter your password"
+                    maxLength={15}
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className="w-full h-11 pl-11 pr-12 rounded-xl border text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
+                    style={{
+                      backgroundColor: "var(--input-bg)",
+                      borderColor: errors.confirmPassword ? "red" : "var(--input-border)",
+                      color: "var(--foreground)",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]/60 hover:text-[var(--foreground)] transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <span className="text-red-500 text-xs block font-semibold animate-pulse">{errors.confirmPassword}</span>
+                )}
+              </div>
+            )}
 
             {mode === "register" && (
               <>
