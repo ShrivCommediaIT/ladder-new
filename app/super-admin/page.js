@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
 import { toast } from "react-toastify";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
   User, 
   Lock, 
@@ -86,7 +86,7 @@ export default function SuperAdminPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      <AnimatePresence mode="wait">
+      <div>
         {!isLoggedIn ? (
           // ==================== LOGIN SCREEN ====================
           <motion.div
@@ -303,7 +303,7 @@ export default function SuperAdminPage() {
 
               {/* Workspace Panels (Scrolls independently on desktop) */}
               <main className="flex-grow p-4 sm:p-8 min-w-0 min-h-[600px]">
-                <AnimatePresence mode="wait">
+                <div>
                   {activeTab === "clubs" ? (
                     <motion.div
                       key="clubs-tab"
@@ -336,7 +336,7 @@ export default function SuperAdminPage() {
                       <SystemSettingsTab />
                     </motion.div>
                   )}
-                </AnimatePresence>
+                </div>
               </main>
             </div>
 
@@ -348,7 +348,7 @@ export default function SuperAdminPage() {
             </footer>
           </motion.div>
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
