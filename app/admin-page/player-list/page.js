@@ -1,11 +1,17 @@
-import { PlayerLists } from "@/components/pages/players/PlayerLists"
+"use client";
+import dynamic from "next/dynamic";
+
+const PlayerLists = dynamic(
+  () => import("@/components/pages/players/PlayerLists").then((m) => ({ default: m.PlayerLists })),
+  { ssr: false, loading: () => null }
+);
 
 const PlayerListsRouter = () => {
   return (
     <div>
-        <PlayerLists />   
+      <PlayerLists />
     </div>
-  )
-}
+  );
+};
 
-export default PlayerListsRouter
+export default PlayerListsRouter;

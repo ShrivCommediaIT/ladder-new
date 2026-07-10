@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import Papa from "papaparse";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import {
@@ -27,7 +26,9 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Link from "next/link";
 import { Layers, Users, UploadCloud, ListChecks, Play, ShieldCheck, Sparkles, Target, FolderKanban, ArrowRight, Mail, Plus, Eye, EyeOff } from "lucide-react";
-import AdminQuickActions from "@/components/shared/AdminQuickActions";
+import dynamic from "next/dynamic";
+
+const AdminQuickActions = dynamic(() => import("@/components/shared/AdminQuickActions"), { ssr: false });
 
 const cardToneClasses = [
   "from-primary/20 via-primary/5 to-transparent",
@@ -56,15 +57,15 @@ const startSteps = [
 
 const brandGradient = "var(--background-image-gradient-brand)";
 
-import LadderList from "../LadderList";
-import LadderInfo from "../LadderInfo";
+const LadderList = dynamic(() => import("../LadderList"), { ssr: false });
+const LadderInfo = dynamic(() => import("../LadderInfo"), { ssr: false });
 import Navbar from "@/components/shared/Navbar";
 
 import { motion, AnimatePresence } from "framer-motion";
 
 import { importSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
 import { importRoster } from "@/redux/slices/rosterSlice";
-import CreatePanel from "@/components/shared/CreatePanel";
+const CreatePanel = dynamic(() => import("@/components/shared/CreatePanel"), { ssr: false });
 
 export default function SubAdminDashboard() {
   const [ladderName, setLadderName] = useState("");
@@ -167,7 +168,8 @@ export default function SubAdminDashboard() {
 
 
 
-  const checkCsvDuplicates = (file) => {
+  const checkCsvDuplicates = async (file) => {
+    const Papa = (await import("papaparse")).default;
     return new Promise((resolve, reject) => {
       Papa.parse(file, {
         header: true,

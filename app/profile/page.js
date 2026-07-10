@@ -18,11 +18,9 @@ import {
   Loader2,
   Trophy
 } from "lucide-react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 import useAuthGuard from "@/hooks/useAuthGuard";
-import Navbar from "@/components/shared/Navbar";
 import { postRequest, postFormData } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { checkPasswordStrength } from "@/lib/utils";
@@ -383,8 +381,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
-      <ToastContainer />
-
       <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Back Button / Page Header */}
         <div className="mb-6">
