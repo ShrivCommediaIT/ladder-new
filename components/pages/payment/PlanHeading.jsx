@@ -636,9 +636,6 @@ export default function PlanHeading() {
                 </div>
               )}
             </div>
-
-
-
             <h1
               className="animate-fade-in-up mt-6 mb-8 text-5xl font-extrabold leading-[1.1] tracking-tight text-foreground md:text-7xl"
               style={{ animationDelay: "0.05s" }}
