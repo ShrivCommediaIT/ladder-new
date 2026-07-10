@@ -71,6 +71,37 @@ export default function ClientLayoutWrapper({ children }) {
                                pathname?.startsWith("/demo-login") ||
                                pathname?.startsWith("/super-admin");
 
+  const [loadChat, setLoadChat] = useState(false);
+
+  useEffect(() => {
+    if (pathname?.startsWith("/super-admin")) return;
+
+    const triggerLoad = () => {
+      setLoadChat(true);
+      removeListeners();
+    };
+
+    const removeListeners = () => {
+      window.removeEventListener("mousemove", triggerLoad);
+      window.removeEventListener("scroll", triggerLoad);
+      window.removeEventListener("keydown", triggerLoad);
+      window.removeEventListener("touchstart", triggerLoad);
+    };
+
+    window.addEventListener("mousemove", triggerLoad, { passive: true });
+    window.addEventListener("scroll", triggerLoad, { passive: true });
+    window.addEventListener("keydown", triggerLoad, { passive: true });
+    window.addEventListener("touchstart", triggerLoad, { passive: true });
+
+    // Fallback: load after 5 seconds of idle time
+    const timer = setTimeout(triggerLoad, 5000);
+
+    return () => {
+      removeListeners();
+      clearTimeout(timer);
+    };
+  }, [pathname]);
+
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
       <Provider store={store}>
@@ -86,7 +117,7 @@ export default function ClientLayoutWrapper({ children }) {
           )}
         </PersistGate>
       </Provider>
-      {!pathname?.startsWith("/super-admin") && (
+      {!pathname?.startsWith("/super-admin") && loadChat && (
         <>
           <Script id="chatling-config" strategy="lazyOnload">
             {`window.chtlConfig = { chatbotId: "7385437887" };`}

@@ -1,11 +1,12 @@
 "use client";
 
-import { useSelector } from "react-redux"; // ✅ Added for ladder type detection
-import DummyPlayerList from "@/components/shared/DummyPlayerList";           // ✅ best5/winlose
+import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ThemeToggle } from "@/components/shared/ThemeToggle";
-import InfoSection from "@/components/shared/InfoSection";
+import dynamic from "next/dynamic";
+
+const DummyPlayerList = dynamic(() => import("@/components/shared/DummyPlayerList"), { ssr: false });
+const InfoSection = dynamic(() => import("@/components/shared/InfoSection"), { ssr: false });
 
 export default function LadderView() {
   const router = useRouter();
