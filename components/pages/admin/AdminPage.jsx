@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import Papa from "papaparse";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,13 +20,15 @@ import {
   Users2,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 
 import { importRoster } from "@/redux/slices/rosterSlice";
 import { createLadder } from "@/redux/slices/ladderSlice";
 import { fetchLadders } from "@/redux/slices/fetchLadderSlice";
-import LadderList from "./LadderList";
-import DemoLadder from "./DemoLadder";
-import AdminImportantInfo from "./info/AdminImportantInfo";
+
+const LadderList = dynamic(() => import("./LadderList"), { ssr: false });
+const DemoLadder = dynamic(() => import("./DemoLadder"), { ssr: false });
+const AdminImportantInfo = dynamic(() => import("./info/AdminImportantInfo"), { ssr: false });
 
 import {
   Dialog,
@@ -35,7 +36,8 @@ import {
   DialogTrigger,
   DialogTitle,
 } from "@/components/ui/dialog";
-import AdminQuickActions from "@/components/shared/AdminQuickActions";
+
+const AdminQuickActions = dynamic(() => import("@/components/shared/AdminQuickActions"), { ssr: false });
 
 const cardToneClasses = [
   "from-primary/20 via-primary/5 to-transparent",
@@ -157,7 +159,8 @@ export default function AdminPage() {
     },
   ];
 
-  const checkCsvDuplicates = (file) => {
+  const checkCsvDuplicates = async (file) => {
+    const Papa = (await import("papaparse")).default;
     return new Promise((resolve, reject) => {
       Papa.parse(file, {
         header: true,
