@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { Card } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
-import Logo from "@/public/logo1.png";
+import Avatar from "@/public/logo1.png";
 import { BasicLeaderboardEdit } from "./BasicLeaderboardEdit";
 import { fetchSkillLeaderboard, setAgeFilter as setSkillAgeFilter } from "@/redux/slices/BasicLeaderboardSlice";
 import PlayerSearchInput from "./PlayerSearchInput";
@@ -44,7 +44,7 @@ const PlayerCard = ({
   const playerImageUrl =
     player?.image && player.image !== "null" && player.image !== "undefined" && player.image !== ""
       ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}`
-      : Logo;
+      : Avatar;
   const getScoreBySkillNumber = (scores, skills, skillNumber) => {
     const scoreObj = scores?.find((s) => s.skill_number === skillNumber);
     const skillObj = skills?.find((s) => s.skill_number === skillNumber);
