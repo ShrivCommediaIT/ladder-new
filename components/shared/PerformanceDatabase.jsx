@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { getRequest, putRequest, deleteRequest, postFormData } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
@@ -164,6 +164,33 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
   const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [keyword, setKeyword] = useState("");
+  const debounceTimer = useRef(null);
+
+  // Debounce search: fire API 400ms after user stops typing
+  useEffect(() => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      const newFilters = {
+        sport,
+        activity,
+        ageGroup,
+        gender,
+        country,
+        keyword,
+        unit,
+        minResult,
+        maxResult,
+        dateFrom,
+        dateTo,
+        witness: verifiedOnly,
+      };
+      setAppliedFilters(newFilters);
+      setCurrentPage(1);
+      fetchResults(1, newFilters);
+    }, 400);
+    return () => clearTimeout(debounceTimer.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyword]);
   const [unit, setUnit] = useState("");
   const [minResult, setMinResult] = useState("");
   const [maxResult, setMaxResult] = useState("");
@@ -298,10 +325,10 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
           page: pageVal,
           limit: 10,
           sport: currentFilters.sport || undefined,
-          activity: currentFilters.keyword || undefined,
           age: ageValue,
           gender: currentFilters.gender || undefined,
           country: currentFilters.country || undefined,
+          search: currentFilters.keyword || undefined,
           min_result: currentFilters.minResult || undefined,
           max_result: currentFilters.maxResult || undefined,
           date_from: currentFilters.dateFrom || undefined,
@@ -727,16 +754,17 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                 >
                   SSP Talent Board  
                 </h1>
-                {!isAdmin && !isGuest && <Link
-                  href="/submit-performance"
-                  onClick={handlePerformanceSubmitClick}
-                  className="inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs sm:text-sm font-bold shadow-md transition-all duration-200 hover:scale-[1.03]
-                    border-zinc-300 bg-zinc-100 text-zinc-900 hover:bg-zinc-200/80
-                    dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700 ms-7"
-                >
-                  Submit a performance
-                  <ArrowRight className="h-3.5 w-3.5 " />
-                </Link>}
+                {!isAdmin && !isGuest && (
+                  <Link
+                    href="/submit-performance"
+                    onClick={handlePerformanceSubmitClick}
+                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs sm:text-sm font-bold text-white shadow-md transition-all duration-200 hover:scale-[1.03] hover:opacity-90 ms-7"
+                    style={{ backgroundImage: brandGradient, boxShadow: "var(--brand-button-shadow)" }}
+                  >
+                    Submit a performance
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
               </div>
               <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
                 Entries on the SSP Talent Board are submitted by participating articipating clubs, coaches and organisations to help showcase emerging talent and notable sporting achievements. Interested parties are encouraged to contact the submitting club or organisation directly for further information.  SSP reserves the right to remove or hide any entry that appears unsuitable, inaccurate, incomplete, or inappropriate
@@ -818,16 +846,26 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
             </div>
 
             <div className="space-y-1.5 min-w-0">
-              <label className={mutedLabelClass}> Search</label>
+              <label className={mutedLabelClass}>Search</label>
               <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search "
+                  placeholder="Search name, sport, country…"
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
-                  className={`${fieldClass} pl-9`}
+                  className={`${fieldClass} pl-9 ${keyword ? "pr-9" : ""}`}
                 />
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                {keyword && (
+                  <button
+                    type="button"
+                    onClick={() => setKeyword("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -884,8 +922,9 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
               </button>
               <button
                 type="submit"
-                className="flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl px-6 text-sm font-semibold uppercase tracking-wide text-white shadow-lg transition-all hover:-translate-y-0.5 sm:w-auto"
-                style={{ backgroundImage: brandGradient, boxShadow: "var(--brand-button-shadow)" }}
+                className="flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl px-6 text-sm font-semibold uppercase tracking-wide shadow-lg transition-all hover:-translate-y-0.5 hover:opacity-85 sm:w-auto
+                  bg-zinc-900 text-white border border-zinc-800
+                  dark:bg-white dark:text-primary dark:border-white/20"
               >
                 <Search className="h-4 w-4" />
                 Search Results
@@ -933,20 +972,19 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
             <table className="min-w-[1000px] w-full table-auto border-collapse text-left">
               <thead>
                 <tr className="border-b border-border/70 bg-[color:color-mix(in_srgb,var(--card),var(--primary)_7%)] text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
-                  <th className="px-6 py-4">Date</th>
-                  <th className="px-6 py-4">Athlete</th>
-                  <th className="px-6 py-4">Age</th>
-                  <th className="px-6 py-4">Gender</th>
                   <th className="px-6 py-4">Sport</th>
                   <th className="px-6 py-4">Activity / Event</th>
                   <th className="px-6 py-4 text-center">Result</th>
-                  <th className="px-6 py-4">Unit</th>
-                  <th className="px-6 py-4">Date of event</th>
+                  <th className="px-6 py-4">Units</th>
+                  <th className="px-6 py-4">Age</th>
+                  <th className="px-6 py-4">Gender</th>
+                  <th className="px-6 py-4">Athlete</th>
+                  <th className="px-6 py-4">Date of Event</th>
                   <th className="px-6 py-4">Country</th>
                   <th className="px-6 py-4">Club / Team</th>
-                  <th className="px-6 py-4">Email address</th>
+                  <th className="px-6 py-4">Submitter</th>
                   <th className="px-6 py-4">Coach / Witness</th>
-                  <th className="px-6 py-4 text-center">Video</th>
+                  <th className="px-6 py-4 text-center">YouTube Video</th>
                 </tr>
               </thead>
 
@@ -977,15 +1015,10 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                           : "bg-[color:color-mix(in_srgb,var(--card),var(--primary)_3%)] hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_8%)]"
                         }`}
                     >
-                      <td className="px-6 py-4 font-medium whitespace-nowrap text-muted-foreground">
-                        {formatDate(item.created_at || item.date_of_performance)}
-                      </td>
-                      <td className="px-6 py-4 font-bold capitalize whitespace-nowrap text-foreground">
-                        {item.full_name}
-                      </td>
-                      <td className="px-6 py-4 font-semibold text-muted-foreground">{item.age}</td>
-                      <td className="px-6 py-4 capitalize text-muted-foreground">{item.gender}</td>
+                      {/* Sport */}
                       <td className="px-6 py-4 font-medium text-primary">{item.sport}</td>
+
+                      {/* Activity / Event */}
                       <td className="px-6 py-4 font-semibold text-foreground">
                         <span className="flex items-center gap-2">
                           {item.activity}
@@ -996,11 +1029,30 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                           )}
                         </span>
                       </td>
+
+                      {/* Result */}
                       <td className="px-6 py-4 text-center font-sans text-[15px] font-extrabold tracking-wide text-primary">
                         {item.result}
                       </td>
+
+                      {/* Units */}
                       <td className="px-6 py-4 font-medium text-muted-foreground">{item.unit}</td>
+
+                      {/* Age */}
+                      <td className="px-6 py-4 font-semibold text-muted-foreground">{item.age}</td>
+
+                      {/* Gender */}
+                      <td className="px-6 py-4 capitalize text-muted-foreground">{item.gender}</td>
+
+                      {/* Athlete */}
+                      <td className="px-6 py-4 font-bold capitalize whitespace-nowrap text-foreground">
+                        {item.full_name}
+                      </td>
+
+                      {/* Date of Event */}
                       <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">{formatDate(item.date_of_performance)}</td>
+
+                      {/* Country */}
                       <td className="px-6 py-4 font-medium whitespace-nowrap text-foreground">
                         <span className="inline-flex items-center gap-2">
                           {getCountryCode(item.country) ? (
@@ -1020,11 +1072,19 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                           {item.country}
                         </span>
                       </td>
+
+                      {/* Club / Team */}
                       <td className="px-6 py-4 max-w-[150px] truncate capitalize text-muted-foreground">
                         {item.club_name || "—"}
                       </td>
-                      <td className="px-6 py-4 text-muted-foreground">{item.email}</td>
-                      <td className="px-6 py-4 capitalize text-muted-foreground">{item.coach_name}</td>
+
+                      {/* Submitter (email) */}
+                      <td className="px-6 py-4 text-muted-foreground">{item.email || "—"}</td>
+
+                      {/* Coach / Witness */}
+                      <td className="px-6 py-4 capitalize text-muted-foreground">{item.coach_name || "—"}</td>
+
+                      {/* YouTube Video */}
                       <td className="px-6 py-4 text-center">
                         {item.video_link && item.video_link.trim() && item.video_link !== "dfgg" ? (
                           <button
@@ -1292,8 +1352,8 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                                 <div className="truncate"><span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Email:</span>{" "}<span className="text-foreground font-medium break-all">{record.email}</span></div>
                               </div>
                               <div className="space-y-1">
-                                <div><span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Venue:</span>{" "}<span className="text-foreground font-semibold">{record.venue || "—"}</span></div>
-                                <div><span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Wind/Conditions:</span>{" "}<span className="text-foreground font-semibold">{record.wind || "—"}</span></div>
+                                {/* <div><span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Venue:</span>{" "}<span className="text-foreground font-semibold">{record.venue || "—"}</span></div> */}
+                                {/* <div><span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Wind/Conditions:</span>{" "}<span className="text-foreground font-semibold">{record.wind || "—"}</span></div> */}
                                 {record.video_link && record.video_link.trim() && record.video_link !== "dfgg" && (
                                   <div className="flex items-center gap-1.5 pt-1">
                                     <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Video Evidence:</span>
@@ -1305,12 +1365,14 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                                 )}
                               </div>
                             </div>
+                            {/* Additional Notes — commented out
                             {record.aditional_notes && (
                               <div className="bg-muted/40 rounded-xl p-3 border border-border/40 text-xs">
                                 <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold block mb-1">Additional Notes</span>
                                 <p className="text-foreground/95 font-medium leading-relaxed italic">"{record.aditional_notes}"</p>
                               </div>
                             )}
+                            */}
                           </>
                         )}
                       </div>
