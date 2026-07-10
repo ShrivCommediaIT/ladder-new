@@ -988,6 +988,9 @@ export default function PlanHeading() {
                 </ul>
               </div>
 
+
+              
+
               {/* Mobile / Tablet Horizontal Scroll Menu */}
               <div className="lg:hidden sticky top-[80px] z-20 -mx-4 overflow-x-auto px-4 py-3 bg-[var(--landing-bg)] border-b border-[var(--landing-border)] scrollbar-none flex gap-2">
                 <a
