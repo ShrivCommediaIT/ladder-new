@@ -23,7 +23,6 @@ import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUser
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { User, XCircle } from "lucide-react";
 import dynamic from "next/dynamic";
-import { motion, AnimatePresence } from "framer-motion";
 
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
