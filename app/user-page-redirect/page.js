@@ -4,33 +4,33 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getRequest } from "@/services/apiService";
 import { setUser } from "@/redux/slices/userSlice";
 import { API_ENDPOINTS } from "@/constants/api";
+
+import UserDetailsTypeUser from "@/components/shared/UserDetailsTypeUser";
+import MinileaguePlayers from "@/components/pages/users/MinileaguePlayers";
+import InfoBar from "@/components/pages/users/InfoBar";
+import { Button } from "@/components/ui/button";
+import PlayersList from "@/components/pages/users/PlayersList";
+import BasicLeaderboardUser from "@/components/pages/users/BasicLeaderboardUser";
+import RosterLeaderboardUser from "@/components/pages/users/RosterLeaderboardUser";
+import InfoSection from "@/components/shared/InfoSection";
+import { EditPlayer } from "@/components/shared/EditPlayer";
+import BasicLeaderboardUserRemove from "@/components/shared/BasicLeaderboardUserRemove";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { User, XCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
-
-const UserDetailsTypeUser = dynamic(() => import("@/components/shared/UserDetailsTypeUser"), { ssr: false });
-const MinileaguePlayers = dynamic(() => import("@/components/pages/users/MinileaguePlayers"), { ssr: false });
-const InfoBar = dynamic(() => import("@/components/pages/users/InfoBar"), { ssr: false });
-const PlayersList = dynamic(() => import("@/components/pages/users/PlayersList"), { ssr: false });
-const BasicLeaderboardUser = dynamic(() => import("@/components/pages/users/BasicLeaderboardUser"), { ssr: false });
-const RosterLeaderboardUser = dynamic(() => import("@/components/pages/users/RosterLeaderboardUser"), { ssr: false });
-const InfoSection = dynamic(() => import("@/components/shared/InfoSection"), { ssr: false });
-const EditPlayer = dynamic(() => import("@/components/shared/EditPlayer").then(m => ({ default: m.EditPlayer })), { ssr: false });
-const BasicLeaderboardUserRemove = dynamic(() => import("@/components/shared/BasicLeaderboardUserRemove"), { ssr: false });
-const PositiveLeaderboard = dynamic(() => import("@/components/pages/players/PositiveLeaderBoard"), { ssr: false });
-const PositiveLeaderboardUser = dynamic(() => import("@/components/pages/users/positiveLeaderBoardUser"), { ssr: false });
-const NegativeLeaderboardUser = dynamic(() => import("@/components/pages/users/negativeLeaderBoardUser"), { ssr: false });
-const MobileQuickActionsAndInvite = dynamic(() => import("@/components/shared/MobileQuickActionsAndInvite"), { ssr: false });
-
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import PositiveLeaderboard from "@/components/pages/players/PositiveLeaderBoard";
+import PositiveLeaderboardUser from "@/components/pages/users/positiveLeaderBoardUser";
+import NegativeLeaderboardUser from "@/components/pages/users/negativeLeaderBoardUser";
+import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsAndInvite";
 
 function UserPageRedirectRouter() {
   const dispatch = useDispatch();
