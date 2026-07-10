@@ -9,6 +9,7 @@ import { setUser } from "@/redux/slices/userSlice";
 import { API_ENDPOINTS } from "@/constants/api";
 import { User, XCircle } from "lucide-react";
 import dynamic from "next/dynamic";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
