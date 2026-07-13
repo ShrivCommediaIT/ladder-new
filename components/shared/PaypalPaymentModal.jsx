@@ -43,8 +43,6 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
         toast.success("Payment status updated successfully!");
       }
 
-      onOpenChange(false);
-
       if (onSuccess) {
         onSuccess();
       }
@@ -52,6 +50,8 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
       console.error("API update error:", apiErr);
       toast.error("Failed to update payment status. Please contact support.");
     } finally {
+      // Always close the modal regardless of API success or failure
+      onOpenChange(false);
       setPaypalLoading(false);
     }
   };
