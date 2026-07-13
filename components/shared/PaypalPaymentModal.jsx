@@ -34,6 +34,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
         await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
           payment_status: 1,
           id: sessionUser?.id,
+          user_id: sessionUser?.user_id || sessionUser?.id,
         });
 
         sessionUser.payment_status = 1;

@@ -392,6 +392,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
                   });
                   parsedUser.payment_status = 1;
                   sessionStorage.setItem("user", JSON.stringify(parsedUser));
+                  localStorage.setItem("paypal_user_backup", JSON.stringify(parsedUser));
                   dispatch(setUser(parsedUser));
                   toast.success("Payment status updated successfully!");
 
@@ -746,6 +747,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
               const parsed = JSON.parse(storedUser);
               parsed.payment_status = 1;
               sessionStorage.setItem("user", JSON.stringify(parsed));
+              localStorage.setItem("paypal_user_backup", JSON.stringify(parsed));
               dispatch(setUser(parsed));
             }
             setShowPaymentModal(false);

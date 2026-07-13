@@ -604,9 +604,11 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
                   await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
                     payment_status: 1,
                     id: parsedUser.id,
+                    user_id: parsedUser.user_id || parsedUser.id
                   });
                   parsedUser.payment_status = 1;
                   sessionStorage.setItem("user", JSON.stringify(parsedUser));
+                  localStorage.setItem("paypal_user_backup", JSON.stringify(parsedUser));
                   dispatch(setUser(parsedUser));
                   toast.success("Payment status updated successfully!");
 
@@ -617,6 +619,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
                   } catch (e) {
                     console.error("Failed to post message to BroadcastChannel:", e);
                   }
+                  
 
                   // Auto-close checkout tab to return user to original tab
                   // setTimeout(() => {
@@ -687,6 +690,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
               // Sync local session/Redux — payment status API already called by the redirect tab
               parsed.payment_status = 1;
               sessionStorage.setItem("user", JSON.stringify(parsed));
+              localStorage.setItem("paypal_user_backup", JSON.stringify(parsed));
               dispatch(setUser(parsed));
             }
             setShowPaymentModal(false);

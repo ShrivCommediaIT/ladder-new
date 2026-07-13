@@ -46,6 +46,10 @@ const UserDetailsTypeUser = () => {
   const handleLogout = () => {
     sessionStorage.removeItem("user");
     localStorage.removeItem("persist:root");
+    localStorage.removeItem("paypal_user_backup");
+    localStorage.removeItem("paypal_redirect_ladder_id");
+    localStorage.removeItem("paypal_redirect_ladder_type");
+    localStorage.removeItem("paypal_pending_post_args");
     sessionStorage.clear();
 
     let url = "/login-user";
