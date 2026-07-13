@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getRequest, postUrlEncoded } from "@/services/apiService";
-import { setUser } from "@/redux/slices/userSlice";
+import { setUser as setReduxUser } from "@/redux/slices/userSlice";
 import { API_ENDPOINTS } from "@/constants/api";
 
 import UserDetailsTypeUser from "@/components/shared/UserDetailsTypeUser";
@@ -46,6 +46,9 @@ function UserPageRedirectRouter() {
   const [loading, setLoading] = useState(true);
   const [isIframe, setIsIframe] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [paymentSuccessDone, setPaymentSuccessDone] = useState(false);
+  const [resolvedLadderId, setResolvedLadderId] = useState(null);
+  const [resolvedLadderType, setResolvedLadderType] = useState(null);
 
   // User Action Modals State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -166,7 +169,7 @@ function UserPageRedirectRouter() {
             parsedUser.payment_status = 1;
             sessionStorage.setItem("user", JSON.stringify(parsedUser));
             localStorage.setItem("paypal_user_backup", JSON.stringify(parsedUser));
-            dispatch(setUser(parsedUser));
+            dispatch(setReduxUser(parsedUser));
             toast.success("Payment status updated successfully!");
           } catch (e) {
             console.error("Failed to update payment status on redirect", e);
@@ -216,18 +219,33 @@ function UserPageRedirectRouter() {
           console.error("Failed to post to BroadcastChannel:", e);
         }
 
-        // Navigate to the leaderboard with clean URL (no payment params)
-        if (finalLadderId && finalLadderType) {
-          const target = `/user-page-redirect?ladder_id=${finalLadderId}&ladder_type=${finalLadderType}`;
-          router.replace(target);
-        } else {
-          // Fallback: just clear the payment params from URL
-          const url = new URL(window.location.href);
-          url.searchParams.delete("payment_status");
-          url.searchParams.delete("payment_success");
-          window.history.replaceState({}, document.title, url.toString());
-          setPaymentProcessing(false);
-        }
+        setResolvedLadderId(finalLadderId);
+        setResolvedLadderType(finalLadderType);
+
+        // Auto-close checkout tab to return user to original tab
+        setTimeout(() => {
+          try {
+            window.open('', '_self');
+            window.close();
+          } catch (err) {
+            console.error("Failed to close window", err);
+          }
+        }, 1500);
+
+        // Navigate to the leaderboard with clean URL (no payment params) as fallback
+        setTimeout(() => {
+          if (finalLadderId && finalLadderType) {
+            const target = `/user-page-redirect?ladder_id=${finalLadderId}&ladder_type=${finalLadderType}`;
+            router.replace(target);
+          } else {
+            // Fallback: just clear the payment params from URL
+            const url = new URL(window.location.href);
+            url.searchParams.delete("payment_status");
+            url.searchParams.delete("payment_success");
+            window.history.replaceState({}, document.title, url.toString());
+            setPaymentProcessing(false);
+          }
+        }, 2000);
       };
 
       processPaymentCompletion();
@@ -484,12 +502,14 @@ function UserPageRedirectRouter() {
             Payment Completed Successfully!
           </p>
           <p className="text-sm text-gray-400">
-            Updating your status and redirecting to the leaderboard...
+            Updating your status and redirecting...
           </p>
         </div>
       </div>
     );
   }
+
+
 
   if (loading) {
     return (

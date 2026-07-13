@@ -716,6 +716,10 @@ export default function PlanHeading() {
                   <Info className="h-4 w-4" />
                 </button>
 
+                <div className="relative  mx-2 mb-2 mt-2 flex w-[calc(100%-1rem)] flex-wrap items-center justify-around gap-3 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] p-3 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] md:absolute md:bottom-2 md:left-2 md:right-0 md:mx-0 md:mt-1 md:w-auto md:flex-nowrap md:justify-between md:gap-2 md:px-4 md:py-2">
+                  see sports
+                </div>  
+
                 {/* Custom HTML/CSS Bottom Bar (Directly overlaying on the image at the bottom) */}
                 <div className="relative mx-2 mb-2 mt-2 flex w-[calc(100%-1rem)] flex-wrap items-center justify-around gap-3 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] p-3 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] md:absolute md:bottom-2 md:left-2 md:right-2 md:mx-0 md:mt-0 md:w-auto md:flex-nowrap md:justify-between md:gap-2 md:px-4 md:py-2">
 
