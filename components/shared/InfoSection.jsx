@@ -260,15 +260,6 @@ export default function InfoSection({
           ) : (
             <ActivityLog userLevel={userLevel} />
           )}
-
-          {!userLevel && (
-            <div className="best-board-card rounded-xl p-4">
-              <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Members & Local Services</p>
-              <p className="text-sm leading-6 text-[var(--best-board-muted)]">
-                Manage member access, local service integrations, discount tokens, and club information from this shared side panel.
-              </p>
-            </div>
-          )}
         </div>
 
       </aside>
