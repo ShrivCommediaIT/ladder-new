@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getRequest } from "@/services/apiService";
+import { getRequest, postUrlEncoded } from "@/services/apiService";
 import { setUser } from "@/redux/slices/userSlice";
 import { API_ENDPOINTS } from "@/constants/api";
 
@@ -105,15 +105,6 @@ function UserPageRedirectRouter() {
           }
         }
 
-        // Broadcast to any other open tabs (e.g. if user had another tab open)
-        try {
-          const channel = new BroadcastChannel("paypal_payment_channel");
-          channel.postMessage({ status: "success" });
-          channel.close();
-        } catch (e) {
-          console.error("Failed to post to BroadcastChannel:", e);
-        }
-
         // Resolve ladder_id & ladder_type for navigation:
         // 1. Try from current URL params (if PayPal included them)
         // 2. Then try localStorage (saved when payment modal opened)
@@ -147,6 +138,61 @@ function UserPageRedirectRouter() {
           } catch (e) {
             /* ignore */
           }
+        }
+
+        // Auto-submit any pending score
+        let activePostArgs = null;
+        let scoreWasPosted = false;
+        try {
+          const saved = localStorage.getItem("paypal_pending_post_args");
+          if (saved) {
+            activePostArgs = JSON.parse(saved);
+          }
+        } catch (e) {
+          console.error("Failed to parse saved post args", e);
+        }
+
+        if (activePostArgs && parsedUser) {
+          toast.info("Submitting your score...");
+          try {
+            const params = new URLSearchParams();
+            params.append("user_id", String(activePostArgs.playerId));
+            params.append("skill_activity_id", String(activePostArgs.skillActivityId));
+            params.append("score", String(activePostArgs.score));
+            params.append("witness_by", String(activePostArgs.witnessBy || ""));
+            params.append("best_result", String(activePostArgs.bestScore || activePostArgs.score));
+
+            let adminId = "";
+            try {
+              const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
+              adminId = adminDetails?.id || "";
+            } catch (e) { }
+            params.append("admin_id", adminId);
+            params.append("ladder_id", finalLadderId || activePostArgs.ladderId || "");
+
+            // Since only the logged-in player can submit their score:
+            params.append("user_name", parsedUser.name || "Player");
+
+            const targetUrl = activePostArgs.url
+              ? (activePostArgs.url.startsWith('/') ? activePostArgs.url : `/${activePostArgs.url}`)
+              : "/user/postResultSkillboard";
+
+            await postUrlEncoded(targetUrl, params);
+            localStorage.removeItem("paypal_pending_post_args");
+            scoreWasPosted = true;
+            toast.success("Score posted successfully!");
+          } catch (postErr) {
+            console.error("Failed to auto-post score on redirect:", postErr);
+          }
+        }
+
+        // Broadcast to any other open tabs (e.g. if user had another tab open)
+        try {
+          const channel = new BroadcastChannel("paypal_payment_channel");
+          channel.postMessage({ status: "success", scorePosted: scoreWasPosted });
+          channel.close();
+        } catch (e) {
+          console.error("Failed to post to BroadcastChannel:", e);
         }
 
         // Navigate to the leaderboard with clean URL (no payment params)
