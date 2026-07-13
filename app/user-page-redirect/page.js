@@ -217,17 +217,17 @@ function UserPageRedirectRouter() {
         }
 
         // Navigate to the leaderboard with clean URL (no payment params)
-        // if (finalLadderId && finalLadderType) {
-        //   const target = `/user-page-redirect?ladder_id=${finalLadderId}&ladder_type=${finalLadderType}`;
-        //   router.replace(target);
-        // } else {
-        //   // Fallback: just clear the payment params from URL
-        //   const url = new URL(window.location.href);
-        //   url.searchParams.delete("payment_status");
-        //   url.searchParams.delete("payment_success");
-        //   window.history.replaceState({}, document.title, url.toString());
-        //   setPaymentProcessing(false);
-        // }
+        if (finalLadderId && finalLadderType) {
+          const target = `/user-page-redirect?ladder_id=${finalLadderId}&ladder_type=${finalLadderType}`;
+          router.replace(target);
+        } else {
+          // Fallback: just clear the payment params from URL
+          const url = new URL(window.location.href);
+          url.searchParams.delete("payment_status");
+          url.searchParams.delete("payment_success");
+          window.history.replaceState({}, document.title, url.toString());
+          setPaymentProcessing(false);
+        }
       };
 
       processPaymentCompletion();
