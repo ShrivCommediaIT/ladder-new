@@ -604,7 +604,6 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
                   await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
                     payment_status: 1,
                     id: parsedUser.id,
-                    user_id: parsedUser.user_id || parsedUser.id
                   });
                   parsedUser.payment_status = 1;
                   sessionStorage.setItem("user", JSON.stringify(parsedUser));
