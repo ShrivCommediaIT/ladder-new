@@ -102,6 +102,11 @@ export default function PlanHeading() {
       title: "The Benefits of the SSP Participation Eco-System",
       description: "Learn how the SSP Participation Ecosystem rewards and engages players of all ages.",
     },
+    {
+      id: "W0wz3uFf0P8",
+      title: "Skills and Performance Boards",
+      description: "Skills and Performance Boards - How to use them?",
+    },
   ];
 
   useEffect(() => {
@@ -158,6 +163,7 @@ export default function PlanHeading() {
 
   const buttonRef = useRef(null);
   const [showPoster, setShowPoster] = useState(false);
+  const [showSportsModal, setShowSportsModal] = useState(false);
   const [popupPosition, setPopupPosition] = useState("bottom");
 
   const [dbLoaded, setDbLoaded] = useState(false);
@@ -716,9 +722,12 @@ export default function PlanHeading() {
                   <Info className="h-4 w-4" />
                 </button>
 
-                <div className="relative  mx-2 mb-2 mt-2 flex w-[calc(100%-1rem)] flex-wrap items-center justify-around gap-3 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] p-3 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] md:absolute md:bottom-2 md:left-2 md:right-0 md:mx-0 md:mt-1 md:w-auto md:flex-nowrap md:justify-between md:gap-2 md:px-4 md:py-2">
+                <div
+                  onClick={() => setShowSportsModal(true)}
+                  className="relative ml-auto mr-2 mb-2 mt-2 flex w-fit items-center justify-center gap-2 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] px-4 py-2.5 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] font-semibold text-sm cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] md:absolute md:bottom-[96px] md:right-2 md:left-auto md:mx-0 md:mt-0 md:py-2 md:px-4 z-20"
+                >
                   see sports
-                </div>  
+                </div>
 
                 {/* Custom HTML/CSS Bottom Bar (Directly overlaying on the image at the bottom) */}
                 <div className="relative mx-2 mb-2 mt-2 flex w-[calc(100%-1rem)] flex-wrap items-center justify-around gap-3 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] p-3 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] md:absolute md:bottom-2 md:left-2 md:right-2 md:mx-0 md:mt-0 md:w-auto md:flex-nowrap md:justify-between md:gap-2 md:px-4 md:py-2">
@@ -861,6 +870,87 @@ export default function PlanHeading() {
                 </DialogContent>
               </Dialog>
             )}
+
+            {/* Dialog modal overlay for see sports list */}
+            {showSportsModal && (
+              <Dialog open={showSportsModal} onOpenChange={setShowSportsModal}>
+                <DialogContent className={`w-[95vw] sm:w-[500px] p-6 rounded-2xl border shadow-2xl backdrop-blur-md max-h-[85vh] overflow-y-auto ${mounted && theme !== "dark" ? "bg-white text-gray-900 border-gray-200" : "bg-[#020713]/95 text-white border-cyan-500/35"
+                  }`}>
+                  <DialogTitle className="text-xl sm:text-2xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-4">
+                    Sports Ecosystem
+                  </DialogTitle>
+                  
+                  {/* COMING SOON Banner */}
+                  <div className="mb-6 p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 flex items-center gap-3">
+                    <span className="flex h-3 w-3 shrink-0 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                    </span>
+                    <div>
+                      <p className="text-sm font-bold text-yellow-400 tracking-wider uppercase leading-none">COMING SOON</p>
+                      <p className="text-xs text-slate-300 mt-1 leading-normal">We are actively preparing new sports integrations for our platform.</p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3">
+                    {/* Cricket */}
+                    <div className="flex items-center gap-4 p-3.5 rounded-xl border border-cyan-500/15 bg-white/5 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300 group">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:scale-110 transition-transform">
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 3a2.5 2.5 0 0 0-4 0L4 13a2.5 2.5 0 0 0 0 4l1 1a2.5 2.5 0 0 0 4 0l10-10a2.5 2.5 0 0 0 0-4z" />
+                          <circle cx="20" cy="20" r="1" fill="currentColor" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">1. Cricket</h4>
+                        <p className="text-xs text-slate-400 mt-0.5">Club cricket ladders & league management</p>
+                      </div>
+                    </div>
+
+                    {/* Darts */}
+                    <div className="flex items-center gap-4 p-3.5 rounded-xl border border-cyan-500/15 bg-white/5 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300 group">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:scale-110 transition-transform">
+                        <Crosshair className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">2. Darts</h4>
+                        <p className="text-xs text-slate-400 mt-0.5">Precision tracking & tournament leaderboards</p>
+                      </div>
+                    </div>
+
+                    {/* Table Tennis */}
+                    <div className="flex items-center gap-4 p-3.5 rounded-xl border border-cyan-500/15 bg-white/5 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300 group">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:scale-110 transition-transform">
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="7" cy="17" r="4" />
+                          <path d="M9 13.5L16.5 6a2 2 0 1 1 3 3L12 16.5" />
+                          <circle cx="17" cy="17" r="1.5" fill="currentColor" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">3. Table Tennis</h4>
+                        <p className="text-xs text-slate-400 mt-0.5">Fast-paced club challenges & rankings</p>
+                      </div>
+                    </div>
+
+                    {/* Tennis */}
+                    <div className="flex items-center gap-4 p-3.5 rounded-xl border border-cyan-500/15 bg-white/5 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300 group">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:scale-110 transition-transform">
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M6 12a6 6 0 0 1 12 0" />
+                          <path d="M12 6a6 6 0 0 1 0 12" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h4 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">4. Tennis</h4>
+                        <p className="text-xs text-slate-400 mt-0.5">Singles & doubles ladder tournaments</p>
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
       </section>
@@ -964,8 +1054,8 @@ export default function PlanHeading() {
                         document.getElementById("intro")?.scrollIntoView({ behavior: "smooth", block: "start" });
                       }}
                       className={`block rounded-lg px-3 py-2 transition-all duration-200 ${activeSection === "intro"
-                          ? "bg-[var(--landing-primary)] text-white shadow-sm"
-                          : "text-[var(--landing-nav-text)] hover:bg-[var(--landing-outline-button-hover)] hover:text-[var(--landing-primary)]"
+                        ? "bg-[var(--landing-primary)] text-white shadow-sm"
+                        : "text-[var(--landing-nav-text)] hover:bg-[var(--landing-outline-button-hover)] hover:text-[var(--landing-primary)]"
                         }`}
                     >
                       Introduction
@@ -980,8 +1070,8 @@ export default function PlanHeading() {
                           document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
                         }}
                         className={`block rounded-lg px-3 py-2 transition-all duration-200 ${activeSection === section.id
-                            ? "bg-[var(--landing-primary)] text-white shadow-sm"
-                            : "text-[var(--landing-nav-text)] hover:bg-[var(--landing-outline-button-hover)] hover:text-[var(--landing-primary)]"
+                          ? "bg-[var(--landing-primary)] text-white shadow-sm"
+                          : "text-[var(--landing-nav-text)] hover:bg-[var(--landing-outline-button-hover)] hover:text-[var(--landing-primary)]"
                           }`}
                       >
                         {section.shortTitle}
@@ -992,7 +1082,7 @@ export default function PlanHeading() {
               </div>
 
 
-              
+
 
               {/* Mobile / Tablet Horizontal Scroll Menu */}
               <div className="lg:hidden sticky top-[80px] z-20 -mx-4 overflow-x-auto px-4 py-3 bg-[var(--landing-bg)] border-b border-[var(--landing-border)] scrollbar-none flex gap-2">
@@ -1003,8 +1093,8 @@ export default function PlanHeading() {
                     document.getElementById("intro")?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
                   className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all border ${activeSection === "intro"
-                      ? "bg-[var(--landing-primary)] border-transparent text-white shadow-sm"
-                      : "bg-[var(--landing-surface)] border-[var(--landing-border)] text-[var(--landing-muted)] hover:text-foreground"
+                    ? "bg-[var(--landing-primary)] border-transparent text-white shadow-sm"
+                    : "bg-[var(--landing-surface)] border-[var(--landing-border)] text-[var(--landing-muted)] hover:text-foreground"
                     }`}
                 >
                   Introduction
@@ -1018,8 +1108,8 @@ export default function PlanHeading() {
                       document.getElementById(section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
                     }}
                     className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all border ${activeSection === section.id
-                        ? "bg-[var(--landing-primary)] border-transparent text-white shadow-sm"
-                        : "bg-[var(--landing-surface)] border-[var(--landing-border)] text-[var(--landing-muted)] hover:text-foreground"
+                      ? "bg-[var(--landing-primary)] border-transparent text-white shadow-sm"
+                      : "bg-[var(--landing-surface)] border-[var(--landing-border)] text-[var(--landing-muted)] hover:text-foreground"
                       }`}
                   >
                     {section.shortTitle}
@@ -1180,10 +1270,10 @@ export default function PlanHeading() {
                         key={video.id}
                         onClick={() => setActiveVideoId(video.id)}
                         className={`w-full text-left p-3 rounded-xl border transition-all flex flex-col gap-1 ${isActive
-                            ? "bg-blue-600/10 border-blue-500 text-blue-500 shadow-md"
-                            : mounted && theme !== "dark"
-                              ? "bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-800"
-                              : "bg-zinc-900/50 hover:bg-zinc-900 border-zinc-800 text-zinc-300"
+                          ? "bg-blue-600/10 border-blue-500 text-blue-500 shadow-md"
+                          : mounted && theme !== "dark"
+                            ? "bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-800"
+                            : "bg-zinc-900/50 hover:bg-zinc-900 border-zinc-800 text-zinc-300"
                           }`}
                       >
                         <div className="flex items-start gap-2 w-full">
