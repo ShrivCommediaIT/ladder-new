@@ -154,6 +154,7 @@ const formatDate = (dateStr) => {
 };
 
 export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) {
+  const listRef = useRef(null);
   const [dbData, setDbData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
@@ -189,7 +190,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
       fetchResults(1, newFilters);
     }, 400);
     return () => clearTimeout(debounceTimer.current);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyword]);
   const [unit, setUnit] = useState("");
   const [minResult, setMinResult] = useState("");
@@ -273,7 +274,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
       if (typeof window !== "undefined") {
         const str = sessionStorage.getItem("adminDetails");
         if (str) {
-          try { adminId = JSON.parse(str)?.id; } catch (_) {}
+          try { adminId = JSON.parse(str)?.id; } catch (_) { }
         }
       }
       const payload = new FormData();
@@ -643,6 +644,11 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
 
   const handlePageClick = (pageNum) => {
     setCurrentPage(pageNum);
+    if (listRef.current) {
+      const yOffset = -90; // Scroll to keep the top of the list visible below the sticky navbar
+      const y = listRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
   };
 
   const renderPageNumbers = () => {
@@ -752,7 +758,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
                   className="bg-clip-text text-3xl font-black tracking-tight text-transparent sm:text-4xl lg:text-5xl"
                   style={{ backgroundImage: brandGradient }}
                 >
-                  SSP Talent Board  
+                  SSP Talent Board
                 </h1>
                 {!isAdmin && !isGuest && (
                   <Link
@@ -933,7 +939,7 @@ export default function PerformanceDatabase({ refreshTrigger, onLoadComplete }) 
           </div>
         </form>
 
-        <div className={`${panelClass} overflow-hidden`}>
+        <div ref={listRef} className={`${panelClass} overflow-hidden`}>
           <div className="flex flex-col items-center justify-between gap-4 border-b border-border/70 bg-[color:color-mix(in_srgb,var(--card),var(--primary)_4%)] p-6 sm:flex-row">
             <div className="text-sm font-semibold tracking-wide text-muted-foreground">
               SHOWING <span className="font-bold text-foreground">{Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}</span> - <span className="font-bold text-foreground">{Math.min(currentPage * itemsPerPage, totalCount)}</span> OF <span className="font-bold text-primary">{totalCount}</span> RESULTS
