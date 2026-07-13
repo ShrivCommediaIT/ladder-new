@@ -33,7 +33,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess, playerEntryId }) =>
       if (sessionUser && sessionUser.id) {
         await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
           payment_status: 1,
-          id: playerEntryId || sessionUser?.id,
+          id: sessionUser?.id,
           user_id: sessionUser?.user_id || sessionUser?.id,
         });
 
@@ -54,6 +54,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess, playerEntryId }) =>
       // onOpenChange(false);
       setPaypalLoading(false);
     }
+    
   };
 
   // Dynamically load script and initialize buttons on the parent document
