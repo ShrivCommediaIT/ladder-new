@@ -370,6 +370,16 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
   const showCountryRank = appliedCountry != "";
   const loggedInUser = useSelector((state) => state.user?.user);
   const isInverted = ladderDetails?.inverted == 0;
+
+  const playerEntryId = useMemo(() => {
+    if (!loggedInUser || !data) return null;
+    const loggedInPlayer = data.find(
+      (p) =>
+        (p.user_id && loggedInUser.user_id && String(p.user_id) === String(loggedInUser.user_id)) ||
+        (p.name && loggedInUser.name && p.name.trim().toLowerCase() === loggedInUser.name.trim().toLowerCase())
+    );
+    return loggedInPlayer ? loggedInPlayer.id : loggedInUser.id;
+  }, [loggedInUser, data]);
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedUser = sessionStorage.getItem("user") || sessionStorage.getItem("userData") || localStorage.getItem("paypal_user_backup");
@@ -385,9 +395,16 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
               const handleReturnSuccess = async () => {
                 toast.success("Payment completed! Updating status...");
                 try {
+                  const loggedInPlayer = data.find(
+                    (p) =>
+                      (p.user_id && parsedUser.user_id && String(p.user_id) === String(parsedUser.user_id)) ||
+                      (p.name && parsedUser.name && p.name.trim().toLowerCase() === parsedUser.name.trim().toLowerCase())
+                  );
+                  const resolvedPlayerId = loggedInPlayer ? loggedInPlayer.id : parsedUser.id;
+
                   await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
                     payment_status: 1,
-                    id: parsedUser.id,
+                    id: resolvedPlayerId,
                     user_id: parsedUser.user_id || parsedUser.id
                   });
                   parsedUser.payment_status = 1;
@@ -881,6 +898,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
         open={showPaymentModal}
         onOpenChange={setShowPaymentModal}
         onSuccess={handlePaymentSuccess}
+        playerEntryId={playerEntryId}
       />
     </>
   );

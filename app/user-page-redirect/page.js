@@ -86,29 +86,7 @@ function UserPageRedirectRouter() {
           console.error("Failed to parse user session", e);
         }
 
-        // Call UPDATE_PLAYER_PAYMENT_STATUS API
-        if (parsedUser && parsedUser.id) {
-          try {
-            await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
-              payment_status: 1,
-              id: parsedUser.id,
-              user_id: parsedUser.user_id || parsedUser.id,
-            });
-
-            parsedUser.payment_status = 1;
-            sessionStorage.setItem("user", JSON.stringify(parsedUser));
-            localStorage.setItem("paypal_user_backup", JSON.stringify(parsedUser));
-            dispatch(setUser(parsedUser));
-            toast.success("Payment status updated successfully!");
-          } catch (e) {
-            console.error("Failed to update payment status on redirect", e);
-          }
-        }
-
         // Resolve ladder_id & ladder_type for navigation:
-        // 1. Try from current URL params (if PayPal included them)
-        // 2. Then try localStorage (saved when payment modal opened)
-        // 3. Then try user session data
         let finalLadderId = searchParams.get("ladder_id");
         let finalLadderType =
           searchParams.get("ladder_type") || searchParams.get("type");
@@ -150,6 +128,49 @@ function UserPageRedirectRouter() {
           }
         } catch (e) {
           console.error("Failed to parse saved post args", e);
+        }
+
+        // Resolve player entry ID
+        let playerEntryId = parsedUser?.id;
+        if (activePostArgs && activePostArgs.playerId) {
+          playerEntryId = activePostArgs.playerId;
+        } else if (parsedUser) {
+          const playersList =
+            finalLadderType === "skill" || finalLadderType === "skills"
+              ? skillPlayers
+              : finalLadderType === "positive"
+              ? positivePlayers
+              : finalLadderType === "negative"
+              ? negativePlayers
+              : winlosePlayers;
+
+          const playerEntry = playersList.find(
+            (p) =>
+              (p.user_id && parsedUser.user_id && String(p.user_id) === String(parsedUser.user_id)) ||
+              (p.name && parsedUser.name && p.name.trim().toLowerCase() === parsedUser.name.trim().toLowerCase())
+          );
+          if (playerEntry) {
+            playerEntryId = playerEntry.id;
+          }
+        }
+
+        // Call UPDATE_PLAYER_PAYMENT_STATUS API
+        if (parsedUser && playerEntryId) {
+          try {
+            await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
+              payment_status: 1,
+              id: playerEntryId,
+              user_id: parsedUser.user_id || parsedUser.id,
+            });
+
+            parsedUser.payment_status = 1;
+            sessionStorage.setItem("user", JSON.stringify(parsedUser));
+            localStorage.setItem("paypal_user_backup", JSON.stringify(parsedUser));
+            dispatch(setUser(parsedUser));
+            toast.success("Payment status updated successfully!");
+          } catch (e) {
+            console.error("Failed to update payment status on redirect", e);
+          }
         }
 
         if (activePostArgs && parsedUser) {
