@@ -9,6 +9,7 @@ export const fetchLadders = createAsyncThunk(
     try {
       const data = await getRequest(API_ENDPOINTS.LADDER_LIST, {
         user_id: userId,
+        created_by:created_by
       });
       return data.data || [];
     } catch (error) {
