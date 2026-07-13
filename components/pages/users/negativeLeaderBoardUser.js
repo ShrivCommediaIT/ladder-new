@@ -738,7 +738,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
     if (typeof window !== "undefined") {
       const channel = new BroadcastChannel("paypal_payment_channel");
       channel.onmessage = async (event) => {
-        const { status } = event.data;
+        const { status, scorePosted } = event.data;
         if (status === "success") {
           toast.success("Payment completed in checkout window! Syncing status...");
           try {
@@ -751,8 +751,16 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
               dispatch(setUser(parsed));
             }
             setShowPaymentModal(false);
-            if (handlePaymentSuccessRef.current) {
-              await handlePaymentSuccessRef.current();
+            if (scorePosted) {
+              setPendingPostArgs(null);
+              if (typeof window !== "undefined") {
+                localStorage.removeItem("paypal_pending_post_args");
+              }
+              refreshLeaderboard(selectedSkillFilter);
+            } else {
+              if (handlePaymentSuccessRef.current) {
+                await handlePaymentSuccessRef.current();
+              }
             }
           } catch (e) {
             console.error("Error syncing payment channel message:", e);
