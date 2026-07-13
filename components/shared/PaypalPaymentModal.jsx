@@ -51,7 +51,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess, playerEntryId }) =>
       toast.error("Failed to update payment status. Please contact support.");
     } finally {
       // Always close the modal regardless of API success or failure
-      onOpenChange(false);
+      // onOpenChange(false);
       setPaypalLoading(false);
     }
   };
