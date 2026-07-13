@@ -28,6 +28,11 @@ import QuickActionsCard from "@/components/shared/QuickActionsCard";
 import ActivityLog from "@/components/pages/players/ActivityList";
 import { Copy, X } from "lucide-react";
 import { formatLadderType } from "./ladderUtils";
+import dynamic from "next/dynamic";
+
+const MusicDownloadList = dynamic(() => import("@/components/pages/players/MusicDownloadList"), {
+  ssr: false,
+});
 
 // User-level specific sidebar imports
 import ContactAdmin from "@/components/shared/ContactAdmin";
@@ -255,19 +260,12 @@ export default function InfoSection({
             </div>
           )}
 
+          {(ladderType === "skill" || ladderType === "skills") && <MusicDownloadList />}
+
           {userLevel ? (
             <ActivityLogUser ladderId={propLadderId} />
           ) : (
             <ActivityLog userLevel={userLevel} />
-          )}
-
-          {!userLevel && (
-            <div className="best-board-card rounded-xl p-4">
-              <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[var(--best-board-muted)]">Members & Local Services</p>
-              <p className="text-sm leading-6 text-[var(--best-board-muted)]">
-                Manage member access, local service integrations, discount tokens, and club information from this shared side panel.
-              </p>
-            </div>
           )}
         </div>
 
