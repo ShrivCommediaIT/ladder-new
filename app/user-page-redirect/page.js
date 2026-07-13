@@ -38,7 +38,7 @@ function UserPageRedirectRouter() {
 
   // ---------------- URL PARAMS ----------------
   const ladderId = searchParams.get("ladder_id");
-  const ladderType = searchParams.get("ladder_type") || searchParams.get("type")
+  const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
 
   const [mobileSection, setMobileSection] = useState("players");
   const [isDesktop, setIsDesktop] = useState(false);
@@ -51,31 +51,34 @@ function UserPageRedirectRouter() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
 
-  // ---------------- FRAME BREAKOUT & CENTRALIZED PAYMENT RETURN ----------------
+  // ---------------- IFRAME DETECTION ----------------
   useEffect(() => {
     if (typeof window !== "undefined" && window.top !== window.self) {
       setIsIframe(true);
     }
   }, []);
 
+  // ---------------- CENTRALIZED PAYMENT RETURN HANDLER ----------------
+  // PayPal redirects back to: /user-page-redirect?payment_status=success
+  // (without ladder_id/ladder_type in the URL)
+  // We always process the payment here, then reconstruct the full URL and navigate.
   useEffect(() => {
     const paymentStatus = searchParams.get("payment_status");
     const paymentSuccess = searchParams.get("payment_success");
     const isSuccess = paymentStatus === "success" || paymentSuccess === "true";
 
-    // Only handle payment completion in page.js if it is NOT the main tab redirect.
-    // Main tab redirects are handled directly by the leaderboard components to preserve score posting.
-    const isMainTabRedirect = typeof window !== "undefined" && !window.opener && window.top === window.self;
-
-    if (isSuccess && typeof window !== "undefined" && !isMainTabRedirect && !paymentProcessing) {
+    if (isSuccess && typeof window !== "undefined" && !paymentProcessing) {
       setPaymentProcessing(true);
 
       const processPaymentCompletion = async () => {
         toast.info("Payment completed! Updating status...");
-        
+
+        // Read user from sessionStorage or localStorage backup
         let parsedUser = null;
         try {
-          const storedUser = sessionStorage.getItem("user") || localStorage.getItem("paypal_user_backup");
+          const storedUser =
+            sessionStorage.getItem("user") ||
+            localStorage.getItem("paypal_user_backup");
           if (storedUser) {
             parsedUser = JSON.parse(storedUser);
           }
@@ -83,12 +86,13 @@ function UserPageRedirectRouter() {
           console.error("Failed to parse user session", e);
         }
 
+        // Call UPDATE_PLAYER_PAYMENT_STATUS API
         if (parsedUser && parsedUser.id) {
           try {
             await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
               payment_status: 1,
               id: parsedUser.id,
-              user_id: parsedUser.user_id || parsedUser.id
+              user_id: parsedUser.user_id || parsedUser.id,
             });
 
             parsedUser.payment_status = 1;
@@ -97,51 +101,81 @@ function UserPageRedirectRouter() {
             dispatch(setUser(parsedUser));
             toast.success("Payment status updated successfully!");
           } catch (e) {
-            console.error("Failed to update status on return redirect", e);
+            console.error("Failed to update payment status on redirect", e);
           }
         }
 
-        // Broadcast success to parent tab
+        // Broadcast to any other open tabs (e.g. if user had another tab open)
         try {
           const channel = new BroadcastChannel("paypal_payment_channel");
           channel.postMessage({ status: "success" });
           channel.close();
         } catch (e) {
-          console.error("Failed to post message to BroadcastChannel:", e);
+          console.error("Failed to post to BroadcastChannel:", e);
         }
 
-        // Clean up URL query parameters so we don't trigger success again
-        if (typeof window !== "undefined") {
+        // Resolve ladder_id & ladder_type for navigation:
+        // 1. Try from current URL params (if PayPal included them)
+        // 2. Then try localStorage (saved when payment modal opened)
+        // 3. Then try user session data
+        let finalLadderId = searchParams.get("ladder_id");
+        let finalLadderType =
+          searchParams.get("ladder_type") || searchParams.get("type");
+
+        if (!finalLadderId || !finalLadderType) {
+          try {
+            finalLadderId =
+              finalLadderId || localStorage.getItem("paypal_redirect_ladder_id");
+            finalLadderType =
+              finalLadderType ||
+              localStorage.getItem("paypal_redirect_ladder_type");
+          } catch (e) {
+            /* ignore */
+          }
+        }
+
+        if (!finalLadderId || !finalLadderType) {
+          try {
+            const stored =
+              sessionStorage.getItem("user") ||
+              localStorage.getItem("paypal_user_backup");
+            if (stored) {
+              const p = JSON.parse(stored);
+              finalLadderId = finalLadderId || p.ladder_id;
+              finalLadderType = finalLadderType || p.ladder_type;
+            }
+          } catch (e) {
+            /* ignore */
+          }
+        }
+
+        // Navigate to the leaderboard with clean URL (no payment params)
+        if (finalLadderId && finalLadderType) {
+          const target = `/user-page-redirect?ladder_id=${finalLadderId}&ladder_type=${finalLadderType}`;
+          router.replace(target);
+        } else {
+          // Fallback: just clear the payment params from URL
           const url = new URL(window.location.href);
           url.searchParams.delete("payment_status");
           url.searchParams.delete("payment_success");
           window.history.replaceState({}, document.title, url.toString());
-        }
-
-        // If running in a separate tab or popup (not inside an iframe), close it or set processing to false as fallback
-        if (window.top === window.self) {
-          setTimeout(() => {
-            try {
-              window.close();
-            } catch (err) {
-              console.error("Failed to close window", err);
-            }
-            // Set processing to false as a fallback so the main tab renders the leaderboard!
-            setPaymentProcessing(false);
-          }, 1500);
-        } else {
-          // If it's inside an iframe, just set processing to false (it will be closed by the parent tab anyway)
           setPaymentProcessing(false);
         }
       };
 
       processPaymentCompletion();
     }
-  }, [searchParams, dispatch, paymentProcessing]);
+  }, [searchParams, dispatch, paymentProcessing, router]);
 
-  // ---------------- REDIRECT FALLBACK FOR PAYPAL RETURN ----------------
+  // ---------------- REDIRECT FALLBACK: ladder_id missing but not a payment return ----------------
   useEffect(() => {
-    if (!ladderId) {
+    const paymentStatus = searchParams.get("payment_status");
+    const paymentSuccess = searchParams.get("payment_success");
+    const isPaymentReturn = paymentStatus === "success" || paymentSuccess === "true";
+
+    // Only do the redirect fallback if this is NOT a payment return
+    // (payment return is handled above)
+    if (!ladderId && !isPaymentReturn) {
       try {
         let finalLadderId = null;
         let finalLadderType = null;
@@ -152,7 +186,11 @@ function UserPageRedirectRouter() {
         }
 
         if (!finalLadderId || !finalLadderType) {
-          const storedUser = sessionStorage.getItem("user") || (typeof window !== "undefined" ? localStorage.getItem("paypal_user_backup") : null);
+          const storedUser =
+            sessionStorage.getItem("user") ||
+            (typeof window !== "undefined"
+              ? localStorage.getItem("paypal_user_backup")
+              : null);
           if (storedUser) {
             const parsed = JSON.parse(storedUser);
             finalLadderId = parsed.ladder_id;
@@ -161,12 +199,9 @@ function UserPageRedirectRouter() {
         }
 
         if (finalLadderId && finalLadderType) {
-          const paymentStatus = searchParams.get("payment_status");
-          const paymentSuccess = searchParams.get("payment_success");
-          let target = `/user-page-redirect?ladder_id=${finalLadderId}&ladder_type=${finalLadderType}`;
-          if (paymentStatus) target += `&payment_status=${paymentStatus}`;
-          if (paymentSuccess) target += `&payment_success=${paymentSuccess}`;
-          router.replace(target);
+          router.replace(
+            `/user-page-redirect?ladder_id=${finalLadderId}&ladder_type=${finalLadderType}`
+          );
         }
       } catch (e) {
         console.error("Redirect fallback error", e);
@@ -203,10 +238,12 @@ function UserPageRedirectRouter() {
   }, []);
 
   // ---------------- USER ID (only localStorage) ----------------
-  const loggedInUserId = user?.id || (!isNaN(Number(user?.user_id)) ? Number(user?.user_id) : null);
+  const loggedInUserId =
+    user?.id || (!isNaN(Number(user?.user_id)) ? Number(user?.user_id) : null);
 
   // Resolve current user rank from Redux based on active ladder type
-  const winlosePlayers = useSelector((state) => state.player?.players?.[Number(ladderId)]?.data) || [];
+  const winlosePlayers =
+    useSelector((state) => state.player?.players?.[Number(ladderId)]?.data) || [];
   const positivePlayers = useSelector((state) => state.positiveLeaderBoard?.data) || [];
   const negativePlayers = useSelector((state) => state.negativeLeaderBoard?.data) || [];
   const skillPlayers = useSelector((state) => state.skillLeaderboard?.data) || [];
@@ -225,8 +262,11 @@ function UserPageRedirectRouter() {
     if (!loggedInUserId) return null;
     if (ladderType === "minileague") {
       for (let i = 0; i < minileagueData.length; i++) {
-        const users = minileagueData[i]?.users_record || minileagueData[i]?.users || [];
-        const found = users.find((p) => Number(p.id || p.user_id) === Number(loggedInUserId));
+        const users =
+          minileagueData[i]?.users_record || minileagueData[i]?.users || [];
+        const found = users.find(
+          (p) => Number(p.id || p.user_id) === Number(loggedInUserId)
+        );
         if (found) return found;
       }
     } else {
@@ -242,11 +282,14 @@ function UserPageRedirectRouter() {
   const myRank = (() => {
     if (!currentUser) return "-";
     if (currentUser.rank) return currentUser.rank;
-    
+
     if (ladderType === "minileague") {
       for (let i = 0; i < minileagueData.length; i++) {
-        const users = minileagueData[i]?.users_record || minileagueData[i]?.users || [];
-        const idx = users.findIndex((p) => Number(p.id || p.user_id) === Number(loggedInUserId));
+        const users =
+          minileagueData[i]?.users_record || minileagueData[i]?.users || [];
+        const idx = users.findIndex(
+          (p) => Number(p.id || p.user_id) === Number(loggedInUserId)
+        );
         if (idx !== -1) return idx + 1;
       }
     } else {
@@ -261,9 +304,10 @@ function UserPageRedirectRouter() {
   })();
 
   // Invite URL and User Quick Actions
-  const inviteUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`
-    : "";
+  const inviteUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`
+      : "";
 
   const quickActions = [];
   if (loggedInUserId && currentUser) {
@@ -276,15 +320,13 @@ function UserPageRedirectRouter() {
     });
   }
 
-
-
   const isMiniLeague = ladderType === "minileague";
   const isSkill = ladderType === "skill";
   const isPositive = ladderType === "positive";
   const isNegative = ladderType === "negative";
 
   // ---------------- FETCH DATA REMOVED ----------------
-  // Redundant fetch removed because child components (MinileaguePlayers, BasicLeaderboardUser, etc.) 
+  // Redundant fetch removed because child components (MinileaguePlayers, BasicLeaderboardUser, etc.)
   // handle their own data fetching including specific filters like age and gender.
 
   const [extraActions, setExtraActions] = useState([]);
@@ -358,7 +400,9 @@ function UserPageRedirectRouter() {
         <div className="space-y-4">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500 mx-auto"></div>
           <p className="text-lg font-medium">Processing payment completion...</p>
-          <p className="text-sm text-gray-400">This window will close automatically shortly.</p>
+          <p className="text-sm text-gray-400">
+            This window will close automatically shortly.
+          </p>
         </div>
       </div>
     );
@@ -369,20 +413,12 @@ function UserPageRedirectRouter() {
       <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white p-4 text-center">
         <div className="space-y-4">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500 mx-auto"></div>
-          <p className="text-lg font-medium text-green-400">Payment Completed Successfully!</p>
-          <p className="text-sm text-gray-400">Updating status and returning to game tab...</p>
-          <button
-            onClick={() => {
-              try {
-                window.close();
-              } catch (e) {
-                console.error("Manual close blocked:", e);
-              }
-            }}
-            className="mt-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition cursor-pointer"
-          >
-            Close Tab
-          </button>
+          <p className="text-lg font-medium text-green-400">
+            Payment Completed Successfully!
+          </p>
+          <p className="text-sm text-gray-400">
+            Updating your status and redirecting to the leaderboard...
+          </p>
         </div>
       </div>
     );
@@ -438,10 +474,11 @@ function UserPageRedirectRouter() {
               key={section.id}
               type="button"
               onClick={() => setMobileSection(section.id)}
-              className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${mobileSection === section.id
+              className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                mobileSection === section.id
                   ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] text-white font-semibold"
                   : "border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] hover:bg-[var(--best-board-surface-soft)]"
-                }`}
+              }`}
             >
               {section.label}
             </button>
@@ -491,7 +528,6 @@ function UserPageRedirectRouter() {
           </AnimatePresence>
         </div>
       </main>
-
 
       <ToastContainer />
 
