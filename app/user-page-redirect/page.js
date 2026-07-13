@@ -159,7 +159,7 @@ function UserPageRedirectRouter() {
           try {
             await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
               payment_status: 1,
-              id: playerEntryId,
+              id: parsedUser.id,
               user_id: parsedUser.user_id || parsedUser.id,
             });
 
