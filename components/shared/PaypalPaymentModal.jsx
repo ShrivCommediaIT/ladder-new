@@ -51,7 +51,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess, playerEntryId }) =>
       toast.error("Failed to update payment status. Please contact support.");
     } finally {
       // Always close the modal regardless of API success or failure
-      // onOpenChange(false);
+      onOpenChange(false);
       setPaypalLoading(false);
     }
     
@@ -203,7 +203,6 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess, playerEntryId }) =>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent aria-describedby={undefined} className="bg-card border border-border text-foreground p-6 rounded-2xl max-w-md w-[95%] max-h-[90vh] flex flex-col">
         <div className="w-full overflow-y-auto pr-1 flex flex-col items-center text-center space-y-4 max-h-[80vh]">
-          <h1>test 12</h1>
           {paypalLoading && (
             <div className="flex items-center justify-center space-x-2 py-4 flex-shrink-0">
               <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce delay-100" />
