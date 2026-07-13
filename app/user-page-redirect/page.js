@@ -92,7 +92,6 @@ function UserPageRedirectRouter() {
             await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
               payment_status: 1,
               id: parsedUser.id,
-              user_id: parsedUser.user_id || parsedUser.id,
             });
 
             parsedUser.payment_status = 1;
@@ -474,11 +473,10 @@ function UserPageRedirectRouter() {
               key={section.id}
               type="button"
               onClick={() => setMobileSection(section.id)}
-              className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${
-                mobileSection === section.id
+              className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${mobileSection === section.id
                   ? "border-[var(--best-board-border-strong)] bg-[var(--best-board-accent-soft)] text-white font-semibold"
                   : "border-[var(--best-board-border)] bg-[var(--best-board-surface)] text-[var(--best-board-text)] hover:bg-[var(--best-board-surface-soft)]"
-              }`}
+                }`}
             >
               {section.label}
             </button>
