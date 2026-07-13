@@ -680,23 +680,12 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
       channel.onmessage = async (event) => {
         const { status } = event.data;
         if (status === "success") {
-          toast.success("Payment completed in checkout window! Syncing status...");
+          toast.success("Payment completed! Syncing status...");
           try {
             const storedUser = sessionStorage.getItem("user");
             if (storedUser) {
               const parsed = JSON.parse(storedUser);
-
-              // Update payment status in backend
-              try {
-                await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
-                  payment_status: 1,
-                  id: parsed.id,
-                  user_id: parsed.user_id || parsed.id
-                });
-              } catch (statusErr) {
-                console.error("Failed to update payment status via channel:", statusErr);
-              }
-
+              // Sync local session/Redux — payment status API already called by the redirect tab
               parsed.payment_status = 1;
               sessionStorage.setItem("user", JSON.stringify(parsed));
               dispatch(setUser(parsed));
@@ -731,25 +720,9 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
       }
     }
 
-    // Update payment status in backend after payment is confirmed
-    try {
-      const storedUser = sessionStorage.getItem("user") || localStorage.getItem("paypal_user_backup");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        if (parsedUser && parsedUser.id) {
-          await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
-            payment_status: 1,
-            id: parsedUser.id,
-            user_id: parsedUser.user_id || parsedUser.id
-          });
-          parsedUser.payment_status = 1;
-          sessionStorage.setItem("user", JSON.stringify(parsedUser));
-          dispatch(setUser(parsedUser));
-        }
-      }
-    } catch (statusErr) {
-      console.error("Failed to update payment status in handlePaymentSuccess:", statusErr);
-    }
+    // NOTE: Payment status API (UPDATE_PLAYER_PAYMENT_STATUS) is already called
+    // inside PaypalPaymentModal before onSuccess fires, so we do NOT call it here again.
+    // We only need to post any pending score the user tried to submit before paying.
 
     // Auto-submit the pending result if it exists!
     if (activePostArgs) {
