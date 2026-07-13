@@ -28,6 +28,11 @@ import QuickActionsCard from "@/components/shared/QuickActionsCard";
 import ActivityLog from "@/components/pages/players/ActivityList";
 import { Copy, X } from "lucide-react";
 import { formatLadderType } from "./ladderUtils";
+import dynamic from "next/dynamic";
+
+const MusicDownloadList = dynamic(() => import("@/components/pages/players/MusicDownloadList"), {
+  ssr: false,
+});
 
 // User-level specific sidebar imports
 import ContactAdmin from "@/components/shared/ContactAdmin";
@@ -254,6 +259,8 @@ export default function InfoSection({
               <LadderRulesCard />
             </div>
           )}
+
+          {(ladderType === "skill" || ladderType === "skills") && <MusicDownloadList />}
 
           {userLevel ? (
             <ActivityLogUser ladderId={propLadderId} />
