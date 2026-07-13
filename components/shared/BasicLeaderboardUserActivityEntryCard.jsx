@@ -562,7 +562,7 @@ export default function BasicLeaderboardActivityEntryCard({
     }
 
     try {
-      const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
+      const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails") || "{}");
 
       setSaving(true);
 
@@ -573,7 +573,7 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("skill_activity_id", String(skillActivityId));
       params.append("score", String(finalScore));
       params.append("witness_by", witnessValue);
-      params.append("admin_id", adminDetails.id);
+      params.append("admin_id", adminDetails?.id || "");
       params.append("ladder_id", ladderId);
       params.append("user_name", playerName);
 
