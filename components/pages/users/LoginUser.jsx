@@ -184,6 +184,11 @@ export default function LoginUser({ ladderId, ladderType }) {
         JSON.stringify(userPayload)
       );
 
+      localStorage.setItem(
+        "paypal_user_backup",
+        JSON.stringify(userPayload)
+      );
+
       sessionStorage.setItem(
         "adminDetails",
         JSON.stringify({ id: res?.admin_id })
@@ -249,6 +254,11 @@ export default function LoginUser({ ladderId, ladderType }) {
 
           sessionStorage.setItem(
             "user",
+            JSON.stringify(userPayload)
+          );
+
+          localStorage.setItem(
+            "paypal_user_backup",
             JSON.stringify(userPayload)
           );
 
