@@ -385,6 +385,16 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
   const currentUser = useSelector((state) => state.user?.user);
   const myRank = currentUser?.rank;
 
+  const playerEntryId = useMemo(() => {
+    if (!currentUser || !data) return null;
+    const loggedInPlayer = data.find(
+      (p) =>
+        (p.user_id && currentUser.user_id && String(p.user_id) === String(currentUser.user_id)) ||
+        (p.name && currentUser.name && p.name.trim().toLowerCase() === currentUser.name.trim().toLowerCase())
+    );
+    return loggedInPlayer ? loggedInPlayer.id : currentUser.id;
+  }, [currentUser, data]);
+
   // CELEBRATION STATE ONLY
   const [showCelebration, setShowCelebration] = useState(false);
 
@@ -601,9 +611,16 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
               const handleReturnSuccess = async () => {
                 toast.success("Payment completed! Updating status...");
                 try {
+                  const loggedInPlayer = data.find(
+                    (p) =>
+                      (p.user_id && parsedUser.user_id && String(p.user_id) === String(parsedUser.user_id)) ||
+                      (p.name && parsedUser.name && p.name.trim().toLowerCase() === parsedUser.name.trim().toLowerCase())
+                  );
+                  const resolvedPlayerId = loggedInPlayer ? loggedInPlayer.id : parsedUser.id;
+
                   await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
                     payment_status: 1,
-                    id: parsedUser.id,
+                    id: resolvedPlayerId,
                     user_id: parsedUser.user_id || parsedUser.id
                   });
                   parsedUser.payment_status = 1;
@@ -622,19 +639,19 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
                   
 
                   // Auto-close checkout tab to return user to original tab
-                  // setTimeout(() => {
-                  //   try {
-                  //     window.close();
-                  //   } catch (err) {
-                  //     console.error("Failed to close window", err);
-                  //   }
-                  // }, 1500);
+                  setTimeout(() => {
+                    try {
+                      window.close();
+                    } catch (err) {
+                      console.error("Failed to close window", err);
+                    }
+                  }, 1500);
 
                   // Refresh page URL to clear query params
-                  // const url = new URL(window.location.href);
-                  // url.searchParams.delete("payment_status");
-                  // url.searchParams.delete("payment_success");
-                  // window.history.replaceState({}, document.title, url.toString());
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete("payment_status");
+                  url.searchParams.delete("payment_success");
+                  window.history.replaceState({}, document.title, url.toString());
 
                   if (handlePaymentSuccessRef.current) {
                     await handlePaymentSuccessRef.current();
@@ -940,6 +957,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
         open={showPaymentModal}
         onOpenChange={setShowPaymentModal}
         onSuccess={handlePaymentSuccess}
+        playerEntryId={playerEntryId}
       />
     </>
   );
