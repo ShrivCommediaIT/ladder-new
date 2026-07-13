@@ -14,7 +14,7 @@ const PAYPAL_GUEST_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_GUEST_CLIENT_ID;
 const PAYPAL_GUEST_HOSTED_BUTTON_ID = process.env.NEXT_PUBLIC_PAYPAL_GUEST_HOSTED_BUTTON_ID;
 const PAYPAL_CURRENCY = process.env.NEXT_PUBLIC_PAYPAL_CURRENCY;
 
-const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
+const PaypalPaymentModal = ({ open, onOpenChange, onSuccess, playerEntryId }) => {
   const dispatch = useDispatch();
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [activeHostedButtonId, setActiveHostedButtonId] = useState(PAYPAL_PLAN_ID);
@@ -33,7 +33,7 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
       if (sessionUser && sessionUser.id) {
         await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
           payment_status: 1,
-          id: sessionUser?.id,
+          id: playerEntryId || sessionUser?.id,
           user_id: sessionUser?.user_id || sessionUser?.id,
         });
 
