@@ -685,6 +685,18 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
             const storedUser = sessionStorage.getItem("user");
             if (storedUser) {
               const parsed = JSON.parse(storedUser);
+
+              // Update payment status in backend
+              try {
+                await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
+                  payment_status: 1,
+                  id: parsed.id,
+                  user_id: parsed.user_id || parsed.id
+                });
+              } catch (statusErr) {
+                console.error("Failed to update payment status via channel:", statusErr);
+              }
+
               parsed.payment_status = 1;
               sessionStorage.setItem("user", JSON.stringify(parsed));
               dispatch(setUser(parsed));
@@ -717,6 +729,26 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
       } catch (e) {
         console.error("Failed to parse saved post args", e);
       }
+    }
+
+    // Update payment status in backend after payment is confirmed
+    try {
+      const storedUser = sessionStorage.getItem("user") || localStorage.getItem("paypal_user_backup");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser && parsedUser.id) {
+          await getRequest(API_ENDPOINTS.UPDATE_PLAYER_PAYMENT_STATUS, {
+            payment_status: 1,
+            id: parsedUser.id,
+            user_id: parsedUser.user_id || parsedUser.id
+          });
+          parsedUser.payment_status = 1;
+          sessionStorage.setItem("user", JSON.stringify(parsedUser));
+          dispatch(setUser(parsedUser));
+        }
+      }
+    } catch (statusErr) {
+      console.error("Failed to update payment status in handlePaymentSuccess:", statusErr);
     }
 
     // Auto-submit the pending result if it exists!

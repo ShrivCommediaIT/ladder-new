@@ -202,29 +202,6 @@ const PaypalPaymentModal = ({ open, onOpenChange, onSuccess }) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent aria-describedby={undefined} className="bg-card border border-border text-foreground p-6 rounded-2xl max-w-md w-[95%] max-h-[90vh] flex flex-col">
         <div className="w-full overflow-y-auto pr-1 flex flex-col items-center text-center space-y-4 max-h-[80vh]">
-          <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
-            <Image src={topLogo} alt="Logo" className="h-16 w-16 object-contain" />
-          </div>
-
-          <h3 className="text-xl font-bold text-foreground">
-            Subscription Required
-          </h3>
-
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            To submit scores for this leaderboard, you need an active subscription.
-          </p>
-
-          <div className="bg-muted/50 w-full p-4 rounded-xl border border-border flex-shrink-0">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary/80">
-              Competition Access
-            </p>
-            <h4 className="text-base font-bold mt-1 text-foreground">
-              SSP International competitions
-            </h4>
-            <p className="text-p3 text-muted-foreground mt-1">
-              (£2 quarterly subscriptions)
-            </p>
-          </div>
 
           {paypalLoading && (
             <div className="flex items-center justify-center space-x-2 py-4 flex-shrink-0">
