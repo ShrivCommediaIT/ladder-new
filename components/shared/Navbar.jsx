@@ -397,27 +397,24 @@ const Navbar = ({
     sessionStorage.clear();
     dispatch(resetUserState());
 
+    let redirectUrl = "/login-user";
+
     if (user?.user_type === "admin") {
-      router.push("/login-page");
-      return;
-    }
-    if (user?.user_type === "sub_admin") {
-      router.push(clubIdPage);
-      return;
-    }
-    if (user?.user_type === "guest") {
-      router.push("/");
-      return;
-    }
-
-    const ladderId = searchParams.get("ladder_id");
-    const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
-
-    if (ladderId && ladderType) {
-      router.push(`/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`);
+      redirectUrl = "/login-page";
+    } else if (user?.user_type === "sub_admin") {
+      redirectUrl = clubIdPage;
+    } else if (user?.user_type === "guest") {
+      redirectUrl = "/";
     } else {
-      router.push("/login-user");
+      const ladderId = searchParams.get("ladder_id");
+      const ladderType = searchParams.get("ladder_type") || searchParams.get("type");
+
+      if (ladderId && ladderType) {
+        redirectUrl = `/login-user?ladder_id=${ladderId}&ladder_type=${ladderType}`;
+      }
     }
+
+    window.location.href = redirectUrl;
   };
 
   const handleDashboard = () => {

@@ -58,7 +58,7 @@ const UserDetailsTypeUser = () => {
       url = `/login-user?ladder_id=${ladder_id}&ladder_type=${ladder_type}`;
     }
 
-    router.push(url);
+    window.location.href = url;
   };
 
   /* ---------------- UI ---------------- */

@@ -80,6 +80,7 @@ export default function SuperAdminPage() {
     setUsername("");
     setPassword("");
     toast.info("Logged out successfully");
+    window.location.href = "/super-admin";
   };
 
   if (!mounted) return null;

@@ -77,27 +77,25 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
     sessionStorage.clear();
     dispatch(resetUserState());
 
+    let redirectUrl = "/login-user";
+
     // Admin logout → login-page
     if (finalUser?.user_type === "admin") {
-      router.push("/login-page");
-      return;
+      redirectUrl = "/login-page";
+    } else if (finalUser?.user_type === "sub_admin") {
+      // Sub-admin logout → subAdminPage
+      redirectUrl = clubIdPage;
+    } else {
+      // Fallback → guest/login
+      const encodedId = finalUser?.ladder_id
+        ? btoa(String(finalUser.ladder_id))
+        : null;
+      redirectUrl = encodedId
+        ? `/login-user?id=${encodedId}${ladderType ? `&ladder_type=${encodeURIComponent(ladderType)}` : ""}`
+        : "/login-user";
     }
 
-    // Sub-admin logout → subAdminPage
-    if (finalUser?.user_type === "sub_admin") {
-      router.push(clubIdPage);
-      return;
-    }
-
-    // Fallback → guest/login
-    const encodedId = finalUser?.ladder_id
-      ? btoa(String(finalUser.ladder_id))
-      : null;
-    const redirectUrl = encodedId
-      ? `/login-user?id=${encodedId}${ladderType ? `&ladder_type=${encodeURIComponent(ladderType)}` : ""}`
-      : "/login-user";
-
-    router.push(redirectUrl);
+    window.location.href = redirectUrl;
   };
 
   const handleAdminClick = () => {
