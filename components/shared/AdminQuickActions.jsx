@@ -22,7 +22,7 @@ export default function AdminQuickActions() {
   const isDark = mounted ? resolvedTheme === "dark" : false;
 
   const handleWhatsAppClick = () => {
-    window.open("https://wa.me/441134180902", "_blank", "noopener,noreferrer");
+    window.open("https://wa.me/447432272573", "_blank", "noopener,noreferrer");
   };
 
 

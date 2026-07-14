@@ -501,7 +501,7 @@ export default function PlanHeading() {
       { label: "Pricing", href: "#pricing" },
       { label: "Clubs/Coaches", href: "#features" },
       { label: "News and Information", href: "#news-and-information" },
-      // { label: "Contact", href: "#contact" },
+      { label: "Contact", href: "#contact" },
     ],
     [],
   );
