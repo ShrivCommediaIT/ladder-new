@@ -31,13 +31,12 @@ import { BsThreads } from "react-icons/bs";
 import { MdRefresh } from "react-icons/md";
 
 import { Button } from "@/components/ui/button";
-import topLogo from "@/public/topLogo.png";
-import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import LandingNavbar from "@/components/shared/LandingNavbar";
 import { isValidEmail } from "@/lib/utils";
 import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import { NAV_ITEMS } from "@/constants/navigation";
 
 export default function ContactPage() {
   const router = useRouter();
@@ -227,104 +226,12 @@ export default function ContactPage() {
     }
   };
 
-  // Nav Items definition for the landing page
-  const navItems = [
-    { label: "SSP International Competitions", href: "/#ssp-international-competitions" },
-    { label: "SSP Talent Board", href: "/#talent-board" },
-    { label: "Features", href: "/#features" },
-    { label: "Pricing", href: "/#pricing" },
-    { label: "Clubs/Coaches", href: "/#features" },
-    { label: "News and Information", href: "/#news-and-information" },
-    { label: "Contact", href: "/contact" },
-  ];
 
-  const navLinkClass =
-    "text-[13px] xl:text-[15px] font-semibold transition-colors whitespace-nowrap";
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--landing-bg)] text-[var(--landing-text)] transition-colors duration-300">
 
-      {/* Navbar rendering conditionally */}
-      {isLoggedIn ? (
-        <Navbar activeTab="" />
-      ) : (
-        <nav className="sticky top-0 z-50 border-b border-[var(--landing-border)] bg-[var(--landing-surface)] backdrop-blur-md">
-          <div className="mx-auto flex h-20 max-w-full items-center justify-between px-4 sm:px-6 lg:px-8">
-            <Link href="/" className="flex items-center">
-              <Image src={topLogo} alt="Sports Solutions Pro" width={60} height={60} className="lg:h-[60px] lg:w-[60px] h-[40px] w-[40px] object-contain" priority />
-            </Link>
-
-            <div className="hidden items-center gap-3 xl:gap-5 lg:flex">
-              {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={`${navLinkClass} ${item.label === "Contact"
-                      ? "text-[var(--landing-primary)] font-bold"
-                      : "text-[var(--landing-nav-text)] hover:text-[var(--landing-nav-hover)]"
-                    }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-
-            <div className="hidden items-center gap-3 lg:flex">
-              <button
-                type="button"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--landing-border)] bg-[var(--landing-surface)] text-[var(--landing-text)] shadow-sm backdrop-blur transition-all duration-200 hover:scale-[1.03] hover:bg-[var(--landing-outline-button-hover)]"
-                aria-label="Toggle theme"
-              >
-                {mounted && (theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />)}
-              </button>
-              <Button asChild size="lg" className="border-0 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] text-white shadow-lg transition-all duration-300 hover:opacity-95 hover:shadow-xl rounded-full px-8">
-                <Link href="/login-user">Log In</Link>
-              </Button>
-            </div>
-
-            <div className="flex items-center gap-2 lg:hidden">
-              <button
-                type="button"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--landing-border)] bg-[var(--landing-surface)] text-[var(--landing-text)] shadow-sm backdrop-blur transition-all duration-200 hover:scale-[1.03] hover:bg-[var(--landing-outline-button-hover)]"
-                aria-label="Toggle theme"
-              >
-                {mounted && (theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />)}
-              </button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-[var(--landing-text)]"
-                aria-label="Toggle menu"
-                onClick={() => setMobileMenuOpen((prev) => !prev)}
-              >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
-            </div>
-          </div>
-
-          {mobileMenuOpen && (
-            <div className="border-t border-[var(--landing-border)] bg-[var(--landing-surface-strong)] lg:hidden">
-              <div className="mx-auto flex max-w-full flex-col gap-4 px-4 py-5 sm:px-6">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="text-sm font-medium text-[var(--landing-nav-text)]"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <Button asChild className="border-0 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] text-white shadow-lg transition-all duration-300 hover:opacity-95 hover:shadow-xl h-11 rounded-full">
-                  <Link href="/login-user">Log In</Link>
-                </Button>
-              </div>
-            </div>
-          )}
-        </nav>
-      )}
+      <LandingNavbar />
 
       {/* ──────────────────────────────────────────────────────── */}
       {/* MID CONTENT AREA (Contact Details & Contact Form Card)     */}

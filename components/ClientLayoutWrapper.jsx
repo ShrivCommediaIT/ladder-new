@@ -6,7 +6,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { ThemeProvider } from "next-themes";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/shared/Navbar';
 import Footer from '@/components/shared/Footer';
@@ -15,6 +15,7 @@ import Script from 'next/script';
 export default function ClientLayoutWrapper({ children }) {
   const [userType, setUserType] = useState("")
   const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     const parsed = JSON.parse(sessionStorage.getItem("userData") || "null");
@@ -59,6 +60,19 @@ export default function ClientLayoutWrapper({ children }) {
       };
     }
   }, []);
+
+  // Fix Next.js App Router route mismatch on back navigation to hash urls
+  useEffect(() => {
+    const handlePopState = () => {
+      if (typeof window !== "undefined" && window.location.pathname !== pathname) {
+        router.push(window.location.pathname + window.location.search + window.location.hash);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [pathname, router]);
 
   const isAuthOrLandingRoute = pathname === "/" ||
                                pathname === "/terms-and-conditions" ||
