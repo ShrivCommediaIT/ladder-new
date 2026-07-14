@@ -64,6 +64,8 @@ export default function ClientLayoutWrapper({ children }) {
                                pathname === "/terms-and-conditions" ||
                                pathname === "/privacy-policy" ||
                                pathname === "/refund-policy" ||
+                               pathname === "/contact" ||
+                               pathname === "/contact-us" ||
                                pathname?.startsWith("/login") ||
                                pathname?.startsWith("/register") ||
                                pathname?.startsWith("/reset-password") ||

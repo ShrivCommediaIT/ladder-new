@@ -186,17 +186,17 @@ export default function Footer() {
               </div>
 
               <div className="flex gap-3">
-                <FaPhoneAlt className="mt-1 h-4 w-4 flex-shrink-0 text-sky-400" />
+                <FaWhatsapp className="mt-1 h-4 w-4 flex-shrink-0 text-sky-400" />
                 <p>
-                  Tel:
+                  WhatsApp / Tel:
                   <br />
                   <a
-                    href="https://wa.me/441134180902"
+                    href="https://wa.me/447432272573"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sky-400 hover:text-sky-300"
                   >
-                    0113 418 0902
+                    +44 07432 272573
                   </a>
                   <br />
                   <span className="text-xs text-gray-400">
