@@ -350,7 +350,7 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
                                 </span>
                             </div>
 
-                            {data?.coupons && data.coupons.length > 0 && (
+                            {/* {data?.coupons && data.coupons.length > 0 && (
                                 <div>
                                     <p className="font-bold border-t border-border pt-3 mb-2 text-primary">
                                         YOUR COUPONS
@@ -389,7 +389,7 @@ const RedeemModal = ({ open, onClose, player, data, loading, onRedeemSuccess }) 
                                         ))}
                                     </div>
                                 </div>
-                            )}
+                            )} */}
 
                             <div>
                                 <p className="font-bold border-t border-border pt-3 mb-2 text-primary uppercase">

@@ -878,12 +878,11 @@ export default function PlanHeading() {
                     </span>
                     <div>
                       <p className="text-sm font-bold text-yellow-400 tracking-wider uppercase leading-none">COMING SOON</p>
-                      <p className="text-xs text-slate-300 mt-1 leading-normal">We are actively preparing new sports integrations for our platform.</p>
+                      {/* <p className="text-xs text-slate-300 mt-1 leading-normal">We are actively preparing new sports integrations for our platform.</p> */}
                     </div>
                   </div>
 
-                  <div className="grid gap-3">
-                    {/* Cricket */}
+                  {/* <div className="grid gap-3">
                     <div className="flex items-center gap-4 p-3.5 rounded-xl border border-cyan-500/15 bg-white/5 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300 group">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:scale-110 transition-transform">
                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -897,7 +896,6 @@ export default function PlanHeading() {
                       </div>
                     </div>
 
-                    {/* Darts */}
                     <div className="flex items-center gap-4 p-3.5 rounded-xl border border-cyan-500/15 bg-white/5 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300 group">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:scale-110 transition-transform">
                         <Crosshair className="h-5 w-5" />
@@ -908,7 +906,6 @@ export default function PlanHeading() {
                       </div>
                     </div>
 
-                    {/* Table Tennis */}
                     <div className="flex items-center gap-4 p-3.5 rounded-xl border border-cyan-500/15 bg-white/5 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300 group">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:scale-110 transition-transform">
                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -923,7 +920,6 @@ export default function PlanHeading() {
                       </div>
                     </div>
 
-                    {/* Tennis */}
                     <div className="flex items-center gap-4 p-3.5 rounded-xl border border-cyan-500/15 bg-white/5 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300 group">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:scale-110 transition-transform">
                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -937,7 +933,7 @@ export default function PlanHeading() {
                         <p className="text-xs text-slate-400 mt-0.5">Singles & doubles ladder tournaments</p>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </DialogContent>
               </Dialog>
             )}
