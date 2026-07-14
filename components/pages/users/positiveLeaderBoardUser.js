@@ -665,16 +665,16 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
               handleReturnSuccess();
             } else {
               // Auto-show payment modal on mount/login if user has not paid AND matches allowed admin ID
-              const storedAdmin = sessionStorage.getItem("adminDetails");
-              const adminDetails = storedAdmin ? JSON.parse(storedAdmin) : null;
-              const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
-              const adminIdFromStore = Number(adminDetails?.id || ladderDetails?.created_by);
+              // const storedAdmin = sessionStorage.getItem("adminDetails");
+              // const adminDetails = storedAdmin ? JSON.parse(storedAdmin) : null;
+              // const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+              // const adminIdFromStore = Number(adminDetails?.id || ladderDetails?.created_by);
 
-              if (adminIdFromStore === requiredAdminId) {
-                if (parsedUser.payment_status === null || parsedUser.payment_status === "null" || !parsedUser.payment_status || parsedUser.payment_status === 0 || parsedUser.payment_status === "0" || (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1")) {
-                  setShowPaymentModal(true);
-                }
-              }
+              // if (adminIdFromStore === requiredAdminId) {
+              //   if (parsedUser.payment_status === null || parsedUser.payment_status === "null" || !parsedUser.payment_status || parsedUser.payment_status === 0 || parsedUser.payment_status === "0" || (parsedUser.payment_status !== 1 && parsedUser.payment_status !== "1")) {
+              //     setShowPaymentModal(true);
+              //   }
+              // }
             }
           }
         } catch (err) {
@@ -918,14 +918,14 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
           ladderId={ladderId}
           skillNumber={selectedSkillNumber}
           skillActivityId={selectedSkillActivityId}
-          onPaymentRequired={(args) => {
-            setOpenEdit(false);
-            setPendingPostArgs(args);
-            if (typeof window !== "undefined") {
-              localStorage.setItem("paypal_pending_post_args", JSON.stringify(args));
-            }
-            setShowPaymentModal(true);
-          }}
+          // onPaymentRequired={(args) => {
+          //   setOpenEdit(false);
+          //   setPendingPostArgs(args);
+          //   if (typeof window !== "undefined") {
+          //     localStorage.setItem("paypal_pending_post_args", JSON.stringify(args));
+          //   }
+          //   setShowPaymentModal(true);
+          // }}
         />
       )}
 
