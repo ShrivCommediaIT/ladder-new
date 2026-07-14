@@ -34,6 +34,7 @@ import {
   Play,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NAV_ITEMS } from "@/constants/navigation";
 import {
   Card,
   CardContent,
@@ -493,18 +494,7 @@ export default function PlanHeading() {
     []
   );
 
-  const navItems = useMemo(
-    () => [
-      { label: "SSP International Competitions", href: "#ssp-international-competitions" },
-      { label: "SSP Talent Board", href: "#talent-board" },
-      { label: "Features", href: "#features" },
-      { label: "Pricing", href: "#pricing" },
-      { label: "Clubs/Coaches", href: "#features" },
-      { label: "News and Information", href: "#news-and-information" },
-      { label: "Contact", href: "#contact" },
-    ],
-    [],
-  );
+  const navItems = NAV_ITEMS;
 
   const buttonClass =
     "border-0 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] text-white shadow-lg transition-all duration-300 hover:opacity-95 hover:shadow-xl";
