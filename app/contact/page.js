@@ -38,6 +38,7 @@ import { Sun, Moon, Menu, X } from "lucide-react";
 import { isValidEmail } from "@/lib/utils";
 import { postRequest } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
+import { NAV_ITEMS } from "@/constants/navigation";
 
 export default function ContactPage() {
   const router = useRouter();
@@ -228,15 +229,7 @@ export default function ContactPage() {
   };
 
   // Nav Items definition for the landing page
-  const navItems = [
-    { label: "SSP International Competitions", href: "/#ssp-international-competitions" },
-    { label: "SSP Talent Board", href: "/#talent-board" },
-    { label: "Features", href: "/#features" },
-    { label: "Pricing", href: "/#pricing" },
-    { label: "Clubs/Coaches", href: "/#features" },
-    { label: "News and Information", href: "/#news-and-information" },
-    { label: "Contact", href: "/contact" },
-  ];
+  const navItems = NAV_ITEMS;
 
   const navLinkClass =
     "text-[13px] xl:text-[15px] font-semibold transition-colors whitespace-nowrap";

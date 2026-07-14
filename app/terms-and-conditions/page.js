@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/components/shared/Navbar";
 import topLogo from "@/public/topLogo.png";
+import { NAV_ITEMS } from "@/constants/navigation";
 import {
   Sun,
   Moon,
@@ -48,13 +49,7 @@ export default function TermsAndConditions() {
     }
   }, []);
 
-  const navItems = [
-    { label: "SSP Talent Board", href: "/#talent-board" },
-    { label: "Features", href: "/#features" },
-    { label: "Pricing", href: "/#pricing" },
-    { label: "Clubs", href: "/#features" },
-    { label: "Contact", href: "/#contact" },
-  ];
+  const navItems = NAV_ITEMS;
 
   const buttonClass =
     "border-0 bg-gradient-to-r from-[var(--landing-primary)] to-[var(--landing-secondary)] text-white shadow-lg transition-all duration-300 hover:opacity-95 hover:shadow-xl";
