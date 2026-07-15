@@ -164,8 +164,15 @@ const MoveNumberInput = ({
     );
 
     // BLOCK SELF OR LOWER RANK (Ranks are 1-based, 1 is best)
-    if (Number(selectedNumber) >= Number(currentRank)) {
-      setShowRankAlert(true);
+    // Commented out to allow challenging both higher and lower ranked players
+    // if (Number(selectedNumber) >= Number(currentRank)) {
+    //   setShowRankAlert(true);
+    //   return;
+    // }
+
+    // Prevent self challenge
+    if (Number(selectedNumber) === Number(currentRank)) {
+      toast.error("You cannot challenge yourself.");
       return;
     }
 
