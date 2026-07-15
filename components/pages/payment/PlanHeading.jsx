@@ -708,7 +708,7 @@ export default function PlanHeading() {
                   {/* Free to Enter Badge */}
                   <div className="absolute right-2 sm:right-2 md:right-3 lg:right-4 bottom-[20px] sm:bottom-[25px] md:bottom-[35px] lg:bottom-[40px] z-30 w-[95px] h-[95px] sm:w-[115px] sm:h-[115px] md:w-[135px] md:h-[135px] lg:w-[155px] lg:h-[155px] pointer-events-none select-none">
                     <Image
-                      src="/free-enter-1.png"
+                      src="/free-enter.png"
                       alt="Free to Enter Badge"
                       width={160}
                       height={160}
