@@ -226,13 +226,20 @@ const MoveNumberInput = ({
 
 
     // ❌ BLOCK INVALID RANK
-    if (resultType === "beat" && Number(selectedNumber) >= Number(currentRank)) {
-      setShowRankAlert(true);
-      return;
-    }
+    // Commented out to allow challenging both higher and lower ranked players
+    // if (resultType === "beat" && Number(selectedNumber) >= Number(currentRank)) {
+    //   setShowRankAlert(true);
+    //   return;
+    // }
 
-    if (resultType === "lost" && Number(selectedNumber) >= Number(currentRank)) {
-      setShowRankAlert(true);
+    // if (resultType === "lost" && Number(selectedNumber) >= Number(currentRank)) {
+    //   setShowRankAlert(true);
+    //   return;
+    // }
+
+    // Prevent self challenge
+    if (Number(selectedNumber) === Number(currentRank)) {
+      toast.error("You cannot challenge yourself.");
       return;
     }
 
