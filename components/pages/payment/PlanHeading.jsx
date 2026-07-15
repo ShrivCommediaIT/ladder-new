@@ -32,6 +32,7 @@ import {
   Waves,
   X,
   Play,
+  Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NAV_ITEMS } from "@/constants/navigation";
@@ -164,6 +165,7 @@ export default function PlanHeading() {
 
   const buttonRef = useRef(null);
   const [showPoster, setShowPoster] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const [showSportsModal, setShowSportsModal] = useState(false);
   const [popupPosition, setPopupPosition] = useState("bottom");
 
@@ -686,21 +688,35 @@ export default function PlanHeading() {
             style={{ animationDelay: "0.18s" }}
           >
             {/* Unified Banner & Bottom Bar Container */}
-            <div className="relative w-full overflow-hidden rounded-[16px] border border-cyan-500/35 bg-[#020713] p-1 shadow-[0_0_24px_rgba(0,145,255,0.28)]">
+            <div className="relative w-full rounded-[16px] border border-cyan-500/35 bg-[#020713] p-1 shadow-[0_0_24px_rgba(0,145,255,0.28)]">
 
               {/* Top Banner Graphic */}
-              <div className="relative overflow-hidden rounded-t-[12px] bg-black">
-                <Image
-                  src="/ssp-internstional.png"
-                  alt="SSP International Competitions"
-                  width={700}
-                  height={350}
-                  sizes="(max-width: 768px) 100vw, 700px"
-                  quality={70}
-                  priority
-                  fetchPriority="high"
-                  className="w-full h-auto block"
-                />
+              <div className="relative rounded-t-[12px] bg-black">
+                <div className="relative w-full">
+                  <Image
+                    src="/ssp-internstional.png"
+                    alt="SSP International Competitions"
+                    width={700}
+                    height={350}
+                    sizes="(max-width: 768px) 100vw, 700px"
+                    quality={70}
+                    priority
+                    fetchPriority="high"
+                    className="w-full h-auto block rounded-t-[12px]"
+                  />
+
+                  {/* Free to Enter Badge */}
+                  <div className="absolute right-2 sm:right-2 md:right-3 lg:right-4 bottom-[20px] sm:bottom-[25px] md:bottom-[35px] lg:bottom-[40px] z-30 w-[95px] h-[95px] sm:w-[115px] sm:h-[115px] md:w-[135px] md:h-[135px] lg:w-[155px] lg:h-[155px] pointer-events-none select-none">
+                    <Image
+                      src="/free-enter-1.png"
+                      alt="Free to Enter Badge"
+                      width={160}
+                      height={160}
+                      priority
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                </div>
 
                 {/* Info button in top right */}
                 <button
@@ -712,15 +728,8 @@ export default function PlanHeading() {
                   <Info className="h-4 w-4" />
                 </button>
 
-                <div
-                  onClick={() => setShowSportsModal(true)}
-                  className="relative ml-auto mr-2 mb-2 mt-2 flex w-fit items-center justify-center gap-2 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] px-4 py-2.5 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] font-semibold text-sm cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] md:absolute md:bottom-[96px] md:right-2 md:left-auto md:mx-0 md:mt-0 md:py-2 md:px-4 z-20"
-                >
-                  see sports
-                </div>
-
                 {/* Custom HTML/CSS Bottom Bar (Directly overlaying on the image at the bottom) */}
-                <div className="relative mx-2 mb-2 mt-2 flex w-[calc(100%-1rem)] flex-wrap items-center justify-around gap-3 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] p-3 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] md:absolute md:bottom-2 md:left-2 md:right-2 md:mx-0 md:mt-0 md:w-auto md:flex-nowrap md:justify-between md:gap-2 md:px-4 md:py-2">
+                <div className="relative mx-2 mb-2 mt-2 flex w-[calc(100%-1rem)] flex-wrap items-center justify-around gap-3 rounded-[14px] border border-cyan-500/45 bg-gradient-to-r from-[#000a29] via-[#00143f] to-[#00081d] p-3 text-white shadow-[0_0_22px_rgba(6,182,212,0.24)] md:absolute md:bottom-2 md:left-2 md:right-2 md:mx-0 md:mt-0 md:w-auto md:flex-nowrap md:justify-between md:gap-2 md:px-4 md:py-2 md:pr-[120px] lg:pr-[140px] z-10">
 
                   {/* 1. Download The App */}
                   <div className="flex items-center gap-2.5">
@@ -817,30 +826,216 @@ export default function PlanHeading() {
                       </svg>
                     </a>
                   </div>
+                </div>
+              </div>
 
-                  {/* Divider */}
-                  <div className="hidden md:block h-9 w-px bg-cyan-500/25" />
+              {/* 2. Choose Your Sport Bottom Bar */}
+              <div className="mt-1 flex items-center justify-between gap-3 overflow-hidden border border-cyan-500/35 bg-[#030716] px-3 py-2 shadow-[inset_0_0_18px_rgba(0,153,255,0.18)]">
+                <div className="flex-1 min-w-0">
+                  <Image
+                    src="/ssp-internstional-bottom.PNG"
+                    alt="SSP International Competitions - Bottom Bar"
+                    width={700}
+                    height={90}
+                    sizes="(max-width: 768px) 100vw, 700px"
+                    quality={70}
+                    className="w-full h-auto block"
+                  />
+                </div>
+                <button
+                  onClick={() => setShowSportsModal(true)}
+                  className="flex h-fit flex-col items-center justify-center rounded-[8px] border border-cyan-500/45 bg-[#020713] hover:bg-cyan-950/20 active:scale-95 px-3 py-2 text-center text-white shadow-[0_0_12px_rgba(6,182,212,0.2)] font-semibold text-xs cursor-pointer transition-all shrink-0 w-[80px] sm:w-[90px]"
+                >
+                  <span className="text-[10px] sm:text-xs leading-tight block">See</span>
+                  <span className="text-[10px] sm:text-xs leading-tight block font-normal text-cyan-400">active</span>
+                  <span className="text-[10px] sm:text-xs leading-tight block">Sports</span>
+                </button>
+              </div>
 
-                  {/* 5. Terms & Conditions */}
+              {/* 3. Bottom Features & Info Links Row */}
+              <div className="mt-1 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-3 rounded-b-[12px] border border-cyan-500/35 bg-[#020713]/90 px-4 py-3 shadow-[inset_0_0_18px_rgba(0,153,255,0.18)] text-white">
+
+                {/* Feature 1: Real-time Rankings */}
+                <div className="flex items-center gap-2.5">
+                  <Trophy className="h-6 w-6 text-white shrink-0" />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-[10px] font-black tracking-wide text-white uppercase">REAL-TIME RANKINGS</span>
+                    <span className="text-[8px] font-medium text-slate-400 mt-0.5">Live standings & updates</span>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden md:block h-7 w-px bg-cyan-500/25" />
+
+                {/* Feature 2: Age & Gender */}
+                <div className="flex items-center gap-2.5">
+                  <Users className="h-6 w-6 text-white shrink-0" />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-[10px] font-black tracking-wide text-white uppercase">AGE & GENDER CATEGORIES</span>
+                    <span className="text-[8px] font-medium text-slate-400 mt-0.5">Fair & inclusive competition</span>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden md:block h-7 w-px bg-cyan-500/25" />
+
+                {/* Feature 3: Certificates */}
+                <div className="flex items-center gap-2.5">
+                  <Gift className="h-6 w-6 text-white shrink-0" />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-[10px] font-black tracking-wide text-white uppercase">CERTIFICATES TO DOWNLOAD</span>
+                    <span className="text-[8px] font-medium text-slate-400 mt-0.5">Celebrate your achievements</span>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden md:block h-7 w-px bg-cyan-500/25" />
+
+                {/* Feature 4: National & International */}
+                <div className="flex items-center gap-2.5">
+                  <Globe className="h-6 w-6 text-white shrink-0" />
+                  <div className="flex flex-col text-left leading-tight">
+                    <span className="text-[10px] font-black tracking-wide text-white uppercase">NATIONAL & INTERNATIONAL RANKINGS</span>
+                    <span className="text-[8px] font-medium text-slate-400 mt-0.5">Compete on a global stage</span>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden md:block h-7 w-px bg-cyan-500/25" />
+
+                {/* How it Works & Terms */}
+                <div className="flex flex-col items-center gap-1.5 shrink-0 self-center md:self-auto mt-2 md:mt-0">
+                  <button
+                    onClick={() => setShowGuide(true)}
+                    className="cursor-pointer bg-yellow-400 hover:bg-yellow-500 text-black font-extrabold text-[10px] uppercase tracking-wider py-1.5 px-4 rounded-md transition-all active:scale-95 shadow-[0_0_12px_rgba(250,204,21,0.3)]"
+                  >
+                    How it Works - <span className="underline text-[var(--landing-primary)]">Click Here</span>
+                  </button>
                   <Link
                     href="/terms-and-conditions"
                     prefetch={false}
-                    className="flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-black tracking-wide text-[11px] sm:text-xs group cursor-pointer transition-colors"
+                    className="text-white hover:text-cyan-400 text-[9px] font-bold tracking-wide underline transition-colors"
                   >
-                    <div className="flex flex-col text-left leading-tight">
-                      <span>TERMS &</span>
-                      <span>CONDITIONS</span>
-                    </div>
-                    <svg className="h-4 w-4 transform group-hover:translate-x-1 transition-transform stroke-current" fill="none" viewBox="0 0 24 24" strokeWidth="3">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
+                    Terms and Conditions
                   </Link>
                 </div>
-              </div>
-              <div className="mt-1 overflow-hidden rounded-b-[12px] border border-cyan-500/35 bg-[#030716] px-2 py-2 shadow-[inset_0_0_18px_rgba(0,153,255,0.18)]">
-                <Image src="/ssp-internstional-bottom.PNG" alt="SSP International Competitions - Bottom Bar" width={700} height={90} sizes="(max-width: 768px) 100vw, 700px" quality={70} className="w-full h-auto block" />
+
               </div>
             </div>
+
+            {/* Dialog modal overlay for How it Works */}
+            {showGuide && (
+              <Dialog open={showGuide} onOpenChange={setShowGuide}>
+                <DialogContent className={`w-[95vw] sm:w-[650px] p-6 sm:p-8 rounded-2xl border shadow-2xl backdrop-blur-md max-h-[85vh] overflow-y-auto ${mounted && theme !== "dark" ? "bg-white text-gray-900 border-gray-200" : "bg-[#020713]/95 text-white border-cyan-500/35"
+                  }`}>
+                  <DialogTitle className="text-xl sm:text-2xl font-black tracking-wide mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    How it Works - Competition Guide
+                  </DialogTitle>
+
+                  <div className="flex flex-col gap-6">
+
+                    {/* Step 1 */}
+                    <div className="flex gap-4">
+                      <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-cyan-500/10 text-cyan-400 font-extrabold text-sm border border-cyan-500/30">
+                        1
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm sm:text-base font-bold leading-tight">Download the FREE SSP App</h4>
+                        <p className={`text-xs sm:text-sm mt-1 font-medium ${mounted && theme !== "dark" ? "text-gray-600" : "text-gray-400"}`}>
+                          Login with <span className="font-extrabold text-yellow-500">SSPCOMPS</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 2 */}
+                    <div className="flex gap-4">
+                      <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-cyan-500/10 text-cyan-400 font-extrabold text-sm border border-cyan-500/30">
+                        2
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm sm:text-base font-bold leading-tight">Find your sport</h4>
+                        <p className={`text-xs sm:text-sm mt-1 font-medium ${mounted && theme !== "dark" ? "text-gray-600" : "text-gray-400"}`}>
+                          Register, Login, Upload Performance
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 3 */}
+                    <div className="flex gap-4">
+                      <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-cyan-500/10 text-cyan-400 font-extrabold text-sm border border-cyan-500/30">
+                        3
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm sm:text-base font-bold leading-tight">To view rankings or update performance thereafter</h4>
+                        <ul className={`list-disc list-inside text-xs sm:text-sm mt-2 space-y-1.5 font-medium ${mounted && theme !== "dark" ? "text-gray-600" : "text-gray-400"}`}>
+                          <li>Login</li>
+                          <li>Enter your name into the search bar</li>
+                          <li>Use the filters to see your national, age and gender rankings</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Performance Verification Section */}
+                    <div className={`p-4 rounded-xl border ${mounted && theme !== "dark" ? "bg-cyan-50/50 border-cyan-200" : "bg-[#030e25]/60 border-cyan-500/25"} shadow-inner`}>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-cyan-400 mb-3 flex items-center gap-1.5">
+                        <ShieldCheck className="h-4 w-4 text-cyan-400" />
+                        Performance Verification
+                      </h4>
+
+                      <div className="space-y-4">
+                        {/* No Need for Verification */}
+                        <div>
+                          <h5 className="text-xs sm:text-sm font-bold text-emerald-400">No Need for Verification</h5>
+                          <p className={`text-xs sm:text-sm mt-1 ${mounted && theme !== "dark" ? "text-gray-700" : "text-gray-300"}`}>
+                            If your performance is below the SSP Qualifying Standard, simply submit your result. No video is required. Leave the “witness by” box empty.
+                          </p>
+                        </div>
+
+                        {/* Needs Verification */}
+                        <div>
+                          <h5 className="text-xs sm:text-sm font-bold text-yellow-400">Needs Verification</h5>
+                          <p className={`text-xs sm:text-sm mt-1 ${mounted && theme !== "dark" ? "text-gray-700" : "text-gray-300"}`}>
+                            If your performance meets or exceeds the SSP Qualifying Standard, upload your result together with a confirmation YouTube video in the “witness by” box.
+                          </p>
+                        </div>
+
+                        {/* Competitors can view */}
+                        <div className={`pt-2 border-t ${mounted && theme !== "dark" ? "border-gray-200" : "border-cyan-500/10"}`}>
+                          <span className="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wide">Competitors can view:</span>
+                          <ul className={`list-disc list-inside text-xs sm:text-sm mt-1.5 space-y-1 ${mounted && theme !== "dark" ? "text-gray-700" : "text-gray-300"}`}>
+                            <li>All Submitted Results</li>
+                            <li>Official SSP Verified Results (using the <strong>Show Only Witnessed</strong> filter)</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Step 6 */}
+                    <div className="flex gap-4">
+                      <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-cyan-500/10 text-cyan-400 font-extrabold text-sm border border-cyan-500/30">
+                        6
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm sm:text-base font-bold leading-tight">Print Certificates</h4>
+                        <p className={`text-xs sm:text-sm mt-1 font-medium ${mounted && theme !== "dark" ? "text-gray-600" : "text-gray-400"}`}>
+                          Visit:{" "}
+                          <a
+                            href="https://sportssolutionspro.com/Certificates"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-cyan-500 hover:text-cyan-400 hover:underline font-bold transition-colors"
+                          >
+                            sportssolutionspro.com/Certificates
+                          </a>{" "}
+                          and print your relevant certificates.
+                        </p>
+                      </div>
+                    </div>
+
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
 
             {/* Dialog modal overlay for /ssp-internstional-1.png */}
             {showPoster && (
@@ -869,7 +1064,7 @@ export default function PlanHeading() {
                   <DialogTitle className="text-xl sm:text-2xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-4">
                     Sports Ecosystem
                   </DialogTitle>
-                  
+
                   {/* COMING SOON Banner */}
                   <div className="mb-6 p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 flex items-center gap-3">
                     <span className="flex h-3 w-3 shrink-0 relative">
