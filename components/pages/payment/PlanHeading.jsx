@@ -713,6 +713,7 @@ export default function PlanHeading() {
                       width={160}
                       height={160}
                       priority
+                      unoptimized
                       className="w-full h-full object-contain"
                     />
                   </div>
