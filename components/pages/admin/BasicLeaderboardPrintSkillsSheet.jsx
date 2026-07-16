@@ -10,6 +10,7 @@ export default function BasicLeaderboardPrintSkillsSheet({
   ladderId = null,
   className = null,
   children = null,
+  disabled = false,
 }) {
   const printRef = useRef(null);
 
@@ -27,6 +28,7 @@ export default function BasicLeaderboardPrintSkillsSheet({
   });
 
   const handlePrint = () => {
+    if (disabled) return;
     if (!printRef.current) return;
 
     const printWindow = window.open("", "_blank");
@@ -233,6 +235,7 @@ ${printContent}
           className="hidden"
           id="print-trigger"
           type="button"
+          disabled={disabled}
         />
       ) : className ? (
         <button
@@ -240,6 +243,7 @@ ${printContent}
           className={className}
           id="print-trigger"
           type="button"
+          disabled={disabled}
         >
           {children || "Print Skills"}
         </button>
@@ -248,9 +252,10 @@ ${printContent}
           onClick={handlePrint}
           variant="outline"
           size="sm"
-          className="cursor-pointer border-sky-500/30 hover:border-sky-500/50 hover:bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-2 transition-all duration-200 shadow-sm"
+          className="cursor-pointer border-sky-500/30 hover:border-sky-500/50 hover:bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-2 transition-all duration-200 shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
           id="print-trigger"
           type="button"
+          disabled={disabled}
         >
           <Printer size={16} className="text-sky-500" />
           {children || "Print Skills"}

@@ -16,6 +16,8 @@ import { getRequest } from "@/services/apiService";
 import { EditPlayer } from "@/components/shared/EditPlayer";
 import PlayerStatusToggle from "@/components/shared/PlayerStatusToggle";
 import PlayerSearch from "./PlayerSearch";
+import AgeFilter from "@/components/shared/AgeFilter";
+import { XCircle } from "lucide-react";
 
 
 
@@ -224,7 +226,7 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, loggedInUserId }
 };
 
 /* ---------------- MAIN COMPONENT ---------------- */
-const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
+const RosterLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const ladderId = propLadderId || searchParams.get("ladder_id");
@@ -241,6 +243,68 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId }) => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editPlayerId, setEditPlayerId] = useState(null);
+
+  const [playerSearchResetSignal, setPlayerSearchResetSignal] = useState(0);
+
+  const handleAgeSearch = useCallback((age, ageType, gender, country) => {
+    const ageNum = age ? Number(age) : "";
+    dispatch(setAgeFilter({ age: ageNum, ageType, gender, country }));
+  }, [dispatch]);
+
+  const handleClearAll = useCallback(() => {
+    dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
+    setSearchTerm("");
+    setPlayerSearchResetSignal((p) => p + 1);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!onActionsChanged) return;
+
+    const actions = [];
+
+    const isFilterActive = appliedAge > 0 || Boolean(appliedGender);
+
+    actions.push({
+      id: "age-filter",
+      node: (
+        <AgeFilter
+          onSearch={handleAgeSearch}
+          user={false}
+          resetSignal={playerSearchResetSignal}
+          isActive={isFilterActive}
+          defaultAge={appliedAge}
+          defaultAgeType={appliedAgeType}
+          defaultGender={appliedGender}
+          showWitness={false}
+        />
+      )
+    });
+
+    if (isFilterActive || searchTerm) {
+      actions.push({
+        id: "clear-all-filters",
+        label: "Clear All Filters",
+        icon: XCircle,
+        onClick: handleClearAll,
+        tone: "danger",
+      });
+    }
+
+    onActionsChanged(actions);
+
+    return () => {
+      onActionsChanged([]);
+    };
+  }, [
+    onActionsChanged,
+    appliedAge,
+    appliedAgeType,
+    appliedGender,
+    playerSearchResetSignal,
+    searchTerm,
+    handleAgeSearch,
+    handleClearAll
+  ]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
