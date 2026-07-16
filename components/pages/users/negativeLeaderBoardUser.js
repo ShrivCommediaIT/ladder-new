@@ -2,7 +2,7 @@
 import PlayerRankBadge from "@/components/shared/PlayerRankBadge";
 import { IMAGE_BASE_URL, API_ENDPOINTS } from "@/constants/api";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { Card } from "@/components/ui/card";

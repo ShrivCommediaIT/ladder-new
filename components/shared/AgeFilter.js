@@ -23,7 +23,8 @@ const AgeFilter = ({
   defaultGender = "",
   defaultCountry = "",
   defaultWitness = 0,
-  showWitness = false
+  showWitness = false,
+  disabled = false
 }) => {
   const [open, setOpen] = useState(false);
   const [dobInput, setDobInput] = useState("");
@@ -120,20 +121,21 @@ const AgeFilter = ({
 
   return (
     <Dialog
-      open={open}
+      open={disabled ? false : open}
       onOpenChange={(isOpen) => {
-        setOpen(isOpen);
+        if (!disabled) setOpen(isOpen);
       }}
     >
       <DialogTrigger asChild>
         <Button
+          disabled={disabled}
           className={`${
             isActive
               ? "border border-emerald-500/45 bg-emerald-500/10 text-foreground hover:bg-emerald-500/15"
               : user
                 ? "border border-primary/40 bg-accent text-foreground hover:bg-muted"
                 : "border border-border bg-card text-foreground hover:bg-muted"
-          } flex h-full w-full flex-col items-center justify-center gap-1 rounded-xl px-4 py-3 text-[10px] font-bold uppercase leading-tight shadow-none transition-all active:scale-95`}
+          } flex h-full w-full flex-col items-center justify-center gap-1 rounded-xl px-4 py-3 text-[10px] font-bold uppercase leading-tight shadow-none transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-60`}
         >
           <Filter className="h-5 w-5" />
             <span>Filter</span>
