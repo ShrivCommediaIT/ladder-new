@@ -612,7 +612,7 @@ export default function BasicLeaderboardActivityEntryCard({
           });
         }
 
-        setOpenSuccess(true);
+        handleSuccessClose();
         return true;
       } else {
         toast.error(skillsPost.error_message);
@@ -1039,33 +1039,7 @@ export default function BasicLeaderboardActivityEntryCard({
         </Button>
       </Card>
 
-      {/* AUTO-CLOSE SUCCESS DIALOG */}
-      <Dialog open={openSuccess} onOpenChange={handleSuccessClose}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-sm mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-emerald-500 text-xl">
-              Score Saved
-            </DialogTitle>
-            <DialogDescription className="text-lg">
-              Activity #{selectedActivity} updated with score{" "}
-              <b>
-                {type === "negative" || ladderType === "negative"
-                  ? formatTimeInfo()
-                  : value == "-" ? "Reset" : Math.abs(value)}
-              </b>
-            </DialogDescription>
-          </DialogHeader>
 
-          <div className="flex justify-end mt-4">
-            <Button
-              onClick={handleSuccessClose}
-              className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold"
-            >
-              OK
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={openSuccessResult} onOpenChange={handleSuccessCloseResult}>
         <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto bg-background text-foreground border border-border">

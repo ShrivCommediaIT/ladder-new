@@ -175,7 +175,7 @@ export default function BasicLeaderboardActivityEntryCard({
       }
       const skillsPost = await postUrlEncoded(API_ENDPOINTS.POST_RESULT_SKILLBOARD, params);
       if ((skillsPost.status === 200)) {
-        setOpenSuccess(true);
+        handleSuccessClose();
         toast.success("Result posted successfully! ");
         if (skillsPost?.eligible_for_token == 1) {
           updateLadderToken({
@@ -184,7 +184,6 @@ export default function BasicLeaderboardActivityEntryCard({
             ladder_type: "skill",
           })
         }
-        setOpenSuccess(true);
         return true;
       } else {
         toast.error(skillsPost.error_message);
@@ -432,19 +431,7 @@ export default function BasicLeaderboardActivityEntryCard({
         </Button>
       </Card>
 
-      {/* Dialogs */}
-      <Dialog open={openSuccess} onOpenChange={handleSuccessClose}>
-        <DialogContent className="max-w-sm bg-background text-foreground border border-border p-6 rounded-2xl shadow-xl">
-          <DialogHeader>
-            <DialogTitle className="text-emerald-600 dark:text-emerald-500 text-xl font-bold">Score Saved</DialogTitle>
-            <DialogDescription className="text-lg text-muted-foreground">
-              Recorded score: <b className="text-foreground">{value == "-" ? "Reset" : value}</b> <br />
-              Witness: <b className="text-foreground">{witnessBy}</b>
-            </DialogDescription>
-          </DialogHeader>
-          <Button onClick={handleSuccessClose} className="bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-black font-bold mt-4 transition-all">OK</Button>
-        </DialogContent>
-      </Dialog>
+
 
 
 

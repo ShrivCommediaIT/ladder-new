@@ -117,10 +117,13 @@ const CreatePanel = ({
 
             <div className="mt-1 mb-3 text-xs text-muted-foreground bg-muted/30 border border-border rounded-lg p-3">
               <p className="font-semibold text-foreground mb-1">
-                CSV Instructions
+                Players CSV Files WITH HEADING
               </p>
-              <p>(1) Names in Column A Or</p>
-              <p>(2) Name + Phone Number (Optional)</p>
+              <p className="font-semibold text-foreground mb-1">
+                CSV Format must be :-
+              </p>
+              <p>(1) Names in Column A or</p>
+              <p>(2) Names in Column A and Phone Numbers in column B</p>
             </div>
 
             <label className="group flex flex-col items-center justify-center h-32 rounded-2xl border border-dashed border-border bg-card hover:bg-muted/50 transition cursor-pointer relative">

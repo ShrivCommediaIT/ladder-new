@@ -171,6 +171,7 @@ export default function PlanHeading() {
 
   const [dbLoaded, setDbLoaded] = useState(false);
   const hasUserScrolledRef = useRef(false);
+  const hashScrolledRef = useRef(false);
 
   const handleInfoClick = (e) => {
     e.preventDefault();
@@ -250,8 +251,11 @@ export default function PlanHeading() {
         const id = hash.replace("#", "");
         const element = document.getElementById(id);
         if (element) {
-          if (force || !hasUserScrolledRef.current) {
+          if (force || (!hasUserScrolledRef.current && !hashScrolledRef.current)) {
             element.scrollIntoView({ behavior: "smooth", block: "start" });
+            if (!force) {
+              hashScrolledRef.current = true;
+            }
           }
         }
       }
@@ -263,9 +267,11 @@ export default function PlanHeading() {
     };
 
     if (mounted) {
-      handleHashScroll();
+      if (!hashScrolledRef.current) {
+        handleHashScroll();
+      }
 
-      if (dbLoaded) {
+      if (dbLoaded && !hashScrolledRef.current) {
         handleHashScroll();
       }
 
@@ -597,7 +603,7 @@ export default function PlanHeading() {
         )}
       </nav>
 
-      <section className="relative overflow-hidden pb-32 pt-24">
+      <section id="intro" className="relative overflow-hidden pb-32 pt-24">
         <div
           className="absolute top-0 right-0 -z-10 h-[800px] w-[800px] translate-x-1/3 -translate-y-1/4 rounded-full blur-3xl opacity-70"
           style={{ background: "var(--landing-hero-orb-1)" }}
@@ -680,7 +686,11 @@ export default function PlanHeading() {
               </Button>
             </div>
           </div>
+        </div>
+      </section>
 
+      <section className="relative overflow-hidden pb-32">
+        <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
           {/* App Promotion & Info Card */}
           <div
             id="ssp-international-competitions"
