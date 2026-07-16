@@ -705,6 +705,14 @@ export default function PlanHeading() {
                     className="w-full h-auto block rounded-t-[12px]"
                   />
 
+                  {/* Print Certificates Button */}
+                  <Link
+                    href="/Certificates"
+                    className="absolute left-[23%] top-[3%] z-30 flex items-center justify-center rounded-full bg-[#FFF080] hover:bg-yellow-300 border border-yellow-400 px-2 py-0.5 sm:px-3 sm:py-1 font-extrabold text-blue-900 shadow-[0_2px_8px_rgba(255,240,128,0.4)] transition-all hover:scale-105 active:scale-95 text-[6px] sm:text-[9px] md:text-[11px] lg:text-[12px] cursor-pointer leading-none"
+                  >
+                    Print Certificates
+                  </Link>
+
                   {/* Free to Enter Badge */}
                   <div className="absolute right-2 sm:right-2 md:right-3 lg:right-4 bottom-[20px] sm:bottom-[25px] md:bottom-[35px] lg:bottom-[40px] z-30 w-[95px] h-[95px] sm:w-[115px] sm:h-[115px] md:w-[135px] md:h-[135px] lg:w-[155px] lg:h-[155px] pointer-events-none select-none">
                     <Image
