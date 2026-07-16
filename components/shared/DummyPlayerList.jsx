@@ -2,13 +2,13 @@
 import PlayerRankBadge from "@/components/shared/PlayerRankBadge";
 import { IMAGE_BASE_URL } from "@/constants/api";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchLeaderboard } from "@/redux/slices/leaderboardSlice";
+import { fetchLeaderboard, setAgeFilter as setAgeFilterDefault } from "@/redux/slices/leaderboardSlice";
 import { fetchGradebars } from "@/redux/slices/gradebarSlice";
-import { fetchSkillLeaderboard } from "@/redux/slices/BasicLeaderboardSlice";
-import { fetchNegativeLeaderboard } from "@/redux/slices/negativeLeaderBoardSlice";
-import { fetchPositiveLeaderboard } from "@/redux/slices/positiveLeaderBoardSlice";
+import { fetchSkillLeaderboard, setAgeFilter as setAgeFilterSkill } from "@/redux/slices/BasicLeaderboardSlice";
+import { fetchNegativeLeaderboard, setAgeFilter as setAgeFilterNegative } from "@/redux/slices/negativeLeaderBoardSlice";
+import { fetchPositiveLeaderboard, setAgeFilter as setAgeFilterPositive } from "@/redux/slices/positiveLeaderBoardSlice";
 import { fetchRosterLeaderboard } from "@/redux/slices/rosterLeaderboardSlice";
 import { fetchMiniLeague } from "@/redux/slices/minileagueSlice";
 import Logo from "@/public/logo.jpg";
@@ -19,6 +19,14 @@ import { Card } from "@/components/ui/card";
 import PlayerStatusToggle from "./PlayerStatusToggle";
 import { PLAYER_COLOR_CLASSES, getPlayerInitials, getPhoneText } from "./ladderUtils";
 
+import AgeFilter from "@/components/shared/AgeFilter";
+import BasicLeaderboardPrintSkillsSheet from "@/components/pages/admin/BasicLeaderboardPrintSkillsSheet";
+import { Funnel, XCircle } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import BasicLeaderboardShort from "@/components/pages/admin/BasicLeaderboardShort";
+import { getRequest } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
+
 /* ─────────────────────────────────────────────
    1. DEFAULT CARD  (bestof5 / best5 / best3 / winlose)
 ───────────────────────────────────────────── */
@@ -26,31 +34,22 @@ const DefaultPlayerCard = ({ player, rank }) => {
   const imageUrl = player.image ? `${IMAGE_BASE_URL}/${player.image}?t=${Date.now()}` : null;
   return (
     <div
-      className="mb-3 rounded-xl transition-all duration-200 group overflow-hidden"
-      style={{
-        background: "var(--best-board-surface)",
-        border: "1px solid var(--best-board-border-strong)",
-        boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
-      }}
+      className="group flex flex-col rounded-xl border border-[var(--best-board-border)] bg-[var(--best-board-surface)] transition hover:border-[var(--best-board-border-strong)] overflow-hidden"
     >
       {/* ── TOP STRIP ── */}
       <div
-        className="flex items-center justify-between px-2 sm:px-3 py-1.5 gap-2"
-        style={{
-          borderBottom: "1px solid var(--best-board-border)",
-          background: "var(--best-board-surface-soft)",
-        }}
+        className="flex items-center justify-between px-4 py-1.5 gap-2 border-b border-[var(--best-board-border)] bg-[var(--best-board-surface-soft)]"
       >
         <PlayerStatusToggle player={player} user={true} viewOnly={true} />
 
         <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
-          {player.age && (
+          {player?.age ? (
             <span
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]"
             >
               Age : {player.age}
             </span>
-          )}
+          ) : null}
           {player.gender && (
             <span
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap bg-[var(--best-board-accent-soft)] border border-[var(--best-board-border-strong)] text-[var(--best-board-highlight)]"
@@ -131,7 +130,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
         <PlayerStatusToggle player={player} user={true} viewOnly={true} />
 
         <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
-          {player.age && (
+          {player?.age ? (
             <span
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
@@ -142,7 +141,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
             >
               Age : {player.age}
             </span>
-          )}
+          ) : null}
           {player.gender && (
             <span
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
@@ -223,25 +222,25 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
           className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
-          {/* Total */}
+          {/* Total badge */}
+          <span
+            className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+            style={{ color: "var(--best-board-muted)" }}
+          >
+            Total
+          </span>
           <div
-            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
             style={{
               background: "var(--best-board-accent-soft)",
               border: "1px solid var(--best-board-border-strong)",
             }}
           >
             <span
-              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center"
               style={{ color: "var(--best-board-highlight)" }}
             >
               {player?.total_point || 0}
-            </span>
-            <span
-              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              Points
             </span>
           </div>
 
@@ -267,7 +266,7 @@ const MinileaguePlayerCard = ({ player, rank, groupSize }) => {
 /* ─────────────────────────────────────────────
    3. SKILL / POSITIVE / NEGATIVE CARD
 ───────────────────────────────────────────── */
-const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, isFiltered = false, activeFilters = [], appliedWitnessBy = 0 }) => {
+const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, isPositive = false, isFiltered = false, activeFilters = [], appliedWitnessBy = 0 }) => {
   const src = player?.image ? `${IMAGE_BASE_URL}/${player.image}` : Logo;
 
   const skillsToRender = appliedWitnessBy === 1
@@ -315,7 +314,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, i
         <PlayerStatusToggle player={player} user={true} viewOnly={true} />
 
         <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
-          {player.age && (
+          {player?.age ? (
             <span
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
@@ -326,7 +325,7 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, i
             >
               Age : {player.age}
             </span>
-          )}
+          ) : null}
           {player.gender && (
             <span
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
@@ -437,7 +436,11 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, i
                           }`}
                       title={`Best Score: ${score} | Target: ${skill.target || "N/A"}${isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
                     >
-                      {Math.abs(score || 0).toFixed(2)}
+                      {isNegative
+                        ? (score || 0)
+                        : isPositive
+                          ? Math.abs(score || 0).toFixed(2)
+                          : (score || 0)}
                     </div>
                   );
                 })}
@@ -474,25 +477,29 @@ const SkillPlayerCard = ({ player, rank, showRanks = true, isNegative = false, i
           className="flex flex-col items-center justify-between gap-1.5 sm:gap-2 pl-2 sm:pl-3 flex-shrink-0"
           style={{ borderLeft: "1px solid var(--best-board-border)" }}
         >
-          {/* Total */}
+          {/* Total badge */}
+          <span
+            className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
+            style={{ color: "var(--best-board-muted)" }}
+          >
+            Total
+          </span>
           <div
-            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[48px] sm:w-[56px] md:w-[60px]"
+            className="flex flex-col items-center justify-center rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-1.5 w-[44px] sm:w-[52px] md:w-[72px] h-10"
             style={{
               background: "var(--best-board-accent-soft)",
               border: "1px solid var(--best-board-border-strong)",
             }}
           >
             <span
-              className="text-sm sm:text-base md:text-lg font-black leading-none w-full text-center truncate"
+              className="text-[7px]  md:text-[10px] font-black leading-none w-full text-center"
               style={{ color: "var(--best-board-highlight)" }}
             >
-              {isNegative ? formatSecondsToTime(player?.total_point) : Math.abs(player?.total_point || 0)}
-            </span>
-            <span
-              className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-wider mt-0.5"
-              style={{ color: "var(--best-board-muted)" }}
-            >
-              Points
+              {isNegative
+                ? formatSecondsToTime(player?.total_point)
+                : isPositive
+                  ? Math.abs(Number(player?.total_point || 0)).toFixed(2)
+                  : (Number(player?.total_point) % 1 === 0 ? (player?.total_point || 0) : Math.abs(Number(player?.total_point || 0)).toFixed(2))}
             </span>
           </div>
 
@@ -545,7 +552,7 @@ const RosterPlayerCard = ({ player, rank }) => {
               Status: {player.token_status}
             </span>
           )}
-          {player.age && (
+          {player?.age ? (
             <span
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
               style={{
@@ -556,7 +563,7 @@ const RosterPlayerCard = ({ player, rank }) => {
             >
               Age : {player.age}
             </span>
-          )}
+          ) : null}
           {player.gender && (
             <span
               className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap"
@@ -702,7 +709,7 @@ const RosterPlayerCard = ({ player, rank }) => {
 /* ─────────────────────────────────────────────
    MAIN COMPONENT
 ───────────────────────────────────────────── */
-export default function DummyPlayerList({ ladderId, ladderType: propLadderType }) {
+export default function DummyPlayerList({ ladderId, ladderType: propLadderType, onActionsChanged }) {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
@@ -791,6 +798,323 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
           type === "negative" ? negativeData.length :
             type === "roster" ? rosterData.length :
               standardPlayers.length;
+
+  const [openSort, setOpenSort] = useState(false);
+  const [isSorted, setIsSorted] = useState(false);
+  const [selectedSkillFilter, setSelectedSkillFilter] = useState(0);
+  const [playerSearchResetSignal, setPlayerSearchResetSignal] = useState(0);
+
+  const initialRows = Array.from({ length: 12 }, (_, i) => ({
+    id: i + 1,
+    description: "",
+    target: "",
+    mode: "plus",
+    unit: "",
+  }));
+  const [rows, setRows] = useState(initialRows);
+
+  useEffect(() => {
+    if (!ladderId || type !== "skill") return;
+
+    const fetchSkillSetup = async () => {
+      try {
+        const res = await getRequest(API_ENDPOINTS.GET_SKILL_SETUP, { ladder_id: ladderId });
+        const apiSkills = res?.data || [];
+        setRows((prevRows) =>
+          prevRows.map((row) => {
+            const found = apiSkills.find(
+              (s) => Number(s.skill_number) === row.id,
+            );
+            return found
+              ? {
+                  ...row,
+                  description: String(found.skill_description || ""),
+                  target: String(found.target || ""),
+                  unit: String(found.unit || ""),
+                  mode: found.skill_sign === "-" ? "minus" : "plus",
+                }
+              : row;
+          }),
+        );
+      } catch (error) {
+        console.error("Failed to fetch skill setup in DummyPlayerList", error);
+      }
+    };
+
+    fetchSkillSetup();
+  }, [ladderId, type]);
+
+  const safeSkillsForPrint = useMemo(() => {
+    return rows.map((row) => ({
+      id: row.id,
+      description: String(row.description || ""),
+      target: String(row.target || ""),
+      unit: String(row.unit || ""),
+      mode: row.mode,
+    }));
+  }, [rows]);
+
+  useEffect(() => {
+    const clearPayload = { age: 0, ageType: "", gender: "", country: "" };
+    if (type === "skill") {
+      dispatch(setAgeFilterSkill(clearPayload));
+    } else if (type === "positive") {
+      dispatch(setAgeFilterPositive(clearPayload));
+    } else if (type === "negative") {
+      dispatch(setAgeFilterNegative(clearPayload));
+    } else {
+      dispatch(setAgeFilterDefault(clearPayload));
+    }
+  }, [dispatch, type]);
+
+  const refreshSortedData = useCallback(
+    (skillNo) => {
+      if (!ladderId) return;
+
+      const payload = {
+        ladder_id: ladderId,
+        type: type,
+        sortbyskillnumber: skillNo,
+      };
+
+      const isSkillType = type === "skill";
+      const isPositiveType = type === "positive";
+      const isNegativeType = type === "negative";
+
+      const activeAge = isSkillType ? appliedAgeSkill : isPositiveType ? appliedAgePositive : isNegativeType ? appliedAgeNegative : defaultAge;
+      const activeAgeType = isSkillType ? skillAgeType : isPositiveType ? positiveAgeType : isNegativeType ? negativeAgeType : defaultAgeType;
+      const activeGender = isSkillType ? skillGender : isPositiveType ? positiveGender : isNegativeType ? negativeGender : defaultGender;
+      const activeCountry = isSkillType ? skillCountry : isPositiveType ? positiveCountry : isNegativeType ? negativeCountry : defaultCountry;
+      const activeWitness = isSkillType ? skillWitness : isPositiveType ? positiveWitness : isNegativeType ? negativeWitness : 0;
+
+      if (activeAge && activeAge > 0) {
+        payload.dob = activeAge;
+        if (activeAgeType) payload.age_type = activeAgeType;
+      }
+      if (activeGender) payload.gender = activeGender;
+      if (activeCountry) payload.country = activeCountry;
+      if (activeWitness === 1) payload.witness_by = 1;
+
+      let actionCreator = fetchLeaderboard;
+      if (type === "skill") actionCreator = fetchSkillLeaderboard;
+      else if (type === "positive") actionCreator = fetchPositiveLeaderboard;
+      else if (type === "negative") actionCreator = fetchNegativeLeaderboard;
+
+      dispatch(actionCreator(payload));
+    },
+    [
+      dispatch,
+      ladderId,
+      type,
+      appliedAgeSkill,
+      skillAgeType,
+      skillGender,
+      skillCountry,
+      skillWitness,
+      appliedAgePositive,
+      positiveAgeType,
+      positiveGender,
+      positiveCountry,
+      positiveWitness,
+      appliedAgeNegative,
+      negativeAgeType,
+      negativeGender,
+      negativeCountry,
+      negativeWitness,
+      defaultAge,
+      defaultAgeType,
+      defaultGender,
+      defaultCountry,
+    ]
+  );
+
+  const handleAgeSearch = useCallback((age, ageType, gender, country, witness) => {
+    const ageNum = age ? Number(age) : "";
+    const witnessVal = witness !== undefined ? witness : 0;
+    const isClearing = (age === null || age === "") && !country && !witnessVal;
+
+    if (isClearing) {
+      setIsSorted(false);
+      setSelectedSkillFilter(0);
+    } else {
+      setIsSorted(true);
+    }
+
+    const filterPayload = { age: ageNum, ageType, gender, country };
+    if (type === "skill") {
+      dispatch(setAgeFilterSkill(filterPayload));
+    } else if (type === "positive") {
+      dispatch(setAgeFilterPositive(filterPayload));
+    } else if (type === "negative") {
+      dispatch(setAgeFilterNegative(filterPayload));
+    } else {
+      dispatch(setAgeFilterDefault(filterPayload));
+    }
+  }, [dispatch, type]);
+
+  const handleSortBySkill = useCallback(() => {
+    setOpenSort(true);
+  }, []);
+
+  const handleSkillsUpdated = useCallback(
+    (skillNo) => {
+      setOpenSort(false);
+      setIsSorted(true);
+      setSelectedSkillFilter(skillNo);
+      refreshSortedData(skillNo);
+    },
+    [refreshSortedData]
+  );
+
+  const handleClearAll = useCallback(() => {
+    setIsSorted(false);
+    setSelectedSkillFilter(0);
+
+    const clearPayload = { age: 0, ageType: "under", gender: "", country: "" };
+    if (type === "skill") {
+      dispatch(setAgeFilterSkill(clearPayload));
+    } else if (type === "positive") {
+      dispatch(setAgeFilterPositive(clearPayload));
+    } else if (type === "negative") {
+      dispatch(setAgeFilterNegative(clearPayload));
+    } else {
+      dispatch(setAgeFilterDefault(clearPayload));
+    }
+    setPlayerSearchResetSignal((p) => p + 1);
+  }, [dispatch, type]);
+
+  useEffect(() => {
+    if (!onActionsChanged) return;
+
+    const actions = [];
+    const isSkillType = type === "skill";
+    const isPositiveType = type === "positive";
+    const isNegativeType = type === "negative";
+
+    if (isSkillType || isPositiveType || isNegativeType) {
+      actions.push({
+        id: "sort-by-activity",
+        label: selectedSkillFilter > 0 ? "Sorted" : "Sort by Activity",
+        icon: Funnel,
+        onClick: () => {},
+        disabled: true,
+      });
+    }
+
+    const showWitness = isSkillType || isPositiveType || isNegativeType;
+    const activeAge = isSkillType ? appliedAgeSkill : isPositiveType ? appliedAgePositive : isNegativeType ? appliedAgeNegative : defaultAge;
+    const activeAgeType = isSkillType ? skillAgeType : isPositiveType ? positiveAgeType : isNegativeType ? negativeAgeType : defaultAgeType;
+    const activeGender = isSkillType ? skillGender : isPositiveType ? positiveGender : isNegativeType ? negativeGender : defaultGender;
+    const activeCountry = isSkillType ? skillCountry : isPositiveType ? positiveCountry : isNegativeType ? negativeCountry : defaultCountry;
+    const activeWitness = isSkillType ? skillWitness : isPositiveType ? positiveWitness : isNegativeType ? negativeWitness : 0;
+
+    const isFilterActive = activeAge > 0 || Boolean(activeGender) || Boolean(activeCountry) || (showWitness && activeWitness === 1);
+
+    if (type !== "minileague") {
+      actions.push({
+        id: "age-filter",
+        node: (
+          <AgeFilter
+            onSearch={handleAgeSearch}
+            user={false}
+            resetSignal={playerSearchResetSignal}
+            isActive={isFilterActive}
+            defaultAge={activeAge}
+            defaultAgeType={activeAgeType}
+            defaultGender={activeGender}
+            defaultCountry={activeCountry}
+            defaultWitness={activeWitness}
+            showWitness={showWitness}
+            disabled={true}
+          />
+        )
+      });
+    }
+
+    const hasActiveFilters = isSorted || selectedSkillFilter > 0 || isFilterActive;
+    if (hasActiveFilters && (type !== "minileague")) {
+      actions.push({
+        id: "clear-all-filters",
+        label: "Clear All Filters",
+        icon: XCircle,
+        onClick: () => {},
+        disabled: true,
+        tone: "danger",
+      });
+    }
+
+    if (isSkillType) {
+      const hasSkills = rows.some((r) => r.description && r.description.trim() !== "");
+      if (hasSkills) {
+        actions.push({
+          id: "print-skills",
+          node: (
+            <BasicLeaderboardPrintSkillsSheet
+              skills={safeSkillsForPrint}
+              ladderId={ladderId}
+              disabled={true}
+              className="rounded-lg h-16 w-full border px-4 text-[var(--best-board-text)] shadow-none transition hover:-translate-y-0.5 flex flex-col items-center justify-center gap-1 text-[10px] font-bold uppercase leading-tight disabled:cursor-not-allowed disabled:opacity-60 best-board-card-soft border-[var(--best-board-border)] hover:bg-[var(--best-board-surface)]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5"
+              >
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
+                <rect x="6" y="14" width="12" height="8" rx="1" />
+              </svg>
+              <span>Print Skills</span>
+            </BasicLeaderboardPrintSkillsSheet>
+          ),
+        });
+      }
+    }
+
+    onActionsChanged(actions);
+
+    return () => {
+      onActionsChanged([]);
+    };
+  }, [
+    onActionsChanged,
+    type,
+    isSorted,
+    selectedSkillFilter,
+    playerSearchResetSignal,
+    appliedAgeSkill,
+    skillAgeType,
+    skillGender,
+    skillCountry,
+    skillWitness,
+    appliedAgePositive,
+    positiveAgeType,
+    positiveGender,
+    positiveCountry,
+    positiveWitness,
+    appliedAgeNegative,
+    negativeAgeType,
+    negativeGender,
+    negativeCountry,
+    negativeWitness,
+    defaultAge,
+    defaultAgeType,
+    defaultGender,
+    defaultCountry,
+    rows,
+    safeSkillsForPrint,
+    ladderId,
+    handleAgeSearch,
+    handleClearAll,
+    handleSortBySkill
+  ]);
 
   useEffect(() => {
     if (!ladderId) return;
@@ -986,6 +1310,19 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
             })}
           </div>
         )}
+
+        <Dialog open={openSort} onOpenChange={setOpenSort}>
+          <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
+            <BasicLeaderboardShort
+              ladderId={ladderId}
+              onClose={() => {
+                setOpenSort(false);
+                setIsSorted(false);
+              }}
+              onSkillsUpdated={handleSkillsUpdated}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -1028,11 +1365,25 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
                   isFiltered={isFiltered}
                   activeFilters={activeFilters}
                   appliedWitnessBy={positiveWitness}
+                  isPositive={true}
                 />
               );
             })}
           </div>
         )}
+
+        <Dialog open={openSort} onOpenChange={setOpenSort}>
+          <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
+            <BasicLeaderboardShort
+              ladderId={ladderId}
+              onClose={() => {
+                setOpenSort(false);
+                setIsSorted(false);
+              }}
+              onSkillsUpdated={handleSkillsUpdated}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -1081,6 +1432,19 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
             })}
           </div>
         )}
+
+        <Dialog open={openSort} onOpenChange={setOpenSort}>
+          <DialogContent className="bg-transparent border-none shadow-none flex items-center justify-center max-w-md">
+            <BasicLeaderboardShort
+              ladderId={ladderId}
+              onClose={() => {
+                setOpenSort(false);
+                setIsSorted(false);
+              }}
+              onSkillsUpdated={handleSkillsUpdated}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -1156,6 +1520,9 @@ export default function DummyPlayerList({ ladderId, ladderType: propLadderType }
               <div className="mb-3 sticky top-0 best-board-section-banner flex items-center justify-between rounded-xl px-4 py-3 text-white font-bold tracking-wide z-10">
                 <span className="best-board-highlight uppercase tracking-[0.18em]">
                   {grade.label}
+                </span>
+                <span className="rounded bg-[var(--best-board-surface-soft)] border border-[var(--best-board-border)] px-2 py-1 text-[11px] font-medium text-[var(--best-board-muted)]">
+                  {grade.players.length} players
                 </span>
               </div>
               <div className="space-y-3">

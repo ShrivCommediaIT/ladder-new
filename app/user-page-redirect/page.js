@@ -464,6 +464,7 @@ function UserPageRedirectRouter() {
         <RosterLeaderboardUser
           ladderId={ladderId}
           editableUserId={loggedInUserId}
+          onActionsChanged={setExtraActions}
         />
       );
     }
