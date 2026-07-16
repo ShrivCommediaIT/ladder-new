@@ -245,10 +245,10 @@ const MoveNumberInput = ({
 
 
     // BLOCK CROSS-SECTION
-    if (currentSectionIndex !== targetSectionIndex) {
-      setShowSectionAlert(true);
-      return;
-    }
+    // if (currentSectionIndex !== targetSectionIndex) {
+    //   setShowSectionAlert(true);
+    //   return;
+    // }
 
     // ALLOW SAME SECTION
     setShowConfirm(true);
@@ -541,7 +541,7 @@ const MoveNumberInput = ({
 
 
 
-      {/* ❌ DIFFERENT SECTION ALERT */}
+      {/* ❌ DIFFERENT SECTION ALERT
       <AlertDialog open={showSectionAlert} onOpenChange={setShowSectionAlert}>
         <AlertDialogContent className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-red-500 text-slate-900 dark:text-gray-100 w-[92vw] sm:max-w-md">
           <AlertDialogHeader>
@@ -566,6 +566,7 @@ const MoveNumberInput = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      */}
 
 
       {/* ❌ INVALID RANK ALERT */}
