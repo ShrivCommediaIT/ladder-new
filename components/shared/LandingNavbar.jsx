@@ -9,9 +9,11 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/shared/Navbar";
 import topLogo from "@/public/topLogo.png";
 import { NAV_ITEMS } from "@/constants/navigation";
+import { usePathname } from "next/navigation";
 
 export default function LandingNavbar() {
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -62,7 +64,7 @@ export default function LandingNavbar() {
               key={item.label}
               href={item.href}
               className={`${navLinkClass} ${
-                item.label === "Contact"
+                (pathname === "/") && item.label === "Contact"
                   ? "text-[var(--landing-primary)] font-bold"
                   : "text-[var(--landing-nav-text)] hover:text-[var(--landing-nav-hover)]"
               }`}
