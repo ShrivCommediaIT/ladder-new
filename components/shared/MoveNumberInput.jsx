@@ -74,7 +74,7 @@ const MoveNumberInput = ({
   const [betDescription, setBetDescription] = useState("");
 
   const [showRankAlert, setShowRankAlert] = useState(false);
-  const [showSectionAlert, setShowSectionAlert] = useState(false);
+  // const [showSectionAlert, setShowSectionAlert] = useState(false);
   const preset = useSelector((state) => state.gradebar?.preset) || 6;
 
   /* -------------------- DATA -------------------- */
@@ -177,10 +177,10 @@ const MoveNumberInput = ({
     }
 
     // BLOCK CROSS-SECTION
-    if (currentSectionIndex !== targetSectionIndex) {
-      setShowSectionAlert(true);
-      return;
-    }
+    // if (currentSectionIndex !== targetSectionIndex) {
+    //   setShowSectionAlert(true);
+    //   return;
+    // }
 
     // ✅ VALID
     setShowConfirm(true);
@@ -489,7 +489,7 @@ const MoveNumberInput = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={showSectionAlert} onOpenChange={setShowSectionAlert}>
+      {/* <AlertDialog open={showSectionAlert} onOpenChange={setShowSectionAlert}>
         <AlertDialogContent className="bg-gray-900 border-yellow-500 text-gray-100 w-[92vw] sm:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold text-yellow-400">
@@ -508,7 +508,7 @@ const MoveNumberInput = ({
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
     </motion.div>
   );
 };
