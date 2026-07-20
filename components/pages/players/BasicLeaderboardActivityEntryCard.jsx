@@ -463,7 +463,6 @@ export default function BasicLeaderboardActivityEntryCard({
               </div>
             </div>
 
-            <p className="text-sm text-muted-foreground font-bold">Note: Results posted without a witness will not qualify for a token.</p>
 
             {/* Witness */}
             <div>
