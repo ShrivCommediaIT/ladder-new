@@ -73,6 +73,12 @@ export default function BasicLeaderboardActivityEntryCard({
   const [loadingTopScore, setLoadingTopScore] = useState(true);
   const [openSuccessResult, setOpenSuccessResult] = useState(false);
   const [hasEditedToday, setHasEditedToday] = useState(false);
+  
+  const [openYoutubeVerification, setOpenYoutubeVerification] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [youtubeError, setYoutubeError] = useState("");
+  const [isAlreadyVerified, setIsAlreadyVerified] = useState(false);
+  const [pendingSubmission, setPendingSubmission] = useState(null);
 
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
@@ -483,7 +489,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
 
 
-  const submitScore = async (inputScore, bestScore, timeObj) => {
+  const submitScore = async (inputScore, bestScore, timeObj, bypassVerification = false, finalWitness = null) => {
     if (!skillActivityId || !playerId) return;
 
     let finalScore;
@@ -561,20 +567,109 @@ export default function BasicLeaderboardActivityEntryCard({
       }
     }
 
+    // Check if we are running for NEXT_PUBLIC_ADMIN_ID and target condition is met
+    const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
+    let currentAdminDetails = {};
+    let subAdminDetails = {};
+    let userData = {};
+    let user = {};
+    if (typeof window !== "undefined") {
+      try {
+        currentAdminDetails = JSON.parse(sessionStorage.getItem("adminDetails") || "{}");
+        subAdminDetails = JSON.parse(sessionStorage.getItem("subAdmin") || "{}");
+        userData = JSON.parse(sessionStorage.getItem("userData") || "{}");
+        user = JSON.parse(sessionStorage.getItem("user") || "{}");
+      } catch (e) {
+        console.error("Error reading sessionStorage", e);
+      }
+    }
+    const adminIdToCheck = Number(
+      currentAdminDetails?.id ||
+      currentAdminDetails?.user_id ||
+      subAdminDetails?.id ||
+      subAdminDetails?.user_id ||
+      userData?.id ||
+      userData?.user_id ||
+      user?.admin_id ||
+      createdBy
+    );
+    const isTargetAdmin = adminIdToCheck === requiredAdminId;
+
+    let isPrepost = false;
+    if (isTargetAdmin && !bypassVerification) {
+      const isNegative = type === "negative" || ladderType === "negative";
+      let hasTarget = false;
+      let scoreForCompare = 0;
+      let targetForCompare = 0;
+
+      if (skillTarget && skillTarget !== "No target" && skillTarget !== "null" && skillTarget !== "" && skillTarget !== "0" && skillTarget !== 0) {
+        hasTarget = true;
+        if (isNegative) {
+          scoreForCompare = Number(convertTimeToSeconds(finalScore));
+          targetForCompare = Number(convertTimeToSeconds(skillTarget) || skillTarget);
+        } else {
+          scoreForCompare = Number(finalScore);
+          targetForCompare = Number(skillTarget);
+        }
+      }
+
+      let targetMet = false;
+      if (hasTarget && !isNaN(scoreForCompare) && !isNaN(targetForCompare)) {
+        const invertedParam = searchParams?.get("inverted");
+        const isInverted = invertedParam === "1";
+        targetMet = isInverted ? (scoreForCompare <= targetForCompare) : (scoreForCompare >= targetForCompare);
+      }
+
+      if (targetMet) {
+        const currentWitness = witnessBy ? witnessBy.trim() : "";
+        const isYoutube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(currentWitness);
+
+        setPendingSubmission({
+          inputScore,
+          bestScore,
+          timeObj,
+          isPrepost: true
+        });
+
+        if (isYoutube) {
+          setIsAlreadyVerified(true);
+          setYoutubeUrl(currentWitness);
+          setOpenYoutubeVerification(true);
+        } else {
+          setIsAlreadyVerified(false);
+          setYoutubeUrl("");
+          setOpenYoutubeVerification(true);
+        }
+        return false;
+      }
+    }
+
+    if (bypassVerification && pendingSubmission?.isPrepost) {
+      isPrepost = true;
+    }
+
     try {
       const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails") || "{}");
 
       setSaving(true);
 
       const witnessValue =
-        witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "";
+        finalWitness !== null
+          ? finalWitness.trim()
+          : (witnessBy && witnessBy.trim() !== "" ? witnessBy.trim() : "");
+      
+      if (finalWitness !== null) {
+        setWitnessBy(finalWitness);
+      }
+
       const params = new URLSearchParams();
       params.append("user_id", String(playerId));
       params.append("skill_activity_id", String(skillActivityId));
+      params.append("skill_number", String(selectedActivity));
       params.append("score", String(finalScore));
       params.append("witness_by", witnessValue);
       params.append("admin_id", adminDetails?.id || "");
-      params.append("ladder_id", ladderId);
+      params.append("ladder_id", String(ladderId));
       params.append("user_name", playerName);
 
 
@@ -599,11 +694,14 @@ export default function BasicLeaderboardActivityEntryCard({
         }
         params.append("best_result", String(bestToSubmit));
       }
-      // return
-      const skillsPost = await postUrlEncoded(`/${URl}`, params);
+      
+      const apiPath = isPrepost 
+        ? `${API_ENDPOINTS.SAVE_PREPOST_RESULT}?ladder_id=${ladderId}&skill_number=${selectedActivity}` 
+        : `/${URl}`;
+      const skillsPost = await postUrlEncoded(apiPath, params);
 
       if (skillsPost?.status === 200 || skillsPost?.status === "success") {
-        toast.success("Result posted successfully!");
+        toast.success(isPrepost ? "Result submitted for verification successfully!" : "Result posted successfully!");
         if (skillsPost?.eligible_for_token == 1) {
           updateLadderToken({
             user_id: playerName,
@@ -613,6 +711,7 @@ export default function BasicLeaderboardActivityEntryCard({
         }
 
         handleSuccessClose();
+        setPendingSubmission(null);
         return true;
       } else {
         toast.error(skillsPost.error_message);
@@ -1154,6 +1253,91 @@ export default function BasicLeaderboardActivityEntryCard({
 
             </div>
 
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openYoutubeVerification} onOpenChange={setOpenYoutubeVerification}>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto p-0 overflow-hidden max-h-[90vh] overflow-y-auto bg-background text-foreground border border-border rounded-2xl shadow-xl">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-muted/30">
+            <h2 className="text-lg font-semibold text-emerald-600 dark:text-emerald-500">
+              Score Verification
+            </h2>
+          </div>
+
+          <div className="px-5 py-4 space-y-4 bg-background">
+            {isAlreadyVerified ? (
+              <>
+                <p className="text-sm font-medium text-foreground">
+                  Congratulations! We will verify your score.
+                </p>
+                <Button
+                  onClick={async () => {
+                    setOpenYoutubeVerification(false);
+                    if (pendingSubmission) {
+                      await submitScore(
+                        pendingSubmission.inputScore,
+                        pendingSubmission.bestScore,
+                        pendingSubmission.timeObj,
+                        true,
+                        youtubeUrl
+                      );
+                    }
+                  }}
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-md transition-all"
+                >
+                  Confirm and Post Score
+                </Button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-foreground leading-relaxed">
+                  Congratulations on a great result! To submit your result, please enter a YouTube verification video link of your performance into the "Witnessed By" box. Without a valid YouTube link, your result cannot be posted.
+                </p>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase">
+                    Witnessed By (YouTube URL)
+                  </label>
+                  <Input
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    value={youtubeUrl}
+                    onChange={(e) => {
+                      setYoutubeUrl(e.target.value);
+                      if (youtubeError) setYoutubeError("");
+                    }}
+                    className="text-start text-sm text-foreground bg-muted border-border"
+                  />
+                  {youtubeError && (
+                    <p className="text-xs text-destructive font-semibold">
+                      {youtubeError}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  onClick={async () => {
+                    const validateYoutubeUrl = (url) => /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/i.test((url || "").trim());
+                    if (validateYoutubeUrl(youtubeUrl)) {
+                      setOpenYoutubeVerification(false);
+                      if (pendingSubmission) {
+                        await submitScore(
+                          pendingSubmission.inputScore,
+                          pendingSubmission.bestScore,
+                          pendingSubmission.timeObj,
+                          true,
+                          youtubeUrl
+                        );
+                      }
+                    } else {
+                      setYoutubeError("Please provide a valid YouTube URL");
+                      toast.error("Please provide a valid YouTube URL");
+                    }
+                  }}
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-md transition-all"
+                >
+                  Submit YouTube Link
+                </Button>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>

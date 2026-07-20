@@ -228,6 +228,22 @@ const UserDetails = ({ user: demoUser, ladderType }) => {
                 Submit to Talent Board
               </DropdownMenuItem>
 
+              {(() => {
+                const requiredAdminId = Number(String(process.env.NEXT_PUBLIC_ADMIN_ID || "").trim());
+                const adminId = Number(finalUser?.id || finalUser?.user_id);
+                const isAdminHiddenRoster = adminId ? adminId === requiredAdminId : false;
+                if (!isAdminHiddenRoster) return null;
+                return (
+                  <DropdownMenuItem
+                    onClick={() => router.push("/admin-page/verify-scores")}
+                    className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    <Shield className="mr-2 h-4 w-4 text-blue-600" />
+                    Verify Scores
+                  </DropdownMenuItem>
+                );
+              })()}
+
               <DropdownMenuItem
                 onClick={() => window.open("/q-a", "_blank")}
                 className="cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"

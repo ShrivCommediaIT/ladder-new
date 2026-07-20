@@ -653,6 +653,25 @@ const Navbar = ({
                         </button>
                       )}
 
+                      {(() => {
+                        const requiredAdminId = Number(String(process.env.NEXT_PUBLIC_ADMIN_ID || "").trim());
+                        const adminId = Number(user?.id || user?.user_id);
+                        const isAdminHiddenRoster = adminId ? adminId === requiredAdminId : false;
+                        if (!isAdminHiddenRoster) return null;
+                        return (
+                          <button
+                            onClick={() => {
+                              router.push("/admin-page/verify-scores");
+                              setProfileOpen(false);
+                            }}
+                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm text-left ${theme === "dark" ? "text-slate-300 hover:bg-white/5 hover:text-white" : "text-slate-600 hover:bg-black/5 hover:text-black"}`}
+                          >
+                            <Shield className="h-4 w-4 text-blue-400" />
+                            Verify Scores
+                          </button>
+                        );
+                      })()}
+
                       <button
                         onClick={() => {
                           window.open("/q-a", "_blank");
@@ -771,6 +790,25 @@ const Navbar = ({
                 Submit to Talent Board
               </button>
             )}
+
+            {(() => {
+              const requiredAdminId = Number(String(process.env.NEXT_PUBLIC_ADMIN_ID || "").trim());
+              const adminId = Number(user?.id || user?.user_id);
+              const isAdminHiddenRoster = adminId ? adminId === requiredAdminId : false;
+              if (!isAdminHiddenRoster) return null;
+              return (
+                <button
+                  onClick={() => {
+                    router.push("/admin-page/verify-scores");
+                    setMobileOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white transition-colors text-left"
+                >
+                  <Shield className="h-4 w-4 text-blue-400" />
+                  Verify Scores
+                </button>
+              );
+            })()}
 
             {/* Q & A Link */}
             <button
