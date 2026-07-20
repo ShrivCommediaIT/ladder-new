@@ -15,6 +15,8 @@ import {
   Mail,
   Plus,
   ShieldCheck,
+  ShieldAlert,
+  Video,
   Sparkles,
   Target,
   UploadCloud,
@@ -36,6 +38,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import AdminQuickActions from "@/components/shared/AdminQuickActions";
+import { getRequest, postUrlEncoded } from "@/services/apiService";
+import { API_ENDPOINTS } from "@/constants/api";
 
 const cardToneClasses = [
   "from-primary/20 via-primary/5 to-transparent",
@@ -71,9 +75,39 @@ export default function AdminPage() {
   const [admin, setAdmin] = useState(null);
   const [quickGuideOpen, setQuickGuideOpen] = useState(false);
 
+  const [pendingVerifications, setPendingVerifications] = useState([]);
+  const [loadingVerifications, setLoadingVerifications] = useState(true);
 
   const dispatch = useDispatch();
   const router = useRouter();
+
+  const requiredAdminId = Number(String(process.env.NEXT_PUBLIC_ADMIN_ID || "").trim());
+  const adminId = admin?.id || admin?.user_id;
+  const isAdminHiddenRoster = adminId ? Number(adminId) === requiredAdminId : false;
+
+  useEffect(() => {
+    if (!admin?.id || !isAdminHiddenRoster) return;
+    const fetchVerifications = async () => {
+      try {
+        setLoadingVerifications(true);
+        const res = await getRequest(API_ENDPOINTS.GET_PREPOST_RESULTS);
+        if (res?.status === 200 || res?.status === "success") {
+          setPendingVerifications(res?.data || []);
+        } else {
+          setPendingVerifications([]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch verifications:", err);
+        setPendingVerifications([]);
+      } finally {
+        setLoadingVerifications(false);
+      }
+    };
+    fetchVerifications();
+  }, [admin?.id]);
+
+
+
 
   const loading = useSelector((state) => state.createLadder?.loading);
   const { allLadders = [], loading: laddersLoading } = useSelector(
@@ -97,9 +131,7 @@ export default function AdminPage() {
     dispatch(fetchLadders({ userId: admin.id }));
   }, [admin?.id, dispatch]);
 
-  const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
-  const adminId = admin?.id || admin?.user_id;
-  const isAdminHiddenRoster = adminId ? Number(adminId) === requiredAdminId : false;
+  // Definitions moved to top
 
   const activeLadders = useMemo(
     () =>
@@ -155,6 +187,17 @@ export default function AdminPage() {
       detail: csvFile ? "Roster file is attached" : "Dashboard connected",
       icon: ShieldCheck,
     },
+    ...(isAdminHiddenRoster
+      ? [
+          {
+            title: "Verify Scores",
+            value: loadingVerifications ? "..." : pendingVerifications.length,
+            detail: pendingVerifications.length > 0 ? "Scores awaiting video review" : "All scores verified",
+            icon: pendingVerifications.length > 0 ? ShieldAlert : ShieldCheck,
+            onClick: () => router.push("/admin-page/verify-scores"),
+          },
+        ]
+      : []),
   ];
 
   const checkCsvDuplicates = (file) => {
@@ -366,10 +409,11 @@ export default function AdminPage() {
           </div>
 
           <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {overviewCards.map(({ title, value, detail, icon: Icon }, index) => (
+            {overviewCards.map(({ title, value, detail, icon: Icon, onClick }, index) => (
               <div
                 key={title}
-                className={`relative overflow-hidden rounded-[22px] sm:rounded-[26px] border border-border bg-card p-4 sm:p-5 ${cardToneClasses[index] ? `bg-gradient-to-br ${cardToneClasses[index]}` : ""}`}
+                onClick={onClick}
+                className={`relative overflow-hidden rounded-[22px] sm:rounded-[26px] border border-border bg-card p-4 sm:p-5 ${cardToneClasses[index] ? `bg-gradient-to-br ${cardToneClasses[index]}` : ""} ${onClick ? "cursor-pointer hover:border-primary/50 transition-all active:scale-95" : ""}`}
               >
                 <div className="relative z-10 flex items-start justify-between gap-3 sm:gap-4">
                   <div className="space-y-2">
@@ -528,6 +572,7 @@ export default function AdminPage() {
         </div>
         <AdminQuickActions />
       </div>
+
 
     </div>
   );

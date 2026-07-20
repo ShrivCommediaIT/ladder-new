@@ -60,6 +60,7 @@ export const API_ENDPOINTS = {
   RESULT_MINILEAGUE:      "/user/resultpostminileague/save",
   MOVE_TO_MINILEAGUE:     "/user/move_to_minileague",
   SAVE_PERFORMANCE_RESULT: "/user/savePerformanceResult",
+  SAVE_PREPOST_RESULT:     "/user/savePrepostResult",
   GET_PERFORMANCE_RESULT_LIST: "/user/getPerformanceResultList",
   PERFORMANCE_RESULT_DETAILS: "/PerformanceResultdetails",
   PERFORMANCE_RESULT_UPDATE: "/PerformanceResultupdate",
@@ -80,6 +81,7 @@ export const API_ENDPOINTS = {
   RESET_SKILLBOARD:        "/user/resetSkillboard",
   ADD_USER_SKILLBOARD:     "/user/adduserskillboard",
   DELETE_SKILL_SETUP:      "/user/DeleteskillSetup",
+  GET_PREPOST_RESULTS:     "/user/getPrePostResult",
 
   // ── Activity & Challenge ──────────────────────
   ACTIVITY:               "/user/activity",
