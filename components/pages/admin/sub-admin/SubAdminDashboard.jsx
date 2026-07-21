@@ -356,8 +356,9 @@ export default function SubAdminDashboard() {
 
       // redirect
       setTimeout(() => {
+        const isNegative = String(ladderType).toLowerCase().trim() === "negative";
         router.push(
-          `/player-list?ladder_id=${createdLadderId}&type=${ladderType}`,
+          `/player-list?ladder_id=${createdLadderId}&type=${ladderType}${isNegative ? "&inverted=1" : ""}`,
         );
       }, 800);
     } catch (error) {

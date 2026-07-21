@@ -211,7 +211,7 @@ export default function BasicLeaderboardActivityEntryCard({
 
       if (hasTarget && !isNaN(scoreForCompare) && !isNaN(targetForCompare)) {
         const invertedParam = searchParams?.get("inverted");
-        const isInverted = invertedParam === "1" || isNegative;
+        const isInverted = invertedParam === "1";
         targetMet = isInverted ? (scoreForCompare <= targetForCompare) : (scoreForCompare >= targetForCompare);
       }
 
