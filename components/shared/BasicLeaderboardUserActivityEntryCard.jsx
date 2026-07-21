@@ -598,29 +598,9 @@ export default function BasicLeaderboardActivityEntryCard({
     let isPrepost = false;
     if (isTargetAdmin && !bypassVerification) {
       const isNegative = type === "negative" || ladderType === "negative";
-      let hasTarget = false;
-      let scoreForCompare = 0;
-      let targetForCompare = 0;
+      const isPositive = type === "positive" || ladderType === "positive";
 
-      if (skillTarget && skillTarget !== "No target" && skillTarget !== "null" && skillTarget !== "" && skillTarget !== "0" && skillTarget !== 0) {
-        hasTarget = true;
-        if (isNegative) {
-          scoreForCompare = Number(convertTimeToSeconds(finalScore));
-          targetForCompare = Number(convertTimeToSeconds(skillTarget) || skillTarget);
-        } else {
-          scoreForCompare = Number(finalScore);
-          targetForCompare = Number(skillTarget);
-        }
-      }
-
-      let targetMet = false;
-      if (hasTarget && !isNaN(scoreForCompare) && !isNaN(targetForCompare)) {
-        const invertedParam = searchParams?.get("inverted");
-        const isInverted = invertedParam === "1";
-        targetMet = isInverted ? (scoreForCompare <= targetForCompare) : (scoreForCompare >= targetForCompare);
-      }
-
-      if (targetMet) {
+      if (isNegative || isPositive) {
         const currentWitness = witnessBy ? witnessBy.trim() : "";
         const isYoutube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(currentWitness);
 
@@ -641,6 +621,51 @@ export default function BasicLeaderboardActivityEntryCard({
           setOpenYoutubeVerification(true);
         }
         return false;
+      } else {
+        let hasTarget = false;
+        let scoreForCompare = 0;
+        let targetForCompare = 0;
+
+        if (skillTarget && skillTarget !== "No target" && skillTarget !== "null" && skillTarget !== "" && skillTarget !== "0" && skillTarget !== 0) {
+          hasTarget = true;
+          if (isNegative) {
+            scoreForCompare = Number(convertTimeToSeconds(finalScore));
+            targetForCompare = Number(convertTimeToSeconds(skillTarget) || skillTarget);
+          } else {
+            scoreForCompare = Number(finalScore);
+            targetForCompare = Number(skillTarget);
+          }
+        }
+
+        let targetMet = false;
+        if (hasTarget && !isNaN(scoreForCompare) && !isNaN(targetForCompare)) {
+          const invertedParam = searchParams?.get("inverted");
+          const isInverted = invertedParam === "1";
+          targetMet = isInverted ? (scoreForCompare <= targetForCompare) : (scoreForCompare >= targetForCompare);
+        }
+
+        if (targetMet) {
+          const currentWitness = witnessBy ? witnessBy.trim() : "";
+          const isYoutube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(currentWitness);
+
+          setPendingSubmission({
+            inputScore,
+            bestScore,
+            timeObj,
+            isPrepost: true
+          });
+
+          if (isYoutube) {
+            setIsAlreadyVerified(true);
+            setYoutubeUrl(currentWitness);
+            setOpenYoutubeVerification(true);
+          } else {
+            setIsAlreadyVerified(false);
+            setYoutubeUrl("");
+            setOpenYoutubeVerification(true);
+          }
+          return false;
+        }
       }
     }
 
@@ -671,6 +696,7 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("admin_id", adminDetails?.id || "");
       params.append("ladder_id", String(ladderId));
       params.append("user_name", playerName);
+      params.append("ladder_type", ladderTypeUpdate);
 
 
 

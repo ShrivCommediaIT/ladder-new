@@ -77,6 +77,8 @@ export default function AdminPage() {
 
   const [pendingVerifications, setPendingVerifications] = useState([]);
   const [loadingVerifications, setLoadingVerifications] = useState(true);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [verifiedRecords, setVerifiedRecords] = useState(0);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -93,12 +95,18 @@ export default function AdminPage() {
         const res = await getRequest(API_ENDPOINTS.GET_PREPOST_RESULTS);
         if (res?.status === 200 || res?.status === "success") {
           setPendingVerifications(res?.data || []);
+          setTotalRecords(Number(res?.total_record || 0));
+          setVerifiedRecords(Number(res?.verified || 0));
         } else {
           setPendingVerifications([]);
+          setTotalRecords(0);
+          setVerifiedRecords(0);
         }
       } catch (err) {
         console.error("Failed to fetch verifications:", err);
         setPendingVerifications([]);
+        setTotalRecords(0);
+        setVerifiedRecords(0);
       } finally {
         setLoadingVerifications(false);
       }
@@ -190,10 +198,20 @@ export default function AdminPage() {
     ...(isAdminHiddenRoster
       ? [
           {
-            title: "Verify Scores",
-            value: loadingVerifications ? "..." : pendingVerifications.length,
-            detail: pendingVerifications.length > 0 ? "Scores awaiting video review" : "All scores verified",
-            icon: pendingVerifications.length > 0 ? ShieldAlert : ShieldCheck,
+            title: (
+              <span className="inline-flex items-center gap-1.5">
+                <span>Verify Scores</span>
+                {!loadingVerifications && (totalRecords - verifiedRecords > 0) && (
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                  </span>
+                )}
+              </span>
+            ),
+            value: loadingVerifications ? "..." : Math.max(0, totalRecords - verifiedRecords),
+            detail: loadingVerifications ? "Syncing stats..." : (totalRecords - verifiedRecords > 0 ? `Total: ${totalRecords} | Verified: ${verifiedRecords}` : "All scores verified"),
+            icon: ShieldAlert,
             onClick: () => router.push("/admin-page/verify-scores"),
           },
         ]
@@ -411,7 +429,7 @@ export default function AdminPage() {
           <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {overviewCards.map(({ title, value, detail, icon: Icon, onClick }, index) => (
               <div
-                key={title}
+                key={typeof title === "string" ? title : index}
                 onClick={onClick}
                 className={`relative overflow-hidden rounded-[22px] sm:rounded-[26px] border border-border bg-card p-4 sm:p-5 ${cardToneClasses[index] ? `bg-gradient-to-br ${cardToneClasses[index]}` : ""} ${onClick ? "cursor-pointer hover:border-primary/50 transition-all active:scale-95" : ""}`}
               >

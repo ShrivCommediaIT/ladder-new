@@ -156,6 +156,8 @@ export default function BasicLeaderboardActivityEntryCard({
 
   /* ---------------- SAVE LOGIC ---------------- */
   const submitScore = async (finalScore, bestScore, bypassVerification = false, finalWitness = null) => {
+    const lType = searchParams?.get("type") || searchParams?.get("ladder_type") || "";
+    const resolvedLadderType = lType === "negative" ? "negative" : (lType === "positive" ? "positive" : "skill");
 
     // Check if we are running for NEXT_PUBLIC_ADMIN_ID and target condition is met
     const requiredAdminId = Number(process.env.NEXT_PUBLIC_ADMIN_ID);
@@ -261,7 +263,7 @@ export default function BasicLeaderboardActivityEntryCard({
       params.append("admin_id", adminDetails?.id || adminDetails?.user_id || "");
       params.append("ladder_id", String(ladderId));
       params.append("user_name", playerName);
-
+      params.append("ladder_type", resolvedLadderType);
 
       if (bestScore !== undefined && bestScore !== null) {
         let bestToSubmit;
@@ -275,7 +277,7 @@ export default function BasicLeaderboardActivityEntryCard({
       
       const apiPath = isPrepost 
         ? `${API_ENDPOINTS.SAVE_PREPOST_RESULT}?ladder_id=${ladderId}&skill_number=${selectedActivity}` 
-        : API_ENDPOINTS.POST_RESULT_SKILLBOARD;
+        : (resolvedLadderType === "negative" ? "/user/postResultNegativeSkillboard" : API_ENDPOINTS.POST_RESULT_SKILLBOARD);
       const skillsPost = await postUrlEncoded(apiPath, params);
       
       if (skillsPost.status === 200 || skillsPost?.status === "success") {
@@ -285,7 +287,7 @@ export default function BasicLeaderboardActivityEntryCard({
           updateLadderToken({
             user_id: playerName,
             ladder_id: ladderId,
-            ladder_type: "skill",
+            ladder_type: resolvedLadderType,
           })
         }
         setPendingSubmission(null);
