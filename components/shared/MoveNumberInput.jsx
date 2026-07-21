@@ -356,8 +356,9 @@ const MoveNumberInput = ({
 
       <Input
         value={selectedNumber}
+        placeholder="Select rank"
         readOnly
-        className="text-center text-3xl mb-2 bg-black text-green-400 border border-gray-700"
+        className="text-center md:text-3xl text-xl mb-2 bg-black text-green-400 border border-gray-700"
       />
 
       <div className="grid grid-cols-3 gap-3 mb-2">

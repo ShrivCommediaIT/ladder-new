@@ -220,62 +220,64 @@ const PlayerCard = ({
 
             {/* Skills section */}
             {skillsToRender?.length > 0 ? (
-              <>
-                {/* ── SKILL NUMBER ROW ── */}
-                <div className="flex gap-0.5 sm:gap-1 mb-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {skillsToRender.map((skill, i) => {
-                    const isNeg = skill.skill_sign === "-";
-                    return (
-                      <div
-                        key={i}
-                        onClick={() => onSkillClick(player.id, skill.skill_number)}
-                        className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors cursor-pointer relative"
-                        style={{
-                          background: "var(--best-board-accent-soft)",
-                          border: "1px solid var(--best-board-border-strong)",
-                          color: "var(--best-board-highlight)",
-                        }}
-                        title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
-                      >
-                        {isNeg && (
-                          <span
-                            className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-extrabold leading-none"
-                            style={{ color: "var(--best-board-danger)" }}
-                          >
-                            −
-                          </span>
-                        )}
-                        {skill.skill_number}
-                      </div>
-                    );
-                  })}
-                </div>
+              <div className="overflow-x-auto pb-1 scrollbar-none w-full">
+                <div className="flex flex-col min-w-max">
+                  {/* ── SKILL NUMBER ROW ── */}
+                  <div className="flex gap-0.5 sm:gap-1 mb-1">
+                    {skillsToRender.map((skill, i) => {
+                      const isNeg = skill.skill_sign === "-";
+                      return (
+                        <div
+                          key={i}
+                          onClick={() => onSkillClick(player.id, skill.skill_number)}
+                          className="w-[46px] sm:w-[58px] h-5 sm:h-6 flex-shrink-0 flex items-center justify-center text-[9px] sm:text-[10px] font-bold rounded transition-colors cursor-pointer relative"
+                          style={{
+                            background: "var(--best-board-accent-soft)",
+                            border: "1px solid var(--best-board-border-strong)",
+                            color: "var(--best-board-highlight)",
+                          }}
+                          title={`Edit Skill ${skill.skill_number}: ${skill.skill_description}`}
+                        >
+                          {isNeg && (
+                            <span
+                              className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-extrabold leading-none"
+                              style={{ color: "var(--best-board-danger)" }}
+                            >
+                              −
+                            </span>
+                          )}
+                          {skill.skill_number}
+                        </div>
+                      );
+                    })}
+                  </div>
 
-                {/* ── SCORE ROW ── */}
-                <div className="flex gap-0.5 sm:gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-                  {skillsToRender.map((skill, i) => {
-                    const scoreData = getScoreBySkillNumber(
-                      player.scores || [],
-                      player.skills || [],
-                      skill.skill_number
-                    );
-                    return (
-                      <div
-                        key={i}
-                        className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
-                          ${scoreData.witnessBy ? (scoreData.isTargetAchieved ? "underline decoration-white decoration-[2px]" : "underline decoration-dark decoration-[2px]") : ""}
-                            ${scoreData.isTargetAchieved
-                            ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
-                            : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
-                          }`}
-                        title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
-                      >
-                        {scoreData.displayScore.toFixed(2)}
-                      </div>
-                    );
-                  })}
+                  {/* ── SCORE ROW ── */}
+                  <div className="flex gap-0.5 sm:gap-1">
+                    {skillsToRender.map((skill, i) => {
+                      const scoreData = getScoreBySkillNumber(
+                        player.scores || [],
+                        player.skills || [],
+                        skill.skill_number
+                      );
+                      return (
+                        <div
+                          key={i}
+                          className={`w-[46px] sm:w-[58px] h-6 flex-shrink-0 flex items-center justify-center rounded text-[9px] sm:text-[10px] font-bold transition-all
+                            ${scoreData.witnessBy ? (scoreData.isTargetAchieved ? "underline decoration-white decoration-[2px]" : "underline decoration-dark decoration-[2px]") : ""}
+                              ${scoreData.isTargetAchieved
+                              ? "bg-[var(--best-board-success)] text-white border border-[var(--best-board-success)] shadow-md"
+                              : "bg-[var(--best-board-warning)] text-dark border border-[var(--best-board-border-strong)] hover:brightness-95"
+                            }`}
+                          title={`Best Score: ${scoreData.displayScore} | Target: ${scoreData.target || "N/A"}${scoreData.isTargetAchieved ? " ✓ ACHIEVED" : ""}`}
+                        >
+                          {scoreData.displayScore.toFixed(2)}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </>
+              </div>
             ) : (
               <div
                 className="h-6 rounded text-[10px] flex items-center justify-center"
