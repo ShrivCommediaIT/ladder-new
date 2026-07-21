@@ -147,9 +147,11 @@ const Minileague = () => {
   }, [ladderId, dispatch]);
 
   const filteredPlayers = searchQuery
-    ? playerList.filter((p) =>
-      p.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    ? playerList.filter((p) => {
+      const cleanName = (p.name || "").replace(/\s+/g, "").toLowerCase();
+      const cleanQuery = searchQuery.replace(/\s+/g, "").toLowerCase();
+      return cleanName.includes(cleanQuery);
+    })
     : playerList;
 
   const uniquePlayers = Array.from(

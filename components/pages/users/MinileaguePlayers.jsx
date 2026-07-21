@@ -285,9 +285,11 @@ const MinileaguePlayers = ({ ladderId }) => {
 
   const finalSections = sectionedPlayers.map((sec) => {
     const filteredPlayers = searchQuery
-      ? (sec?.users_record || []).filter((p) =>
-        p?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      ? (sec?.users_record || []).filter((p) => {
+        const cleanName = (p?.name || "").replace(/\s+/g, "").toLowerCase();
+        const cleanQuery = searchQuery.replace(/\s+/g, "").toLowerCase();
+        return cleanName.includes(cleanQuery);
+      })
       : sec?.users_record || [];
 
     const blankCount = Math.max(0, totalSlots - filteredPlayers.length);

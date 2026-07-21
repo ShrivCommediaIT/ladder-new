@@ -794,8 +794,9 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
 
   const filteredPlayers = data.filter((player) => {
     if (!searchQuery) return true;
-    const cleanName = player.name.replace(/\s+/g, "").toLowerCase();
-    return cleanName.includes(searchQuery);
+    const cleanName = (player.name || "").replace(/\s+/g, "").toLowerCase();
+    const cleanQuery = searchQuery.replace(/\s+/g, "").toLowerCase();
+    return cleanName.includes(cleanQuery);
   });
 
   return (

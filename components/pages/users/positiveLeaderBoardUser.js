@@ -843,7 +843,7 @@ const PositiveLeaderboardUser = ({ ladderId: propLadderId, onPlayerAdded, onActi
   }, [refreshLeaderboard]);
 
   const filteredPlayers = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.replace(/\s+/g, "").toLowerCase();
     if (!q) return data;
 
     const clean = (name = "") =>
