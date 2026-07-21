@@ -75,6 +75,18 @@ const isDirectVideoUrl = (url) => {
   return lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".ogg") || lower.endsWith(".mov");
 };
 
+const formatVerificationScore = (score) => {
+  if (!score) return "";
+  const scoreStr = String(score);
+  if (scoreStr.includes(":") && scoreStr.includes(".")) {
+    const parts = scoreStr.split(".");
+    if (parts[1]) {
+      return `${parts[0]}.${parts[1].slice(0, 2)}`;
+    }
+  }
+  return scoreStr;
+};
+
 export default function VerifyScoresPage() {
   const router = useRouter();
   const [activeVideoUrl, setActiveVideoUrl] = useState(null);
@@ -228,13 +240,13 @@ export default function VerifyScoresPage() {
           const postRes = await postUrlEncoded(targetUrl, params);
 
           if (postRes?.status === 200 || postRes?.status === "success") {
-            toast.success(`Approved score of ${item.score} for ${item.user_name || `Player ID: ${item.user_id}`} successfully!`);
+            toast.success(`Approved score of ${formatVerificationScore(item.score)} for ${item.user_name || `Player ID: ${item.user_id}`} successfully!`);
           } else {
             toast.error(postRes?.error_message || "Failed to post score live.");
             return;
           }
         } else {
-          toast.info(`Rejected score of ${item.score} for ${item.user_name || `Player ID: ${item.user_id}`}.`);
+          toast.info(`Rejected score of ${formatVerificationScore(item.score)} for ${item.user_name || `Player ID: ${item.user_id}`}.`);
         }
 
         await fetchVerifications();
@@ -340,7 +352,7 @@ export default function VerifyScoresPage() {
                             )}
                           </td>
                           <td className="py-4 px-4 text-center font-extrabold text-primary">
-                            {item.score}
+                            {formatVerificationScore(item.score)}
                           </td>
                           <td className="py-4 px-4">
                             {item.witness_by ? (
@@ -418,7 +430,7 @@ export default function VerifyScoresPage() {
                         </div>
                         <div className="text-right">
                           <div className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Score</div>
-                          <div className="font-black text-lg text-primary mt-0.5">{item.score}</div>
+                          <div className="font-black text-lg text-primary mt-0.5">{formatVerificationScore(item.score)}</div>
                         </div>
                       </div>
 

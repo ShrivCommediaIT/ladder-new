@@ -197,9 +197,10 @@ function UserPageRedirectRouter() {
             // Since only the logged-in player can submit their score:
             params.append("user_name", parsedUser.name || "Player");
 
+            const isNegativeScore = activePostArgs.url?.includes("postResultNegativeSkillboard") || String(activePostArgs.score).includes(":");
             const targetUrl = activePostArgs.url
               ? (activePostArgs.url.startsWith('/') ? activePostArgs.url : `/${activePostArgs.url}`)
-              : "/user/postResultSkillboard";
+              : (isNegativeScore ? "/user/postResultNegativeSkillboard" : "/user/postResultSkillboard");
 
             await postUrlEncoded(targetUrl, params);
             localStorage.removeItem("paypal_pending_post_args");
