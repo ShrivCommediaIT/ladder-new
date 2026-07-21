@@ -419,7 +419,7 @@ const MoveNumberInput = ({
 
             <AlertDialogTitle className="text-xl font-bold text-violet-400 flex items-center gap-2">
               <CheckCircle className="text-green-500 h-5 w-5" />
-              Confirm Result22
+              Confirm Result
             </AlertDialogTitle>
 
             <AlertDialogDescription className="text-start text-lg text-white">
@@ -431,7 +431,7 @@ const MoveNumberInput = ({
 
           <AlertDialogFooter className="mt-5 flex flex-col sm:flex-row gap-3">
 
-            <AlertDialogCancel className="w-full text-gray-800 sm:w-auto">
+            <AlertDialogCancel className="w-full text-gray-800 dark:text-gray-200 sm:w-auto">
               Go Back
             </AlertDialogCancel>
 
