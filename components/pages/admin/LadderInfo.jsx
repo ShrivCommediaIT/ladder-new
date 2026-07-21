@@ -23,7 +23,9 @@ export default function LadderInfo({ ladders }) {
   const router = useRouter();
 
   const handleEditClick = (ladderId, ladderType, inverted) => {
-    router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}&inverted=${inverted}&demo=true`);
+    const isNegative = String(ladderType).toLowerCase().trim() === "negative";
+    const finalInverted = isNegative ? "1" : inverted;
+    router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}&inverted=${finalInverted}&demo=true`);
   };
 
   useEffect(() => {
