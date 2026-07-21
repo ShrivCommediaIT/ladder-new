@@ -155,7 +155,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
   }, [ladderId, numericLadderId, players, refreshLeaderboard]);
 
   const filteredPlayers = useMemo(() => {
-    const cleanedSearch = effectiveSearch;
+    const cleanedSearch = (effectiveSearch || "").replace(/\s+/g, "").toLowerCase();
     let nextPlayers = playerList;
 
     if (cleanedSearch) {

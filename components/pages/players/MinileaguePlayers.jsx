@@ -307,7 +307,7 @@ const MinileaguePlayers = () => {
   const processedSections = sectionedPlayers;
 
   const finalSections = React.useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.replace(/\s+/g, "").toLowerCase();
 
     if (!q) {
       return processedSections.map((sec) => ({
@@ -320,19 +320,21 @@ const MinileaguePlayers = () => {
       }));
     }
 
+    const clean = (name = "") => name.replace(/\s+/g, "").toLowerCase();
+
     const sections = [];
     processedSections.forEach((sec) => {
       const allPlayers = sec?.users_record || [];
       const startsWith = allPlayers
-        .filter((p) => p?.name?.toLowerCase().startsWith(q))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .filter((p) => clean(p?.name).startsWith(q))
+        .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
       const contains = allPlayers
         .filter(
           (p) =>
-            !p?.name?.toLowerCase().startsWith(q) &&
-            p?.name?.toLowerCase().includes(q)
+            !clean(p?.name).startsWith(q) &&
+            clean(p?.name).includes(q)
         )
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
       const players = [...startsWith, ...contains];
       if (players.length > 0)
         sections.push({ label: sec?.section, players, blankCount: 0 });

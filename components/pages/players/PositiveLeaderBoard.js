@@ -449,7 +449,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, [refreshLeaderboard]);
 
   const filteredPlayers = React.useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.replace(/\s+/g, "").toLowerCase();
     const clean = (name = "") => name.replace(/\s+/g, "").toLowerCase();
     const baseList = !q ? data : [
       ...data.filter((p) => clean(p.name).startsWith(q)).sort((a, b) => a.name.localeCompare(b.name)),
