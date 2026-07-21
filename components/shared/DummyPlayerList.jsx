@@ -585,7 +585,7 @@ const RosterPlayerCard = ({ player, rank }) => {
                 border: "1px solid var(--best-board-border-strong)",
               }}
             >
-              Country: {player.country}
+              {player.country}
             </span>
           )}
         </div>
