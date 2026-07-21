@@ -358,7 +358,7 @@ const MoveNumberInput = ({
         value={selectedNumber}
         placeholder="Opponent's Rank"
         readOnly
-        className="text-center md:text-3xl text-xl mb-2 bg-black text-green-400 border border-gray-700"
+        className="text-center text-sm md:text-md mb-2 bg-black text-green-400 border border-gray-700"
       />
 
       <div className="grid grid-cols-3 gap-3 mb-2">
@@ -419,7 +419,7 @@ const MoveNumberInput = ({
 
             <AlertDialogTitle className="text-xl font-bold text-violet-400 flex items-center gap-2">
               <CheckCircle className="text-green-500 h-5 w-5" />
-              Confirm Result
+              Confirm Result22
             </AlertDialogTitle>
 
             <AlertDialogDescription className="text-start text-lg text-white">
