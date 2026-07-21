@@ -186,13 +186,15 @@ export default function BasicLeaderboardActivityEntryCard({
     );
     const isTargetAdmin = adminIdToCheck === requiredAdminId;
 
+    let hasTarget = false;
+    let targetMet = false;
     let isPrepost = false;
+
     if (isTargetAdmin && !bypassVerification) {
       // BasicLeaderboardActivityEntryCard has searchParams and we can get ladder_type from it.
       const ladderType = searchParams?.get("type") || searchParams?.get("ladder_type");
       const isNegative = ladderType === "negative";
       
-      let hasTarget = false;
       let scoreForCompare = 0;
       let targetForCompare = 0;
 
@@ -207,7 +209,6 @@ export default function BasicLeaderboardActivityEntryCard({
         }
       }
 
-      let targetMet = false;
       if (hasTarget && !isNaN(scoreForCompare) && !isNaN(targetForCompare)) {
         const invertedParam = searchParams?.get("inverted");
         const isInverted = invertedParam === "1";
@@ -281,8 +282,14 @@ export default function BasicLeaderboardActivityEntryCard({
       const skillsPost = await postUrlEncoded(apiPath, params);
       
       if (skillsPost.status === 200 || skillsPost?.status === "success") {
+        if (isPrepost) {
+          toast.success("Result submitted for verification successfully!");
+        } else if (hasTarget && !targetMet) {
+          toast.info("Target not met. Result posted directly to the leaderboard!");
+        } else {
+          toast.success("Result posted successfully!");
+        }
         handleSuccessClose();
-        toast.success(isPrepost ? "Result submitted for verification successfully!" : "Result posted successfully!");
         if (skillsPost?.eligible_for_token == 1) {
           updateLadderToken({
             user_id: playerName,

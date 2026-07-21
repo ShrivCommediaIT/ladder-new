@@ -595,12 +595,34 @@ export default function BasicLeaderboardActivityEntryCard({
     );
     const isTargetAdmin = adminIdToCheck === requiredAdminId;
 
+    let hasTarget = false;
+    let targetMet = false;
     let isPrepost = false;
+
     if (isTargetAdmin && !bypassVerification) {
       const isNegative = type === "negative" || ladderType === "negative";
-      const isPositive = type === "positive" || ladderType === "positive";
 
-      if (isNegative || isPositive) {
+      let scoreForCompare = 0;
+      let targetForCompare = 0;
+
+      if (skillTarget && skillTarget !== "No target" && skillTarget !== "null" && skillTarget !== "" && skillTarget !== "0" && skillTarget !== 0) {
+        hasTarget = true;
+        if (isNegative) {
+          scoreForCompare = Number(convertTimeToSeconds(finalScore));
+          targetForCompare = Number(convertTimeToSeconds(skillTarget) || skillTarget);
+        } else {
+          scoreForCompare = Number(finalScore);
+          targetForCompare = Number(skillTarget);
+        }
+      }
+
+      if (hasTarget && !isNaN(scoreForCompare) && !isNaN(targetForCompare)) {
+        const invertedParam = searchParams?.get("inverted");
+        const isInverted = invertedParam === "1";
+        targetMet = isInverted ? (scoreForCompare <= targetForCompare) : (scoreForCompare >= targetForCompare);
+      }
+
+      if (targetMet) {
         const currentWitness = witnessBy ? witnessBy.trim() : "";
         const isYoutube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(currentWitness);
 
@@ -621,51 +643,6 @@ export default function BasicLeaderboardActivityEntryCard({
           setOpenYoutubeVerification(true);
         }
         return false;
-      } else {
-        let hasTarget = false;
-        let scoreForCompare = 0;
-        let targetForCompare = 0;
-
-        if (skillTarget && skillTarget !== "No target" && skillTarget !== "null" && skillTarget !== "" && skillTarget !== "0" && skillTarget !== 0) {
-          hasTarget = true;
-          if (isNegative) {
-            scoreForCompare = Number(convertTimeToSeconds(finalScore));
-            targetForCompare = Number(convertTimeToSeconds(skillTarget) || skillTarget);
-          } else {
-            scoreForCompare = Number(finalScore);
-            targetForCompare = Number(skillTarget);
-          }
-        }
-
-        let targetMet = false;
-        if (hasTarget && !isNaN(scoreForCompare) && !isNaN(targetForCompare)) {
-          const invertedParam = searchParams?.get("inverted");
-          const isInverted = invertedParam === "1";
-          targetMet = isInverted ? (scoreForCompare <= targetForCompare) : (scoreForCompare >= targetForCompare);
-        }
-
-        if (targetMet) {
-          const currentWitness = witnessBy ? witnessBy.trim() : "";
-          const isYoutube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(currentWitness);
-
-          setPendingSubmission({
-            inputScore,
-            bestScore,
-            timeObj,
-            isPrepost: true
-          });
-
-          if (isYoutube) {
-            setIsAlreadyVerified(true);
-            setYoutubeUrl(currentWitness);
-            setOpenYoutubeVerification(true);
-          } else {
-            setIsAlreadyVerified(false);
-            setYoutubeUrl("");
-            setOpenYoutubeVerification(true);
-          }
-          return false;
-        }
       }
     }
 
@@ -727,7 +704,13 @@ export default function BasicLeaderboardActivityEntryCard({
       const skillsPost = await postUrlEncoded(apiPath, params);
 
       if (skillsPost?.status === 200 || skillsPost?.status === "success") {
-        toast.success(isPrepost ? "Result submitted for verification successfully!" : "Result posted successfully!");
+        if (isPrepost) {
+          toast.success("Result submitted for verification successfully!");
+        } else if (hasTarget && !targetMet) {
+          toast.info("Target not met. Result posted directly to the leaderboard!");
+        } else {
+          toast.success("Result posted successfully!");
+        }
         if (skillsPost?.eligible_for_token == 1) {
           updateLadderToken({
             user_id: playerName,

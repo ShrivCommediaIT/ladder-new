@@ -78,7 +78,9 @@ const LadderList = ({ userId }) => {
   }, [userId, admin?.id, admin?.user_type, subAdmin?.id, subAdmin?.user_id, subAdmin?.user_type]);
 
   const handleEditClick = (ladderId, ladderType, inverted) => {
-    router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}&inverted=${inverted}`);
+    const isNegative = String(ladderType).toLowerCase().trim() === "negative";
+    const finalInverted = isNegative ? "1" : inverted;
+    router.push(`/player-list?ladder_id=${ladderId}&type=${ladderType}&inverted=${finalInverted}`);
   };
 
   const handleDelete = async (ladderId) => {

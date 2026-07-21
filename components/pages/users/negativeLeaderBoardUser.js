@@ -886,14 +886,14 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
           ladderId={ladderId}
           skillNumber={selectedSkillNumber}
           skillActivityId={selectedSkillActivityId}
-          // onPaymentRequired={(args) => {
-          //   setOpenEdit(false);
-          //   setPendingPostArgs(args);
-          //   if (typeof window !== "undefined") {
-          //     localStorage.setItem("paypal_pending_post_args", JSON.stringify(args));
-          //   }
-          //   setShowPaymentModal(true);
-          // }}
+        // onPaymentRequired={(args) => {
+        //   setOpenEdit(false);
+        //   setPendingPostArgs(args);
+        //   if (typeof window !== "undefined") {
+        //     localStorage.setItem("paypal_pending_post_args", JSON.stringify(args));
+        //   }
+        //   setShowPaymentModal(true);
+        // }}
         />
       )}
 
