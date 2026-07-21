@@ -76,7 +76,7 @@ const PlayerCard = ({ player, rank, onRedeemClick, onEditClick, currentUser }) =
           )}
           {player.country && (
             <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap best-board-tag-accent">
-              Country: {player.country}
+              {player.country}
             </span>
           )}
         </div>
