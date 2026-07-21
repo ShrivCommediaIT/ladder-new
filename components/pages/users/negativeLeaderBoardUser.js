@@ -602,7 +602,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
 
         const targetUrl = activePostArgs.url
           ? (activePostArgs.url.startsWith('/') ? activePostArgs.url : `/${activePostArgs.url}`)
-          : "/user/postResultSkillboard";
+          : "/user/postResultNegativeSkillboard";
         const res = await postUrlEncoded(targetUrl, params);
 
         if (res?.status === 200 || res?.status === "success") {

@@ -20,13 +20,77 @@ import { getRequest, postUrlEncoded } from "@/services/apiService";
 import { API_ENDPOINTS } from "@/constants/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const brandGradient = "var(--background-image-gradient-brand)";
 const subtleButtonClass =
   "flex items-center justify-center gap-2 rounded-xl border border-border bg-[color:color-mix(in_srgb,var(--card),var(--primary)_4%)] px-4 text-sm font-semibold text-foreground transition-all hover:-translate-y-0.5 hover:bg-[color:color-mix(in_srgb,var(--card),var(--primary)_8%)]";
 
+const getEmbedUrl = (url) => {
+  if (!url) return "";
+  const cleanedUrl = url.trim();
+
+  // 1. YouTube Shorts
+  if (cleanedUrl.includes("youtube.com/shorts/") || cleanedUrl.includes("youtu.be/shorts/")) {
+    const parts = cleanedUrl.split("/shorts/");
+    if (parts[1]) {
+      const videoId = parts[1].split(/[?#]/)[0];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+  }
+
+  // 2. YouTube standard or share links
+  if (cleanedUrl.includes("youtube.com") || cleanedUrl.includes("youtu.be")) {
+    let videoId = "";
+    if (cleanedUrl.includes("youtu.be/")) {
+      videoId = cleanedUrl.split("youtu.be/")[1]?.split(/[?#]/)[0];
+    } else if (cleanedUrl.includes("v=")) {
+      videoId = cleanedUrl.split("v=")[1]?.split(/[&?#]/)[0];
+    } else if (cleanedUrl.includes("embed/")) {
+      videoId = cleanedUrl.split("embed/")[1]?.split(/[?#]/)[0];
+    }
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+  }
+
+  // 3. Vimeo
+  if (cleanedUrl.includes("vimeo.com")) {
+    const videoId = cleanedUrl.split("vimeo.com/")[1]?.split(/[?#]/)[0];
+    if (videoId && !isNaN(Number(videoId))) {
+      return `https://player.vimeo.com/video/${videoId}`;
+    }
+  }
+
+  return cleanedUrl;
+};
+
+const isDirectVideoUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase().trim();
+  return lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".ogg") || lower.endsWith(".mov");
+};
+
+const formatVerificationScore = (score) => {
+  if (!score) return "";
+  const scoreStr = String(score);
+  if (scoreStr.includes(":") && scoreStr.includes(".")) {
+    const parts = scoreStr.split(".");
+    if (parts[1]) {
+      return `${parts[0]}.${parts[1].slice(0, 2)}`;
+    }
+  }
+  return scoreStr;
+};
+
 export default function VerifyScoresPage() {
   const router = useRouter();
+  const [activeVideoUrl, setActiveVideoUrl] = useState(null);
+  const [activeVideoTitle, setActiveVideoTitle] = useState("");
   const [admin, setAdmin] = useState(null);
   const [pendingVerifications, setPendingVerifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -176,13 +240,13 @@ export default function VerifyScoresPage() {
           const postRes = await postUrlEncoded(targetUrl, params);
 
           if (postRes?.status === 200 || postRes?.status === "success") {
-            toast.success(`Approved score of ${item.score} for ${item.user_name || `Player ID: ${item.user_id}`} successfully!`);
+            toast.success(`Approved score of ${formatVerificationScore(item.score)} for ${item.user_name || `Player ID: ${item.user_id}`} successfully!`);
           } else {
             toast.error(postRes?.error_message || "Failed to post score live.");
             return;
           }
         } else {
-          toast.info(`Rejected score of ${item.score} for ${item.user_name || `Player ID: ${item.user_id}`}.`);
+          toast.info(`Rejected score of ${formatVerificationScore(item.score)} for ${item.user_name || `Player ID: ${item.user_id}`}.`);
         }
 
         await fetchVerifications();
@@ -288,20 +352,21 @@ export default function VerifyScoresPage() {
                             )}
                           </td>
                           <td className="py-4 px-4 text-center font-extrabold text-primary">
-                            {item.score}
+                            {formatVerificationScore(item.score)}
                           </td>
                           <td className="py-4 px-4">
                             {item.witness_by ? (
-                              <a
-                                href={item.witness_by}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                              <button
+                                onClick={() => {
+                                  setActiveVideoUrl(item.witness_by);
+                                  setActiveVideoTitle(`${item.user_name || 'Player'}'s Performance - ${item.skill_description || item.ladder_name || 'Verification'}`);
+                                }}
                                 className="inline-flex items-center gap-1.5 text-xs text-primary font-bold hover:underline"
                               >
                                 <Video className="h-3.5 w-3.5 flex-shrink-0 text-red-500" />
                                 Watch Performance
                                 <ExternalLink className="h-3 w-3" />
-                              </a>
+                              </button>
                             ) : (
                               <span className="text-xs text-destructive font-semibold">No URL Provided</span>
                             )}
@@ -365,7 +430,7 @@ export default function VerifyScoresPage() {
                         </div>
                         <div className="text-right">
                           <div className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">Score</div>
-                          <div className="font-black text-lg text-primary mt-0.5">{item.score}</div>
+                          <div className="font-black text-lg text-primary mt-0.5">{formatVerificationScore(item.score)}</div>
                         </div>
                       </div>
 
@@ -384,16 +449,17 @@ export default function VerifyScoresPage() {
                         
                         <div>
                           {item.witness_by ? (
-                            <a
-                              href={item.witness_by}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={() => {
+                                  setActiveVideoUrl(item.witness_by);
+                                  setActiveVideoTitle(`${item.user_name || 'Player'}'s Performance - ${item.skill_description || item.ladder_name || 'Verification'}`);
+                              }}
                               className="inline-flex items-center gap-1.5 text-xs text-primary font-bold hover:underline py-1"
                             >
                               <Video className="h-4 w-4 flex-shrink-0 text-red-500" />
                               Watch Performance
                               <ExternalLink className="h-3 w-3" />
-                            </a>
+                            </button>
                           ) : (
                             <span className="text-xs text-destructive font-semibold">No URL Provided</span>
                           )}
@@ -467,6 +533,53 @@ export default function VerifyScoresPage() {
           )}
         </motion.div>
       </div>
+
+      {activeVideoUrl && (
+        <Dialog open={!!activeVideoUrl} onOpenChange={(open) => !open && setActiveVideoUrl(null)}>
+          <DialogContent className="max-w-5xl w-[95vw] md:w-[90vw] lg:w-[85vw] p-4 sm:p-6 rounded-2xl border shadow-2xl bg-zinc-950 text-white border-zinc-800 focus:outline-none">
+            <DialogTitle className="text-lg font-bold pr-6 truncate">
+              {activeVideoTitle || "Verification Performance Video"}
+            </DialogTitle>
+            
+            <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black border border-white/10 mt-4">
+              {isDirectVideoUrl(activeVideoUrl) ? (
+                <video 
+                  src={activeVideoUrl} 
+                  controls 
+                  autoPlay 
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <iframe
+                  src={`${getEmbedUrl(activeVideoUrl)}?autoplay=1`}
+                  title="Performance Verification Video"
+                  className="absolute inset-0 w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              )}
+            </div>
+            
+            <div className="flex justify-end gap-3 mt-4">
+              <a
+                href={activeVideoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition-all"
+              >
+                Open in New Tab
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+              <button
+                onClick={() => setActiveVideoUrl(null)}
+                className="px-5 py-2 rounded-xl text-xs font-semibold bg-zinc-800 text-white hover:bg-zinc-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
