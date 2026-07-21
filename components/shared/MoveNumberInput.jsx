@@ -356,7 +356,7 @@ const MoveNumberInput = ({
 
       <Input
         value={selectedNumber}
-        placeholder="Select rank"
+        placeholder="Opponent's Rank"
         readOnly
         className="text-center md:text-3xl text-xl mb-2 bg-black text-green-400 border border-gray-700"
       />

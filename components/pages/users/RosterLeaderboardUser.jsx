@@ -337,15 +337,20 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => 
   }, [loadData]);
 
   // Filtering & Sorting
-  const filteredPlayers = (data || []).filter(p => 
-    !searchTerm || p.name?.toLowerCase().includes(searchTerm.toLowerCase().trim())
-  );
+  const filteredPlayers = (data || []).filter(p => {
+    if (!searchTerm) return true;
+    const cleanName = (p.name || "").replace(/\s+/g, "").toLowerCase();
+    const cleanQuery = searchTerm.replace(/\s+/g, "").toLowerCase();
+    return cleanName.includes(cleanQuery);
+  });
 
   const sortedPlayers = [...filteredPlayers].sort((a, b) => {
     if (!searchTerm) return 0;
-    const q = searchTerm.toLowerCase().trim();
-    const aStarts = a.name?.toLowerCase().startsWith(q);
-    const bStarts = b.name?.toLowerCase().startsWith(q);
+    const q = searchTerm.replace(/\s+/g, "").toLowerCase();
+    const cleanA = (a.name || "").replace(/\s+/g, "").toLowerCase();
+    const cleanB = (b.name || "").replace(/\s+/g, "").toLowerCase();
+    const aStarts = cleanA.startsWith(q);
+    const bStarts = cleanB.startsWith(q);
     if (aStarts && !bStarts) return -1;
     if (!aStarts && bStarts) return 1;
     return 0;

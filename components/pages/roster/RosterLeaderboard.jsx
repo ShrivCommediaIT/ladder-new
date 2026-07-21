@@ -285,7 +285,7 @@ const RosterLeaderboard = () => {
 
 
   // ✅ search + alphabet priority sort
-  const cleaned = searchQuery;
+  const cleaned = (searchQuery || "").replace(/\s+/g, "").toLowerCase();
 
   let working = data || [];
 

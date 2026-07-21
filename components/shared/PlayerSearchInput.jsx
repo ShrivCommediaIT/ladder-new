@@ -60,9 +60,11 @@ const PlayerInfo = () => {
   }, [dispatch, user?.id]);
 
   const filteredPlayers = searchQuery
-    ? playerList.filter((player) =>
-      player.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    ? playerList.filter((player) => {
+      const cleanName = (player.name || "").replace(/\s+/g, "").toLowerCase();
+      const cleanQuery = searchQuery.replace(/\s+/g, "").toLowerCase();
+      return cleanName.includes(cleanQuery);
+    })
     : playerList;
 
   const uniqueFilteredPlayers = Array.from(

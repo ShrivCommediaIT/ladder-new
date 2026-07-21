@@ -503,7 +503,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   }, [refreshLeaderboard]);
 
   const filteredPlayers = React.useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.replace(/\s+/g, "").toLowerCase();
     const clean = (name = "") => name.replace(/\s+/g, "").toLowerCase();
     const baseList = !q ? data : [
       ...data
