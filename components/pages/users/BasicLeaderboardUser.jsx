@@ -478,7 +478,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = 0, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry, witness = appliedWitnessBy) => {
+    (skillNo = 0, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry, witness = appliedWitnessBy, name = searchQuery) => {
       if (!ladderId || isRefreshing) return;
 
       setIsRefreshing(true);
@@ -502,12 +502,26 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
       if (witness === 1) {
         payload.witness_by = 1;
       }
+
+      const isFilterActive = (age && age > 0) || Boolean(gender) || Boolean(country) || witness === 1 || (skillNo && skillNo !== 0);
+      if (isFilterActive && name && name.trim()) {
+        payload.name = name.trim();
+      }
+
       dispatch(fetchSkillLeaderboard(payload)).finally(() => {
         setIsRefreshing(false);
       });
     },
-    [dispatch, ladderId, isRefreshing, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy],
+    [dispatch, ladderId, isRefreshing, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy, searchQuery],
   );
+
+  const handleSearchChange = useCallback((val) => {
+    setSearchQuery(val);
+    const isFilterActive = appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry) || appliedWitnessBy === 1 || selectedSkillFilter > 0;
+    if (isFilterActive) {
+      refreshLeaderboard(selectedSkillFilter, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy, val);
+    }
+  }, [appliedAge, appliedGender, appliedCountry, appliedWitnessBy, selectedSkillFilter, refreshLeaderboard]);
 
   const handleAgeSearch = useCallback((age, ageType, gender, country, witness) => {
     const ageNum = age ? Number(age) : "";
@@ -730,7 +744,7 @@ const BasicLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => {
           <div className="flex-1 w-full min-w-0">
             <PlayerSearch
               searchTerm={searchQuery}
-              setSearchTerm={setSearchQuery}
+              setSearchTerm={handleSearchChange}
               onClearFilters={handleClearFilters}
               activeFilters={hasFiltersApplied}
               resetSignal={playerSearchResetSignal}

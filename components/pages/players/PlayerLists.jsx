@@ -34,11 +34,13 @@ const BasicLeaderboardShort = dynamic(() => import("@/components/pages/admin/Bas
   ssr: false,
 });
 
+import UploadCsvModal from "@/components/shared/UploadCsvModal";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Funnel, RotateCw, RefreshCw, XCircle, Plus, Eye, Zap } from "lucide-react";
+import { Funnel, RotateCw, RefreshCw, XCircle, Plus, Eye, Zap, UploadCloud } from "lucide-react";
 
 import { fetchUserActivity, clearActivityState } from "@/redux/slices/activitySlice";
 import { fetchLeaderboard, setAgeFilter } from "@/redux/slices/leaderboardSlice";
@@ -123,7 +125,7 @@ export const PlayerLists = () => {
     return (age && age !== "" && age !== 0) || (ageType && ageType !== "under") || (gender && gender !== "") || (country && country !== "");
   };
 
-  const refreshSkillLeaderboard = (skillNo = 0, witness = witnessBy) => {
+  const refreshSkillLeaderboard = (skillNo = 0, witness = witnessBy, searchName = bestSearchValue) => {
     if (!ladderId) return;
     let laddartype, fetchSlice;
     if (typeFromParams === "positive" || ladderTypeFromParams === "positive") { laddartype = "positive"; fetchSlice = fetchPositiveLeaderboard; }
@@ -141,21 +143,37 @@ export const PlayerLists = () => {
     if (witness === 1) {
       payload.witness_by = 1;
     }
+    const isFilterActive = hasFiltersApplied() || witness === 1 || skillNo > 0;
+    if (isFilterActive && searchName && searchName.trim()) {
+      payload.name = searchName.trim();
+    }
     dispatch(fetchSlice(payload));
     if (isMiniLeague) dispatch(fetchLeaderboard({ ...payload, type: "minileague" }));
   };
 
-  const refreshLeaderboard = () => {
+  const refreshLeaderboard = (searchName = bestSearchValue) => {
     if (!ladderId) return;
     if (isSkill || isPositive || isNegative || ["best5", "best3", "winlose"].includes(resolvedType) || isMiniLeague) {
-      refreshSkillLeaderboard();
+      refreshSkillLeaderboard(0, witnessBy, searchName);
     } else {
       const payload = { ladder_id: ladderId, type: resolvedType };
       if (appliedAge > 0) { payload.dob = appliedAge; if (appliedAgeType) payload.age_type = appliedAgeType; }
       if (appliedGender) payload.gender = appliedGender;
       if (appliedCountry) payload.country = appliedCountry;
+      const isFilterActive = hasFiltersApplied();
+      if (isFilterActive && searchName && searchName.trim()) {
+        payload.name = searchName.trim();
+      }
       dispatch(fetchLeaderboard(payload));
-      if (isRoster) dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: appliedAge > 0 ? appliedAge : undefined, age_type: appliedAge > 0 && appliedAgeType ? appliedAgeType : undefined, gender: appliedGender || undefined, country: appliedCountry || undefined }));
+      if (isRoster) dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: appliedAge > 0 ? appliedAge : undefined, age_type: appliedAge > 0 && appliedAgeType ? appliedAgeType : undefined, gender: appliedGender || undefined, country: appliedCountry || undefined, name: isFilterActive && searchName ? searchName.trim() : undefined }));
+    }
+  };
+
+  const handleBestSearchChange = (val) => {
+    setBestSearchValue(val);
+    const isFilterActive = hasFiltersApplied() || witnessBy === 1 || currentSkillNo > 0;
+    if (isFilterActive) {
+      refreshLeaderboard(val);
     }
   };
 
@@ -390,6 +408,16 @@ export const PlayerLists = () => {
     onClick: () => setOpenAddPlayerDialog(true),
   });
 
+  // Upload CSV button when there are no players in the ladder
+  if (["best5", "best3", "winlose", "bestof5", "bestof3"].includes(resolvedType) && currentPlayerCount === 0) {
+    quickActions.push({
+      id: "upload-csv",
+      label: "Upload CSV",
+      icon: UploadCloud,
+      onClick: () => setOpenUploadDialog(true),
+    });
+  }
+
   // Sort button
   if (isSkill || isPositive || isNegative) {
     quickActions.push({
@@ -452,7 +480,7 @@ export const PlayerLists = () => {
 
       {isBestLayout ? (
         <div className="w-full px-1 pb-6 sm:px-6 lg:px-10">
-          <PlayersLists1 searchValue={bestSearchValue} onSearchChange={setBestSearchValue} />
+          <PlayersLists1 searchValue={bestSearchValue} onSearchChange={handleBestSearchChange} />
         </div>
       ) : (
         <>
@@ -538,20 +566,18 @@ export const PlayerLists = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Upload CSV after reset */}
-      <Dialog open={openUploadDialog} onOpenChange={setOpenUploadDialog}>
-        <DialogContent className="bg-gray-400 rounded-lg border border-[#313546] sm:max-w-xl">
-          <UploadPlayerLists
-            ladderId={ladderId}
-            onSuccessClose={() => {
-              setOpenUploadDialog(false);
-              refreshLeaderboard();
-              dispatch(fetchGradebars(ladderId));
-              toast.success("Players uploaded successfully!");
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Upload CSV Modal */}
+      <UploadCsvModal
+        open={openUploadDialog}
+        onOpenChange={setOpenUploadDialog}
+        ladderId={ladderId}
+        ladderType={resolvedType}
+        onSuccess={() => {
+          refreshLeaderboard();
+          dispatch(fetchGradebars(ladderId));
+          toast.success("Players uploaded successfully!");
+        }}
+      />
 
       {/* Add / Remove Dialog */}
       <Dialog open={openAddPlayerDialog} onOpenChange={setOpenAddPlayerDialog}>

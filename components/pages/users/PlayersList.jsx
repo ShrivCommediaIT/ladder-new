@@ -106,7 +106,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
 
   /* ------------------ FETCH DATA ------------------ */
 
-  const refreshData = useCallback((age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry) => {
+  const refreshData = useCallback((age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry, name = searchTerm) => {
     if (ladderId && ladderType) {
       const payload = {
         ladder_id: ladderId,
@@ -122,11 +122,23 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       if (country) {
         payload.country = country;
       }
+      const isFilterActive = age > 0 || Boolean(gender) || Boolean(country);
+      if (isFilterActive && name && name.trim()) {
+        payload.name = name.trim();
+      }
       dispatch(fetchLeaderboard(payload));
       dispatch(fetchGradebars(ladderId));
       setCacheBuster(Date.now());
     }
-  }, [dispatch, ladderId, ladderType, appliedAge, appliedAgeType, appliedGender, appliedCountry]);
+  }, [dispatch, ladderId, ladderType, appliedAge, appliedAgeType, appliedGender, appliedCountry, searchTerm]);
+
+  const handleSearchChange = useCallback((val) => {
+    setSearchTerm(val);
+    const isFilterActive = appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry);
+    if (isFilterActive) {
+      refreshData(appliedAge, appliedAgeType, appliedGender, appliedCountry, val);
+    }
+  }, [appliedAge, appliedAgeType, appliedGender, appliedCountry, refreshData]);
 
   const handleAgeSearch = useCallback((age, ageType, gender, country) => {
     const ageNum = age ? Number(age) : "";
@@ -279,7 +291,7 @@ export default function PlayersList({ ladderId: propLadderId, ladderType: propLa
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4">
         <PlayerSearch
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
+          setSearchTerm={handleSearchChange}
           onClearFilters={() => {
             dispatch(setAgeFilter({ age: 0, ageType: "under", gender: "", country: "" }));
             setResetSignal((p) => p + 1);

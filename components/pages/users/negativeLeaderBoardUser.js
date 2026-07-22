@@ -507,7 +507,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
 
   // REFRESH FUNCTION FIRST
   const refreshLeaderboard = useCallback(
-    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry, witness = appliedWitnessBy) => {
+    (skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry, witness = appliedWitnessBy, name = searchQuery) => {
       if (ladderId) {
         const payload = {
           ladder_id: ladderId,
@@ -532,14 +532,27 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
           payload.witness_by = 1;
         }
 
+        const isFilterActive = age > 0 || Boolean(gender) || Boolean(country) || witness === 1 || skillNo > 0;
+        if (isFilterActive && name && name.trim()) {
+          payload.name = name.trim();
+        }
+
         setIsRefreshing(true);
         dispatch(fetchNegativeLeaderboard(payload)).finally(() => {
           setIsRefreshing(false);
         });
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy],
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy, searchQuery],
   );
+
+  const handleSearchChange = useCallback((val) => {
+    setSearchQuery(val);
+    const isFilterActive = appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry) || appliedWitnessBy === 1 || selectedPositiveFilter > 0;
+    if (isFilterActive) {
+      refreshLeaderboard(selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, appliedCountry, appliedWitnessBy, val);
+    }
+  }, [appliedAge, appliedGender, appliedCountry, appliedWitnessBy, selectedPositiveFilter, refreshLeaderboard]);
 
   const handleAgeSearch = useCallback((age, ageType, gender, country, witness) => {
     const ageNum = age ? Number(age) : "";
@@ -810,7 +823,7 @@ const NegativeLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) =
           <div className="flex-1 w-full min-w-0">
             <PlayerSearch
               searchTerm={searchQuery}
-              setSearchTerm={setSearchQuery}
+              setSearchTerm={handleSearchChange}
               onClearFilters={handleClearFilters}
               activeFilters={Boolean(searchQuery) || appliedAge > 0 || Boolean(appliedGender) || Boolean(appliedCountry)}
             />

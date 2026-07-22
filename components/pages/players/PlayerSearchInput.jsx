@@ -21,12 +21,6 @@ const PlayerSearchInput = ({
   const type = searchParams.get("type");
   const demo = searchParams.get("demo");
   
-  // Clean search value (IGNORE ALL SPACES for backend)
-  const cleanSearchValue = useCallback((inputValue) => {
-    if (!inputValue) return "";
-    return inputValue.replace(/\s+/g, "").toLowerCase();
-  }, []);
-
   useEffect(() => {
     const subAdminDetails = JSON.parse(sessionStorage.getItem("subAdmin"))
     setIsSubAdminDetails(subAdminDetails)
@@ -36,9 +30,9 @@ const PlayerSearchInput = ({
     (e) => {
       const rawValue = e.target.value;
       setDisplayValue(rawValue);
-      onChange(cleanSearchValue(rawValue));
+      onChange(rawValue);
     },
-    [cleanSearchValue, onChange]
+    [onChange]
   );
 
   const handleClear = useCallback(() => {
