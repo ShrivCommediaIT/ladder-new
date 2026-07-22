@@ -17,6 +17,7 @@ import { API_ENDPOINTS } from "@/constants/api";
 import { EditPlayer } from "./EditPlayer";
 import AddRemoveBox from "@/components/pages/admin/AddRemoveBox";
 import UploadPlayerLists from "@/components/pages/uploadCsv/UploadPlayerLists";
+import UploadCsvModal from "@/components/shared/UploadCsvModal";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +29,7 @@ import BestOfPlayerListSection from "./bestof/BestOfPlayerListSection";
 import InfoSection from "../../shared/InfoSection";
 import LadderPageLayout from "../../shared/LadderPageLayout";
 import PlayerSearchInput from "./PlayerSearchInput";
-import { ArrowDownUp, Plus, RotateCcw, XCircle } from "lucide-react";
+import { ArrowDownUp, Plus, RotateCcw, XCircle, UploadCloud } from "lucide-react";
 import AgeFilter from "@/components/shared/AgeFilter";
 import MobileQuickActionsAndInvite from "@/components/shared/MobileQuickActionsAndInvite";
 
@@ -298,12 +299,14 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
       : "";
 
   const activityItems = activityState?.data?.data || [];
+
   const quickActions = useMemo(() => {
     const isMiniLeague = ladderType === "minileague";
-    const isSkillBoard = ["skill", "positive", "negative"].includes(ladderType);
     const isRoster = ladderType === "roster";
+    const isBestOrWinlose = ["best5", "best3", "winlose", "bestof5", "bestof3"].includes(ladderType);
+    const hasNoPlayers = (playerList || []).length === 0;
 
-    return [
+    const actions = [
       {
         id: "reset",
         label: isMiniLeague ? "Zero All" : "Reset",
@@ -317,6 +320,18 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
         icon: Plus,
         onClick: () => setAddRemoveOpen(true),
       },
+    ];
+
+    if (isBestOrWinlose && hasNoPlayers) {
+      actions.push({
+        id: "upload-csv",
+        label: "Upload CSV",
+        icon: UploadCloud,
+        onClick: () => setOpenUploadDialog(true),
+      });
+    }
+
+    actions.push(
       {
         id: "age-filter",
         node: (
@@ -343,9 +358,11 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
           refreshLeaderboard(0, "", "", "");
         },
         hidden: !hasFilters,
-      },
-    ];
-  }, [appliedAge, appliedGender, ladderType, ageFilterResetSignal, hasFilters, handleAgeSearch, refreshLeaderboard, dispatch]);
+      }
+    );
+
+    return actions;
+  }, [appliedAge, appliedCountry, appliedGender, appliedAgeType, ladderType, playerList, ageFilterResetSignal, hasFilters, handleAgeSearch, refreshLeaderboard, dispatch]);
 
   return (
     <LadderPageLayout
@@ -448,21 +465,18 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
         </DialogContent>
       </Dialog>
 
-      {/* Upload CSV after reset */}
-      <Dialog open={openUploadDialog} onOpenChange={setOpenUploadDialog}>
-        <DialogContent className="bg-gray-400 rounded-lg border border-[#313546] sm:max-w-xl">
-          <UploadPlayerLists
-            ladderId={ladderId}
-            ladderType={ladderType}
-            onSuccessClose={() => {
-              setOpenUploadDialog(false);
-              refreshLeaderboard();
-              dispatch(fetchGradebars(ladderId));
-              toast.success("Players uploaded successfully!");
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Upload CSV Modal */}
+      <UploadCsvModal
+        open={openUploadDialog}
+        onOpenChange={setOpenUploadDialog}
+        ladderId={ladderId}
+        ladderType={ladderType}
+        onSuccess={() => {
+          refreshLeaderboard();
+          dispatch(fetchGradebars(ladderId));
+          toast.success("Players uploaded successfully!");
+        }}
+      />
     </LadderPageLayout>
   );
 };

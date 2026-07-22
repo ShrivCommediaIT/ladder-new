@@ -34,11 +34,13 @@ const BasicLeaderboardShort = dynamic(() => import("@/components/pages/admin/Bas
   ssr: false,
 });
 
+import UploadCsvModal from "@/components/shared/UploadCsvModal";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Funnel, RotateCw, RefreshCw, XCircle, Plus, Eye, Zap } from "lucide-react";
+import { Funnel, RotateCw, RefreshCw, XCircle, Plus, Eye, Zap, UploadCloud } from "lucide-react";
 
 import { fetchUserActivity, clearActivityState } from "@/redux/slices/activitySlice";
 import { fetchLeaderboard, setAgeFilter } from "@/redux/slices/leaderboardSlice";
@@ -390,6 +392,16 @@ export const PlayerLists = () => {
     onClick: () => setOpenAddPlayerDialog(true),
   });
 
+  // Upload CSV button when there are no players in the ladder
+  if (["best5", "best3", "winlose", "bestof5", "bestof3"].includes(resolvedType) && currentPlayerCount === 0) {
+    quickActions.push({
+      id: "upload-csv",
+      label: "Upload CSV",
+      icon: UploadCloud,
+      onClick: () => setOpenUploadDialog(true),
+    });
+  }
+
   // Sort button
   if (isSkill || isPositive || isNegative) {
     quickActions.push({
@@ -538,20 +550,18 @@ export const PlayerLists = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Upload CSV after reset */}
-      <Dialog open={openUploadDialog} onOpenChange={setOpenUploadDialog}>
-        <DialogContent className="bg-gray-400 rounded-lg border border-[#313546] sm:max-w-xl">
-          <UploadPlayerLists
-            ladderId={ladderId}
-            onSuccessClose={() => {
-              setOpenUploadDialog(false);
-              refreshLeaderboard();
-              dispatch(fetchGradebars(ladderId));
-              toast.success("Players uploaded successfully!");
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Upload CSV Modal */}
+      <UploadCsvModal
+        open={openUploadDialog}
+        onOpenChange={setOpenUploadDialog}
+        ladderId={ladderId}
+        ladderType={resolvedType}
+        onSuccess={() => {
+          refreshLeaderboard();
+          dispatch(fetchGradebars(ladderId));
+          toast.success("Players uploaded successfully!");
+        }}
+      />
 
       {/* Add / Remove Dialog */}
       <Dialog open={openAddPlayerDialog} onOpenChange={setOpenAddPlayerDialog}>
