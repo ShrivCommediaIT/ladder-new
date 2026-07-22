@@ -555,7 +555,13 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     [ladderId, refreshLeaderboard],
   );
 
-  const activityItems = activityState?.data?.data || [];
+  const handleSearchChange = (val) => {
+    setSearchQuery(val);
+    const isFilterActive = hasFilters || localWitnessBy === 1 || selectedSkillFilter > 0;
+    if (isFilterActive) {
+      refreshLeaderboard(selectedSkillFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy, appliedCountry);
+    }
+  };
 
   const handleAgeSearch = (age, ageType, gender, country, witness) => {
     const ageNum = age ? Number(age) : "";
@@ -642,7 +648,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
           <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
           <div className="flex flex-col gap-2">
-            <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+            <PlayerSearchInput value={searchQuery} onChange={handleSearchChange} />
           </div>
           {(loading || isRefreshing) && (
             <p className="text-center text-xs opacity-70 text-[var(--best-board-muted)]">Updating list...</p>

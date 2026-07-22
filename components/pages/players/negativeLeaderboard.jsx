@@ -428,7 +428,8 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       ageType = appliedAgeType,
       gender = appliedGender,
       witness = localWitnessBy,
-      country = appliedCountry
+      country = appliedCountry,
+      searchName = searchQuery
     ) => {
       if (ladderId) {
         const payload = { ladder_id: ladderId, type: "negative" };
@@ -442,14 +443,28 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         }
         if (gender) payload.gender = gender;
         if (country) payload.country = country;
+
+        const isFilterActive = (age && age > 0) || Boolean(gender) || Boolean(country) || witness === 1 || (skillNo && skillNo !== 0);
+        if (isFilterActive && searchName && searchName.trim()) {
+          payload.name = searchName.trim();
+        }
+
         Promise.all([
           dispatch(fetchNegativeLeaderboard(payload)),
           dispatch(fetchUserActivity({ ladder_id: Number(ladderId) })),
         ]);
       }
     },
-    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy]
+    [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy, searchQuery]
   );
+
+  const handleSearchChange = useCallback((val) => {
+    setSearchQuery(val);
+    const isFilterActive = (appliedAge && appliedAge > 0) || Boolean(appliedGender) || Boolean(appliedCountry) || localWitnessBy === 1 || (selectedPositiveFilter && selectedPositiveFilter !== 0);
+    if (isFilterActive) {
+      refreshLeaderboard(selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy, appliedCountry, val);
+    }
+  }, [appliedAge, appliedAgeType, appliedGender, localWitnessBy, appliedCountry, selectedPositiveFilter, refreshLeaderboard]);
 
   const handleAgeSearch = (age, ageType, gender, country, witness) => {
     const ageNum = age ? Number(age) : "";
@@ -668,7 +683,7 @@ const NegativeLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       >
         <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
           <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
-          <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+          <PlayerSearchInput value={searchQuery} onChange={handleSearchChange} />
           {loading && (
             <p className="hidden text-center text-[var(--best-board-muted)]">Loading...</p>
           )}

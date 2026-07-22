@@ -329,8 +329,21 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => 
     }
     if (appliedGender) payload.gender = appliedGender;
 
+    const isFilterActive = appliedAge > 0 || Boolean(appliedGender);
+    if (isFilterActive && searchTerm && searchTerm.trim()) {
+      payload.name = searchTerm.trim();
+    }
+
     dispatch(fetchRosterLeaderboard(payload));
-  }, [ladderId, dispatch, appliedAge, appliedAgeType, appliedGender]);
+  }, [ladderId, dispatch, appliedAge, appliedAgeType, appliedGender, searchTerm]);
+
+  const handleSearchChange = useCallback((val) => {
+    setSearchTerm(val);
+    const isFilterActive = appliedAge > 0 || Boolean(appliedGender);
+    if (isFilterActive) {
+      loadData();
+    }
+  }, [appliedAge, appliedGender, loadData]);
 
   useEffect(() => {
     loadData();
@@ -390,7 +403,7 @@ const RosterLeaderboardUser = ({ ladderId: propLadderId, onActionsChanged }) => 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4 px-4 mb-6">
         <PlayerSearch 
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
+          setSearchTerm={handleSearchChange}
           onAgeSearch={(age, ageType, gender) => {
             const ageNum = age ? Number(age) : "";
             dispatch(setAgeFilter({ age: ageNum, ageType, gender }));
