@@ -125,7 +125,7 @@ export const PlayerLists = () => {
     return (age && age !== "" && age !== 0) || (ageType && ageType !== "under") || (gender && gender !== "") || (country && country !== "");
   };
 
-  const refreshSkillLeaderboard = (skillNo = 0, witness = witnessBy) => {
+  const refreshSkillLeaderboard = (skillNo = 0, witness = witnessBy, searchName = bestSearchValue) => {
     if (!ladderId) return;
     let laddartype, fetchSlice;
     if (typeFromParams === "positive" || ladderTypeFromParams === "positive") { laddartype = "positive"; fetchSlice = fetchPositiveLeaderboard; }
@@ -143,21 +143,37 @@ export const PlayerLists = () => {
     if (witness === 1) {
       payload.witness_by = 1;
     }
+    const isFilterActive = hasFiltersApplied() || witness === 1 || skillNo > 0;
+    if (isFilterActive && searchName && searchName.trim()) {
+      payload.name = searchName.trim();
+    }
     dispatch(fetchSlice(payload));
     if (isMiniLeague) dispatch(fetchLeaderboard({ ...payload, type: "minileague" }));
   };
 
-  const refreshLeaderboard = () => {
+  const refreshLeaderboard = (searchName = bestSearchValue) => {
     if (!ladderId) return;
     if (isSkill || isPositive || isNegative || ["best5", "best3", "winlose"].includes(resolvedType) || isMiniLeague) {
-      refreshSkillLeaderboard();
+      refreshSkillLeaderboard(0, witnessBy, searchName);
     } else {
       const payload = { ladder_id: ladderId, type: resolvedType };
       if (appliedAge > 0) { payload.dob = appliedAge; if (appliedAgeType) payload.age_type = appliedAgeType; }
       if (appliedGender) payload.gender = appliedGender;
       if (appliedCountry) payload.country = appliedCountry;
+      const isFilterActive = hasFiltersApplied();
+      if (isFilterActive && searchName && searchName.trim()) {
+        payload.name = searchName.trim();
+      }
       dispatch(fetchLeaderboard(payload));
-      if (isRoster) dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: appliedAge > 0 ? appliedAge : undefined, age_type: appliedAge > 0 && appliedAgeType ? appliedAgeType : undefined, gender: appliedGender || undefined, country: appliedCountry || undefined }));
+      if (isRoster) dispatch(fetchRosterLeaderboard({ ladder_id: ladderId, dob: appliedAge > 0 ? appliedAge : undefined, age_type: appliedAge > 0 && appliedAgeType ? appliedAgeType : undefined, gender: appliedGender || undefined, country: appliedCountry || undefined, name: isFilterActive && searchName ? searchName.trim() : undefined }));
+    }
+  };
+
+  const handleBestSearchChange = (val) => {
+    setBestSearchValue(val);
+    const isFilterActive = hasFiltersApplied() || witnessBy === 1 || currentSkillNo > 0;
+    if (isFilterActive) {
+      refreshLeaderboard(val);
     }
   };
 
@@ -464,7 +480,7 @@ export const PlayerLists = () => {
 
       {isBestLayout ? (
         <div className="w-full px-1 pb-6 sm:px-6 lg:px-10">
-          <PlayersLists1 searchValue={bestSearchValue} onSearchChange={setBestSearchValue} />
+          <PlayersLists1 searchValue={bestSearchValue} onSearchChange={handleBestSearchChange} />
         </div>
       ) : (
         <>

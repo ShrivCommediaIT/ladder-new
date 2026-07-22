@@ -382,7 +382,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
     setTimeout(() => setShowCelebration(false), 4000 + Math.random() * 1000);
   }, []);
 
-  const refreshLeaderboard = useCallback((skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, witness = localWitnessBy, country = appliedCountry) => {
+  const refreshLeaderboard = useCallback((skillNo = selectedPositiveFilter, age = appliedAge, ageType = appliedAgeType, gender = appliedGender, witness = localWitnessBy, country = appliedCountry, searchName = searchQuery) => {
     if (ladderId) {
       const payload = {
         ladder_id: ladderId,
@@ -406,12 +406,25 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
         payload.country = country;
       }
 
+      const isFilterActive = (age && age > 0) || Boolean(gender) || Boolean(country) || witness === 1 || (skillNo && skillNo !== 0);
+      if (isFilterActive && searchName && searchName.trim()) {
+        payload.name = searchName.trim();
+      }
+
       Promise.all([
         dispatch(fetchPositiveLeaderboard(payload)),
         dispatch(fetchUserActivity({ ladder_id: Number(ladderId) }))
       ]);
     }
-  }, [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy]);
+  }, [dispatch, ladderId, selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy, searchQuery]);
+
+  const handleSearchChange = useCallback((val) => {
+    setSearchQuery(val);
+    const isFilterActive = (appliedAge && appliedAge > 0) || Boolean(appliedGender) || Boolean(appliedCountry) || localWitnessBy === 1 || (selectedPositiveFilter && selectedPositiveFilter !== 0);
+    if (isFilterActive) {
+      refreshLeaderboard(selectedPositiveFilter, appliedAge, appliedAgeType, appliedGender, localWitnessBy, appliedCountry, val);
+    }
+  }, [appliedAge, appliedAgeType, appliedGender, localWitnessBy, appliedCountry, selectedPositiveFilter, refreshLeaderboard]);
 
   const handleAgeSearch = (age, ageType, gender, country, witness) => {
     const ageNum = age ? Number(age) : "";
@@ -536,7 +549,7 @@ const PositiveLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
       >
         <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0`}>
           <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
-          <PlayerSearchInput value={searchQuery} onChange={setSearchQuery} />
+          <PlayerSearchInput value={searchQuery} onChange={handleSearchChange} />
           {loading && <p className="hidden text-center text-white">Loading...</p>}
           <div className="mt-2 space-y-2">
             {filteredPlayers.length === 0 ? (

@@ -110,7 +110,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
   }, [dispatch, ladderId]);
 
   const refreshLeaderboard = useCallback(
-    async (age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry) => {
+    async (age = appliedAge, ageType = appliedAgeType, gender = appliedGender, country = appliedCountry, searchName = effectiveSearch) => {
       if (!ladderId || isRefreshingRef.current) return;
 
       isRefreshingRef.current = true;
@@ -119,6 +119,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
 
       try {
         const payload = { ladder_id: ladderId, type: urlType };
+        const isFilterActive = (age > 0) || Boolean(gender) || Boolean(country);
         if (age > 0) {
           payload.dob = age;
           payload.age_type = ageType;
@@ -128,6 +129,9 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
         }
         if (country) {
           payload.country = country;
+        }
+        if (isFilterActive && searchName && searchName.trim()) {
+          payload.name = searchName.trim();
         }
 
         await Promise.all([
@@ -142,8 +146,16 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
         }, 700);
       }
     },
-    [appliedAge, appliedAgeType, appliedGender, dispatch, ladderId, urlType],
+    [appliedAge, appliedAgeType, appliedGender, appliedCountry, effectiveSearch, dispatch, ladderId, urlType],
   );
+
+  const handleSearchChange = useCallback((val) => {
+    setEffectiveSearch(val);
+    const isFilterActive = (appliedAge && appliedAge > 0) || Boolean(appliedGender) || Boolean(appliedCountry);
+    if (isFilterActive) {
+      refreshLeaderboard(appliedAge, appliedAgeType, appliedGender, appliedCountry, val);
+    }
+  }, [appliedAge, appliedAgeType, appliedGender, appliedCountry, refreshLeaderboard, setEffectiveSearch]);
 
   useEffect(() => {
     if (!ladderId) return;
@@ -418,7 +430,7 @@ const Best5Players = ({ ladderId: propLadderId, searchValue = "", onSearchChange
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <div className={`${mobileSection === "info" ? "hidden" : "block"} min-w-0 space-y-4`}>
         <MobileQuickActionsAndInvite inviteUrl={inviteUrl} quickActions={quickActions} />
-        <PlayerSearchInput value={effectiveSearch} onChange={setEffectiveSearch} />
+        <PlayerSearchInput value={effectiveSearch} onChange={handleSearchChange} />
         <BestOfPlayerListSection
           mobileSection={mobileSection}
           loadingPlayers={loadingPlayers}
