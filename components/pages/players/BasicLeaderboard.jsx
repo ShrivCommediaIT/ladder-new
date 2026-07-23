@@ -384,6 +384,7 @@ const BasicLeaderboard = ({ ladderId: propLadderId, onPlayerAdded }) => {
   );
   const currentUser = useSelector((state) => state.user?.user);
   const activityState = useSelector((state) => state.activity);
+  const activityItems = activityState?.data?.data || [];
 
   // CELEBRATION STATE ONLY
   const [showCelebration, setShowCelebration] = useState(false);

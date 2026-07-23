@@ -190,52 +190,48 @@ export default function BasicLeaderboardActivityEntryCard({
     let targetMet = false;
     let isPrepost = false;
 
-    if (isTargetAdmin && !bypassVerification) {
-      // BasicLeaderboardActivityEntryCard has searchParams and we can get ladder_type from it.
-      const ladderType = searchParams?.get("type") || searchParams?.get("ladder_type");
-      const isNegative = ladderType === "negative";
-      
-      let scoreForCompare = 0;
-      let targetForCompare = 0;
+    const isNegative = resolvedLadderType === "negative";
+    
+    let scoreForCompare = 0;
+    let targetForCompare = 0;
 
-      if (skillTarget && skillTarget !== "No target" && skillTarget !== "null" && skillTarget !== "" && skillTarget !== "0" && skillTarget !== 0) {
-        hasTarget = true;
-        if (isNegative) {
-          scoreForCompare = Number(convertTimeToSeconds(finalScore));
-          targetForCompare = Number(convertTimeToSeconds(skillTarget) || skillTarget);
-        } else {
-          scoreForCompare = Number(finalScore);
-          targetForCompare = Number(skillTarget);
-        }
+    if (skillTarget && skillTarget !== "No target" && skillTarget !== "null" && skillTarget !== "" && skillTarget !== "0" && skillTarget !== 0) {
+      hasTarget = true;
+      if (isNegative) {
+        scoreForCompare = Number(convertTimeToSeconds(finalScore));
+        targetForCompare = Number(convertTimeToSeconds(skillTarget) || skillTarget);
+      } else {
+        scoreForCompare = Number(finalScore);
+        targetForCompare = Number(skillTarget);
       }
+    }
 
-      if (hasTarget && !isNaN(scoreForCompare) && !isNaN(targetForCompare)) {
-        const invertedParam = searchParams?.get("inverted");
-        const isInverted = invertedParam === "1";
-        targetMet = isInverted ? (scoreForCompare <= targetForCompare) : (scoreForCompare >= targetForCompare);
+    if (hasTarget && !isNaN(scoreForCompare) && !isNaN(targetForCompare)) {
+      const invertedParam = searchParams?.get("inverted");
+      const isInverted = isNegative ? (invertedParam !== "0") : (invertedParam === "1");
+      targetMet = isInverted ? (scoreForCompare <= targetForCompare) : (scoreForCompare >= targetForCompare);
+    }
+
+    if (isTargetAdmin && !bypassVerification && targetMet) {
+      const currentWitness = witnessBy ? witnessBy.trim() : "";
+      const isYoutube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(currentWitness);
+
+      setPendingSubmission({
+        finalScore,
+        bestScore,
+        isPrepost: true
+      });
+
+      if (isYoutube) {
+        setIsAlreadyVerified(true);
+        setYoutubeUrl(currentWitness);
+        setOpenYoutubeVerification(true);
+      } else {
+        setIsAlreadyVerified(false);
+        setYoutubeUrl("");
+        setOpenYoutubeVerification(true);
       }
-
-      if (targetMet) {
-        const currentWitness = witnessBy ? witnessBy.trim() : "";
-        const isYoutube = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i.test(currentWitness);
-
-        setPendingSubmission({
-          finalScore,
-          bestScore,
-          isPrepost: true
-        });
-
-        if (isYoutube) {
-          setIsAlreadyVerified(true);
-          setYoutubeUrl(currentWitness);
-          setOpenYoutubeVerification(true);
-        } else {
-          setIsAlreadyVerified(false);
-          setYoutubeUrl("");
-          setOpenYoutubeVerification(true);
-        }
-        return false;
-      }
+      return false;
     }
 
     if (bypassVerification && pendingSubmission?.isPrepost) {

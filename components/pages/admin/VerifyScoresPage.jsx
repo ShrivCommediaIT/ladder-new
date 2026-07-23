@@ -126,21 +126,20 @@ export default function VerifyScoresPage() {
       setLoading(true);
       const res = await getRequest(`${API_ENDPOINTS.GET_PREPOST_RESULTS}?per_page=10&page=${currentPage}`);
       if (res?.status === 200 || res?.status === "success") {
-        const responseData = res?.data;
-        
-        if (responseData && Array.isArray(responseData)) {
-          // Flat array fallback
-          setPendingVerifications(responseData);
-          setTotalPages(1);
-          setTotalCount(responseData.length);
-        } else if (responseData && responseData.data && Array.isArray(responseData.data)) {
-          // Paginated structure
-          setPendingVerifications(responseData.data);
-          setTotalPages(responseData.last_page || 1);
-          setTotalCount(responseData.total || responseData.data.length);
-          if (responseData.data.length === 0 && currentPage > 1) {
+        const items = res?.data || [];
+        const pagination = res?.pagination;
+
+        if (pagination) {
+          setPendingVerifications(items);
+          setTotalPages(pagination.last_page || 1);
+          setTotalCount(pagination.total || res?.total_record || items.length);
+          if (items.length === 0 && currentPage > 1) {
             setCurrentPage((p) => p - 1);
           }
+        } else if (Array.isArray(items)) {
+          setPendingVerifications(items);
+          setTotalPages(1);
+          setTotalCount(res?.total_record || items.length);
         } else {
           setPendingVerifications([]);
           setTotalPages(1);
