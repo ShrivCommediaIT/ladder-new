@@ -79,7 +79,7 @@ const MoveNumberInput = ({
 
   /* -------------------- DATA -------------------- */
   const challengedPlayer =
-    players.find((p) => p.rank === Number(selectedNumber)) || null;
+    players.find((p) => Number(p.rank) === Number(selectedNumber)) || null;
 
   const numberButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
@@ -192,18 +192,22 @@ const MoveNumberInput = ({
 
       let payload;
       const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails"));
+      const isLost = resultType === "lost";
+      const challengedUserId = challengedPlayer?.id || challengedPlayer?.user_id || challengedPlayer?.player_id;
 
       if (ladderType === "best5" || ladderType === "best3") {
         payload = {
           ladder_id,
-          match_status: resultType,
+          match_status: isLost ? "beat" : resultType,
           user_id,
-          move_to_rank: Number(selectedNumber),
-          move_from_rank: currentRank,
+          move_to_rank: isLost ? currentRank : Number(selectedNumber),
+          move_from_rank: isLost ? Number(selectedNumber) : currentRank,
           score,
           admin_id: adminDetails?.id,
-          user_name: selectedPlayer.name,
+          user_name: isLost ? challengedPlayer?.name : selectedPlayer.name,
+          opposit_user_id: isLost ? selectedPlayer.name : challengedPlayer?.name,
           witness_by: selectedPlayer.name,
+          move_from_user_id: isLost ? challengedUserId : currentId,
 
           // ✅ Only send bet for beat/lost
           ...(resultType === "beat" || resultType === "lost"
@@ -233,13 +237,14 @@ const MoveNumberInput = ({
         payload = {
           user_id,
           ladder_id,
-          match_status: resultType,
-          move_from_user_id: currentId,
-          move_to_rank: Number(selectedNumber),
-          move_from_rank: currentRank,
+          match_status: isLost ? "beat" : resultType,
+          move_from_user_id: isLost ? challengedUserId : currentId,
+          move_to_rank: isLost ? currentRank : Number(selectedNumber),
+          move_from_rank: isLost ? Number(selectedNumber) : currentRank,
           score,
           admin_id: adminDetails?.id,
-          user_name: selectedPlayer.name,
+          user_name: isLost ? challengedPlayer?.name : selectedPlayer.name,
+          opposit_user_id: isLost ? selectedPlayer.name : challengedPlayer?.name,
           witness_by: selectedPlayer.name,
 
           // ✅ Only send bet for beat/lost

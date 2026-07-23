@@ -241,22 +241,23 @@ const MovePlayerMinileague = ({
         rawMiniLeague[currentSection]?.section || "unknown";
       const toSectionName = fromSectionName;
 
+      const isLost = resultType === "lost";
+
       const payload = {
         user_id: Number(userId),
         ladder_id: Number(effectiveLadderId),
-        match_status: resultType,
-        move_to_rank: Number(selectedNumber),
-        move_from_rank: moveFromRank,
-        opposit_user_id:challengedPlayer.name,
+        match_status: isLost ? "beat" : resultType,
+        move_to_rank: isLost ? moveFromRank : Number(selectedNumber),
+        move_from_rank: isLost ? Number(selectedNumber) : moveFromRank,
+        user_name: isLost ? challengedPlayer?.name : selectedPlayer?.name,
+        opposit_user_id: isLost ? selectedPlayer?.name : challengedPlayer?.name,
         score: score || "",
         bet: betDescription || "",
-        witness_by: selectedPlayer.name,
+        witness_by: selectedPlayer?.name,
         admin_id: adminDetails.id,
         move_from_section: fromSectionName,
         move_to_section: toSectionName,
       };
-
-      console.log("Payload for moveMiniLeague:", payload);
 
       const moveMiniLeagueRes = await dispatch(moveMiniLeague(payload)).unwrap();
             

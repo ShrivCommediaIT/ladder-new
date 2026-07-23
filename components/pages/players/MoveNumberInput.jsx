@@ -58,7 +58,7 @@ const MoveNumberInput = ({
   const ladderDetails = useSelector((state) => state.player?.players?.[ladder_id]?.ladderDetails) || {};
   const ladderType = ladderDetails?.type;
 
-  const challengedPlayer = players.find((p) => p.rank === Number(selectedNumber)) || null;
+  const challengedPlayer = players.find((p) => Number(p.rank) === Number(selectedNumber)) || null;
 
   const preset = useSelector((state) => state.gradebar?.preset) || 6;
 
@@ -98,19 +98,22 @@ const MoveNumberInput = ({
       setLoading(true);
 
       const adminDetails = JSON.parse(sessionStorage.getItem("adminDetails") || "{}");
+      const isLost = resultType === "lost";
+      const challengedUserId = challengedPlayer?.id || challengedPlayer?.user_id || challengedPlayer?.player_id;
 
       // Common payload parts
       const commonPayload = {
         ladder_id,
-        match_status: resultType,
+        match_status: isLost ? "beat" : resultType,
         user_id,
-        move_to_rank: Number(selectedNumber),
-        move_from_rank: currentRank,
+        move_to_rank: isLost ? currentRank : Number(selectedNumber),
+        move_from_rank: isLost ? Number(selectedNumber) : currentRank,
         score,
         admin_id: adminDetails.id,
-        user_name: selectedPlayer?.name,
-        opposit_user_id:challengedPlayer.name,
+        user_name: isLost ? challengedPlayer?.name : selectedPlayer?.name,
+        opposit_user_id: isLost ? selectedPlayer?.name : challengedPlayer?.name,
         witness_by: "test",
+        move_from_user_id: isLost ? challengedUserId : currentId,
         ...(resultType === "beat" || resultType === "lost"
           ? { bet: betDescription }
           : {}),
@@ -124,12 +127,8 @@ const MoveNumberInput = ({
           response = await dispatch(movePlayer(commonPayload)).unwrap();
         }
       } else {
-        const payload = {
-          ...commonPayload,
-          move_from_user_id: currentId,
-        };
-        console.log("standard ladder move payload", payload);
-        response = await dispatch(movePlayer(payload)).unwrap();
+        console.log("standard ladder move payload", commonPayload);
+        response = await dispatch(movePlayer(commonPayload)).unwrap();
       }
 
       if (response?.success_message === "Success") {

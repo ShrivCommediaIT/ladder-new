@@ -236,16 +236,19 @@ const MoveNumberMinileague = ({
       const fromSectionName = rawMiniLeague[currentSection]?.section || "unknown";
       const toSectionName = fromSectionName;
 
+      const isLost = resultType === "lost";
+
       const payload = {
         user_id: Number(userId),
         ladder_id: Number(effectiveLadderId),
-        match_status: resultType,
-        move_to_rank: Number(selectedNumber),
-        move_from_rank: currentPlayerRank,
-        opposit_user_id:challengedPlayer.name,
+        match_status: isLost ? "beat" : resultType,
+        move_to_rank: isLost ? currentPlayerRank : Number(selectedNumber),
+        move_from_rank: isLost ? Number(selectedNumber) : currentPlayerRank,
+        user_name: isLost ? challengedPlayer?.name : selectedPlayer?.name,
+        opposit_user_id: isLost ? selectedPlayer?.name : challengedPlayer?.name,
         score: score || "",
         bet: betDescription || "",
-        witness_by:selectedPlayer.name,
+        witness_by: selectedPlayer?.name,
         move_from_section: fromSectionName,
         move_to_section: toSectionName,
         challengedPlayer: challengedPlayer ?? null,
