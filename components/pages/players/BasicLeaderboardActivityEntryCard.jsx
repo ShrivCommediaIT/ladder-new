@@ -698,6 +698,9 @@ export default function BasicLeaderboardActivityEntryCard({
                 <p className="text-sm text-foreground leading-relaxed">
                   Congratulations on a great result! To submit your result, please enter a YouTube verification video link of your performance into the "Witnessed By" box. Without a valid YouTube link, your result cannot be posted.
                 </p>
+                <p className="text-sm text-foreground leading-relaxed mt-2">
+                  This is necessary to protect the integrity of performances submitted that are above the SSP Verification Threshold
+                </p>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-muted-foreground uppercase">
                     Witnessed By (YouTube URL)

@@ -8,7 +8,11 @@ export const movePlayer = createAsyncThunk(
   "playerMoving/movePlayer",
   async (payload, { rejectWithValue }) => {
     try {
-      const data = await getRequest(API_ENDPOINTS.RESULT_SAVE, payload);
+      const finalPayload = {
+        ...payload,
+        match_status: payload?.match_status === "lost" ? "beat" : payload?.match_status,
+      };
+      const data = await getRequest(API_ENDPOINTS.RESULT_SAVE, finalPayload);
       if (data.status === 200) {
         return {
           success_message: data.message || "Move Successful",
@@ -46,7 +50,11 @@ export const movePlayerBestOf5 = createAsyncThunk(
   "playerMoving/movePlayerBestOf5",
   async (payload, { rejectWithValue }) => {
     try {
-      const data = await getRequest(API_ENDPOINTS.RESULT_BESTOF5, payload);
+      const finalPayload = {
+        ...payload,
+        match_status: payload?.match_status === "lost" ? "beat" : payload?.match_status,
+      };
+      const data = await getRequest(API_ENDPOINTS.RESULT_BESTOF5, finalPayload);
       if (data.status === 200) {
         return {
           success_message: data.message || "Best of 5 Result Saved",
@@ -72,9 +80,10 @@ export const moveMiniLeague = createAsyncThunk(
       if (!ladder_id || !match_status || !user_id || !move_to_rank) {
         return rejectWithValue("Missing core fields");
       }
+      const finalMatchStatus = match_status === "lost" ? "beat" : match_status;
       const data = await getRequest(API_ENDPOINTS.RESULT_MINILEAGUE, {
         ladder_id: Number(ladder_id),
-        match_status,
+        match_status: finalMatchStatus,
         user_id: Number(user_id),
         move_to_rank: Number(move_to_rank),
         move_from_rank: Number(move_from_rank || 0),
